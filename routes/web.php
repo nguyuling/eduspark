@@ -10,6 +10,40 @@ use App\Http\Controllers\Teacher\QuizManagementController; // Import the specifi
 // --- 1. AUTHENTICATION ROUTES ---
 require __DIR__.'/auth.php'; 
 
+// ===== USER MODULE =====
+// Default page
+Route::get('/', function () {
+    return view('user.login');
+});
+Route::get('/register', fn() => view('user.register'))->name('register');
+Route::post('/register', [UserController::class, 'register'])->name('register.post');
+
+Route::get('/login', fn() => view('user.login'))->name('login');
+Route::post('/login', [UserController::class, 'login'])->name('login.post');
+
+// Profile
+Route::get('/profile', [UserController::class, 'profile'])
+    ->name('profile.show')
+    ->middleware('auth');
+
+Route::get('/profile/edit', [UserController::class, 'editProfile'])
+    ->name('profile.edit')
+    ->middleware('auth');
+
+Route::post('/profile/update', [UserController::class, 'updateProfile'])
+    ->name('profile.update')
+    ->middleware('auth');
+
+// Password
+Route::get('/profile/password/edit', [UserController::class, 'editPassword'])
+    ->name('profile.password.edit') 
+    ->middleware('auth');
+
+Route::post('/profile/password/update', [UserController::class, 'updatePassword'])
+    ->name('profile.password.update')
+    ->middleware('auth');
+
+// ===== QUIZ MODULE =====
 // --- 2. CENTRAL DASHBOARD ROUTE ---
 Route::middleware(['auth'])->get('/home', [DashboardController::class, 'index'])->name('home');
 
