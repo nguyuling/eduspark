@@ -12,7 +12,7 @@ class UserController extends Controller
     // 🔹 UPDATED: Register — now with phone, district, school_code & auto user_id
     public function register(Request $request)
     {
-        // ✅ Enhanced validation (inline — no extra Request class needed)
+        // Enhanced validation (inline — no extra Request class needed)
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
@@ -27,7 +27,7 @@ class UserController extends Controller
             'phone' => 'nullable|string|max:15|regex:/^[\+]?[0-9\s\-\(\)]{7,}$/',
         ]);
 
-        // ✅ Auto-generate user_id (same logic as model boot, but safe here too)
+        // Auto-generate user_id (same logic as model boot, but safe here too)
         $prefix = $validated['role'] === 'teacher' ? 'G' : 'P';
         $base = "{$prefix}-{$validated['school_code']}-";
         $suffix = Str::lower(Str::random(3, '0123456789abcdef'));
@@ -41,7 +41,7 @@ class UserController extends Controller
             $attempts++;
         }
 
-        // ✅ Create user
+        // Create user
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -50,14 +50,14 @@ class UserController extends Controller
             'district' => $validated['district'],
             'school_code' => $validated['school_code'],
             'phone' => $validated['phone'] ?? null,
-            'user_id' => $user_id, // ✅ now explicitly set
+            'user_id' => $user_id,
         ]);
 
         return redirect('/register')
             ->with('success', "Account succesfully created! You can now log in.");
     }
 
-    // 🔹 Login (unchanged — keeps your JSON API behavior)
+    // Login (unchanged — keeps your JSON API behavior)
     public function login(Request $request)
     {
         $request->validate([
@@ -75,27 +75,28 @@ class UserController extends Controller
 
         auth()->login($user);
 
+        // Use the 'home' route instead of hardcoding '/profile'
         return response()->json([
             'success' => true,
-            'redirect' => url('/profile')
+            'redirect' => route('home') 
         ]);
     }
 
-    // 🔹 Show main profile page
+    // Show main profile page
     public function profile()
     {
         $user = auth()->user();
         return view('user.profile.show', compact('user'));
     }
 
-    // 🔹 Edit main profile (name/email)
+    // Edit main profile (name/email)
     public function editProfile()
     {
         $user = auth()->user();
         return view('user.profile.edit', compact('user'));
     }
 
-    // 🔹 Update name/email
+    // Update name/email
     public function updateProfile(Request $request)
     {
         $user = auth()->user();
@@ -117,13 +118,13 @@ class UserController extends Controller
         return back()->with('success', 'Profile information updated successfully.');
     }
 
-    // 🔹 Show password change form
+    // Show password change form
     public function editPassword()
     {
         return view('user.profile.edit-password');
     }
 
-    // 🔹 Update password securely
+    // Update password securely
     public function updatePassword(Request $request)
     {
         $request->validate([
@@ -142,7 +143,7 @@ class UserController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        // ✅ SAFE & EXPLICIT REDIRECT
+        // SAFE & EXPLICIT REDIRECT
         return redirect()->route('profile.show')
             ->with('success', 'Your password has been updated successfully.');
     }

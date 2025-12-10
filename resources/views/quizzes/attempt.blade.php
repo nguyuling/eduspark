@@ -28,7 +28,6 @@
                     </p>
                     <hr>
 
-                    {{-- 🚨 CRITICAL FIX: The main form wrapper is REMOVED. Inputs stand alone. --}}
                     <div id="quiz-questions-wrapper">
                         
                         {{-- Laravel CSRF token is necessary for submission --}}
@@ -99,7 +98,7 @@
                         
                         {{-- QUIT QUIZ FORM (DELETE) - This must stay as a standard form --}}
                         <div class="order-1">
-                            <form action="{{ route('student.quizzes.quit', $attempt->id) }}" method="POST">
+                            <form action="{{ route('student.quizzes.attempt.quit', $attempt->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-lg btn-danger" 
@@ -109,7 +108,7 @@
                             </form>
                         </div>
                         
-                        {{-- 🚨 SUBMIT QUIZ BUTTON - Now calls the explicit JavaScript function --}}
+                        {{-- SUBMIT QUIZ BUTTON - Now calls the explicit JavaScript function --}}
                         <div class="order-2">
                             <button type="button" class="btn btn-lg btn-success" onclick="submitQuizData()">
                                 Submit Quiz

@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    /**
-     * Redirects users to the appropriate dashboard based on their role.
-     */
     public function index()
     {
-        if (Auth::user()->role === 'teacher') {
-            // Redirect teacher to their quiz management index
-            return redirect()->route('teacher.quizzes.index');
-        }
-        
-        // Redirect student to the available quizzes index
-        return redirect()->route('student.quizzes.index');
+        $user = Auth::user();
+
+        if ($user->role === 'teacher') {
+            // This is the view for the Teacher dashboard
+            return view('dashboard.teacher_home', [
+                'user' => $user
+            ]);
+        } 
+
+        return view('home', [
+            'user' => $user
+        ]);
     }
 }

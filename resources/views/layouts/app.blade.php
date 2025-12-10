@@ -10,105 +10,119 @@
 
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+    
+    {{-- ADDED: Bootstrap Icons CDN for better module icons in the sidebar --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+@vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    
+    {{-- ADDED: ESSENTIAL STYLES FOR SIDEBAR LAYOUT --}}
+    <style>
+        .sidebar-container {
+            width: 250px; /* Fixed width for the sidebar */
+            z-index: 1000;
+        }
+        .content-offset {
+            margin-left: 250px; /* Push main content past the fixed sidebar */
+            width: calc(100% - 250px);
+            min-height: 100vh; /* Ensure main content is full height */
+        }
+        .sidebar-link {
+            padding: 10px 15px;
+            display: block;
+            color: #333; /* Default text color */
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        .sidebar-link:hover {
+            background-color: #f8f9fa; /* Light hover background */
+            color: #007bff; /* Primary color on hover */
+        }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
+    <div id="app" style="display: flex;">
+        
+        {{-- START: VERTICAL SIDEBAR (250px wide) --}}
+        <div class="sidebar-container bg-white shadow-sm border-end vh-100 position-fixed">
+            <div class="p-3">
+                
+                {{-- App Logo/Brand (using original navbar-brand style) --}}
+                <a class="navbar-brand d-block mb-4 text-center text-primary fw-bold" href="{{ url('/') }}" style="font-size: 1.5rem;">
                     {{ config('app.name', 'Laravel') }}
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    
-                    {{-- START: LEFT SIDE - MODULE NAVIGATION --}}
-                    <ul class="navbar-nav me-auto">
-                        @auth
-                            {{-- LESSONS & FORUM (Accessible to all authenticated users) --}}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('lessons.index') }}">Lessons</a>
+                <hr class="mb-4">
+                
+                {{-- MODULE NAVIGATION LIST --}}
+                <ul class="nav flex-column">
+                    @auth
+                        
+                        {{-- 1. CORE MODULES --}}
+                        <li class="nav-item mb-1">
+                            <a class="sidebar-link" href="{{ route('lessons.index') }}"><i class="bi bi-book me-2"></i> Lessons</a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="sidebar-link" href="{{ route('forum.index') }}"><i class="bi bi-chat-dots me-2"></i> Forum</a>
+                        </li>
+
+                        {{-- 2. ROLE-SPECIFIC MODULES --}}
+                        @if (Auth::user()->role === 'teacher')
+                            <li class="nav-item mb-1">
+                                <a class="sidebar-link" href="{{ route('teacher.quizzes.index') }}"><i class="bi bi-patch-question me-2"></i> Quiz</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('forum.index') }}">Forum</a>
+                            <li class="nav-item mb-1">
+                                <a class="sidebar-link" href="{{ route('performance.teacher_view') }}"><i class="bi bi-bar-chart me-2"></i> Performance</a>
                             </li>
-                            
-                            {{-- ROLE-SPECIFIC MODULES --}}
-                            @if (Auth::user()->role === 'teacher')
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('teacher.quizzes.index') }}">Quiz</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('performance.teacher_view') }}">Performance</a>
-                                </li>
-                            @else {{-- Assumes student role --}}
-                                <li class="nav-item">
-                                    {{-- Note: Student Quiz index route name is student.quizzes.index from web.php --}}
-                                    <a class="nav-link" href="{{ route('student.quizzes.index') }}">Quiz</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('games.index') }}">Game</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('performance.student_view') }}">Performance</a>
-                                </li>
-                            @endif
-                        @endauth
-                    </ul>
-                    {{-- END: LEFT SIDE - MODULE NAVIGATION --}}
-                    
-
-                    {{-- START: RIGHT SIDE - AUTHENTICATION LINKS (Login/Logout/Register) --}}
-                    <ul class="navbar-nav ms-auto">
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                            @endif
-
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
-                                </a>
-
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    {{-- You could add a Profile link here if needed --}}
-                                    {{-- <a class="dropdown-item" href="{{ route('profile.show') }}">Profile</a> --}}
-                                    
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
+                        @else {{-- Assumes student role --}}
+                            <li class="nav-item mb-1">
+                                <a class="sidebar-link" href="{{ route('student.quizzes.index') }}"><i class="bi bi-patch-question me-2"></i>Quiz</a>
                             </li>
-                        @endguest
-                    </ul>
-                    {{-- END: RIGHT SIDE - AUTHENTICATION LINKS --}}
+                            <li class="nav-item mb-1">
+                                <a class="sidebar-link" href="{{ route('games.index') }}"><i class="bi bi-joystick me-2"></i> Game</a>
+                            </li>
+                            <li class="nav-item mb-1">
+                                <a class="sidebar-link" href="{{ route('performance.student_view') }}"><i class="bi bi-graph-up me-2"></i> Performance</a>
+                            </li>
+                        @endif
+                        
+                        <hr class="my-3">
+                        
+                        {{-- 3. USER/AUTHENTICATION LINKS --}}
+                        <li class="nav-item mb-1">
+                            <a class="sidebar-link" href="{{ route('profile.show') }}"><i class="bi bi-person-circle me-2"></i> {{ Auth::user()->name }}</a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="sidebar-link text-danger" href="{{ route('logout') }}"
+                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <i class="bi bi-box-arrow-right me-2"></i> {{ __('Logout') }}
+                            </a>
+                        </li>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
 
-                </div>
+                    @else
+                        {{-- Display Login/Register if not authenticated --}}
+                        <li class="nav-item">
+                            <a class="sidebar-link" href="{{ route('login') }}"><i class="bi bi-box-arrow-in-right me-2"></i> {{ __('Login') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="sidebar-link" href="{{ route('register') }}"><i class="bi bi-person-add me-2"></i> {{ __('Register') }}</a>
+                        </li>
+                    @endauth
+                </ul>
             </div>
-        </nav>
-        
-        <main class="py-4">
+        </div>
+        {{-- END: VERTICAL SIDEBAR --}}
+
+
+        {{-- START: MAIN CONTENT AREA (Pushed to the right) --}}
+        <main class="py-4 content-offset"> 
             @yield('content')
         </main>
-        
+        {{-- END: MAIN CONTENT AREA --}}
+
     </div>
 </body>
 </html>

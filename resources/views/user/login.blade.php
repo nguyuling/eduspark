@@ -234,10 +234,10 @@
             body: JSON.stringify({ email, password })
           });
 
-          const data = await response.json();
+        const data = await response.json();
 
           if (data.success) {
-            window.location.href = data.redirect || '{{ url("/profile") }}';
+            window.location.href = data.redirect || '{{ route("home") }}'; 
           } else {
             errorMessageEl.textContent = data.message || 'Login failed. Please check your credentials.';
             document.getElementById('password').value = '';

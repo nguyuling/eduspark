@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Auth; // <-- Added Auth facade
+use App\Providers\RouteServiceProvider; // Assuming you have this defined
 
 class LoginController extends Controller
 {
@@ -22,10 +25,37 @@ class LoginController extends Controller
 
     /**
      * Where to redirect users after login.
+     * * NOTE: This property is maintained by the AuthenticatesUsers trait, but the 
+     * redirectTo() method below overrides it for dynamic redirection.
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = RouteServiceProvider::HOME; 
+    
+    /**
+     * Get the post login redirect path based on the user's role.
+     * This method overrides the default behavior of the AuthenticatesUsers trait.
+     *
+     * @return string
+     */
+    protected function redirectTo()
+    {
+        $user = Auth::user();
+        
+        // Check the user's role (assuming 'role' column exists in your User model)
+        if ($user->role === 'teacher') {
+            // Redirect teachers to the teacher dashboard route
+            return route('teacher.quizzes.index');
+        } 
+        
+        if ($user->role === 'student') {
+            // Redirect students to the student dashboard route
+            return route('student.quizzes.index');
+        }
+
+        // Fallback to the generic home route
+        return $this->redirectTo; 
+    }
 
     /**
      * Create a new controller instance.
