@@ -10,7 +10,7 @@
 <div class="container">
 <div class="row justify-content-center">
 <div class="col-md-12">
-
+<h1 class="mb-4 fw-bold text-primary">Quiz</h1>
 {{-- FILTERING CARD (Search form) --}}
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-light">

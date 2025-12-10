@@ -108,8 +108,14 @@
       margin-top: 10px;
       transition: 0.2s;
     }
+    
+    .btn-register:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
 
-    .btn-register:hover {
+    .btn-register:hover:not(:disabled) {
       opacity: 0.9;
       transform: translateY(-2px);
     }
@@ -171,7 +177,7 @@
         </div>
     @endif
 
-    <form action="{{ url('/register') }}" method="POST">
+    <form action="{{ route('register.post') }}" method="POST" id="registration-form">
         @csrf
 
         <div class="form-group">
@@ -207,7 +213,7 @@
         <!-- District -->
         <div class="form-group conditional-section" id="district-section">
             <label for="district">District</label>
-            <select id="district" name="district">
+            <select id="district" name="district" required>
                 <option value="">-- Select District --</option>
                 <option value="Pengerang" {{ old('district')=='Pengerang' ? 'selected' : '' }}>Pengerang</option>
                 <option value="Johor Bahru" {{ old('district')=='Johor Bahru' ? 'selected' : '' }}>Johor Bahru</option>
@@ -224,11 +230,10 @@
         <!-- School -->
         <div class="form-group conditional-section" id="school-section">
             <label for="school_code">School</label>
-            <select id="school_code" name="school_code">
+            <select id="school_code" name="school_code" required>
                 <option value="">-- Select School --</option>
                 <!-- Options populated by JS -->
             </select>
-            <!-- <input type="hidden" id="school-code-hidden" name="school_code"> -->
         </div>
 
         <!-- Phone (optional) -->
@@ -280,6 +285,10 @@
     };
 
     // DOM Elements
+    const form = document.getElementById('registration-form');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
     const roleSelect = document.getElementById('role');
     const stateSection = document.getElementById('state-section');
     const districtSection = document.getElementById('district-section');
@@ -289,7 +298,29 @@
     const schoolSelect = document.getElementById('school_code');
     const submitBtn = document.getElementById('submit-btn');
 
-    // Show sections progressively
+    // --- Core Logic ---
+
+    // 1. Function to check if all required fields are filled
+    function checkFormValidity() {
+        const requiredFields = [nameInput, emailInput, passwordInput, roleSelect, districtSelect, schoolSelect];
+        
+        // Check if all required fields have a non-empty value
+        const allRequiredFilled = requiredFields.every(field => field.value.trim() !== '');
+
+        // Also check if the role, district, and school sections are visible (implies the flow has reached this point)
+        const conditionalFieldsVisible = roleSelect.value !== '' && districtSelect.value !== '' && schoolSelect.value !== '';
+        
+        // Enable button only if all required fields are filled AND conditional fields are selected
+        submitBtn.disabled = !(allRequiredFilled && conditionalFieldsVisible);
+    }
+
+    // 2. Attach checkFormValidity to all required input fields
+    [nameInput, emailInput, passwordInput, roleSelect, districtSelect, schoolSelect].forEach(field => {
+        field.addEventListener('input', checkFormValidity);
+        field.addEventListener('change', checkFormValidity);
+    });
+
+    // 3. Show sections progressively (and call checkFormValidity after changes)
     roleSelect.addEventListener('change', function() {
       if (this.value) {
         stateSection.style.display = 'block';
@@ -298,14 +329,13 @@
         phoneSection.style.display = 'none';
         districtSelect.value = '';
         schoolSelect.innerHTML = '<option value="">-- Select District First --</option>';
-        submitBtn.disabled = true;
       } else {
         stateSection.style.display = 'none';
         districtSection.style.display = 'none';
         schoolSection.style.display = 'none';
         phoneSection.style.display = 'none';
-        submitBtn.disabled = true;
       }
+      checkFormValidity();
     });
 
     districtSelect.addEventListener('change', function() {
@@ -317,29 +347,26 @@
           const opt = document.createElement('option');
           opt.value = school.code;
           opt.textContent = school.name;
+          // Retain old value if applicable (for Laravel validation errors)
           if (school.code === "{{ old('school_code') }}") opt.selected = true;
           schoolSelect.appendChild(opt);
         });
         schoolSection.style.display = 'block';
+        phoneSection.style.display = 'block'; // Show phone after district is selected, school select is visible
       } else {
         schoolSection.style.display = 'none';
         phoneSection.style.display = 'none';
-        submitBtn.disabled = true;
-        return;
       }
+      checkFormValidity();
     });
 
     schoolSelect.addEventListener('change', function() {
-      if (this.value) {
-        phoneSection.style.display = 'block';
-        submitBtn.disabled = false;
-      } else {
-        phoneSection.style.display = 'none';
-        submitBtn.disabled = true;
-      }
+        // phoneSection is already visible after district selection, but we check validity.
+        checkFormValidity();
     });
 
-    // Re-apply old selections on page load (for validation errors)
+
+    // 4. Re-apply old selections on page load (for validation errors)
     document.addEventListener('DOMContentLoaded', function() {
       const oldRole = "{{ old('role') }}";
       const oldDistrict = "{{ old('district') }}";
@@ -353,13 +380,16 @@
 
       if (oldDistrict && schoolsByDistrict[oldDistrict]) {
         districtSelect.value = oldDistrict;
-        // Trigger district change manually
+        // Trigger district change manually to populate schools
         const event = new Event('change');
         districtSelect.dispatchEvent(event);
+        
         // Then select school if exists
         if (oldSchool) {
+          // Use setTimeout to ensure the options are fully rendered before selecting
           setTimeout(() => {
             schoolSelect.value = oldSchool;
+            // Trigger change on school select too
             schoolSelect.dispatchEvent(new Event('change'));
           }, 50);
         }
@@ -367,6 +397,9 @@
         districtSelect.value = oldDistrict;
         schoolSection.style.display = 'none';
       }
+      
+      // Final check on load to ensure button state is correct if all fields were submitted successfully
+      checkFormValidity();
     });
   </script>
 </body>

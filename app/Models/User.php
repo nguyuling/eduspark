@@ -2,31 +2,40 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+// Make sure you import HasFactory
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * We must add all the new registration fields here so they can be written to the database.
+     *
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
+        // --- NEW FIELDS ---
+        'role',
+        'district',
+        'school_code',
+        'phone',
+        'user_id', // CRITICAL: Must be fillable for the controller to set it
+        // --- END NEW FIELDS ---
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -34,15 +43,30 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        // Ensure 'role' is cast correctly if you use it in other logic
+        'role' => 'string', 
+    ];
+    
+    // --- Relationships ---
+    
+    // Relationship for Quizzes created by this User (Teacher)
+    public function createdQuizzes()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        // Quizzes have a 'teacher_id' column that refers to the User's 'id'
+        return $this->hasMany(Quiz::class, 'teacher_id');
+    }
+
+    // Relationship for Quiz Attempts by this User (Student)
+    public function quizAttempts()
+    {
+        // QuizAttempts have a 'student_id' column that refers to the User's 'id'
+        return $this->hasMany(QuizAttempt::class, 'student_id');
     }
 }
