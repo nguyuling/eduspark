@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\GameProgressController;
 
 // Game Update Routes (Teacher specific)
 Route::prefix('teacher')->middleware('auth:sanctum')->group(function () {
@@ -24,9 +25,17 @@ Route::prefix('teacher')->middleware('auth:sanctum')->group(function () {
     });
 });
 
-// Public game routes (for students to see updated games)
 Route::prefix('games')->group(function () {
+    // Public game routes
     Route::get('/', [GameController::class, 'index']);
     Route::get('/{id}', [GameController::class, 'show']);
     Route::get('/{id}/version', [GameController::class, 'getUpdateHistory']);
+    Route::post('/save-score', [GameController::class, 'saveScore']);
+    
+    // Game Progress Routes
+    Route::get('/{game}/start', [GameProgressController::class, 'startGame']);
+    Route::post('/{game}/save-progress', [GameProgressController::class, 'saveProgress']);
+    Route::get('/{game}/progress', [GameProgressController::class, 'getProgress']);
+    Route::get('/progress/all', [GameProgressController::class, 'getAllProgress']);
+    Route::post('/rewards/{reward}/claim', [GameProgressController::class, 'claimReward']);
 });

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Models\GameScore; 
 
 class GameController extends Controller
 {
@@ -266,5 +267,34 @@ class GameController extends Controller
             \Log::error("Failed to notify students about game update: " . $e->getMessage());
             return false;
         }
+    }
+
+    public function saveScore(Request $request)
+    {
+        // Validate incoming data
+        $validated = $request->validate([
+            'user_id' => 'required',
+            'game_id' => 'required|integer',
+            'score' => 'required|integer',
+            'time_taken' => 'integer|nullable',
+            'game_stats' => 'nullable'
+        ]);
+        
+        // Create the score record
+        $gameScore = GameScore::create([
+            'user_id' => $validated['user_id'],
+            'game_id' => $validated['game_id'],
+            'score' => $validated['score'],
+            'time_taken' => $validated['time_taken'] ?? 0,
+            'game_stats' => is_array($validated['game_stats'] ?? []) 
+                ? json_encode($validated['game_stats']) 
+                : ($validated['game_stats'] ?? '{}')
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Score saved successfully',
+            'score_id' => $gameScore->id
+        ]);
     }
 }

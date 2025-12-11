@@ -1,92 +1,89 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { progressService } from '../../services/progressService';
+import GameSummary from './GameSummary';
+import RewardsDisplay from './RewardsDisplay';
+import './WhackAMole.css';
 
 const WhackAMole = () => {
-  const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
-  const [moles, setMoles] = useState(Array(9).fill(false));
-  const [gameOver, setGameOver] = useState(false);
-  const [currentMoles, setCurrentMoles] = useState([]); // Now support multiple moles
-  const [gameSpeed, setGameSpeed] = useState(1200); // Starting speed in ms
-  const [moleState, setMoleState] = useState({}); // Track state for each mole
-  const [combo, setCombo] = useState(0);
-  const [maxCombo, setMaxCombo] = useState(0);
-  const [powerUp, setPowerUp] = useState(null); // Power-up types
-  const [powerUpActive, setPowerUpActive] = useState(false);
-  const [powerUpTimer, setPowerUpTimer] = useState(0);
-  const [multiplier, setMultiplier] = useState(1); // Score multiplier
-  const [bonusTime, setBonusTime] = useState(0); // Bonus time added
-  const [showHammer, setShowHammer] = useState(false);
-  const [hammerPosition, setHammerPosition] = useState({ x: 0, y: 0 });
-  const [highScore, setHighScore] = useState(() => {
-    return parseInt(localStorage.getItem('whackHighScore') || '0');
+  const [markah, setMarkah] = useState(0);
+  const [masaTinggal, setMasaTinggal] = useState(30);
+  const [lubang, setLubang] = useState(Array(9).fill(false));
+  const [permainanTamcat, setPermainanTamcat] = useState(false);
+  const [tikusMuncul, setTikusMuncul] = useState([]);
+  const [kelajuan, setKelajuan] = useState(1200);
+  const [keadaanTikus, setKeadaanTikus] = useState({});
+  const [kombo, setKombo] = useState(0);
+  const [komboTertinggi, setKomboTertinggi] = useState(0);
+  const [kuasa, setKuasa] = useState(null);
+  const [kuasaAktif, setKuasaAktif] = useState(false);
+  const [pengiraMasaKuasa, setPengiraMasaKuasa] = useState(0);
+  const [pendarab, setPendarab] = useState(1);
+  const [masaTambahan, setMasaTambahan] = useState(0);
+  const [tunjukTukul, setTunjukTukul] = useState(false);
+  const [posisiTukul, setPosisiTukul] = useState({ x: 0, y: 0 });
+  const [markahTertinggi, setMarkahTertinggi] = useState(() => {
+    return parseInt(localStorage.getItem('markahTertinggiTukul') || '0');
   });
-  const [gameStarted, setGameStarted] = useState(false);
+  const [permainanDimulakan, setPermainanDimulakan] = useState(false);
+  const [kemajuanPermainan, setKemajuanPermainan] = useState(null);
+  const [ganjaranDibuka, setGanjaranDibuka] = useState([]);
+  const [tunjukRingkasan, setTunjukRingkasan] = useState(false);
   
-  const boardRef = useRef(null);
+  const papanRef = useRef(null);
 
-  // Select random mole holes to show moles
-  const showRandomMoles = useCallback(() => {
-    if (gameOver) return;
+  const munculkanTikusRawak = useCallback(() => {
+    if (permainanTamcat) return;
     
-    // Clear current moles
-    setCurrentMoles(prev => []);
-    setMoleState({});
+    setTikusMuncul([]);
+    setKeadaanTikus({});
     
-    // Determine how many moles to show based on difficulty
-    const moleCount = Math.min(2 + Math.floor(score / 15), 4); // Increase mole count as score increases
-    const holes = [];
+    const bilanganTikus = Math.min(2 + Math.floor(markah / 15), 4);
+    const lubangTerpilih = [];
     
-    // Select random holes
-    while (holes.length < moleCount) {
-      const hole = Math.floor(Math.random() * 9);
-      if (!holes.includes(hole)) {
-        holes.push(hole);
+    while (lubangTerpilih.length < bilanganTikus) {
+      const lubang = Math.floor(Math.random() * 9);
+      if (!lubangTerpilih.includes(lubang)) {
+        lubangTerpilih.push(lubang);
       }
     }
     
-    // Set the new moles
-    setCurrentMoles(holes);
+    setTikusMuncul(lubangTerpilih);
     
-    // Set mole states
-    const newState = {};
-    holes.forEach(hole => {
-      newState[hole] = 'popping';
+    const keadaanBaru = {};
+    lubangTerpilih.forEach(lubang => {
+      keadaanBaru[lubang] = 'muncul';
     });
-    setMoleState(newState);
+    setKeadaanTikus(keadaanBaru);
     
-    // Hide moles after a short time
-    const hideTimeout = setTimeout(() => {
-      setCurrentMoles([]);
-      setMoleState({});
-      setCombo(0);
-    }, gameSpeed * 0.7);
+    const timeoutSembunyi = setTimeout(() => {
+      setTikusMuncul([]);
+      setKeadaanTikus({});
+      setKombo(0);
+    }, kelajuan * 0.7);
     
-    return () => clearTimeout(hideTimeout);
-  }, [gameOver, gameSpeed, score]);
+    return () => clearTimeout(timeoutSembunyi);
+  }, [permainanTamcat, kelajuan, markah]);
 
-  // Game loop - show moles at intervals
   useEffect(() => {
-    if (gameOver || !gameStarted) return;
+    if (permainanTamcat || !permainanDimulakan) return;
     
-    const moleInterval = setInterval(() => {
-      showRandomMoles();
-    }, gameSpeed);
+    const intervalTikus = setInterval(() => {
+      munculkanTikusRawak();
+    }, kelajuan);
     
-    return () => clearInterval(moleInterval);
-  }, [showRandomMoles, gameOver, gameSpeed, gameStarted]);
+    return () => clearInterval(intervalTikus);
+  }, [munculkanTikusRawak, permainanTamcat, kelajuan, permainanDimulakan]);
 
-  // Timer countdown
   useEffect(() => {
-    if (gameOver || timeLeft <= 0 || !gameStarted) return;
+    if (permainanTamcat || masaTinggal <= 0 || !permainanDimulakan) return;
     
-    const timer = setTimeout(() => {
-      setTimeLeft(prev => {
+    const pengira = setTimeout(() => {
+      setMasaTinggal(prev => {
         if (prev <= 1) {
-          setGameOver(true);
-          // Update high score if needed
-          if (score > highScore) {
-            setHighScore(score);
-            localStorage.setItem('whackHighScore', score.toString());
+          setPermainanTamcat(true);
+          if (markah > markahTertinggi) {
+            setMarkahTertinggi(markah);
+            localStorage.setItem('markahTertinggiTukul', markah.toString());
           }
           return 0;
         }
@@ -94,162 +91,190 @@ const WhackAMole = () => {
       });
     }, 1000);
     
-    return () => clearTimeout(timer);
-  }, [timeLeft, gameOver, bonusTime, score, highScore, gameStarted]);
+    return () => clearTimeout(pengira);
+  }, [masaTinggal, permainanTamcat, markah, markahTertinggi, permainanDimulakan]);
 
-  // Power-up generation
   useEffect(() => {
-    if (gameOver || powerUpActive || !gameStarted) return;
+    if (permainanTamcat || kuasaAktif || !permainanDimulakan) return;
     
-    const powerUpInterval = setInterval(() => {
-      if (Math.random() > 0.85) { // 15% chance to generate power-up
-        const types = ['time', 'points', 'combo'];
-        const randomType = types[Math.floor(Math.random() * types.length)];
-        setPowerUp(randomType);
+    const intervalKuasa = setInterval(() => {
+      if (Math.random() > 0.85) {
+        const jenisKuasa = ['masa', 'mata', 'kombo'];
+        const kuasaRawak = jenisKuasa[Math.floor(Math.random() * jenisKuasa.length)];
+        setKuasa(kuasaRawak);
         
-        // Hide power-up after 5 seconds
         setTimeout(() => {
-          setPowerUp(null);
+          setKuasa(null);
         }, 5000);
       }
-    }, 10000); // Check every 10 seconds
+    }, 10000);
     
-    return () => clearInterval(powerUpInterval);
-  }, [gameOver, powerUpActive, gameStarted]);
+    return () => clearInterval(intervalKuasa);
+  }, [permainanTamcat, kuasaAktif, permainanDimulakan]);
 
-  // Power-up timer countdown
   useEffect(() => {
-    if (powerUpActive && powerUpTimer > 0) {
-      const timer = setTimeout(() => {
-        setPowerUpTimer(prev => prev - 1);
+    if (kuasaAktif && pengiraMasaKuasa > 0) {
+      const pengira = setTimeout(() => {
+        setPengiraMasaKuasa(prev => prev - 1);
       }, 1000);
       
-      return () => clearTimeout(timer);
-    } else if (powerUpActive && powerUpTimer <= 0) {
-      // Deactivate power-up
-      setPowerUpActive(false);
-      setMultiplier(1);
+      return () => clearTimeout(pengira);
+    } else if (kuasaAktif && pengiraMasaKuasa <= 0) {
+      setKuasaAktif(false);
+      setPendarab(1);
     }
-  }, [powerUpActive, powerUpTimer]);
+  }, [kuasaAktif, pengiraMasaKuasa]);
 
-  // Increase difficulty as score increases
   useEffect(() => {
-    if (score > 0 && score % 10 === 0) {
-      // Decrease game speed (make it faster) but not below 400ms
-      setGameSpeed(prev => Math.max(400, prev - 50));
+    if (markah > 0 && markah % 10 === 0) {
+      setKelajuan(prev => Math.max(400, prev - 50));
     }
-  }, [score]);
+  }, [markah]);
 
-  // Handle whacking a mole
-  const whackMole = (index) => {
-    if (gameOver || !currentMoles.includes(index)) return;
+  useEffect(() => {
+    if (permainanDimulakan) {
+      mulakanPenjejakanPermainan(2);
+    }
+  }, [permainanDimulakan]);
+
+  const mulakanPenjejakanPermainan = async (idPermainan) => {
+    try {
+      const response = await progressService.startGame(idPermainan);
+      setKemajuanPermainan(response.data.progress);
+    } catch (error) {
+      console.error('Gagal memulakan penjejakan permainan:', error);
+    }
+  };
+
+  const ketukTikus = (indeks) => {
+    if (permainanTamcat || !tikusMuncul.includes(indeks)) return;
     
-    // Calculate points
-    let points = 10 * multiplier;
-    if (powerUpActive && multiplier > 1) {
-      points *= 1.5; // Bonus for active power-up
+    let mata = 10 * pendarab;
+    if (kuasaAktif && pendarab > 1) {
+      mata *= 1.5;
     }
     
-    // Update score
-    setScore(prev => prev + points);
+    setMarkah(prev => prev + mata);
     
-    // Update combo
-    const newCombo = combo + 1;
-    setCombo(newCombo);
-    if (newCombo > maxCombo) {
-      setMaxCombo(newCombo);
+    const komboBaru = kombo + 1;
+    setKombo(komboBaru);
+    if (komboBaru > komboTertinggi) {
+      setKomboTertinggi(komboBaru);
     }
     
-    // Update mole state
-    setMoleState(prev => ({
+    setKeadaanTikus(prev => ({
       ...prev,
-      [index]: 'whacked'
+      [indeks]: 'diketuk'
     }));
     
-    // Remove the whacked mole
-    setCurrentMoles(prev => prev.filter(hole => hole !== index));
+    setTikusMuncul(prev => prev.filter(lubang => lubang !== indeks));
     
-    // Reset mole state after animation
     setTimeout(() => {
-      setMoleState(prev => {
-        const newState = { ...prev };
-        delete newState[index];
-        return newState;
+      setKeadaanTikus(prev => {
+        const keadaanBaru = { ...prev };
+        delete keadaanBaru[indeks];
+        return keadaanBaru;
       });
     }, 300);
   };
 
-  // Handle hammer effect
-  const handleWhack = (e, index) => {
-    if (gameOver) return;
+  useEffect(() => {
+    if (permainanTamcat) {
+      simpanKemajuanPermainan();
+      setTunjukRingkasan(true);
+    }
+  }, [permainanTamcat]);
+
+  const simpanKemajuanPermainan = async () => {
+    try {
+      const dataKemajuan = {
+        score: markah,
+        level: 1,
+        time_spent: 30 - masaTinggal,
+        completed: true,
+        progress_data: {
+          moles_whacked: markah / 10,
+          max_combo: komboTertinggi,
+          accuracy_percentage: ((markah / 10) / 30) * 100
+        }
+      };
+
+      const response = await progressService.saveProgress(2, dataKemajuan);
+      setKemajuanPermainan(response.data.progress);
+      
+      if (response.data.rewards_unlocked && response.data.rewards_unlocked.length > 0) {
+        setGanjaranDibuka(response.data.rewards_unlocked);
+      }
+    } catch (error) {
+      console.error('Gagal menyimpan kemajuan:', error);
+    }
+  };
+
+  const kendalikanKetukan = (e, indeks) => {
+    if (permainanTamcat) return;
     
-    // Calculate hammer position
-    const rect = boardRef.current.getBoundingClientRect();
+    const rect = papanRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    setHammerPosition({ x, y });
-    setShowHammer(true);
+    setPosisiTukul({ x, y });
+    setTunjukTukul(true);
     
-    // Hide hammer after animation
     setTimeout(() => {
-      setShowHammer(false);
+      setTunjukTukul(false);
     }, 300);
     
-    // Whack the mole
-    whackMole(index);
+    ketukTikus(indeks);
   };
 
-  // Handle power-up collection
-  const collectPowerUp = () => {
-    if (!powerUp) return;
+  const kumpulKuasa = () => {
+    if (!kuasa) return;
     
-    setPowerUpActive(true);
-    setPowerUpTimer(10); // 10 seconds duration
+    setKuasaAktif(true);
+    setPengiraMasaKuasa(10);
     
-    if (powerUp === 'time') {
-      setTimeLeft(prev => prev + 5); // Add 5 seconds
-      setBonusTime(5); // Visual indicator
-      setTimeout(() => setBonusTime(0), 2000);
-    } else if (powerUp === 'points') {
-      setMultiplier(2); // Double points
-    } else if (powerUp === 'combo') {
-      setCombo(prev => prev + 5); // Add to combo
+    if (kuasa === 'masa') {
+      setMasaTinggal(prev => prev + 5);
+      setMasaTambahan(5);
+      setTimeout(() => setMasaTambahan(0), 2000);
+    } else if (kuasa === 'mata') {
+      setPendarab(2);
+    } else if (kuasa === 'kombo') {
+      setKombo(prev => prev + 5);
     }
     
-    setPowerUp(null);
+    setKuasa(null);
   };
 
-  const resetGame = () => {
-    setScore(0);
-    setTimeLeft(30);
-    setMoles(Array(9).fill(false));
-    setGameOver(false);
-    setCurrentMoles([]);
-    setGameSpeed(1200);
-    setMoleState({});
-    setCombo(0);
-    setMaxCombo(0);
-    setPowerUp(null);
-    setPowerUpActive(false);
-    setPowerUpTimer(0);
-    setMultiplier(1);
-    setBonusTime(0);
+  const setSemulaPermainan = () => {
+    setMarkah(0);
+    setMasaTinggal(30);
+    setLubang(Array(9).fill(false));
+    setPermainanTamcat(false);
+    setTikusMuncul([]);
+    setKelajuan(1200);
+    setKeadaanTikus({});
+    setKombo(0);
+    setKomboTertinggi(0);
+    setKuasa(null);
+    setKuasaAktif(false);
+    setPengiraMasaKuasa(0);
+    setPendarab(1);
+    setMasaTambahan(0);
   };
 
-  const startGame = () => {
-    setGameStarted(true);
-    resetGame();
+  const mulakanPermainan = () => {
+    setPermainanDimulakan(true);
+    setSemulaPermainan();
   };
 
-  const returnToHome = () => {
-    setGameStarted(false);
-    setGameOver(false);
+  const kembaliKeLamanUtama = () => {
+    setPermainanDimulakan(false);
+    setPermainanTamcat(false);
   };
 
-  // Calculate time bar percentage
-  const timePercentage = (timeLeft / 30) * 100;
-  const timeColor = timeLeft > 15 ? '#4CAF50' : timeLeft > 5 ? '#FFC107' : '#F44336';
+  const peratusanMasa = (masaTinggal / 30) * 100;
+  const warnaMasa = masaTinggal > 15 ? '#4CAF50' : masaTinggal > 5 ? '#FFC107' : '#F44336';
 
   return (
     <div style={{ 
@@ -261,7 +286,7 @@ const WhackAMole = () => {
       minHeight: '100vh',
       padding: '20px'
     }}>
-      {!gameStarted ? (
+      {!permainanDimulakan ? (
         <div style={{
           maxWidth: '600px',
           margin: '0 auto',
@@ -276,7 +301,7 @@ const WhackAMole = () => {
             color: '#4ecca3',
             textShadow: '0 0 10px rgba(78, 204, 163, 0.7)',
             marginBottom: '20px'
-          }}>🐹 Whack-a-Mole!</h2>
+          }}>🐹 Ketuk Tikus!</h2>
           
           <div style={{ 
             fontSize: '1.2rem', 
@@ -284,8 +309,8 @@ const WhackAMole = () => {
             lineHeight: '1.6',
             color: '#f1f1f1'
           }}>
-            <p>Whack the moles as they pop up!</p>
-            <p>Try to get the highest score possible in 30 seconds.</p>
+            <p>Ketuk tikus yang muncul secepat mungkin!</p>
+            <p>Cuba dapatkan markah tertinggi dalam masa 30 saat.</p>
           </div>
           
           <div style={{ 
@@ -294,12 +319,12 @@ const WhackAMole = () => {
             backgroundColor: '#16213e',
             borderRadius: '10px'
           }}>
-            <h4 style={{ color: '#4ecca3', marginBottom: '10px' }}>How to Play:</h4>
+            <h4 style={{ color: '#4ecca3', marginBottom: '10px' }}>Cara Bermain:</h4>
             <div style={{ textAlign: 'left', display: 'inline-block', width: '100%' }}>
-              <p>• Click on moles as they pop up to whack them</p>
-              <p>• Try to whack as many as possible in 30 seconds</p>
-              <p>• Power-ups will appear randomly - click them for bonuses</p>
-              <p>• The game gets harder as your score increases</p>
+              <p>• Klik pada tikus yang muncul untuk mengetuknya</p>
+              <p>• Cuba ketuk sebanyak mungkin dalam masa 30 saat</p>
+              <p>• Kuasa bonus akan muncul secara rawak - klik untuk manfaat</p>
+              <p>• Permainan semakin sukar apabila markah meningkat</p>
             </div>
           </div>
           
@@ -316,9 +341,9 @@ const WhackAMole = () => {
               transition: 'all 0.3s',
               boxShadow: '0 0 10px rgba(76, 175, 80, 0.5)'
             }}
-            onClick={startGame}
+            onClick={mulakanPermainan}
           >
-            Start Game
+            ▶ Mulakan Permainan
           </button>
         </div>
       ) : (
@@ -328,7 +353,7 @@ const WhackAMole = () => {
             color: '#4ecca3',
             textShadow: '0 0 10px rgba(78, 204, 163, 0.7)',
             marginBottom: '20px'
-          }}>🐹 Whack-a-Mole!</h2>
+          }}>🐹 Ketuk Tikus!</h2>
           
           <div style={{
             display: 'flex',
@@ -341,12 +366,12 @@ const WhackAMole = () => {
             border: '2px solid #4ecca3'
           }}>
             <div style={{ margin: '5px' }}>
-              <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>Score:</span>
-              <span style={{ marginLeft: '10px', fontSize: '1.2rem' }}>{score}</span>
+              <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>Markah:</span>
+              <span style={{ marginLeft: '10px', fontSize: '1.2rem' }}>{markah}</span>
             </div>
             
             <div style={{ margin: '5px' }}>
-              <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>Time:</span>
+              <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>Masa:</span>
               <div style={{ 
                 width: '200px', 
                 height: '20px', 
@@ -358,16 +383,16 @@ const WhackAMole = () => {
                 <div 
                   style={{ 
                     height: '100%', 
-                    width: `${timePercentage}%`, 
-                    backgroundColor: timeColor,
+                    width: `${peratusanMasa}%`, 
+                    backgroundColor: warnaMasa,
                     transition: 'width 0.5s ease'
                   }}
                 ></div>
               </div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{timeLeft}s</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{masaTinggal}s</div>
             </div>
             
-            {bonusTime > 0 && (
+            {masaTambahan > 0 && (
               <div style={{
                 position: 'absolute',
                 top: '-20px',
@@ -379,7 +404,7 @@ const WhackAMole = () => {
                 fontWeight: 'bold',
                 animation: 'pulse 0.5s'
               }}>
-                +{bonusTime}s!
+                +{masaTambahan}s!
               </div>
             )}
           </div>
@@ -391,7 +416,7 @@ const WhackAMole = () => {
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-            {combo > 1 && (
+            {kombo > 1 && (
               <div style={{
                 fontSize: '1.8rem',
                 color: '#FFD700',
@@ -400,10 +425,10 @@ const WhackAMole = () => {
                 animation: 'pulse 0.5s',
                 margin: '0 10px'
               }}>
-                COMBO x{combo}!
+                KOMBO x{kombo}!
               </div>
             )}
-            {powerUpActive && (
+            {kuasaAktif && (
               <div style={{
                 fontSize: '1.4rem',
                 color: '#FF416C',
@@ -412,12 +437,12 @@ const WhackAMole = () => {
                 animation: 'pulse 0.5s',
                 margin: '0 10px'
               }}>
-                {multiplier > 1 ? `x${multiplier} POINTS!` : 'BONUS TIME!'}
+                {pendarab > 1 ? `x${pendarab} MATA!` : 'MASA TAMBAHAN!'}
               </div>
             )}
           </div>
           
-          {powerUp && (
+          {kuasa && (
             <div 
               style={{
                 position: 'absolute',
@@ -434,17 +459,17 @@ const WhackAMole = () => {
                 boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
                 animation: 'bounce 1s infinite'
               }}
-              onClick={collectPowerUp}
+              onClick={kumpulKuasa}
             >
               <div style={{ fontSize: '1.5rem' }}>
-                {powerUp === 'time' && '⏱️'}
-                {powerUp === 'points' && '💰'}
-                {powerUp === 'combo' && '🔥'}
+                {kuasa === 'masa' && '⏱️'}
+                {kuasa === 'mata' && '💰'}
+                {kuasa === 'kombo' && '🔥'}
               </div>
               <div style={{ fontWeight: 'bold', color: '#333' }}>
-                {powerUp === 'time' && 'BONUS TIME'}
-                {powerUp === 'points' && 'SCORE MULTIPLIER'}
-                {powerUp === 'combo' && 'COMBO BOOST'}
+                {kuasa === 'masa' && 'MASA TAMBAHAN'}
+                {kuasa === 'mata' && 'PENDARAB MARKAH'}
+                {kuasa === 'kombo' && 'BOOST KOMBO'}
               </div>
             </div>
           )}
@@ -458,13 +483,13 @@ const WhackAMole = () => {
             margin: '0 auto',
             position: 'relative',
             overflow: 'hidden'
-          }} ref={boardRef}>
+          }} ref={papanRef}>
             <div style={{ 
               color: '#f1f1f1', 
               marginBottom: '15px',
               fontSize: '1.1rem'
             }}>
-              Whack the moles as fast as you can!
+              Ketuk tikus secepat mungkin!
             </div>
             
             <div style={{
@@ -474,12 +499,12 @@ const WhackAMole = () => {
               width: '100%',
               margin: '20px 0'
             }}>
-              {moles.map((hasMole, index) => (
+              {lubang.map((adaTikus, indeks) => (
                 <div 
-                  key={index}
+                  key={indeks}
                   style={{
                     aspectRatio: '1',
-                    backgroundColor: currentMoles.includes(index) ? '#5D2906' : '#8B4513',
+                    backgroundColor: tikusMuncul.includes(indeks) ? '#5D2906' : '#8B4513',
                     borderRadius: '50%',
                     position: 'relative',
                     overflow: 'hidden',
@@ -490,12 +515,12 @@ const WhackAMole = () => {
                     justifyContent: 'center',
                     alignItems: 'flex-end'
                   }}
-                  onClick={(e) => handleWhack(e, index)}
+                  onClick={(e) => kendalikanKetukan(e, indeks)}
                 >
-                  {currentMoles.includes(index) && (
+                  {tikusMuncul.includes(indeks) && (
                     <div style={{
                       position: 'absolute',
-                      bottom: moleState[index] === 'whacked' ? '0%' : '0%',
+                      bottom: keadaanTikus[indeks] === 'diketuk' ? '0%' : '0%',
                       left: '50%',
                       transform: 'translateX(-50%)',
                       width: '80%',
@@ -503,7 +528,7 @@ const WhackAMole = () => {
                       backgroundColor: '#A9A9A9',
                       borderRadius: '50% 50% 40% 40%',
                       transition: 'bottom 0.3s ease',
-                      animation: moleState[index] === 'whacked' ? 'whack 0.3s forwards' : 'none'
+                      animation: keadaanTikus[indeks] === 'diketuk' ? 'whack 0.3s forwards' : 'none'
                     }}>
                       <div style={{
                         position: 'absolute',
@@ -567,14 +592,14 @@ const WhackAMole = () => {
                 </div>
               ))}
               
-              {showHammer && (
+              {tunjukTukul && (
                 <div 
                   style={{
                     position: 'absolute',
                     zIndex: 20,
                     pointerEvents: 'none',
-                    left: `${hammerPosition.x}px`,
-                    top: `${hammerPosition.y}px`,
+                    left: `${posisiTukul.x}px`,
+                    top: `${posisiTukul.y}px`,
                     transform: 'translate(-50%, -50%)',
                     animation: 'whackHammer 0.3s ease-out'
                   }}
@@ -615,7 +640,7 @@ const WhackAMole = () => {
               )}
             </div>
 
-            {gameOver && (
+            {permainanTamcat && (
               <div style={{
                 position: 'fixed',
                 top: 0,
@@ -637,10 +662,10 @@ const WhackAMole = () => {
                   maxWidth: '400px',
                   width: '80%'
                 }}>
-                  <h3 style={{ color: '#ff5252', fontSize: '2rem', marginBottom: '20px' }}>Game Over!</h3>
-                  <p style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Final Score: <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>{score}</span></p>
-                  <p style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Max Combo: <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>x{maxCombo}</span></p>
-                  <p style={{ fontSize: '1.2rem', marginBottom: '20px' }}>High Score: <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>{highScore}</span></p>
+                  <h3 style={{ color: '#ff5252', fontSize: '2rem', marginBottom: '20px' }}>Permainan Tamat!</h3>
+                  <p style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Markah Akhir: <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>{markah}</span></p>
+                  <p style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Kombo Tertinggi: <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>x{komboTertinggi}</span></p>
+                  <p style={{ fontSize: '1.2rem', marginBottom: '20px' }}>Markah Tertinggi: <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>{markahTertinggi}</span></p>
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
                     <button 
                       style={{
@@ -654,9 +679,13 @@ const WhackAMole = () => {
                         fontSize: '1.1rem',
                         transition: 'all 0.2s'
                       }}
-                      onClick={resetGame}
+                      onClick={() => {
+                        setSemulaPermainan();
+                        setTunjukRingkasan(false);
+                        setGanjaranDibuka([]);
+                      }}
                     >
-                      Play Again
+                      Main Semula
                     </button>
                     <button 
                       style={{
@@ -670,37 +699,75 @@ const WhackAMole = () => {
                         fontSize: '1.1rem',
                         transition: 'all 0.2s'
                       }}
-                      onClick={returnToHome}
+                      onClick={kembaliKeLamanUtama}
                     >
-                      Home
+                      Laman Utama
                     </button>
                   </div>
                 </div>
               </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '20px' }}>
-              <button 
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#9C27B0',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  transition: 'all 0.2s'
-                }}
-                onClick={returnToHome}
-              >
-                Home
-              </button>
-            </div>
+            {!permainanTamcat && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '20px' }}>
+                <button 
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#9C27B0',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '1rem',
+                    transition: 'all 0.2s'
+                  }}
+                  onClick={kembaliKeLamanUtama}
+                >
+                  Laman Utama
+                </button>
+              </div>
+            )}
+
+            {tunjukRingkasan && (
+              <div style={{ marginTop: '30px' }}>
+                <GameSummary progress={kemajuanPermainan} game={{ name: 'Ketuk Tikus' }} />
+                
+                {ganjaranDibuka.length > 0 && (
+                  <RewardsDisplay 
+                    rewards={ganjaranDibuka}
+                    onClaim={(ganjaran) => {
+                      console.log('Ganjaran dituntut:', ganjaran);
+                    }}
+                  />
+                )}
+                
+                <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px' }}>
+                  <button
+                    onClick={() => {
+                      setSemulaPermainan();
+                      setTunjukRingkasan(false);
+                      setGanjaranDibuka([]);
+                    }}
+                    style={{
+                      padding: '12px 25px',
+                      background: 'linear-gradient(90deg, #4ecca3, #4CAF50)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '12px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Main Semula
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}
-      
+
       <style>{`
         @keyframes pulse {
           0% { transform: scale(1); }
