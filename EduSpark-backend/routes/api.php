@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\GameProgressController;
+use App\Http\Controllers\LeaderboardController;
 
 // Game Update Routes (Teacher specific)
 Route::prefix('teacher')->middleware('auth:sanctum')->group(function () {
@@ -23,6 +24,25 @@ Route::prefix('teacher')->middleware('auth:sanctum')->group(function () {
         Route::post('/validate', [GameController::class, 'validateGameData']);
         Route::post('/{id}/validate', [GameController::class, 'validateGameData']);
     });
+});
+
+// Leaderboard Routes
+Route::prefix('leaderboard')->group(function () {
+    // Get leaderboard with filters
+    Route::get('/', [LeaderboardController::class, 'index']);
+    
+    // Update score after game
+    Route::post('/update-score', [LeaderboardController::class, 'updateScore']);
+    
+    // Get user position
+    Route::get('/user/{userId}', [LeaderboardController::class, 'getUserPosition']);
+    
+    // Get available classes and subjects for filters
+    Route::get('/available-classes', [LeaderboardController::class, 'getAvailableClasses']);
+    Route::get('/available-subjects', [LeaderboardController::class, 'getAvailableSubjects']);
+    
+    // Teacher-only: Reset leaderboard
+    Route::middleware('auth:sanctum')->post('/reset', [LeaderboardController::class, 'reset']);
 });
 
 Route::prefix('games')->group(function () {
