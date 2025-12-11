@@ -9,7 +9,6 @@
             <h1 class="text-4xl font-extrabold text-blue-800 tracking-tight sm:text-5xl">
                 Welcome, {{ Auth::user()->name }}! 
             </h1>
-            {{-- ... rest of card content ... --}}
         </div>
     </div>
 </div>

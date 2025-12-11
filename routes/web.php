@@ -66,18 +66,21 @@ Route::prefix('quizzes')->middleware(['auth', 'role:student'])->group(function (
 
 // --- 4. TEACHER QUIZ ROUTES ---
 Route::prefix('teacher/quizzes')->middleware(['auth', 'role:teacher'])->group(function () {
+
     Route::get('/', [QuizManagementController::class, 'index'])->name('teacher.quizzes.index');
     Route::get('/create', [QuizManagementController::class, 'create'])->name('teacher.quizzes.create');
     Route::post('/', [QuizManagementController::class, 'store'])->name('teacher.quizzes.store');
+    Route::get('/{quiz}', [QuizManagementController::class, 'show'])->name('teacher.quizzes.show');
     Route::get('/{quiz}/edit', [QuizManagementController::class, 'edit'])->name('teacher.quizzes.edit');
     Route::put('/{quiz}', [QuizManagementController::class, 'update'])->name('teacher.quizzes.update');
     Route::delete('/{quiz}', [QuizManagementController::class, 'destroy'])->name('teacher.quizzes.destroy');
     Route::get('/{quiz}/results', [QuizManagementController::class, 'results'])->name('teacher.quizzes.results');
-});
-
-Route::post('/teacher/attempts/{attempt}/remark', [QuizManagementController::class, 'addRemark'])
+    Route::post('/teacher/attempts/{attempt}/remark', [QuizManagementController::class, 'addRemark'])
     ->name('teacher.attempts.remark')
     ->middleware(['auth', 'role:teacher']);
+});
+
+
 
 
 // --- 5. ROOT REDIRECTION ---
