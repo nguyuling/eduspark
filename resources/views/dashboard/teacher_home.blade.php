@@ -8,20 +8,16 @@
         <div class="col-md-10">
             <div class="card shadow-lg text-center">
                 <div class="card-header bg-danger text-white">
-                    <h2 class="mb-0">Teacher Dashboard</h2>
+                    <h2 class="mb-0">Welcome to EduSpark</h2>
                 </div>
 
                 <div class="card-body">
-                    <h3 class="display-6 mb-4">Welcome back, {{ $user->name }}!</h3>
+                    <h3 class="display-6 mb-4">Hello, {{ $user->name }}!</h3>
                     
                     <p class="lead">
-                        As a **Teacher**, you can access your modules like Quiz Management and Performance Reports via the navigation bar above.
+                        You are logged in as a **{{ ucfirst(Auth::user()->role) }}**. 
+                        Please use the module links in the **navigation bar at the top of the page** to continue.
                     </p>
-                    
-                    <hr class="my-4">
-                    <a href="{{ route('teacher.quizzes.index') }}" class="btn btn-lg btn-success">
-                        Go to Quiz Management
-                    </a>
                 </div>
             </div>
         </div>

@@ -16,8 +16,6 @@
                         You are logged in as a **{{ ucfirst(Auth::user()->role) }}**. 
                         Please use the module links in the **navigation bar at the top of the page** to continue.
                     </p>
-                    
-                    <hr class="my-4">
                 </div>
             </div>
         </div>

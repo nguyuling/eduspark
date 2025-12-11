@@ -23,16 +23,13 @@ class TeacherController extends Controller
             'title' => '',
             'creator_email' => '',
             'publish_date_range' => '',
-            'scope' => 'all' // Defaulting to 'all' as per front-end file
+            'scope' => 'all'
         ], $filters);
 
         // 2. Start the base query (assuming relationship counters are managed in the Quiz Model)
-        // CRITICAL FIX: Use withoutGlobalScopes() to ensure we bypass any scopes 
-        // that might be hiding draft quizzes or quizzes created by other users by default.
-        // We still need the 'user' relationship loaded for display/filtering purposes.
         $query = Quiz::withoutGlobalScopes()
-            ->withCount(['questions', 'attempts']) // Count related models
-            ->with('creator'); // Requires the 'user' method in Quiz model
+            ->withCount(['questions', 'attempts'])
+            ->with('creator'); 
 
         // 3. Apply the 'scope' filter
         if ($filters['scope'] === 'mine') {

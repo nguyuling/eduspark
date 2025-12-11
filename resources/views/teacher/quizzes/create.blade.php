@@ -45,8 +45,8 @@
                                 </div>
                                 <div class="col-md-6 mb-3 d-flex align-items-end">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="publish" id="publish" {{ old('publish') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="publish">
+                                        <input class="form-check-input" type="checkbox" name="is_published" id="is_published" {{ old('is_published') ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="is_published">
                                             Publish Quiz Immediately
                                         </label>
                                     </div>
@@ -87,7 +87,7 @@
         MC: 'multiple_choice',
         SA: 'short_answer',
         TF: 'true_false',
-        CHECKBOX: 'checkbox' // <--- ADDED CHECKBOX TYPE
+        CHECKBOX: 'checkbox'
     };
     
     // Global counter for question indices
@@ -105,7 +105,7 @@
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-7">  <label class="form-label">Question Text <span class="text-danger">*</span></label>
-                        <textarea name="questions[${index}][text]" class="form-control" rows="2" required></textarea>
+                        <textarea name="questions[${index}][question_text]" class="form-control" rows="2" required></textarea>
                     </div>
                     <div class="col-md-1">  <label class="form-label">Points <span class="text-danger">*</span></label>
                         <input type="number" name="questions[${index}][points]" class="form-control" value="1" min="1" required>
@@ -132,12 +132,12 @@
     const shortAnswerTemplate = (index) => `
         <div class="mb-3">
             <label class="form-label text-success">Correct Answer <span class="text-danger">*</span></label>
+            {{-- CRITICAL FIX: The key 'correct_answer' holds the text for short answer --}}
             <input type="text" name="questions[${index}][correct_answer]" class="form-control" placeholder="Enter the exact correct short answer" required>
         </div>
     `;
 
     // Template for Options container (used by MC, TF, and CHECKBOX)
-    // Takes the current type to determine input style (radio or checkbox)
     const optionTemplate = (qIndex, type) => {
         const rowTemplate = (type === QUESTION_TYPES.CHECKBOX) ? checkboxOptionRow : optionRow;
 
@@ -159,11 +159,20 @@
     const optionRow = (qIndex, oIndex) => `
         <div class="input-group mb-2 option-row" data-o-index="${oIndex}">
             <div class="input-group-text">
+                {{-- CRITICAL FIX: The value sent is the option's text itself, simplifying controller logic --}}
                 <input class="form-check-input mt-0 correct-option-radio" type="radio" 
-                       name="questions[${qIndex}][correct_option_index]" 
-                       value="${oIndex}" ${oIndex === 0 ? 'checked' : ''} required>
+                       name="questions[${qIndex}][correct_answer]" 
+                       value="" 
+                       data-option-text-target 
+                       ${oIndex === 0 ? 'checked' : ''} required>
             </div>
-            <input type="text" name="questions[${qIndex}][options][${oIndex}][text]" class="form-control" placeholder="Option Text" required>
+            {{-- CRITICAL FIX: Changed name to option_text and used empty [] to send an array of options --}}
+            <input type="text" 
+                   name="questions[${qIndex}][options][]" 
+                   class="form-control option-text-input" 
+                   placeholder="Option Text" 
+                   required 
+                   oninput="updateRadioValue(this)">
             <button type="button" class="btn btn-outline-danger remove-option-btn" data-o-index="${oIndex}">X</button>
         </div>
     `;
@@ -172,13 +181,40 @@
     const checkboxOptionRow = (qIndex, oIndex) => `
         <div class="input-group mb-2 option-row" data-o-index="${oIndex}">
             <div class="input-group-text">
+                {{-- CRITICAL FIX: The name is now an array to capture multiple correct answers --}}
                 <input class="form-check-input mt-0 correct-option-checkbox" type="checkbox" 
-                       name="questions[${qIndex}][correct_option_indices][]" 
-                       value="${oIndex}"> </div>
-            <input type="text" name="questions[${qIndex}][options][${oIndex}][text]" class="form-control" placeholder="Option Text" required>
+                       name="questions[${qIndex}][correct_answers][]" 
+                       value="" 
+                       data-option-text-target> 
+            </div>
+            {{-- CRITICAL FIX: Changed name to option_text and used empty [] to send an array of options --}}
+            <input type="text" 
+                   name="questions[${qIndex}][options][]" 
+                   class="form-control option-text-input" 
+                   placeholder="Option Text" 
+                   required
+                   oninput="updateCheckboxValue(this)">
             <button type="button" class="btn btn-outline-danger remove-option-btn" data-o-index="${oIndex}">X</button>
         </div>
     `;
+
+    // Function to dynamically update the radio button's value when the option text changes
+    function updateRadioValue(inputElement) {
+        const optionText = inputElement.value;
+        const radio = inputElement.closest('.input-group').querySelector('[data-option-text-target]');
+        if (radio && radio.type === 'radio') {
+            radio.value = optionText;
+        }
+    }
+
+    // Function to dynamically update the checkbox button's value when the option text changes
+    function updateCheckboxValue(inputElement) {
+        const optionText = inputElement.value;
+        const checkbox = inputElement.closest('.input-group').querySelector('[data-option-text-target]');
+        if (checkbox && checkbox.type === 'checkbox') {
+            checkbox.value = optionText;
+        }
+    }
 
 
     // --- FUNCTIONS ---
@@ -188,7 +224,6 @@
         const container = document.getElementById(`answers-container-${qIndex}`);
         container.innerHTML = ''; // Clear previous content
         
-        // Define which option row template to use when adding new options
         const rowTemplate = (type === QUESTION_TYPES.CHECKBOX) ? checkboxOptionRow : optionRow;
 
         if (type === QUESTION_TYPES.SA) {
@@ -210,17 +245,17 @@
                     <div class="input-group mb-2 option-row" data-o-index="0">
                         <div class="input-group-text">
                             <input class="form-check-input mt-0 correct-option-radio" type="radio" 
-                                   name="questions[${qIndex}][correct_option_index]" value="0" checked required>
+                                   name="questions[${qIndex}][correct_answer]" value="True" checked required>
                         </div>
-                        <input type="text" name="questions[${qIndex}][options][0][text]" class="form-control" value="True" readonly>
+                        <input type="text" name="questions[${qIndex}][options][]" class="form-control option-text-input" value="True" readonly oninput="updateRadioValue(this)">
                         <button type="button" class="btn btn-outline-secondary" disabled>X</button>
                     </div>
                     <div class="input-group mb-2 option-row" data-o-index="1">
                         <div class="input-group-text">
                             <input class="form-check-input mt-0 correct-option-radio" type="radio" 
-                                   name="questions[${qIndex}][correct_option_index]" value="1" required>
+                                   name="questions[${qIndex}][correct_answer]" value="False" required>
                         </div>
-                        <input type="text" name="questions[${qIndex}][options][1][text]" class="form-control" value="False" readonly>
+                        <input type="text" name="questions[${qIndex}][options][]" class="form-control option-text-input" value="False" readonly oninput="updateRadioValue(this)">
                         <button type="button" class="btn btn-outline-secondary" disabled>X</button>
                     </div>
                 `;
@@ -232,7 +267,7 @@
     // Adds a new option row to a question (Now accepts the rowTemplate function)
     const addOptionRow = (qIndex, optionsList, rowTemplate) => {
         const currentOptions = optionsList.querySelectorAll('.option-row').length;
-        if (currentOptions >= 10) { // Increased max limit for Checkbox flexibility
+        if (currentOptions >= 10) { 
             alert("A question cannot have more than 10 options.");
             return;
         }
@@ -242,15 +277,17 @@
     };
 
 
-    // --- EVENT LISTENERS ---
+    // --- EVENT LISTENERS & INITIALIZATION ---
     
     document.addEventListener('DOMContentLoaded', function () {
         const container = document.getElementById('questions-container');
         const addQuestionBtn = document.getElementById('add-question-btn');
+        let questionIndex = 0;
         
         // 1. Initial Load: Render the first question
+        // Fix: Use insertAdjacentHTML and renderAnswerFields to ensure correct setup
         container.insertAdjacentHTML('beforeend', questionTemplate(questionIndex));
-        renderAnswerFields(questionIndex, QUESTION_TYPES.MC); // Default to Multiple Choice
+        renderAnswerFields(questionIndex, QUESTION_TYPES.MC); 
         questionIndex++;
 
         // 2. Add Question Button
@@ -266,19 +303,38 @@
             // Remove Question
             if (e.target.classList.contains('remove-question-btn')) {
                 const card = e.target.closest('.question-card');
-                if (container.querySelectorAll('.question-card').length > 1) {
+                const questionCards = container.querySelectorAll('.question-card');
+                if (questionCards.length > 1) {
+                     // Get the index of the card being removed
+                     const removedIndex = parseInt(card.getAttribute('data-index'));
                      card.remove();
-                     // Re-index all cards after removal
+                     
+                     // Re-index all cards that came after the removed one
                      container.querySelectorAll('.question-card').forEach((qCard, i) => {
-                         const oldIndex = parseInt(qCard.getAttribute('data-index'));
-                         qCard.setAttribute('data-index', i);
+                         const currentCardIndex = parseInt(qCard.getAttribute('data-index'));
+                         
+                         // Only process cards that need re-indexing
+                         if(currentCardIndex > removedIndex) {
+                             const newIndex = currentCardIndex - 1;
+                             
+                             // Update attribute
+                             qCard.setAttribute('data-index', newIndex);
+                             
+                             // Update display number
+                             qCard.querySelector('.card-header h5').textContent = `Question #${newIndex + 1}`;
+                             
+                             // Update all names and IDs within the card using regex
+                             qCard.innerHTML = qCard.innerHTML.replace(new RegExp(`questions\\[${currentCardIndex}\\]`, 'g'), `questions[${newIndex}]`)
+                                                              .replace(new RegExp(`answers-container-${currentCardIndex}`, 'g'), `answers-container-${newIndex}`)
+                                                              .replace(new RegExp(`data-index="${currentCardIndex}"`, 'g'), `data-index="${newIndex}"`);
 
-                         // Update all names and IDs within the card using regex or manual replacement
-                         qCard.innerHTML = qCard.innerHTML.replace(new RegExp(`questions\\[${oldIndex}\\]`, 'g'), `questions[${i}]`)
-                                                          .replace(new RegExp(`answers-container-${oldIndex}`, 'g'), `answers-container-${i}`)
-                                                          .replace(new RegExp(`data-index="${oldIndex}"`, 'g'), `data-index="${i}"`);
+                            // Re-bind the remove button with the correct new data-index
+                            qCard.querySelector('.remove-question-btn').setAttribute('data-index', newIndex);
+                         }
                      });
-                     questionIndex = container.querySelectorAll('.question-card').length; // Reset counter
+                     
+                     questionIndex--; // Decrement the global counter
+                     
                 } else {
                     alert("A quiz must have at least one question.");
                 }
@@ -294,31 +350,33 @@
                 const typeSelect = document.querySelector(`.question-type-select[data-index="${qIndex}"]`);
                 const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
 
-                if (optionsList.querySelectorAll('.option-row').length > 2 || type === QUESTION_TYPES.SA) {
+                if (optionsList.querySelectorAll('.option-row').length > 2) {
                     optionRow.remove();
                     // Re-index remaining options to maintain sequential array keys
                     optionsList.querySelectorAll('.option-row').forEach((row, i) => {
-                        row.setAttribute('data-o-index', i);
-                        
-                        // Update the radio/checkbox name value
-                        const input = row.querySelector('input[type="radio"], input[type="checkbox"]');
-                        if (input) input.value = i;
-                        
                         // Update the text input name (the key [${oIndex}])
-                        const textInput = row.querySelector('input[type="text"]');
+                        const textInput = row.querySelector('.option-text-input');
                         if (textInput) {
-                            textInput.name = textInput.name.replace(/options\[\d+\]/, `options[${i}]`);
-                        }
-                        
-                        // If it's a radio button, re-check the first one if it was deleted and this is the new 0
-                        if(input && input.type === 'radio' && i === 0) {
-                            input.checked = true;
+                            textInput.name = `questions[${qIndex}][options][]`; // Revert to simple array index
                         }
                     });
 
+                } else if (type === QUESTION_TYPES.SA) {
+                    // Do nothing, Short Answer is handled by its own template
                 } else {
                     alert("Multiple Choice/True False/Checkbox questions must have at least two options.");
                 }
+            }
+
+            // Delegation for add option button (must be rebound after type change)
+            if (e.target.classList.contains('add-option-btn')) {
+                const qIndex = e.target.getAttribute('data-q-index');
+                const typeSelect = document.querySelector(`.question-type-select[data-index="${qIndex}"]`);
+                const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+                
+                const rowTemplate = (type === QUESTION_TYPES.CHECKBOX) ? checkboxOptionRow : optionRow;
+                const optionsList = e.target.previousElementSibling;
+                addOptionRow(qIndex, optionsList, rowTemplate);
             }
         });
 

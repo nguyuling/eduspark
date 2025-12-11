@@ -15,13 +15,21 @@
                 </div>
             @endif
 
+            {{-- Display warning message from policy check --}}
+            @if (session('warning'))
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('warning') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <div class="card shadow-lg">
                 <div class="card-header bg-warning text-white">
                     <h2>Edit Quiz: {{ $quiz->title }}</h2>
                 </div>
 
                 <div class="card-body">
-                    {{-- FORM ACTION & METHOD CHANGED FOR UPDATE --}}
+                    {{-- FORM ACTION & METHOD CORRECT --}}
                     <form method="POST" action="{{ route('teacher.quizzes.update', $quiz->id) }}">
                         @csrf
                         @method('PUT') {{-- Required for the Update method in the controller --}}
@@ -32,12 +40,10 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="title" class="form-label">Quiz Title</label>
-                                    {{-- Use $quiz->title or old('title') --}}
                                     <input type="text" class="form-control" id="title" name="title" value="{{ old('title', $quiz->title) }}" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="max_attempts" class="form-label">Max Attempts Allowed</label>
-                                    {{-- Use $quiz->max_attempts or old('max_attempts') --}}
                                     <input type="number" class="form-control" id="max_attempts" name="max_attempts" value="{{ old('max_attempts', $quiz->max_attempts) }}" min="1" required>
                                 </div>
                             </div>
@@ -45,13 +51,12 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="due_at" class="form-label">Due Date (Optional)</label>
-                                    {{-- Format the date/time correctly for the input field --}}
                                     <input type="datetime-local" class="form-control" id="due_at" name="due_at" value="{{ old('due_at', optional($quiz->due_at)->format('Y-m-d\TH:i')) }}">
                                 </div>
                                 <div class="col-md-6 mb-3 d-flex align-items-end">
                                     <div class="form-check">
-                                        {{-- Check the box if old('publish') is set OR $quiz->is_published is true --}}
-                                        <input class="form-check-input" type="checkbox" name="publish" id="publish" {{ old('publish', $quiz->is_published) ? 'checked' : '' }}>
+                                        {{-- FIX: Corrected name from 'publish' to 'is_published' --}}
+                                        <input class="form-check-input" type="checkbox" name="is_published" id="publish" {{ old('is_published', $quiz->is_published) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="publish">
                                             Publish Quiz Immediately
                                         </label>
@@ -69,7 +74,7 @@
                         {{-- === QUESTION CONTAINER (Dynamically managed by JavaScript) === --}}
                         <h4 class="mt-4 mb-3">Questions <span class="text-danger">*</span></h4>
                         <div id="questions-container">
-                            {{-- EXISTING QUESTIONS WILL BE POPULATED HERE --}}
+                            {{-- EXISTING QUESTIONS WILL BE POPULATED HERE BY JS --}}
                         </div>
 
                         <button type="button" class="btn btn-outline-secondary btn-sm mb-4" id="add-question-btn">
@@ -96,18 +101,34 @@
         CHECKBOX: 'checkbox'
     };
     
-    // Global counter for question indices
+    // Global counter for question indices (initialized in DOMContentLoaded)
     let questionIndex = 0;
     
     // PHP/Blade passes the existing quiz data to JavaScript
     const existingQuestions = @json($quiz->questions);
 
 
+    // --- HELPER FUNCTION ---
+    
+    /**
+     * Updates the value of the corresponding correct-answer input (radio/checkbox) 
+     * when the option text input is changed, if the option is currently marked correct.
+     */
+    function updateCorrectAnswerValue(textInput) {
+        const optionRow = textInput.closest('.option-row');
+        const correctInput = optionRow.querySelector('.correct-option-radio, .correct-option-checkbox');
+        
+        // Only update the value of the radio/checkbox if it is currently checked
+        if (correctInput && correctInput.checked) {
+            correctInput.value = textInput.value;
+        }
+    }
+
+
     // --- TEMPLATES ---
     
     // Template for a new question card
     const questionTemplate = (index, questionData = {}) => {
-        // Determine selected type or default to MC
         const currentType = questionData.type || QUESTION_TYPES.MC;
         
         return `
@@ -120,7 +141,8 @@
                 <div class="row mb-3">
                     <div class="col-md-8">
                         <label class="form-label">Question Text <span class="text-danger">*</span></label>
-                        <textarea name="questions[${index}][text]" class="form-control" rows="2" required>${questionData.question_text || ''}</textarea>
+                        {{-- FIX: Changed [text] to [question_text] --}}
+                        <textarea name="questions[${index}][question_text]" class="form-control" rows="2" required>${questionData.question_text || ''}</textarea>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Points <span class="text-danger">*</span></label>
@@ -148,13 +170,17 @@
 
     // Template for the Short Answer input
     const shortAnswerTemplate = (index, questionData) => {
-        // Short Answer is stored as the option_text of the first option
-        const existingAnswer = questionData.options ? questionData.options[0].option_text : '';
+        // FIX: Use questionData.correct_answer directly
+        const existingAnswer = questionData.correct_answer || '';
         return `
             <div class="mb-3">
                 <label class="form-label text-success">Correct Answer <span class="text-danger">*</span></label>
+                {{-- FIX: Correct name for Short Answer and ensure value is preserved --}}
                 <input type="text" name="questions[${index}][correct_answer]" class="form-control" 
                        placeholder="Enter the exact correct short answer" value="${existingAnswer}" required>
+                
+                {{-- FIX: Add a hidden options field for short answer, as the controller expects one --}}
+                <input type="hidden" name="questions[${index}][options][]" value="Short Answer Placeholder">
             </div>
         `;
     };
@@ -164,10 +190,14 @@
         <div class="input-group mb-2 option-row" data-o-index="${oIndex}">
             <div class="input-group-text">
                 <input class="form-check-input mt-0 correct-option-radio" type="radio" 
-                       name="questions[${qIndex}][correct_option_index]" 
-                       value="${oIndex}" ${isCorrect ? 'checked' : ''} required>
+                       {{-- FIX: Name is correct_answer, value is the option text --}}
+                       name="questions[${qIndex}][correct_answer]" 
+                       value="${optionData.option_text || ''}" ${isCorrect ? 'checked' : ''} required>
             </div>
-            <input type="text" name="questions[${qIndex}][options][${oIndex}][text]" class="form-control" placeholder="Option Text" value="${optionData.option_text || ''}" required>
+            {{-- FIX: Simplified option text name to be an array of strings --}}
+            <input type="text" name="questions[${qIndex}][options][]" class="form-control option-text-input" 
+                   placeholder="Option Text" value="${optionData.option_text || ''}" required
+                   oninput="updateCorrectAnswerValue(this)">
             <button type="button" class="btn btn-outline-danger remove-option-btn" data-o-index="${oIndex}">X</button>
         </div>
     `;
@@ -177,10 +207,14 @@
         <div class="input-group mb-2 option-row" data-o-index="${oIndex}">
             <div class="input-group-text">
                 <input class="form-check-input mt-0 correct-option-checkbox" type="checkbox" 
-                       name="questions[${qIndex}][correct_option_indices][]" 
-                       value="${oIndex}" ${isCorrect ? 'checked' : ''}>
+                       {{-- FIX: Name is correct_answer[], value is the option text --}}
+                       name="questions[${qIndex}][correct_answer][]" 
+                       value="${optionData.option_text || ''}" ${isCorrect ? 'checked' : ''}>
             </div>
-            <input type="text" name="questions[${qIndex}][options][${oIndex}][text]" class="form-control" placeholder="Option Text" value="${optionData.option_text || ''}" required>
+            {{-- FIX: Simplified option text name to be an array of strings --}}
+            <input type="text" name="questions[${qIndex}][options][]" class="form-control option-text-input" 
+                   placeholder="Option Text" value="${optionData.option_text || ''}" required
+                   oninput="updateCorrectAnswerValue(this)">
             <button type="button" class="btn btn-outline-danger remove-option-btn" data-o-index="${oIndex}">X</button>
         </div>
     `;
@@ -189,22 +223,24 @@
     const optionsContainerTemplate = (qIndex, type, questionData) => {
         const rowTemplate = (type === QUESTION_TYPES.CHECKBOX) ? checkboxOptionRow : optionRow;
         let optionsHtml = '';
-        let options = questionData.options || [{}, {}]; // Default to two empty options if none exist
+        let options = questionData.options || []; // Start with actual options
 
         options.forEach((option, oIndex) => {
-            const isCorrect = option.is_correct || false; // Check if option is marked correct in DB
+            const isCorrect = option.is_correct || false; 
             optionsHtml += rowTemplate(qIndex, oIndex, option, isCorrect);
         });
 
-        // Ensure at least two options are present if loading empty
-        if (options.length < 2) {
-             optionsHtml += rowTemplate(qIndex, options.length, {});
-             optionsHtml += rowTemplate(qIndex, options.length + 1, {});
+        // Ensure at least two options are present
+        while (options.length + optionsHtml.split('option-row').length - 1 < 2) {
+             optionsHtml += rowTemplate(qIndex, options.length + optionsHtml.split('option-row').length - 1, {});
         }
-
+        
+        // Find the highest existing index to continue adding options
+        const highestIndex = options.length > 0 ? options.length : 0;
+        
         return `
             <h6 class="mb-2">Options & Correct Answer(s) <span class="text-danger">*</span></h6>
-            <div class="options-list" data-q-index="${qIndex}">
+            <div class="options-list" data-q-index="${qIndex}" data-next-o-index="${highestIndex}">
                 ${optionsHtml}
             </div>
             <button type="button" class="btn btn-sm btn-outline-primary mt-2 add-option-btn" data-q-index="${qIndex}">
@@ -223,10 +259,14 @@
 
             // SPECIAL CASE: True/False logic
             if (type === QUESTION_TYPES.TF) {
-                 // Force options to True/False text and disable removal/adding
-                 const options = questionData.options || [{}, {}];
-                 const isTrueCorrect = options[0] ? options[0].is_correct : false;
-                 const isFalseCorrect = options[1] ? options[1].is_correct : false;
+                 // Force options to True/False text
+                 const options = questionData.options || [
+                     { option_text: 'True', is_correct: false }, 
+                     { option_text: 'False', is_correct: false }
+                 ];
+                 
+                 const isTrueCorrect = options.find(o => o.option_text === 'True')?.is_correct || false;
+                 const isFalseCorrect = options.find(o => o.option_text === 'False')?.is_correct || false;
 
                  content = `
                     <h6 class="mb-2">Correct Answer <span class="text-danger">*</span></h6>
@@ -234,17 +274,17 @@
                         <div class="input-group mb-2 option-row" data-o-index="0">
                             <div class="input-group-text">
                                 <input class="form-check-input mt-0 correct-option-radio" type="radio" 
-                                       name="questions[${qIndex}][correct_option_index]" value="0" ${isTrueCorrect ? 'checked' : ''} required>
+                                       name="questions[${qIndex}][correct_answer]" value="True" ${isTrueCorrect ? 'checked' : ''} required>
                             </div>
-                            <input type="text" name="questions[${qIndex}][options][0][text]" class="form-control" value="True" readonly>
+                            <input type="text" name="questions[${qIndex}][options][]" class="form-control option-text-input" value="True" readonly>
                             <button type="button" class="btn btn-outline-secondary" disabled>X</button>
                         </div>
                         <div class="input-group mb-2 option-row" data-o-index="1">
                             <div class="input-group-text">
                                 <input class="form-check-input mt-0 correct-option-radio" type="radio" 
-                                       name="questions[${qIndex}][correct_option_index]" value="1" ${isFalseCorrect ? 'checked' : ''} required>
+                                       name="questions[${qIndex}][correct_answer]" value="False" ${isFalseCorrect ? 'checked' : ''} required>
                             </div>
-                            <input type="text" name="questions[${qIndex}][options][1][text]" class="form-control" value="False" readonly>
+                            <input type="text" name="questions[${qIndex}][options][]" class="form-control option-text-input" value="False" readonly>
                             <button type="button" class="btn btn-outline-secondary" disabled>X</button>
                         </div>
                     </div>
@@ -260,16 +300,15 @@
         const container = document.getElementById(`answers-container-${qIndex}`);
         container.innerHTML = renderAnswerFieldsContent(qIndex, type, questionData);
         
-        // Re-bind the add option button to ensure it uses the correct row template
+        // Re-bind the add option button logic
         const addBtn = container.querySelector('.add-option-btn');
         if (addBtn) {
             addBtn.onclick = function() {
-                // Determine the row template function dynamically
                 const typeSelect = document.querySelector(`.question-type-select[data-index="${qIndex}"]`);
                 const currentType = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
                 const rowTemplate = (currentType === QUESTION_TYPES.CHECKBOX) ? checkboxOptionRow : optionRow;
                 
-                const optionsList = this.previousElementSibling; // The options-list div
+                const optionsList = this.previousElementSibling; 
                 addOptionRow(qIndex, optionsList, rowTemplate);
             };
         }
@@ -277,14 +316,17 @@
 
     // Adds a new option row to a question (Now accepts the rowTemplate function)
     const addOptionRow = (qIndex, optionsList, rowTemplate) => {
-        const currentOptions = optionsList.querySelectorAll('.option-row').length;
-        if (currentOptions >= 10) { 
+        const currentOptionsCount = optionsList.querySelectorAll('.option-row').length;
+        if (currentOptionsCount >= 10) { 
             alert("A question cannot have more than 10 options.");
             return;
         }
         
+        // Calculate the next index to ensure the option array is sequential
+        const nextOIndex = currentOptionsCount;
+
         // Use the passed-in rowTemplate (radio or checkbox)
-        optionsList.insertAdjacentHTML('beforeend', rowTemplate(qIndex, currentOptions, {}));
+        optionsList.insertAdjacentHTML('beforeend', rowTemplate(qIndex, nextOIndex, {}));
     };
 
 
@@ -294,19 +336,45 @@
         const container = document.getElementById('questions-container');
         const addQuestionBtn = document.getElementById('add-question-btn');
         
-        // 1. Initial Load: Check for existing questions
+        // 1. Initial Load: Populate existing questions and set starting index
         if (existingQuestions.length > 0) {
             existingQuestions.forEach((qData, i) => {
                 container.insertAdjacentHTML('beforeend', questionTemplate(i, qData));
                 renderAnswerFields(i, qData.type, qData);
-                questionIndex++;
+                // The re-indexing logic below will fix any gaps caused by previous removals
             });
+            // FIX: Set the global index counter to the correct starting point
+            questionIndex = existingQuestions.length;
+            
         } else {
-             // If no existing questions (shouldn't happen on edit, but safe)
+             // If no existing questions (e.g., if user deleted them all and refreshed)
             container.insertAdjacentHTML('beforeend', questionTemplate(questionIndex));
             renderAnswerFields(questionIndex, QUESTION_TYPES.MC); 
             questionIndex++;
         }
+        
+        // Function to handle re-indexing dynamically after a question is removed
+        const reIndexQuestions = () => {
+            container.querySelectorAll('.question-card').forEach((qCard, i) => {
+                const oldIndex = parseInt(qCard.getAttribute('data-index'));
+                if (oldIndex !== i) {
+                    qCard.setAttribute('data-index', i);
+
+                    // A more robust way to update names: find all elements with old index in name and replace it
+                    qCard.querySelectorAll('[name]').forEach(el => {
+                        el.name = el.name.replace(`questions[${oldIndex}]`, `questions[${i}]`);
+                    });
+                    
+                    // Update element IDs and data attributes
+                    qCard.querySelector('.remove-question-btn').setAttribute('data-index', i);
+                    const header = qCard.querySelector('.card-header h5');
+                    if(header) header.textContent = `Question #${i + 1}`;
+                }
+            });
+            // Reset the global counter
+            questionIndex = container.querySelectorAll('.question-card').length;
+        };
+
 
         // 2. Add Question Button
         addQuestionBtn.addEventListener('click', function() {
@@ -323,18 +391,7 @@
                 const card = e.target.closest('.question-card');
                 if (container.querySelectorAll('.question-card').length > 1) {
                      card.remove();
-                     // Re-index all cards after removal
-                     container.querySelectorAll('.question-card').forEach((qCard, i) => {
-                         const oldIndex = parseInt(qCard.getAttribute('data-index'));
-                         qCard.setAttribute('data-index', i);
-
-                         // Update all names and IDs within the card
-                         const content = qCard.innerHTML.replace(new RegExp(`questions\\[${oldIndex}\\]`, 'g'), `questions[${i}]`)
-                                                          .replace(new RegExp(`answers-container-${oldIndex}`, 'g'), `answers-container-${i}`)
-                                                          .replace(new RegExp(`data-index="${oldIndex}"`, 'g'), `data-index="${i}"`);
-                         qCard.innerHTML = content;
-                     });
-                     questionIndex = container.querySelectorAll('.question-card').length; // Reset counter
+                     reIndexQuestions(); // Call the re-indexing function
                 } else {
                     alert("A quiz must have at least one question.");
                 }
@@ -344,32 +401,18 @@
             if (e.target.classList.contains('remove-option-btn')) {
                 const optionRow = e.target.closest('.option-row');
                 const optionsList = optionRow.closest('.options-list');
-                
-                const qIndex = optionsList.getAttribute('data-q-index');
-                const typeSelect = document.querySelector(`.question-type-select[data-index="${qIndex}"]`);
+                const typeSelect = optionRow.closest('.question-card').querySelector('.question-type-select');
                 const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
-
+                
                 // Check minimum options for option-based types (MC, TF, CB)
                 if (optionsList.querySelectorAll('.option-row').length > 2) {
                     optionRow.remove();
-                    // Re-index remaining options to maintain sequential array keys
-                    optionsList.querySelectorAll('.option-row').forEach((row, i) => {
-                        row.setAttribute('data-o-index', i);
-                        
-                        const input = row.querySelector('input[type="radio"], input[type="checkbox"]');
-                        if (input) input.value = i;
-                        
-                        const textInput = row.querySelector('input[type="text"]');
-                        if (textInput) {
-                            textInput.name = textInput.name.replace(/options\[\d+\]/, `options[${i}]`);
-                        }
-                        
-                        // Ensure radio buttons maintain a checked state if the checked one was deleted
-                        if(input && input.type === 'radio' && i === 0 && !optionsList.querySelector('input[type="radio"]:checked')) {
-                            input.checked = true;
-                        }
-                    });
-
+                    
+                    // Ensure the correct-answer radio button stays selected if the checked one was deleted
+                    if (type !== QUESTION_TYPES.CHECKBOX && !optionsList.querySelector('.correct-option-radio:checked')) {
+                        const firstRadio = optionsList.querySelector('.correct-option-radio');
+                        if (firstRadio) firstRadio.checked = true;
+                    }
                 } else if (type !== QUESTION_TYPES.SA) {
                     alert("Multiple Choice, True/False, and Checkbox questions must have at least two options.");
                 }
@@ -381,7 +424,7 @@
             if (e.target.classList.contains('question-type-select')) {
                 const qIndex = e.target.getAttribute('data-index');
                 const type = e.target.value;
-                // When changing type, render with no previous answer data, as the format changes
+                // When changing type, render without previous answer data to avoid format issues
                 renderAnswerFields(qIndex, type, {}); 
             }
         });
