@@ -8,6 +8,7 @@
   left: 28px;
   top: 28px;
   height: calc(100vh - 56px);
+  z-index: 100;
 }
 body.light .sidebar{
   background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.68));
