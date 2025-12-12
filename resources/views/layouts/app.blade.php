@@ -50,26 +50,6 @@
         {{-- Sidebar Component --}}
         @include('components.sidebar')
         
-        {{-- MAIN CONTENT AREA --}}
-        <main class="w-100"> 
+        {{-- Sidebar --}}
+        @include('components.sidebar')
             @yield('content')
-        </main>
-        {{-- END: MAIN CONTENT AREA --}}
-    </div>
-    
-    <script>
-        // Theme Toggle
-        const body = document.body;
-        const saved = localStorage.getItem('theme') || 'light';
-        body.classList.add(saved);
-        
-        window.applyTheme = function(mode) {
-            if(mode === 'light') {
-                body.classList.replace('dark', 'light');
-            } else {
-                body.classList.replace('light', 'dark');
-            }
-        }
-    </script>
-</body>
-</html>
