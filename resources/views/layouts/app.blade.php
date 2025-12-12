@@ -32,13 +32,17 @@ body.light { background:var(--bg-light); color:#0b1220; }
 body.dark  { background:var(--bg-dark); color:#e6eef8; }
 
 /* Layout */
-.app { display:flex; min-height:100vh; gap:28px; padding:28px; }
+.app { display:flex; height:100vh; gap:28px; padding:28px; overflow:hidden; }
 
 /* Sidebar */
 .sidebar {
   width:240px; border-radius:16px; padding:18px;
   display:flex; flex-direction:column; align-items:center; gap:12px;
   backdrop-filter:blur(8px) saturate(120%);
+  /* sidebar is scrollable if content overflows */
+  height: calc(100vh - 56px);
+  max-height: calc(100vh - 56px);
+  overflow-y: auto;
 }
 body.light .sidebar {
   background:linear-gradient(180deg,rgba(255,255,255,0.70),rgba(255,255,255,0.65));
@@ -102,7 +106,9 @@ body.dark  .card { background:var(--card-dark); border:1px solid rgba(255,255,25
 .title { font-size:22px; font-weight:800; margin:0; }
 .sub { color:var(--muted); font-size:13px; }
 
-/* Responsive */
+/* Main area scroll handling + Responsive */
+main { flex:1; overflow-y: auto; overflow-x: hidden; }
+
 @media(max-width:920px){
   .sidebar { display:none; }
   .app { padding:14px; }
@@ -115,37 +121,88 @@ body.dark  .card { background:var(--card-dark); border:1px solid rgba(255,255,25
 
   {{-- Sidebar --}}
   <aside class="sidebar">
-    <img src="{{ asset('logo.png') }}" alt="Pengajar logo" class="logo">
+    <img src="{{ asset('logo.png') }}" alt="Logo" class="logo">
+    @php
+      $isTeacher = auth()->check() && (auth()->user()->role ?? null) === 'teacher';
+      // Fallback: if visiting reports routes, show teacher nav even if role missing
+      if (! $isTeacher && request()->is('reports*')) {
+          $isTeacher = true;
+      }
+    @endphp
+
     <div class="brand">
-      <span style="color:#1D5DCD;">Pen</span><span style="color:#E63946;">gajar</span>
+      @if($isTeacher)
+        <span style="color:#1D5DCD;">Pen</span><span style="color:#E63946;">gajar</span>
+      @else
+        <span style="color:#1D5DCD;">Pel</span><span style="color:#E63946;">ajar</span>
+      @endif
     </div>
 
     <nav class="nav">
-      <a href="{{ Route::has('reports.index') ? route('reports.index') : url('/reports') }}"
-         class="{{ request()->is('reports*') ? 'active' : '' }}">
-         Laporan
-      </a>
-
-      <a href="{{ Route::has('materials.index') ? route('materials.index') : url('/materials') }}"
-         class="{{ request()->is('materials*') ? 'active' : '' }}">
-         Bahan
-      </a>
-
-      <a href="{{ Route::has('assessments.index') ? route('assessments.index') : url('/assessments') }}"
-         class="{{ request()->is('assessments*') ? 'active' : '' }}">
-         Penilaian
-      </a>
-
-      <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}"
-         class="{{ request()->is('forum*') ? 'active' : '' }}">
-         Forum
-      </a>
-
-      <a href="{{ Route::has('games.index') ? route('games.index') : url('/games') }}"
-         class="{{ request()->is('games*') ? 'active' : '' }}">
-         Permainan
-      </a>
+      @if($isTeacher)
+        {{-- Teacher Navigation --}}
+        <a href="{{ Route::has('reports.index') ? route('reports.index') : url('/reports') }}"
+           class="{{ request()->is('reports*') ? 'active' : '' }}">
+           Laporan
+        </a>
+        <a href="{{ Route::has('materials.index') ? route('materials.index') : url('/materials') }}"
+           class="{{ request()->is('materials*') ? 'active' : '' }}">
+           Bahan
+        </a>
+        <a href="{{ Route::has('assessments.index') ? route('assessments.index') : url('/assessments') }}"
+           class="{{ request()->is('assessments*') ? 'active' : '' }}">
+           Penilaian
+        </a>
+        <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}"
+           class="{{ request()->is('forum*') ? 'active' : '' }}">
+           Forum
+        </a>
+        <a href="{{ Route::has('games.index') ? route('games.index') : url('/games') }}"
+           class="{{ request()->is('games*') ? 'active' : '' }}">
+           Permainan
+        </a>
+      @else
+        {{-- Student Navigation --}}
+        <a href="{{ Route::has('performance.index') ? route('performance.index') : url('/performance') }}"
+          class="{{ request()->is('performance*') ? 'active' : '' }}">
+          Prestasi
+        </a>
+        <a href="{{ Route::has('materials.index') ? route('materials.index') : url('/materials') }}"
+           class="{{ request()->is('materials*') ? 'active' : '' }}">
+           Bahan
+        </a>
+        <a href="{{ Route::has('assessments.index') ? route('assessments.index') : url('/assessments') }}"
+           class="{{ request()->is('assessments*') ? 'active' : '' }}">
+           Penilaian
+        </a>
+        <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}"
+           class="{{ request()->is('forum*') ? 'active' : '' }}">
+           Forum
+        </a>
+        <a href="{{ Route::has('games.index') ? route('games.index') : url('/games') }}"
+           class="{{ request()->is('games*') ? 'active' : '' }}">
+           Permainan
+        </a>
+      @endif
     </nav>
+
+    {{-- User button pinned to bottom of sidebar --}}
+    <div style="margin-top:auto;width:100%;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1);">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 8px;width:100%;">
+        @auth
+          <a href="{{ url('/profile') }}" style="display:flex;align-items:center;text-decoration:none;color:inherit;flex:1;gap:8px;padding:8px;border-radius:12px;transition:all .2s ease;min-width:0;" onmouseover="this.style.background='rgba(106,77,247,0.08)'" onmouseout="this.style.background='transparent'">
+            <img src="{{ auth()->user()->avatar ?? asset('avatar.png') }}" alt="avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+            <div style="text-align:left;flex:1;min-width:0;">
+              <div style="font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ auth()->user()->name }}</div>
+              <div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ auth()->user()->email }}</div>
+            </div>
+          </a>
+        @else
+          <a href="{{ url('/login') }}" style="display:block;flex:1;padding:10px 12px;text-align:center;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:12px;color:#fff;text-decoration:none;font-weight:700;font-size:14px;transition:all .2s ease;box-shadow:0 4px 12px rgba(106,77,247,0.3);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)'">Log in</a>
+        @endauth
+        <button id="themeToggle" style="background:none;border:0;color:inherit;font-size:18px;cursor:pointer;padding:8px;border-radius:8px;transition:all .2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">☀️</button>
+      </div>
+    </div>
   </aside>
 
   {{-- Main --}}
@@ -155,10 +212,6 @@ body.dark  .card { background:var(--card-dark); border:1px solid rgba(255,255,25
         <h1 class="title">@yield('page_title','Pengajar')</h1>
         <div class="sub">@yield('page_sub','')</div>
       </div>
-
-      <button id="themeToggle" style="background:none;border:0;color:inherit;font-size:18px;cursor:pointer;">
-        ☀️
-      </button>
     </div>
 
     @yield('content')

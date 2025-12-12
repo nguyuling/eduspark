@@ -11,31 +11,37 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Students table
-        Schema::create('students', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
-        });
+        // Students table (create only if missing)
+        if (! Schema::hasTable('students')) {
+            Schema::create('students', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->timestamps();
+            });
+        }
 
-        // Scores table
-        Schema::create('scores', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
-            $table->string('subject');
-            $table->decimal('score', 5, 2);
-            $table->date('date');
-            $table->timestamps();
-        });
+        // Scores table (create only if missing)
+        if (! Schema::hasTable('scores')) {
+            Schema::create('scores', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
+                $table->string('subject');
+                $table->decimal('score', 5, 2);
+                $table->date('date');
+                $table->timestamps();
+            });
+        }
 
-        // Attendance table
-        Schema::create('attendances', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
-            $table->date('date');
-            $table->boolean('present')->default(true);
-            $table->timestamps();
-        });
+        // Attendance table (create only if missing)
+        if (! Schema::hasTable('attendances')) {
+            Schema::create('attendances', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
+                $table->date('date');
+                $table->boolean('present')->default(true);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -43,8 +49,14 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('attendances');
-        Schema::dropIfExists('scores');
-        Schema::dropIfExists('students');
+        if (Schema::hasTable('attendances')) {
+            Schema::dropIfExists('attendances');
+        }
+        if (Schema::hasTable('scores')) {
+            Schema::dropIfExists('scores');
+        }
+        if (Schema::hasTable('students')) {
+            Schema::dropIfExists('students');
+        }
     }
 };
