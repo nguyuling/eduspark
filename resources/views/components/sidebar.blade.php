@@ -25,7 +25,7 @@ body.dark .sidebar{
   display:flex; align-items:center; gap:10px;
   padding:10px 12px; border-radius:10px;
   color:var(--muted); text-decoration:none; font-weight:600;
-  margin:6px 0; position:relative; font-size:14px;
+  margin:6px 0; position:relative; font-size:16px;
   transition: all .2s ease;
 }
 .nav a:hover { color:var(--accent); background:rgba(106,77,247,0.05); }
