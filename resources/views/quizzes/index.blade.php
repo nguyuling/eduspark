@@ -62,9 +62,11 @@ body.dark .card  { background:var(--card-dark); border:1px solid rgba(255,255,25
 .card .label { font-size:13px; color:var(--muted); font-weight:600; }
 .card .value { font-weight:700; font-size:20px; margin-top:6px; }
 
-.panel { border-radius:var(--card-radius); padding:14px; animation: fadeInUp .4s ease; margin-bottom:20px; background: transparent; border: 1px solid var(--control-border); backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2,6,23,0.18); }
+.panel { border-radius:var(--card-radius); padding:14px; animation: fadeInUp .4s ease; margin-bottom:20px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2,6,23,0.18); transition: border-color .2s ease; }
 body.light .panel { background: rgba(255,255,255,0.96); }
 body.dark .panel  { background:#0f1724; }
+
+.panel:hover { border-color: var(--accent); }
 
 input[type="text"], input[type="date"], textarea, select, input[type="file"] { width:100%; padding:11px 14px; border-radius:8px; border:1px solid var(--control-border); background: var(--input-bg); color: inherit; font-size:14px; outline: none; transition: box-shadow .12s ease, border-color .12s ease, transform .06s ease; resize: vertical; box-sizing: border-box; }
 textarea { min-height:84px; line-height:1.45; }
@@ -89,6 +91,35 @@ thead th { text-align:left; font-weight:700; color:var(--muted); font-size:13px;
 tbody td { padding:12px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; background: transparent; }
 
 tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1px); }
+
+/* Search & Filter input styling - gray borders */
+.panel form input[type="text"],
+.panel form input[type="email"],
+.panel form select {
+  border: 2px solid #d1d5db !important;
+  background: transparent !important;
+  color: inherit;
+  padding: 11px 14px !important;
+  height: 44px !important;
+  box-sizing: border-box;
+  border-radius: 8px;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.panel form input[type="text"]:hover,
+.panel form input[type="email"]:hover,
+.panel form select:hover {
+  border-color: #9ca3af !important;
+  background: rgba(200, 200, 200, 0.08) !important;
+}
+
+.panel form input[type="text"]:focus,
+.panel form input[type="email"]:focus,
+.panel form select:focus {
+  border-color: #9ca3af !important;
+  background: rgba(200, 200, 200, 0.08) !important;
+  outline: none;
+}
 
 @media (max-width:920px){ .sidebar{ display:none; } .app{ padding:14px; } }
 
