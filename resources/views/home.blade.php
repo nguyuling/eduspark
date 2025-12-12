@@ -62,11 +62,48 @@ body.dark .card  { background:var(--card-dark); border:1px solid rgba(255,255,25
 .card .label { font-size:13px; color:var(--muted); font-weight:600; }
 .card .value { font-weight:700; font-size:20px; margin-top:6px; }
 
-.panel { border-radius:var(--card-radius); padding:14px; animation: fadeInUp .4s ease; margin-bottom:20px; background: transparent; border: 1px solid var(--control-border); backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2,6,23,0.18); }
+.panel { border-radius:var(--card-radius); padding:14px; animation: fadeInUp .4s ease; margin-bottom:20px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2,6,23,0.18); transition: border-color .2s ease; }
 body.light .panel { background: rgba(255,255,255,0.96); }
 body.dark .panel  { background:#0f1724; }
 
+.panel:hover { border-color: var(--accent); }
+
 input[type="text"], input[type="date"], textarea, select, input[type="file"] { width:100%; padding:11px 14px; border-radius:8px; border:1px solid var(--control-border); background: var(--input-bg); color: inherit; font-size:14px; outline: none; transition: box-shadow .12s ease, border-color .12s ease, transform .06s ease; resize: vertical; box-sizing: border-box; }
+
+/* Search & Filter / Form input styling - gray borders */
+.panel form input[type="text"],
+.panel form input[type="date"],
+.panel form textarea,
+.panel form select,
+.panel form input[type="file"] {
+  border: 2px solid #d1d5db !important;
+  background: transparent !important;
+  color: inherit;
+  padding: 11px 14px !important;
+  box-sizing: border-box;
+  border-radius: 8px;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.panel form input[type="text"]:hover,
+.panel form input[type="date"]:hover,
+.panel form textarea:hover,
+.panel form select:hover,
+.panel form input[type="file"]:hover {
+  border-color: #9ca3af !important;
+  background: rgba(200, 200, 200, 0.08) !important;
+}
+
+.panel form input[type="text"]:focus,
+.panel form input[type="date"]:focus,
+.panel form textarea:focus,
+.panel form select:focus,
+.panel form input[type="file"]:focus {
+  border-color: #9ca3af !important;
+  background: rgba(200, 200, 200, 0.08) !important;
+  outline: none;
+}
+
 textarea { min-height:84px; line-height:1.45; }
 
 input[type="file"] { padding:8px 12px; border-radius:8px; }
@@ -84,11 +121,13 @@ button:hover { transform: translateY(-3px); opacity:0.98; }
 button:active { transform: translateY(-1px); }
 .btn-small { padding:6px 10px; font-size:13px; border-radius:8px; }
 
-table { width:100%; border-collapse:separate; border-spacing:0; font-size:14px; margin-top:1rem; }
-thead th { text-align:left; font-weight:700; color:var(--muted); font-size:13px; padding:12px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-tbody td { padding:12px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; background: transparent; }
+table { width:100%; border-collapse:collapse; font-size:14px; margin-top:1rem; border: 2px solid #d4c5f9; border-radius: 8px; overflow: hidden; }
+thead th { text-align:center; font-weight:700; color:var(--muted); font-size:13px; padding:12px 10px; border-bottom: 2px solid #d4c5f9; background: rgba(212, 197, 249, 0.05); }
+tbody td { padding:12px 10px; border-bottom: 1px solid #e5e1f2; vertical-align: middle; background: transparent; border-right: 1px solid #e5e1f2; }
+tbody td:last-child { border-right: none; }
+tbody tr:last-child td { border-bottom: none; }
 
-tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1px); }
+tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
 .file-meta { display:flex; flex-direction:column; gap:6px; }
 .actions { display:flex; gap:8px; align-items:center; }
 
@@ -146,6 +185,63 @@ tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1
       </div>
     </section>
 
+    <!-- Lesson List Table -->
+    <section class="panel">
+      <h2 style="margin:0 0 12px 0; font-size:18px;">Lesson List</h2>
+
+      <!-- Search & Filters (Sprint 3) -->
+      <div style="display:flex; gap:12px; margin-bottom:12px; align-items:end;">
+        <div style="flex:1.5;">
+          <label class="small-muted">Search (title, description, subject)</label>
+          <input type="text" id="searchInput" placeholder="Enter keyword...">
+        </div>
+
+        <div style="flex:1;">
+          <label class="small-muted">File type</label>
+          <select id="fileTypeFilter">
+            <option value="">All</option>
+            <option value="pdf">PDF</option>
+            <option value="docx">DOCX</option>
+            <option value="pptx">PPTX</option>
+            <option value="jpg">JPG</option>
+            <option value="png">PNG</option>
+            <option value="txt">TXT</option>
+          </select>
+        </div>
+
+        <div style="flex:1;">
+          <label class="small-muted">From</label>
+          <input type="date" id="dateFrom">
+        </div>
+
+        <div style="flex:1;">
+          <label class="small-muted">To</label>
+          <input type="date" id="dateTo">
+        </div>
+
+        <div style="width:110px;">
+          <button id="filterBtn" class="btn-small">Filter</button>
+        </div>
+      </div>
+
+      <table>
+          <thead>
+              <tr>
+                  <th style="width:48px">#</th>
+                  <th>Title</th>
+                  <th>Description</th>
+                  <th style="width:180px">File</th>
+                  <th style="width:120px">Class Group</th>
+
+                  <th style="width:220px">Actions</th>
+              </tr>
+          </thead>
+          <tbody id="lessonTableBody"></tbody>
+      </table>
+
+      <div id="noResults" style="display:none; margin-top:12px; color:var(--muted);">No results found.</div>
+    </section>
+
     <!-- Lesson Upload Panel -->
     <section class="panel">
       <h2 style="margin:0 0 10px 0; font-size:18px;">Add New Lesson</h2>
@@ -190,64 +286,6 @@ tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1
           <div class="small-muted" style="font-size:13px;">Max file size: 10MB</div>
         </div>
       </form>
-    </section>
-
-    <!-- Lesson List Table -->
-    <section class="panel">
-      <h2 style="margin:0 0 12px 0; font-size:18px;">Lesson List</h2>
-
-      <!-- Search & Filters (Sprint 3) -->
-      <div style="display:flex; gap:12px; margin-bottom:12px; align-items:end;">
-        <div style="flex:1;">
-          <label class="small-muted">Search (title, description, subject)</label>
-          <input type="text" id="searchInput" placeholder="Enter keyword...">
-        </div>
-
-        <div style="width:160px;">
-          <label class="small-muted">File type</label>
-          <select id="fileTypeFilter">
-            <option value="">All</option>
-            <option value="pdf">PDF</option>
-            <option value="docx">DOCX</option>
-            <option value="pptx">PPTX</option>
-            <option value="jpg">JPG</option>
-            <option value="png">PNG</option>
-            <option value="txt">TXT</option>
-          </select>
-        </div>
-
-        <div style="width:140px;">
-          <label class="small-muted">From</label>
-          <input type="date" id="dateFrom">
-        </div>
-
-        <div style="width:140px;">
-          <label class="small-muted">To</label>
-          <input type="date" id="dateTo">
-        </div>
-
-        <div style="width:110px;">
-          <button id="filterBtn" class="btn-small">Filter</button>
-        </div>
-      </div>
-
-      <table>
-          <thead>
-              <tr>
-                  <th style="width:48px">#</th>
-                  <th>Title</th>
-                  <th>Description</th>
-                  <th style="width:180px">File</th>
-                  <th style="width:120px">Class Group</th>
-
-                  <th style="width:220px">Actions</th>
-              </tr>
-          </thead>
-          <tbody id="lessonTableBody"></tbody>
-      </table>
-
-      <div id="noResults" style="display:none; margin-top:12px; color:var(--muted);">No results found.</div>
-    </section>
   </main>
 </div>
 

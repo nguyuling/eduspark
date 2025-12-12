@@ -86,11 +86,13 @@ button:hover { transform: translateY(-3px); opacity:0.98; }
 button:active { transform: translateY(-1px); }
 .btn-small { padding:6px 10px; font-size:13px; border-radius:8px; }
 
-table { width:100%; border-collapse:separate; border-spacing:0; font-size:14px; margin-top:1rem; }
-thead th { text-align:left; font-weight:700; color:var(--muted); font-size:13px; padding:12px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-tbody td { padding:12px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; background: transparent; }
+table { width:100%; border-collapse:collapse; font-size:14px; margin-top:1rem; border: 2px solid #d4c5f9; border-radius: 8px; overflow: hidden; }
+thead th { text-align:center; font-weight:700; color:var(--muted); font-size:13px; padding:12px 10px; border-bottom: 2px solid #d4c5f9; background: rgba(212, 197, 249, 0.05); }
+tbody td { padding:12px 10px; border-bottom: 1px solid #e5e1f2; vertical-align: middle; background: transparent; border-right: 1px solid #e5e1f2; }
+tbody td:last-child { border-right: none; }
+tbody tr:last-child td { border-bottom: none; }
 
-tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1px); }
+tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
 
 /* Search & Filter input styling - gray borders */
 .panel form input[type="text"],
@@ -104,6 +106,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1
   box-sizing: border-box;
   border-radius: 8px;
   transition: border-color .2s ease, background .2s ease;
+  width: 100% !important;
 }
 
 .panel form input[type="text"]:hover,
@@ -119,6 +122,29 @@ tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1
   border-color: #9ca3af !important;
   background: rgba(200, 200, 200, 0.08) !important;
   outline: none;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+  width: 20px !important;
+  height: 20px !important;
+  cursor: pointer;
+  accent-color: var(--accent);
+  border: 2px solid #d1d5db !important;
+  border-radius: 4px;
+  transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+  box-sizing: border-box;
+}
+
+input[type="checkbox"]:hover {
+  border-color: #9ca3af !important;
+  box-shadow: 0 0 0 3px rgba(106, 77, 247, 0.1);
+}
+
+input[type="checkbox"]:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(106, 77, 247, 0.15);
 }
 
 @media (max-width:920px){ .sidebar{ display:none; } .app{ padding:14px; } }
@@ -174,7 +200,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1
     <section class="panel">
       <h2 style="margin:0 0 10px 0; font-size:18px;">Search & Filter</h2>
       <form method="GET" action="{{ route('student.quizzes.index') }}">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:12px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
           <div>
             <label>Unique ID</label>
             <input type="text" name="unique_id" value="{{ $filters['unique_id'] ?? '' }}" placeholder="A1b2C3d4">
@@ -188,8 +214,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1
             <input type="email" name="creator_email" value="{{ $filters['creator_email'] ?? '' }}" placeholder="teacher@email.com">
           </div>
           <div>
-            <label>Publish Date</label>
-            <select name="publish_date">
+            <label>Published Date</label>
+            <select name="publish_date" style="width:100%;">
               <option value="">All Time</option>
               <option value="today" @if (isset($filters['publish_date']) && $filters['publish_date'] == 'today') selected @endif>Today</option>
               <option value="this_month" @if (isset($filters['publish_date']) && $filters['publish_date'] == 'this_month') selected @endif>This Month</option>
@@ -218,10 +244,9 @@ tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1
       <table>
         <thead>
           <tr>
-            <th style="width:45%">Quiz Details</th>
-            <th style="width:20%">Attempts</th>
-            <th style="width:15%">Score</th>
-            <th style="width:20%">Action</th>
+            <th style="width:58%">Quiz</th>
+            <th style="width:20%">Status</th>
+            <th style="width:22%">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -237,54 +262,51 @@ tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1
               elseif ($quiz->due_at && $quiz->due_at->isPast()) $statusBadge = 'Due';
             @endphp
             <tr>
-              <td style="width:45%">
-                <div style="font-weight:700; margin-bottom:6px;">{{ $quiz->title }}</div>
-                <div style="font-size:13px; color:var(--muted); margin-bottom:8px;">{{ $quiz->description }}</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                  <span style="background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px; font-size:12px;">Creator: {{ $quiz->creator->name ?? 'N/A' }}</span>
-                  <span style="background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px; font-size:12px;">ID: {{ $quiz->unique_code ?? 'N/A' }}</span>
-                </div>
-              </td>
-              <td style="width:20%">
-                <div style="font-size:13px; margin-bottom:4px;">Attempts: <strong>{{ $attemptsUsed }}/{{ $quiz->max_attempts }}</strong></div>
-                <div style="font-size:12px; color:var(--muted);">
+              <td style="width:58%">
+                <div style="font-weight:700; margin-bottom:4px;">{{ $quiz->title }}</div>
+                <div style="font-size:13px; color:var(--muted); margin-bottom:8px; line-height:1.4;">{{ $quiz->description }}</div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:11px; align-items:center;">
+                  <span style="background:rgba(106,77,247,0.08); padding:4px 8px; border-radius:4px;"><strong>Creator:</strong> {{ $quiz->creator->name ?? 'N/A' }}</span>
+                  <span style="background:rgba(106,77,247,0.08); padding:4px 8px; border-radius:4px; display:flex; align-items:center; gap:4px;">
+                    <strong>ID:</strong> {{ $quiz->unique_code ?? 'N/A' }}
+                    <button type="button" onclick="copyToClipboard('{{ $quiz->unique_code }}', this)" style="background:none; border:none; cursor:pointer; padding:0; color:var(--accent); font-weight:600; font-size:12px;" title="Copy ID">📋</button>
+                  </span>
                   @if ($quiz->due_at)
-                    @if ($quiz->due_at->isPast())
-                      <span style="color:var(--danger);">Deadline: {{ $quiz->due_at->format('M d, Y') }}</span>
-                    @else
-                      <span style="color:var(--success);">Due: {{ $quiz->due_at->format('M d, Y') }}</span>
-                    @endif
-                  @else
-                    No Deadline
+                    <span style="background:rgba(106,77,247,0.08); padding:4px 8px; border-radius:4px; color:{{ $quiz->due_at->isPast() ? 'var(--danger)' : 'var(--success)' }};">
+                      <strong>Due on:</strong> {{ $quiz->due_at->format('M d, Y') }}
+                    </span>
                   @endif
                 </div>
               </td>
-              <td style="width:15%; text-align:center;">
+              <td style="width:20%; text-align:center;">
                 <div style="font-weight:600; font-size:12px; margin-bottom:4px; padding:4px 8px; background:rgba(106,77,247,0.1); border-radius:6px; display:inline-block;">{{ $statusBadge }}</div>
-                @if ($latestAttempt)
-                  @php
-                    $totalMarks = $quiz->questions->sum('points') ?? 0;
-                  @endphp
-                  <div style="font-weight:700; margin-top:4px;">{{ $latestAttempt->score }}/{{ $totalMarks }}</div>
-                @endif
+                <div style="font-size:12px; margin-top:4px;">
+                  <div style="margin-bottom:2px;">{{ $attemptsUsed }}/{{ $quiz->max_attempts }} attempts</div>
+                  @if ($latestAttempt)
+                    @php
+                      $totalMarks = $quiz->questions->sum('points') ?? 0;
+                    @endphp
+                    <div style="font-weight:700;">Score: {{ $latestAttempt->score }}/{{ $totalMarks }}</div>
+                  @endif
+                </div>
               </td>
-              <td style="width:20%">
+              <td style="width:22%; text-align:center;">
                 @if ($canAttempt)
-                  <a href="{{ route('student.quizzes.attempt.start', $quiz->id) }}" class="btn-small">
-                    {{ $attemptsUsed > 0 ? 'Re-attempt' : 'Start' }}
+                  <a href="{{ route('student.quizzes.attempt.start', $quiz->id) }}" style="display:inline-block; padding:10px 18px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+                    {{ $attemptsUsed > 0 ? 'Re-attempt' : 'Start Quiz' }}
                   </a>
                 @elseif ($latestAttempt)
-                  <a href="{{ route('student.quizzes.result', $latestAttempt->id) }}" class="btn-small button-outline">
+                  <a href="{{ route('student.quizzes.result', $latestAttempt->id) }}" style="display:inline-block; padding:10px 18px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;">
                     View Result
                   </a>
                 @else
-                  <span style="color:var(--danger); font-size:12px;">Unavailable</span>
+                  <span style="color:var(--danger); font-size:12px; font-weight:600;">Unavailable</span>
                 @endif
               </td>
             </tr>
           @empty
             <tr>
-              <td colspan="4" style="text-align:center; padding:24px; color:var(--muted);">
+              <td colspan="3" style="text-align:center; padding:24px; color:var(--muted);">
                 @if (!empty(array_filter($filters)))
                   No quizzes matched your criteria.
                 @else
@@ -307,6 +329,14 @@ function applyTheme(mode){
 }
 const saved=localStorage.getItem('theme')||'dark'; applyTheme(saved);
 toggle.addEventListener('click',()=>{const next=body.classList.contains('dark')?'light':'dark'; applyTheme(next); localStorage.setItem('theme',next);});
+
+function copyToClipboard(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const originalText = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = originalText; }, 1500);
+  });
+}
 </script>
 
 @endsection
