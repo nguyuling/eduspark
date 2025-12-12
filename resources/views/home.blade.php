@@ -104,7 +104,7 @@ tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
   <main class="main" style="flex:1;">
     <div class="header" style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:20px; margin-top:40px; margin-left:40px; margin-right:40px;">
       <div>
-        <div class="title" style="font-weight:700;font-size:28px;">Lessons</div>
+        <div class="title" style="font-weight:700;font-size:28px;">Lesson</div>
         <div class="sub" style="color:var(--muted);font-size:13px;">Manage lesson materials</div>
       </div>
       <div style="display:flex;gap:12px;align-items:center;">
