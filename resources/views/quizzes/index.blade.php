@@ -142,20 +142,18 @@ input[type="checkbox"]:checked {
         <div class="title" style="font-weight:700;font-size:20px;">Quiz</div>
         <div class="sub" style="color:var(--muted);font-size:13px;">Take quizzes and track your progress</div>
       </div>
-      <button id="themeToggle" style="background:none;border:0;color:inherit;font-weight:600;cursor:pointer;">🌙</button>
-    </div>
-
-    <!-- Cards (Stats) -->
-    <section class="cards">
-      <div class="card">
-        <div class="label">Available Quizzes</div>
-        <div class="value">
-          <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:8px 12px; border-radius:999px;">
-            {{ $quizzes->count() }}
-          </span>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <div class="card" style="margin:0; min-width:120px;">
+          <div class="label">Total Quizzes</div>
+          <div class="value">
+            <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:8px 12px; border-radius:999px;">
+              {{ $quizzes->count() }}
+            </span>
+          </div>
         </div>
+        <button id="themeToggle" style="background:none;border:0;color:inherit;font-weight:600;cursor:pointer;font-size:24px;">🌙</button>
       </div>
-    </section>
+    </div>
 
     @if (session('error'))
       <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;font-size:14px;">{{ session('error') }}</div>
@@ -163,7 +161,7 @@ input[type="checkbox"]:checked {
 
     <!-- Quiz Filter Panel -->
     <section class="panel">
-      <h2 style="margin:0 0 10px 0; font-size:18px;">Search Quiz</h2>
+      <h2 style="margin:0 0 10px 0; font-size:18px; font-weight:700;">Search Quiz</h2>
       <form method="GET" action="{{ route('student.quizzes.index') }}">
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
           <div>
@@ -204,7 +202,7 @@ input[type="checkbox"]:checked {
 
     <!-- Quiz List Table -->
     <section class="panel">
-      <h2 style="margin:0 0 12px 0; font-size:18px;">Quizzes Available</h2>
+      <h2 style="margin:0 0 12px 0; font-size:18px; font-weight:700;">Quizzes Available</h2>
       
       <table>
         <thead>
