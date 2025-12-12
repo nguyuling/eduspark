@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\Teacher\QuizManagementController; 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\LessonController;
 
 // --- 1. AUTHENTICATION ROUTES ---
 
@@ -26,6 +27,10 @@ Route::post('/logout', function () {
     request()->session()->regenerateToken();
     return redirect('/'); // Redirects to the root, which in turn redirects to /login
 })->name('logout');
+
+// Lesson download and preview routes (protected)
+Route::middleware('auth')->get('/lessons/download/{id}', [LessonController::class, 'downloadLesson'])->name('lesson.download');
+Route::middleware('auth')->get('/lessons/preview/{id}', [LessonController::class, 'previewFile'])->name('lesson.preview.file');
 
 
 // --- 2. AUTHENTICATED USER ROUTES (Central Hub and Modules) ---

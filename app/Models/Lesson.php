@@ -12,7 +12,9 @@ class Lesson extends Model
     protected $fillable = [
         'title',
         'description',
+        'file_name',
         'file_path',
+        'file_ext',
         'uploaded_by',
         'class_group',
         'visibility',
