@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <div class="app">
   <main class="main">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center; margin-bottom:24px; margin-top:40px; margin-left:40px; margin-right:40px;">
       <div class="page-header">
         <h1>My Profile</h1>
         <div class="subtitle">View and manage your account information</div>
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- Personal Information -->
-    <div class="panel">
+    <div class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
       <div class="panel-header">
         <h3>Personal Information</h3>
       </div>
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- Organization Details -->
-    <div class="panel">
+    <div class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
       <div class="panel-header">
         <h3>Organization Details</h3>
       </div>
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- Account Security -->
-    <div class="panel">
+    <div class="panel" style="margin-left:40px; margin-right:40px;">
       <div class="panel-header">
         <h3>Account Security</h3>
       </div>

@@ -137,9 +137,9 @@ input[type="checkbox"]:checked {
 <div class="app">
   <!-- Main -->
   <main class="main" style="flex:1;">
-    <div class="header" style="display:flex;justify-content:space-between;align-items:center; margin-bottom:20px;">
+    <div class="header" style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:20px; margin-top:40px; margin-left:40px; margin-right:40px;">
       <div>
-        <div class="title" style="font-weight:700;font-size:20px;">Quiz</div>
+        <div class="title" style="font-weight:700;font-size:28px;">Quiz</div>
         <div class="sub" style="color:var(--muted);font-size:13px;">Take quizzes and track your progress</div>
       </div>
       <div style="display:flex;gap:12px;align-items:center;">
@@ -160,7 +160,7 @@ input[type="checkbox"]:checked {
     @endif
 
     <!-- Quiz Filter Panel -->
-    <section class="panel">
+    <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
       <h2 style="margin:0 0 10px 0; font-size:18px; font-weight:700;">Search Quiz</h2>
       <form method="GET" action="{{ route('student.quizzes.index') }}">
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
@@ -201,7 +201,7 @@ input[type="checkbox"]:checked {
     </section>
 
     <!-- Quiz List Table -->
-    <section class="panel">
+    <section class="panel" style="margin-left:40px; margin-right:40px;">
       <h2 style="margin:0 0 12px 0; font-size:18px; font-weight:700;">Quizzes Available</h2>
       
       <table>
