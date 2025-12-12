@@ -3,23 +3,23 @@
 @section('content')
 <style>
 .app { margin-left: 268px; padding: 28px; font-family: Inter, system-ui, sans-serif; }
-.main { flex: 1; max-width: 600px; }
+.main { flex: 1; }
 
 .page-header { margin-bottom: 28px; }
 .page-header h1 { font-weight: 700; font-size: 28px; margin: 0 0 6px 0; }
 .page-header .subtitle { color: var(--muted); font-size: 14px; }
 
-.alert { padding: 14px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: flex; align-items: flex-start; gap: 12px; }
+.alert { padding: 14px 16px; border-radius: 8px; margin-bottom: 20px; margin-left: 40px; margin-right: 40px; font-size: 14px; display: flex; align-items: flex-start; gap: 12px; }
 .alert-success { background: rgba(42, 157, 143, 0.1); border-left: 3px solid var(--success); color: var(--success); }
 .alert-danger { background: rgba(230, 57, 70, 0.1); border-left: 3px solid var(--danger); color: var(--danger); }
 .alert-title { font-weight: 700; margin-bottom: 6px; }
 
-.panel { border-radius: var(--card-radius); padding: 20px; margin-bottom: 20px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); transition: border-color .2s ease; }
+.panel { border-radius: var(--card-radius); padding: 20px; margin-bottom: 20px; margin-left: 40px; margin-right: 40px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); transition: border-color .2s ease; }
 body.light .panel { background: rgba(255, 255, 255, 0.96); }
 body.dark .panel { background: #0f1724; }
 
 .panel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-.panel-header h3 { font-weight: 700; font-size: 16px; margin: 0; }
+.panel-header h3 { font-weight: 700; font-size: 18px; margin: 0; }
 
 .form-group { margin-bottom: 18px; }
 label { font-size: 13px; color: var(--muted); font-weight: 600; display: block; margin-bottom: 6px; }
@@ -40,7 +40,7 @@ input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focu
 
 .panel-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; margin-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
 
-.btn { cursor: pointer; padding: 8px 12px; border-radius: 10px; border: none; font-weight: 700; font-size: 14px; transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.btn { cursor: pointer; padding: 12px 20px; border-radius: 10px; border: none; font-weight: 700; font-size: 15px; transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
 .btn-primary { background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: #fff; box-shadow: 0 6px 18px rgba(8, 12, 32, 0.25); }
 .btn-primary:hover { transform: translateY(-3px); opacity: 0.98; }
 .btn-danger { background: var(--danger); color: #fff; box-shadow: 0 6px 18px rgba(230, 57, 70, 0.25); }
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <div class="app">
   <main class="main">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:24px; margin-top:40px; margin-left:40px; margin-right:40px;">
       <div class="page-header">
         <h1>Change Password</h1>
         <div class="subtitle">Update your password to keep your account secure</div>
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ← Back to Profile
           </a>
           <button type="submit" class="btn btn-danger">
-            Secure Update
+            Save New Password
           </button>
         </div>
       </form>
