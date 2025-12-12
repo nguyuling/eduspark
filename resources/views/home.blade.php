@@ -116,10 +116,10 @@ tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1
       <span style="color:#1D5DCD;">edu</span><span style="color:#E63946;">Spark</span>
     </div>
     <nav class="nav">
-      <a href="#" class="active">Lessons</a>
+      <a href="{{ route('home') }}" class="active">Lessons</a>
       <a href="#">Forum</a>
       <a href="#">Games</a>
-      <a href="#">Quiz</a>
+      <a href="{{ Auth::user()->role === 'teacher' ? route('teacher.quizzes.index') : route('student.quizzes.index') }}">Quiz</a>
       <a href="#">Performance</a>
     </nav>
   </aside>
