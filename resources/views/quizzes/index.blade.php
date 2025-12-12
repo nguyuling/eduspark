@@ -12,7 +12,7 @@ body.dark .card  { background:var(--card-dark); border:1px solid rgba(255,255,25
 .card .label { font-size:13px; color:var(--muted); font-weight:600; }
 .card .value { font-weight:700; font-size:20px; margin-top:6px; }
 
-.panel { border-radius:var(--card-radius); padding:14px; animation: fadeInUp .4s ease; margin-bottom:20px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2,6,23,0.18); transition: border-color .2s ease; }
+.panel { border-radius:var(--card-radius); padding:20px; animation: fadeInUp .4s ease; margin-bottom:20px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2,6,23,0.18); transition: border-color .2s ease; }
 body.light .panel { background: rgba(255,255,255,0.96); }
 body.dark .panel  { background:#0f1724; }
 
@@ -161,48 +161,46 @@ input[type="checkbox"]:checked {
 
     <!-- Quiz Filter Panel -->
     <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
-      <h2 style="margin:0 0 10px 0; font-size:18px; font-weight:700;">Search Quiz</h2>
-      <form method="GET" action="{{ route('student.quizzes.index') }}">
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
-          <div>
-            <label>Unique ID</label>
-            <input type="text" name="unique_id" value="{{ $filters['unique_id'] ?? '' }}" placeholder="A1b2C3d4">
-          </div>
-          <div>
-            <label>Title</label>
-            <input type="text" name="title" value="{{ $filters['title'] ?? '' }}" placeholder="Computer Science">
-          </div>
-          <div>
-            <label>Creator Email</label>
-            <input type="email" name="creator_email" value="{{ $filters['creator_email'] ?? '' }}" placeholder="teacher@email.com">
-          </div>
-          <div>
-            <label>Published Date</label>
-            <select name="publish_date" style="width:100%;">
-              <option value="">All Time</option>
-              <option value="today" @if (isset($filters['publish_date']) && $filters['publish_date'] == 'today') selected @endif>Today</option>
-              <option value="this_month" @if (isset($filters['publish_date']) && $filters['publish_date'] == 'this_month') selected @endif>This Month</option>
-              <option value="3_months" @if (isset($filters['publish_date']) && $filters['publish_date'] == '3_months') selected @endif>Last 3 Months</option>
-              <option value="this_year" @if (isset($filters['publish_date']) && $filters['publish_date'] == 'this_year') selected @endif>This Year</option>
-            </select>
-          </div>
+      <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700;">Search Quiz</h2>
+      <form method="GET" action="{{ route('student.quizzes.index') }}" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:20px;">
+        <div>
+          <label>Unique ID</label>
+          <input type="text" name="unique_id" value="{{ $filters['unique_id'] ?? '' }}" placeholder="A1b2C3d4" style="height:40px;">
         </div>
-        <div style="display:flex; gap:10px; align-items:center;">
-          <div style="display:flex; align-items:center; gap:6px;">
-            <input type="checkbox" id="attempted" name="attempted" value="1" @if (isset($filters['attempted']) && $filters['attempted'] == '1') checked @endif style="width:auto;padding:0;">
-            <label for="attempted" style="margin-bottom:0;font-size:14px;">Only show quizzes I have attempted</label>
-          </div>
-          <div style="margin-left:auto; display:flex; gap:8px;">
-            <a href="{{ route('student.quizzes.index') }}" class="btn-small button-outline">Clear Filters</a>
-            <button type="submit" class="btn-small">Apply Filters</button>
-          </div>
+        <div>
+          <label>Title</label>
+          <input type="text" name="title" value="{{ $filters['title'] ?? '' }}" placeholder="Computer Science" style="height:40px;">
+        </div>
+        <div>
+          <label>Creator Email</label>
+          <input type="email" name="creator_email" value="{{ $filters['creator_email'] ?? '' }}" placeholder="teacher@email.com" style="height:40px;">
+        </div>
+        <div>
+          <label>Published Date</label>
+          <select name="publish_date" style="height:40px;">
+            <option value="">All Time</option>
+            <option value="today" @if (isset($filters['publish_date']) && $filters['publish_date'] == 'today') selected @endif>Today</option>
+            <option value="this_month" @if (isset($filters['publish_date']) && $filters['publish_date'] == 'this_month') selected @endif>This Month</option>
+            <option value="3_months" @if (isset($filters['publish_date']) && $filters['publish_date'] == '3_months') selected @endif>Last 3 Months</option>
+            <option value="this_year" @if (isset($filters['publish_date']) && $filters['publish_date'] == 'this_year') selected @endif>This Year</option>
+          </select>
         </div>
       </form>
+      <div style="display:flex; gap:10px; align-items:center; margin-bottom:20px;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <input type="checkbox" id="attempted" name="attempted" value="1" @if (isset($filters['attempted']) && $filters['attempted'] == '1') checked @endif style="width:auto;padding:0;">
+          <label for="attempted" style="margin-bottom:0;font-size:14px;">Only show quizzes I have attempted</label>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end;">
+        <a href="{{ route('student.quizzes.index') }}" class="btn-small button-outline">Clear Filters</a>
+        <button type="submit" class="btn-small" onclick="document.querySelector('form').submit();">Apply Filters</button>
+      </div>
     </section>
 
     <!-- Quiz List Table -->
-    <section class="panel" style="margin-left:40px; margin-right:40px;">
-      <h2 style="margin:0 0 12px 0; font-size:18px; font-weight:700;">Quizzes Available</h2>
+    <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+      <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700;">Quizzes Available</h2>
       
       <table>
         <thead>
