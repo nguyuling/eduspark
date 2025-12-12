@@ -117,10 +117,10 @@ tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1
     </div>
     <nav class="nav">
       <a href="#" class="active">Lessons</a>
-      <a href="#">Materials</a>
-      <a href="#">Assessments</a>
       <a href="#">Forum</a>
       <a href="#">Games</a>
+      <a href="#">Quiz</a>
+      <a href="#">Performance</a>
     </nav>
   </aside>
 
