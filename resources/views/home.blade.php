@@ -193,8 +193,8 @@ tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
               <td style="width:20%; text-align:center;">
                 <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
                   @if ($lesson->file_path)
-                    <a href="{{ route('lesson.preview.file', $lesson->id) }}" class="btn-small button-outline">View</a>
-                    <a href="{{ route('lesson.download', $lesson->id) }}" download class="btn-small button-outline">Download</a>
+                    <a href="{{ route('lesson.preview.file', $lesson->id) }}" style="background: transparent; color: inherit; border: 1px solid rgba(255,255,255,0.06); box-shadow: none; padding:12px 20px; border-radius:10px; font-weight:700; font-size:15px; text-decoration:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition: transform .08s ease, opacity .12s ease;">View</a>
+                    <a href="{{ route('lesson.download', $lesson->id) }}" download style="background: transparent; color: inherit; border: 1px solid rgba(255,255,255,0.06); box-shadow: none; padding:12px 20px; border-radius:10px; font-weight:700; font-size:15px; text-decoration:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition: transform .08s ease, opacity .12s ease;">Download</a>
                   @endif
                 </div>
               </td>

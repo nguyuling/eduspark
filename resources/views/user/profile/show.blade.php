@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="panel-footer">
         <div></div>
-        <a href="{{ route('profile.edit') }}" class="btn btn-primary">
+        <a href="{{ route('profile.edit') }}" style="cursor: pointer; padding:12px 20px; border-radius:10px; border:none; background: linear-gradient(90deg, var(--accent), var(--accent-2)); color:#fff; font-weight:700; font-size:15px; transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; box-shadow: 0 6px 18px rgba(8, 12, 32, 0.25);">
           Edit Profile
         </a>
       </div>
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <p style="margin: 0 0 16px 0; color: var(--muted);">Password is set and secured.</p>
       <div style="display: flex; justify-content: flex-end;">
-        <a href="{{ route('profile.password.edit') }}" class="btn btn-danger">
+        <a href="{{ route('profile.password.edit') }}" style="cursor: pointer; padding:12px 20px; border-radius:10px; border:none; background: var(--danger); color:#fff; font-weight:700; font-size:15px; transition: transform .08s ease, opacity .12s ease; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; box-shadow: none;">
           Change Password
         </a>
       </div>
