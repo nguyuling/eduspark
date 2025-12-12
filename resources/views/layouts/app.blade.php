@@ -11,18 +11,65 @@
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     
-    {{-- ADDED: Bootstrap Icons CDN for better module icons in the sidebar --}}
+    {{-- Bootstrap Icons CDN --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 
-@vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <style>
+        /* ---------- Theme variables ---------- */
+        :root{
+          --bg-light:#f5f7ff;
+          --bg-dark:#071026;
+          --card-light:rgba(255,255,255,0.9);
+          --card-dark:#0f1724;
+          --accent:#6A4DF7;
+          --accent-2:#9C7BFF;
+          --muted:#98a0b3;
+          --success:#2A9D8F;
+          --danger:#E63946;
+          --yellow:#F4C430;
+          --glass: rgba(255,255,255,0.04);
+          --input-bg: rgba(255,255,255,0.02);
+          --control-border: rgba(255,255,255,0.08);
+          --radius: 10px;
+          --card-radius: 14px;
+          --focus-glow: 0 6px 20px rgba(106,77,247,0.12);
+          --shadow-soft: 0 6px 20px rgba(2,6,23,0.45);
+          font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+
+        body.light { background:var(--bg-light); color:#0b1220; }
+        body.dark  { background:var(--bg-dark); color:#e6eef8; }
+
+        body { margin:0; padding:0; }
+    </style>
 </head>
-<body>
+<body class="dark">
     <div id="app">
-        {{-- START: MAIN CONTENT AREA --}}
+        {{-- Sidebar Component --}}
+        @include('components.sidebar')
+        
+        {{-- MAIN CONTENT AREA --}}
         <main class="w-100"> 
             @yield('content')
         </main>
         {{-- END: MAIN CONTENT AREA --}}
     </div>
+    
+    <script>
+        // Theme Toggle
+        const body = document.body;
+        const saved = localStorage.getItem('theme') || 'dark';
+        body.classList.add(saved);
+        
+        window.applyTheme = function(mode) {
+            if(mode === 'light') {
+                body.classList.replace('dark', 'light');
+            } else {
+                body.classList.replace('light', 'dark');
+            }
+        }
+    </script>
 </body>
 </html>
