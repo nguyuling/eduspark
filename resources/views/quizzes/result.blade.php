@@ -3,63 +3,9 @@
 @section('content')
 
 <style>
-/* ---------- Theme variables ---------- */
-:root{
-  --bg-light:#f5f7ff;
-  --bg-dark:#071026;
-  --card-light:rgba(255,255,255,0.9);
-  --card-dark:#0f1724;
-  --accent:#6A4DF7;
-  --accent-2:#9C7BFF;
-  --muted:#98a0b3;
-  --success:#2A9D8F;
-  --danger:#E63946;
-  --yellow:#F4C430;
-  --glass: rgba(255,255,255,0.04);
-  --input-bg: rgba(255,255,255,0.02);
-  --control-border: rgba(255,255,255,0.08);
-  --radius: 10px;
-  --card-radius: 14px;
-  --focus-glow: 0 6px 20px rgba(106,77,247,0.12);
-  --shadow-soft: 0 6px 20px rgba(2,6,23,0.45);
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
+.app { display:flex; min-height:100vh; gap:28px; padding:28px; font-family: Inter, system-ui, sans-serif; margin-left:268px; }
 
-body.light { background:var(--bg-light); color:#0b1220; }
-body.dark  { background:var(--bg-dark); color:#e6eef8; }
-
-.app { display:flex; min-height:100vh; gap:28px; padding:28px; font-family: Inter, system-ui, sans-serif; }
-
-.sidebar{
-  width:240px; border-radius:var(--card-radius); padding:18px;
-  display:flex; flex-direction:column; align-items:center; gap:12px;
-  backdrop-filter: blur(8px) saturate(120%);
-  box-shadow: none;
-  position: fixed;
-  left: 28px;
-  top: 28px;
-  height: calc(100vh - 56px);
-}
-body.light .sidebar{
-  background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.68));
-  border:1px solid rgba(13,18,25,0.05);
-}
-body.dark .sidebar{
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border:1px solid rgba(255,255,255,0.03);
-}
-.logo { width:110px; height:auto; margin-bottom:6px; }
-
-.nav { width:100%; margin-top:10px; padding-top:6px; }
-.nav a {
-  display:flex; align-items:center; gap:10px;
-  padding:10px 12px; border-radius:10px;
-  color:var(--muted); text-decoration:none; font-weight:600;
-  margin:6px 0; position:relative; font-size:14px;
-}
-.nav a.active { color:var(--accent); }
-
-.main { flex:1; margin-left:268px; }
+.main { flex:1; }
 
 .panel { border-radius:var(--card-radius); padding:20px; animation: fadeInUp .4s ease; margin-bottom:20px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2,6,23,0.18); transition: border-color .2s ease; }
 body.light .panel { background: rgba(255,255,255,0.96); }
@@ -117,12 +63,21 @@ body.dark .question-card { background:#0f1724; }
       <span style="color:#1D5DCD;">edu</span><span style="color:#E63946;">Spark</span>
     </div>
     <nav class="nav">
-      <a href="{{ route('home') }}">Lessons</a>
-      <a href="#">Forum</a>
-      <a href="#">Games</a>
-      <a href="{{ Auth::user()->role === 'teacher' ? route('teacher.quizzes.index') : route('student.quizzes.index') }}" class="active">Quiz</a>
-      <a href="#">Performance</a>
+      <a href="{{ route('home') }}"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19h16v2H4zm0-6h16v2H4zm0-6h16v2H4zM4 1h16v2H4z"/></svg></span>Lessons</a>
+      <a href="#"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V4l8 5 8-5v2z"/></svg></span>Forum</a>
+      <a href="#"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 6h-2v9c0 .55-.45 1-1 1h-1c-.55 0-1-.45-1-1V4c0-1.1-.9-2-2-2h-3.5C10.88 2 10 2.88 10 4v3H5c-1.1 0-2 .9-2 2v11h2v2h2v-2h8v2h2v-2h2V9c0-.55-.45-1-1-1zm-4-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"/></svg></span>Games</a>
+      <a href="{{ Auth::user()->role === 'teacher' ? route('teacher.quizzes.index') : route('student.quizzes.index') }}" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>Quiz</a>
+      <a href="#"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg></span>Performance</a>
     </nav>
+    <div class="profile-section">
+      <a href="{{ route('profile.show') }}" class="profile-link">
+        <div class="profile-icon">{{ substr(Auth::user()->name, 0, 1) }}</div>
+        <div style="flex:1; text-align:left; overflow:hidden;">
+          <div style="font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ Auth::user()->name }}</div>
+          <div style="font-size:11px; color:var(--muted); text-transform:capitalize;">{{ Auth::user()->role }}</div>
+        </div>
+      </a>
+    </div>
   </aside>
 
   <!-- Main Content -->
