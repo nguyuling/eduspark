@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Personal Information -->
     <div class="panel">
       <div class="panel-header">
-        <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--accent); border-radius: 50%; color: #fff; font-weight: 700; font-size: 12px;">{{ substr($user->name, 0, 1) }}</div>
         <h3>Personal Information</h3>
       </div>
       <div class="info-grid">
@@ -101,7 +100,6 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Organization Details -->
     <div class="panel">
       <div class="panel-header">
-        <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--accent); border-radius: 50%; color: #fff; font-weight: 700; font-size: 12px;">🏢</div>
         <h3>Organization Details</h3>
       </div>
       @php
@@ -131,7 +129,6 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Account Security -->
     <div class="panel">
       <div class="panel-header">
-        <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--danger); border-radius: 50%; color: #fff; font-weight: 700; font-size: 12px;">🔒</div>
         <h3>Account Security</h3>
       </div>
       <p style="margin: 0 0 16px 0; color: var(--muted);">Password is set and secured.</p>

@@ -101,7 +101,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <div class="panel">
       <div class="panel-header">
-        <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--accent); border-radius: 50%; color: #fff; font-weight: 700; font-size: 12px;">✎</div>
         <h3>Personal Details</h3>
       </div>
 

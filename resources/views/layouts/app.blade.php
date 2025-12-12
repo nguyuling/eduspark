@@ -45,7 +45,7 @@
         body { margin:0; padding:0; }
     </style>
 </head>
-<body class="dark">
+<body class="light">
     <div id="app">
         {{-- Sidebar Component --}}
         @include('components.sidebar')
@@ -60,7 +60,7 @@
     <script>
         // Theme Toggle
         const body = document.body;
-        const saved = localStorage.getItem('theme') || 'dark';
+        const saved = localStorage.getItem('theme') || 'light';
         body.classList.add(saved);
         
         window.applyTheme = function(mode) {
