@@ -100,466 +100,131 @@ tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
 </style>
 
 <div class="app">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <img src="{{ asset('logo.png') }}" alt="EduSpark logo" class="logo">
-    <div class="logo-text" aria-hidden="true" style="font-weight:700;font-size:18px;">
-      <span style="color:#1D5DCD;">edu</span><span style="color:#E63946;">Spark</span>
-    </div>
-    <nav class="nav">
-      <a href="{{ route('home') }}" class="active">Lessons</a>
-      <a href="#">Forum</a>
-      <a href="#">Games</a>
-      <a href="{{ Auth::user()->role === 'teacher' ? route('teacher.quizzes.index') : route('student.quizzes.index') }}">Quiz</a>
-      <a href="#">Performance</a>
-    </nav>
-  </aside>
-
   <!-- Main -->
   <main class="main" style="flex:1;">
     <div class="header" style="display:flex;justify-content:space-between;align-items:center; margin-bottom:20px;">
       <div>
-        <div class="title" style="font-weight:700;font-size:20px;">Lessons</div>
+        <div class="title" style="font-weight:700;font-size:20px;">Lesson</div>
         <div class="sub" style="color:var(--muted);font-size:13px;">Manage lesson materials</div>
       </div>
-      <button id="themeToggle" style="background:none;border:0;color:inherit;font-weight:600;cursor:pointer;">🌙</button>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <div class="card" style="margin:0; min-width:120px;">
+          <div class="label">Total Lessons</div>
+          <div class="value">
+            <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:8px 12px; border-radius:999px;">
+              {{ \App\Models\Lesson::count() }}
+            </span>
+          </div>
+        </div>
+        <button id="themeToggle" style="background:none;border:0;color:inherit;font-weight:600;cursor:pointer;font-size:24px;">🌙</button>
+      </div>
     </div>
 
-    <!-- Cards (optional stats placeholders) -->
-    <section class="cards">
-      <div class="card">
-        <div class="label">Total Lessons</div>
-        <div class="value">
-          <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:8px 12px; border-radius:999px;">
-            {{ \App\Models\Lesson::count() }}
-          </span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Lesson List Table -->
+    <!-- Search Lesson Panel -->
     <section class="panel">
-      <h2 style="margin:0 0 12px 0; font-size:18px;">Search Lesson</h2>
-
-      <!-- Search & Filters (Sprint 3) -->
-      <div style="display:flex; gap:12px; margin-bottom:12px; align-items:end;">
-        <div style="flex:1.5;">
-          <label class="small-muted">Search (title, description, subject)</label>
-          <input type="text" id="searchInput" placeholder="Enter keyword...">
+      <h2 style="margin:0 0 10px 0; font-size:18px; font-weight:700;">Search Lesson</h2>
+      <form method="GET" action="{{ route('home') }}" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
+        <div>
+          <label>Search</label>
+          <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Title or description" style="height:40px;">
         </div>
-
-        <div style="flex:1;">
-          <label class="small-muted">File type</label>
-          <select id="fileTypeFilter">
+        <div>
+          <label>File Type</label>
+          <select name="file_type" style="height:40px;">
             <option value="">All</option>
-            <option value="pdf">PDF</option>
-            <option value="docx">DOCX</option>
-            <option value="pptx">PPTX</option>
-            <option value="jpg">JPG</option>
-            <option value="png">PNG</option>
-            <option value="txt">TXT</option>
+            <option value="pdf" @if (isset($filters['file_type']) && $filters['file_type'] == 'pdf') selected @endif>PDF</option>
+            <option value="docx" @if (isset($filters['file_type']) && $filters['file_type'] == 'docx') selected @endif>DOCX</option>
+            <option value="pptx" @if (isset($filters['file_type']) && $filters['file_type'] == 'pptx') selected @endif>PPTX</option>
+            <option value="jpg" @if (isset($filters['file_type']) && $filters['file_type'] == 'jpg') selected @endif>JPG</option>
+            <option value="png" @if (isset($filters['file_type']) && $filters['file_type'] == 'png') selected @endif>PNG</option>
           </select>
         </div>
-
-        <div style="flex:1;">
-          <label class="small-muted">From</label>
-          <input type="date" id="dateFrom">
+        <div>
+          <label>From</label>
+          <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" style="height:40px;">
         </div>
-
-        <div style="flex:1;">
-          <label class="small-muted">To</label>
-          <input type="date" id="dateTo">
-        </div>
-
-        <div style="width:110px;">
-          <button id="filterBtn" class="btn-small">Filter</button>
-        </div>
-      </div>
-
-      <table>
-          <thead>
-              <tr>
-                  <th style="width:48px">#</th>
-                  <th>Title</th>
-                  <th>Description</th>
-                  <th style="width:180px">File</th>
-                  <th style="width:120px">Class Group</th>
-
-                  <th style="width:220px">Actions</th>
-              </tr>
-          </thead>
-          <tbody id="lessonTableBody"></tbody>
-      </table>
-
-      <div id="noResults" style="display:none; margin-top:12px; color:var(--muted);">No results found.</div>
-    </section>
-
-    <!-- Lesson Upload Panel -->
-    <section class="panel">
-      <h2 style="margin:0 0 10px 0; font-size:18px;">Add New Lesson</h2>
-      <form id="createLessonForm" enctype="multipart/form-data">
-        @csrf
-        <div style="margin-bottom:12px;">
-            <label>Title:</label>
-            <input type="text" name="title" required placeholder="e.g. Introduction to Algorithms">
-        </div>
-
-        <div style="margin-bottom:12px;">
-            <label>Description:</label>
-            <textarea name="description" rows="3" placeholder="Short description (optional)"></textarea>
-        </div>
-
-<div class="mt-3">
-    <label for="class_group" class="block text-sm font-medium text-gray-700">Class Group</label>
-    <select name="class_group" id="class_group" class="mt-1 w-full border border-gray-300 rounded-md p-2">
-        <option value="4A">4A</option>
-        <option value="4B">4B</option>
-        <option value="4C">4C</option>
-        <option value="5A">5A</option>
-        <option value="5B">5B</option>
-    </select>
-</div>
-
-<div class="mt-3">
-    <label for="visibility" class="block text-sm font-medium text-gray-700">Visibility</label>
-    <select name="visibility" id="visibility" class="mt-1 w-full border border-gray-300 rounded-md p-2">
-        <option value="class">Class Only</option>
-        <option value="public">Public (All Students)</option>
-    </select>
-</div>
-
-        <div style="margin-bottom:12px;">
-            <label>Upload File:</label>
-            <input type="file" name="file" accept=".pdf,.docx,.pptx,.txt,.jpg,.png">
-        </div>
-
-        <div style="display:flex; gap:10px; align-items:center;">
-          <button type="submit" style="min-width:120px;">Upload Lesson</button>
-          <div class="small-muted" style="font-size:13px;">Max file size: 10MB</div>
+        <div>
+          <label>To</label>
+          <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" style="height:40px;">
         </div>
       </form>
+      <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end;">
+        <a href="{{ route('home') }}" class="btn-small button-outline">Clear Filters</a>
+        <button onclick="document.querySelector('.panel form').submit();" class="btn-small">Apply Filters</button>
+      </div>
+    </section>
+
+    <!-- Lessons Available Panel -->
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h2 style="margin:0; font-size:18px; font-weight:700;">Lessons Available</h2>
+        <a href="{{ route('lessons.index') }}" style="background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:12px 20px; border-radius:10px; border:none; font-weight:700; font-size:15px; text-decoration:none; cursor:pointer; box-shadow: 0 6px 18px rgba(8,12,32,0.25); transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease; display:inline-flex; align-items:center; gap:6px;">Create Lesson</a>
+      </div>
+      
+      <table style="margin-top:16px;">
+        <thead>
+          <tr>
+            <th style="width:60%">Lesson</th>
+            <th style="width:20%">File</th>
+            <th style="width:20%">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @forelse ($lessons ?? [] as $lesson)
+            <tr>
+              <td style="width:60%">
+                <div style="font-weight:700; margin-bottom:4px;">{{ $lesson->title }}</div>
+                <div style="font-size:13px; color:var(--muted); margin-bottom:8px; line-height:1.4;">{{ $lesson->description ?: 'No description' }}</div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:11px; align-items:center;">
+                  <span style="background:rgba(106,77,247,0.08); padding:4px 8px; border-radius:4px;"><strong>Class:</strong> {{ $lesson->class_group ?? 'N/A' }}</span>
+                  <span style="background:rgba(106,77,247,0.08); padding:4px 8px; border-radius:4px;">
+                    <strong>Created:</strong> {{ $lesson->created_at->format('M d, Y') }}
+                  </span>
+                </div>
+              </td>
+              <td style="width:20%; text-align:center;">
+                @if ($lesson->file_path)
+                  <div style="font-weight:700; font-size:12px; margin-bottom:4px;">{{ strtoupper(pathinfo($lesson->file_name ?? $lesson->file_path, PATHINFO_EXTENSION)) }}</div>
+                  <div style="font-size:11px; color:var(--muted);">{{ $lesson->file_name ?? basename($lesson->file_path) }}</div>
+                @else
+                  <div style="color:var(--muted); font-size:12px;">No file</div>
+                @endif
+              </td>
+              <td style="width:20%; text-align:center;">
+                <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+                  @if ($lesson->file_path)
+                    <a href="{{ route('lesson.preview.file', $lesson->id) }}" class="btn-small button-outline">View</a>
+                    <a href="{{ route('lesson.download', $lesson->id) }}" download class="btn-small button-outline">Download</a>
+                  @endif
+                </div>
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="3" style="text-align:center; padding:20px; color:var(--muted);">No lessons found.</td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
+    </section>
   </main>
 </div>
 
-
-<!-- Modal Viewer (Option A) -->
-<div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-hidden="true">
-  <div class="modal" role="document">
-    <header>
-      <div>
-        <div id="modalTitle" style="font-weight:700;color:inherit;">Preview</div>
-        <div id="modalInfo" class="info" style="margin-top:6px;color:var(--muted);font-size:13px;"></div>
-      </div>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <button id="modalDownloadBtn" class="button-outline btn-small" style="padding:8px 10px;">Download</button>
-        <button id="modalCloseBtn" class="button-outline btn-small" style="padding:8px 10px;">✕</button>
-      </div>
-    </header>
-    <div class="content" style="background:#fff;">
-      <iframe id="previewFrame" src="" frameborder="0"></iframe>
-    </div>
-  </div>
-</div>
+@endsection
 
 <script>
-const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-const body=document.body, toggle=document.getElementById('themeToggle');
-function applyTheme(mode){
-  if(mode==='light'){body.classList.replace('dark','light');toggle.textContent='☀️';}
-  else{body.classList.replace('light','dark');toggle.textContent='🌙';}
-}
-const saved=localStorage.getItem('theme')||'dark'; applyTheme(saved);
-toggle.addEventListener('click',()=>{const next=body.classList.contains('dark')?'light':'dark'; applyTheme(next); localStorage.setItem('theme',next);});
-
-function buildQuery(params) {
-    return Object.keys(params).filter(k => params[k]).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`).join('&');
-}
-
-async function loadLessons() {
-    const q = document.getElementById('searchInput').value.trim();
-    const file_type = document.getElementById('fileTypeFilter').value;
-    const date_from = document.getElementById('dateFrom').value;
-    const date_to = document.getElementById('dateTo').value;
-
-    const qs = buildQuery({ q, file_type, date_from, date_to });
-    const url = '/api/lessons' + (qs ? ('?' + qs) : '');
-
-    const response = await fetch(url);
-    if (!response.ok) {
-        alert('Failed to load lessons.');
-        return;
-    }
-    const lessons = await response.json();
-    const tableBody = document.getElementById('lessonTableBody');
-    tableBody.innerHTML = '';
-
-    if (!lessons || lessons.length === 0) {
-        document.getElementById('noResults').style.display = 'block';
-        return;
-    } else {
-        document.getElementById('noResults').style.display = 'none';
-    }
-
-    lessons.forEach((lesson, index) => {
-    const fileLabel = lesson.file_path ? `${lesson.file_name}` : 'No file';
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>${index + 1}</td>
-        <td><input type="text" id="title-${lesson.id}" value="${escapeHtml(lesson.title)}"></td>
-        <td><textarea id="desc-${lesson.id}">${escapeHtml(lesson.description || '')}</textarea></td>
-        <td>
-            ${lesson.file_path ? `<div class="file-meta">
-                <div style="font-weight:700">${escapeHtml(fileLabel)}</div>
-                <div class="small-muted" style="font-size:12px">${lesson.file_ext ? lesson.file_ext.toUpperCase() : ''} • ${lesson.created_at ? new Date(lesson.created_at).toLocaleString() : ''}</div>
-            </div>` : 'No file'}
-            <input type="file" id="file-${lesson.id}" accept=".pdf,.docx,.pptx,.txt,.jpg,.png" style="margin-top:6px;">
-        </td>
-        <td class="actions">
-            <button onclick="updateLesson(${lesson.id})" class="btn-small">Edit</button>
-            <button onclick="deleteLesson(${lesson.id})" class="btn-small danger">Delete</button>
-            ${lesson.file_path ? `<button onclick="viewLesson(${lesson.id})" class="btn-small button-outline" style="margin-left:6px;">View</button>
-            <button onclick="downloadLesson(${lesson.id}, this)" class="btn-small button-outline" style="margin-left:6px;">Download</button>` : ''}
-        </td>
-    `;
-    tableBody.appendChild(row);
-});
-
-}
-
-function escapeHtml(text) {
-    if (!text) return '';
-    return text.replace(/[&<>"'\/]/g, function (s) {
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '/': '&#x2F;' };
-        return map[s];
+document.addEventListener('DOMContentLoaded', function() {
+  const themeToggle = document.getElementById('themeToggle');
+  if(themeToggle) {
+    themeToggle.addEventListener('click', function() {
+      const isDark = document.body.classList.contains('dark');
+      const newTheme = isDark ? 'light' : 'dark';
+      document.body.classList.replace(isDark ? 'dark' : 'light', newTheme);
+      localStorage.setItem('theme', newTheme);
+      themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
     });
-}
-
-document.getElementById('createLessonForm').addEventListener('submit', async function(e){
-    e.preventDefault();
-    const formData = new FormData(this);
-    try {
-        const response = await fetch('/api/lessons', {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': csrfToken },
-            body: formData
-        });
-        const data = await response.json();
-        if (!data.success) throw new Error(data.message || 'Unknown error');
-        alert('Lesson created successfully!');
-        this.reset();
-        loadLessons();
-    } catch(err){
-        console.error(err);
-        alert('Unexpected error: ' + err.message);
-    }
+    const isDark = document.body.classList.contains('dark');
+    themeToggle.textContent = isDark ? '🌙' : '☀️';
+  }
 });
-
-async function updateLesson(id) {
-    const formData = new FormData();
-    formData.append('title', document.getElementById(`title-${id}`).value);
-    formData.append('description', document.getElementById(`desc-${id}`).value);
-    formData.append('_method', 'PUT');
-
-    const fileInput = document.getElementById(`file-${id}`);
-    if (fileInput && fileInput.files[0]) {
-        formData.append('file', fileInput.files[0]);
-    }
-
-    try {
-        const response = await fetch(`/api/lessons/${id}`, {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': csrfToken },
-            body: formData
-        });
-        const data = await response.json();
-        if (!data.success) throw new Error(data.message || 'Unknown error');
-        alert(data.message || 'Lesson updated successfully!');
-        loadLessons();
-    } catch(err){
-        console.error(err);
-        alert('Unexpected error: ' + err.message);
-    }
-}
-
-async function deleteLesson(id) {
-    if (!confirm('Are you sure you want to delete this lesson?')) return;
-    const formData = new FormData();
-    try {
-        const response = await fetch(`/api/lessons/${id}/delete`, {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': csrfToken },
-            body: formData
-        });
-        const data = await response.json();
-        alert(data.message || 'Lesson deleted');
-        loadLessons();
-    } catch(err){
-        console.error(err);
-        alert('Unexpected error: ' + err.message);
-    }
-}
-
-document.getElementById('filterBtn').addEventListener('click', () => loadLessons());
-document.getElementById('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadLessons(); });
-
-const modalBackdrop = document.getElementById('modalBackdrop');
-const previewFrame = document.getElementById('previewFrame');
-const modalTitle = document.getElementById('modalTitle');
-const modalInfo = document.getElementById('modalInfo');
-const modalCloseBtn = document.getElementById('modalCloseBtn');
-const modalDownloadBtn = document.getElementById('modalDownloadBtn');
-
-modalCloseBtn.addEventListener('click', closeModal);
-modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) closeModal(); });
-
-function openModal() {
-    modalBackdrop.style.display = 'flex';
-    modalBackdrop.setAttribute('aria-hidden', 'false');
-}
-function closeModal() {
-    previewFrame.src = '';
-    modalBackdrop.style.display = 'none';
-    modalBackdrop.setAttribute('aria-hidden', 'true');
-    modalTitle.textContent = 'Preview';
-    modalInfo.textContent = '';
-}
-
-function isPreviewable(ext, mime) {
-    const previewableExts = ['pdf', 'jpg', 'jpeg', 'png', 'txt'];
-    if (!ext) return false;
-    ext = ext.toLowerCase();
-    if (previewableExts.includes(ext)) return true;
-    if (mime && mime.startsWith('image/')) return true;
-    if (mime === 'application/pdf') return true;
-    return false;
-}
-
-async function viewLesson(id) {
-    try {
-        const res = await fetch(`/api/lessons/${id}/preview`);
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-            alert(data.message || 'Cannot preview this file.');
-            return;
-        }
-
-        const { url, mime, file_name, file_ext, lesson } = data;
-
-        modalTitle.textContent = lesson.title || file_name || 'Preview';
-        modalInfo.textContent = `${file_name} • ${mime || (file_ext?file_ext.toUpperCase():'')}`;
-
-        modalDownloadBtn.onclick = () => downloadLesson(id, modalDownloadBtn);
-
-        if (isPreviewable(file_ext, mime)) {
-            previewFrame.src = url;
-        } else {
-            previewFrame.src = 'about:blank';
-            if (confirm('This file cannot be previewed in the browser. Would you like to download it instead?')) {
-                downloadLesson(id, modalDownloadBtn);
-                return;
-            } else {
-                return;
-            }
-        }
-
-        openModal();
-    } catch (err) {
-        console.error(err);
-        alert('Error while trying to preview file.');
-    }
-}
-
-function downloadLesson(id, button) {
-    button = button || null;
-    const originalText = button ? button.textContent : null;
-    if (button) { button.textContent = 'Downloading...'; button.disabled = true; }
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', `/lessons/download/${id}`, true);
-    xhr.responseType = 'blob';
-    xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-
-    let progressBarWrapper = null;
-    let progressBar = null;
-    if (button) {
-        progressBarWrapper = document.createElement('div');
-        progressBarWrapper.style.width = '100%';
-        progressBarWrapper.style.maxWidth = '220px';
-        progressBarWrapper.style.marginTop = '6px';
-        const wrapperInner = document.createElement('div');
-        wrapperInner.className = 'progress-bar';
-        progressBar = document.createElement('span');
-        progressBar.style.width = '0%';
-        wrapperInner.appendChild(progressBar);
-        progressBarWrapper.appendChild(wrapperInner);
-        button.parentNode.insertBefore(progressBarWrapper, button.nextSibling);
-    }
-
-    xhr.onprogress = function(e) {
-        if (!e.lengthComputable) return;
-        const percent = Math.round((e.loaded / e.total) * 100);
-        if (progressBar) progressBar.style.width = percent + '%';
-    };
-
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            const disposition = xhr.getResponseHeader('Content-Disposition') || '';
-            let filename = 'download';
-            const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
-            if (matches != null && matches[1]) {
-                filename = matches[1].replace(/['"]/g, '');
-            } else {
-            }
-
-            (async () => {
-                try {
-                    if (!filename || filename === 'download') {
-                        const p = await fetch(`/api/lessons/${id}/preview`);
-                        if (p.ok) {
-                            const pd = await p.json();
-                            if (pd && pd.file_name) filename = pd.file_name;
-                        }
-                    }
-                } catch(e) { }
-
-                const blob = xhr.response;
-                const link = document.createElement('a');
-                const url = window.URL.createObjectURL(blob);
-                link.href = url;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-                window.URL.revokeObjectURL(url);
-
-                if (button) {
-                    button.textContent = 'Downloaded';
-                    setTimeout(() => {
-                        button.textContent = originalText;
-                        button.disabled = false;
-                        if (progressBarWrapper) progressBarWrapper.remove();
-                    }, 1200);
-                } else {
-                    alert('Download complete');
-                }
-            })();
-        } else {
-            alert('Download failed (server error).');
-            if (button) { button.textContent = originalText; button.disabled = false; if (progressBarWrapper) progressBarWrapper.remove(); }
-        }
-    };
-
-    xhr.onerror = function() {
-        alert('Download failed (network error).');
-        if (button) { button.textContent = originalText; button.disabled = false; if (progressBarWrapper) progressBarWrapper.remove(); }
-    };
-
-    xhr.send();
-}
-
-loadLessons();
-
 </script>
-
-@endsection
