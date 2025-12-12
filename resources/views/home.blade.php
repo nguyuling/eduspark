@@ -3,57 +3,8 @@
 @section('content')
 
 <style>
-/* ---------- Theme variables (kept from lessons UI) ---------- */
-:root{
-  --bg-light:#f5f7ff;
-  --bg-dark:#071026;
-  --card-light:rgba(255,255,255,0.9);
-  --card-dark:#0f1724;
-  --accent:#6A4DF7;
-  --accent-2:#9C7BFF;
-  --muted:#98a0b3;
-  --success:#2A9D8F;
-  --danger:#E63946;
-  --yellow:#F4C430;
-  --glass: rgba(255,255,255,0.04);
-  --input-bg: rgba(255,255,255,0.02);
-  --control-border: rgba(255,255,255,0.08);
-  --radius: 10px;
-  --card-radius: 14px;
-  --focus-glow: 0 6px 20px rgba(106,77,247,0.12);
-  --shadow-soft: 0 6px 20px rgba(2,6,23,0.45);
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
-
-body.light { background:var(--bg-light); color:#0b1220; }
-body.dark  { background:var(--bg-dark); color:#e6eef8; }
-
-.app { display:flex; min-height:80vh; gap:28px; padding:28px; font-family: Inter, system-ui, sans-serif; }
-
-.sidebar{
-  width:240px; border-radius:var(--card-radius); padding:18px;
-  display:flex; flex-direction:column; align-items:center; gap:12px;
-  backdrop-filter: blur(8px) saturate(120%);
-  box-shadow: none;
-}
-body.light .sidebar{
-  background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.68));
-  border:1px solid rgba(13,18,25,0.05);
-}
-body.dark .sidebar{
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border:1px solid rgba(255,255,255,0.03);
-}
-.logo { width:110px; height:auto; margin-bottom:6px; }
-
-.nav { width:100%; margin-top:10px; padding-top:6px; }
-.nav a {
-  display:flex; align-items:center; gap:10px;
-  padding:10px 12px; border-radius:10px;
-  color:var(--muted); text-decoration:none; font-weight:600;
-  margin:6px 0; position:relative; font-size:14px;
-}
-.nav a.active { color:var(--accent); }
+/* Theme variables defined in layouts/app.blade.php */
+.app { display:flex; min-height:80vh; gap:28px; padding:28px; font-family: Inter, system-ui, sans-serif; margin-left:268px; }
 
 .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; margin-bottom:20px; }
 .card { border-radius:var(--card-radius); padding:14px 16px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; text-align:left; transition: transform .12s ease, box-shadow .12s ease; background: transparent; }
