@@ -126,25 +126,55 @@ tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
 
 /* Checkbox styling */
 input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   width: 20px !important;
   height: 20px !important;
   cursor: pointer;
-  accent-color: var(--accent);
   border: 2px solid #d1d5db !important;
   border-radius: 4px;
-  transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+  transition: border-color .2s ease, background .2s ease;
   box-sizing: border-box;
+  background: transparent !important;
+  accent-color: var(--accent);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+input[type="checkbox"]::after {
+  content: '';
+  position: absolute;
+  display: none;
+  left: 5px;
+  top: 1px;
+  width: 6px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+input[type="checkbox"]:checked::after {
+  display: block;
 }
 
 input[type="checkbox"]:hover {
   border-color: #9ca3af !important;
-  box-shadow: 0 0 0 3px rgba(106, 77, 247, 0.1);
+  background: rgba(200, 200, 200, 0.08) !important;
 }
 
 input[type="checkbox"]:focus {
   outline: none;
+  border-color: #9ca3af !important;
+  background: rgba(200, 200, 200, 0.08) !important;
+}
+
+input[type="checkbox"]:checked {
+  background: var(--accent) !important;
   border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px rgba(106, 77, 247, 0.15);
 }
 
 @media (max-width:920px){ .sidebar{ display:none; } .app{ padding:14px; } }
@@ -198,7 +228,7 @@ input[type="checkbox"]:focus {
 
     <!-- Quiz Filter Panel -->
     <section class="panel">
-      <h2 style="margin:0 0 10px 0; font-size:18px;">Search & Filter</h2>
+      <h2 style="margin:0 0 10px 0; font-size:18px;">Search Quiz</h2>
       <form method="GET" action="{{ route('student.quizzes.index') }}">
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
           <div>

@@ -62,7 +62,7 @@ body.dark .card  { background:var(--card-dark); border:1px solid rgba(255,255,25
 .card .label { font-size:13px; color:var(--muted); font-weight:600; }
 .card .value { font-weight:700; font-size:20px; margin-top:6px; }
 
-.panel { border-radius:var(--card-radius); padding:14px; animation: fadeInUp .4s ease; margin-bottom:20px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2,6,23,0.18); transition: border-color .2s ease; }
+.panel { border-radius:var(--card-radius); padding:20px; animation: fadeInUp .4s ease; margin-bottom:20px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2,6,23,0.18); transition: border-color .2s ease; }
 body.light .panel { background: rgba(255,255,255,0.96); }
 body.dark .panel  { background:#0f1724; }
 
@@ -83,6 +83,7 @@ input[type="text"], input[type="date"], textarea, select, input[type="file"] { w
   box-sizing: border-box;
   border-radius: 8px;
   transition: border-color .2s ease, background .2s ease;
+  width: 100% !important;
 }
 
 .panel form input[type="text"]:hover,
@@ -187,7 +188,7 @@ tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
 
     <!-- Lesson List Table -->
     <section class="panel">
-      <h2 style="margin:0 0 12px 0; font-size:18px;">Lesson List</h2>
+      <h2 style="margin:0 0 12px 0; font-size:18px;">Search Lesson</h2>
 
       <!-- Search & Filters (Sprint 3) -->
       <div style="display:flex; gap:12px; margin-bottom:12px; align-items:end;">
