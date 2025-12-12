@@ -68,8 +68,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- Personal Information -->
     <div class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
-      <div class="panel-header">
-        <h3>Personal Information</h3>
+      <div class="panel-header" style="margin:0 0 10px 0; padding-bottom:12px;">
+        <h3 style="font-size:18px;">Personal Information</h3>
       </div>
       <div class="info-grid">
         <div class="info-item">
@@ -99,8 +99,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- Organization Details -->
     <div class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
-      <div class="panel-header">
-        <h3>Organization Details</h3>
+      <div class="panel-header" style="margin:0 0 10px 0; padding-bottom:12px;">
+        <h3 style="font-size:18px;">Organization Details</h3>
       </div>
       @php
         $schoolNames = ['JEA3060' => 'SMK Pengerang Utama', 'JEA3061' => 'SMK Pengerang'];
@@ -127,9 +127,9 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- Account Security -->
-    <div class="panel" style="margin-left:40px; margin-right:40px;">
-      <div class="panel-header">
-        <h3>Account Security</h3>
+    <div class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;\">
+      <div class="panel-header" style="margin:0 0 10px 0; padding-bottom:12px;">
+        <h3 style="font-size:18px;">Account Security</h3>
       </div>
       <p style="margin: 0 0 16px 0; color: var(--muted);">Password is set and secured.</p>
       <div style="display: flex; justify-content: flex-end;">

@@ -122,8 +122,8 @@ tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
 
     <!-- Search Lesson Panel -->
     <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
-      <h2 style="margin:0 0 10px 0; font-size:18px; font-weight:700;">Search Lesson</h2>
-      <form method="GET" action="{{ route('home') }}" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
+      <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700;">Search Lesson</h2>
+      <form method="GET" action="{{ route('home') }}" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:20px;">
         <div>
           <label>Search</label>
           <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Title or description" style="height:40px;">
@@ -148,20 +148,20 @@ tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
           <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" style="height:40px;">
         </div>
       </form>
-      <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end;">
+      <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end; margin-top:20px;">
         <a href="{{ route('home') }}" class="btn-small button-outline">Clear Filters</a>
         <button onclick="document.querySelector('.panel form').submit();" class="btn-small">Apply Filters</button>
       </div>
     </section>
 
     <!-- Lessons Available Panel -->
-    <section class="panel" style="margin-left:40px; margin-right:40px;">
+    <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;\">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <h2 style="margin:0; font-size:18px; font-weight:700;">Lessons Available</h2>
+        <h2 style="margin:0 0 10px 0; font-size:18px; font-weight:700;">Lessons Available</h2>
         <a href="{{ route('lessons.index') }}" style="background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:12px 20px; border-radius:10px; border:none; font-weight:700; font-size:15px; text-decoration:none; cursor:pointer; box-shadow: 0 6px 18px rgba(8,12,32,0.25); transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease; display:inline-flex; align-items:center; gap:6px;">Create Lesson</a>
       </div>
       
-      <table style="margin-top:16px;">
+      <table style="margin-top:20px;">
         <thead>
           <tr>
             <th style="width:60%">Lesson</th>
