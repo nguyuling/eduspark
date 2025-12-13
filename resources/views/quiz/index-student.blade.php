@@ -120,7 +120,7 @@
               </td>
               <td style="width:22%; text-align:center;">
                 @if ($canAttempt)
-                  <a href="{{ route('student.quizzes.attempt.start', $quiz->id) }}" style="display:inline-block; padding:10px 18px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+                  <a href="{{ route('student.quizzes.start', $quiz->id) }}" style="display:inline-block; padding:10px 18px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
                     {{ $attemptsUsed > 0 ? 'Cuba Semula' : 'Mula Kuiz' }}
                   </a>
                 @elseif ($latestAttempt)
