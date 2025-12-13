@@ -12,26 +12,25 @@ use Illuminate\Support\Facades\Route;
 require __DIR__ . '/auth.php';
 
 Route::get('/', function() {
-    // If user is authenticated, redirect to forum
     if (auth()->check()) {
-        return redirect('/forum');
+        return redirect('/performance');
     }
-    // If guest, show login page (don't redirect)
-    return view('auth.login');
-});
+    return redirect('/login');
+})->name('home');
 
 // Profile routes (authenticated only)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [UserController::class, 'profile'])->name('profile.show');
     Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
-    Route::get('/profile/edit-password', [UserController::class, 'editPassword'])->name('password.edit');
+    Route::get('/profile/edit-password', [UserController::class, 'editPassword'])->name('profile.password.edit');
     Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password.update');
 });
 
 // Lesson routes (authenticated only)
 Route::middleware('auth')->group(function () {
     Route::get('/lesson', [LessonController::class, 'index'])->name('lesson.index');
+    Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
     Route::post('/lesson', [LessonController::class, 'store'])->name('lesson.store');
     Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
     Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');

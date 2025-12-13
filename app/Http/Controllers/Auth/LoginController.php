@@ -26,7 +26,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/forum';
+    protected $redirectTo = '/performance';
     
     /**
      * Get the post login redirect path.

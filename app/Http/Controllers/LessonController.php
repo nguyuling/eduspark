@@ -11,7 +11,6 @@ class LessonController extends Controller
 {
     /**
      * List all lessons with optional filtering
-     * GET /api/lessons?q=&file_type=&date_from=&date_to=
      */
     public function index(Request $request)
     {
@@ -40,22 +39,33 @@ class LessonController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $lessons = $query->get()->map(function ($lesson) {
-            return [
-                'id' => $lesson->id,
-                'title' => $lesson->title,
-                'description' => $lesson->description,
-                'file_name' => $lesson->file_name,
-                'file_path' => $lesson->file_path,
-                'file_ext' => $lesson->file_ext,
-                'class_group' => $lesson->class_group,
-                'visibility' => $lesson->visibility,
-                'created_at' => $lesson->created_at,
-                'updated_at' => $lesson->updated_at,
-            ];
-        });
+        $lessons = $query->get();
 
-        return response()->json($lessons);
+        // Return JSON if API request, otherwise render view
+        if ($request->expectsJson()) {
+            return response()->json($lessons->map(function ($lesson) {
+                return [
+                    'id' => $lesson->id,
+                    'title' => $lesson->title,
+                    'description' => $lesson->description,
+                    'file_name' => $lesson->file_name,
+                    'file_path' => $lesson->file_path,
+                    'file_ext' => $lesson->file_ext,
+                    'class_group' => $lesson->class_group,
+                    'visibility' => $lesson->visibility,
+                    'created_at' => $lesson->created_at,
+                    'updated_at' => $lesson->updated_at,
+                ];
+            }));
+        }
+
+        // Determine user role and show appropriate view
+        $user = Auth::user();
+        if ($user && $user->role === 'teacher') {
+            return view('lesson.index-teacher', compact('lessons'));
+        }
+        
+        return view('lesson.index-student', compact('lessons'));
     }
 
     /**
