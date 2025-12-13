@@ -193,6 +193,44 @@
             <input type="password" id="password_confirmation" name="password_confirmation" required minlength="6" placeholder="••••••••">
         </div>
 
+        <div class="form-group">
+            <label for="role">Role</label>
+            <select id="role" name="role" required>
+                <option value="">-- Select Role --</option>
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="district">District</label>
+            <select id="district" name="district" required>
+                <option value="">-- Select District --</option>
+                <option value="Pengerang" {{ old('district')=='Pengerang' ? 'selected' : '' }}>Pengerang</option>
+                <option value="Johor Bahru" {{ old('district')=='Johor Bahru' ? 'selected' : '' }}>Johor Bahru</option>
+                <option value="Kota Tinggi" {{ old('district')=='Kota Tinggi' ? 'selected' : '' }}>Kota Tinggi</option>
+                <option value="Mersing" {{ old('district')=='Mersing' ? 'selected' : '' }}>Mersing</option>
+                <option value="Batu Pahat" {{ old('district')=='Batu Pahat' ? 'selected' : '' }}>Batu Pahat</option>
+                <option value="Kluang" {{ old('district')=='Kluang' ? 'selected' : '' }}>Kluang</option>
+                <option value="Pontian" {{ old('district')=='Pontian' ? 'selected' : '' }}>Pontian</option>
+                <option value="Segamat" {{ old('district')=='Segamat' ? 'selected' : '' }}>Segamat</option>
+                <option value="Muar" {{ old('district')=='Muar' ? 'selected' : '' }}>Muar</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="school_code">School</label>
+            <select id="school_code" name="school_code" required>
+                <option value="">-- Select School --</option>
+                <!-- Options populated by JavaScript -->
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone Number (Optional)</label>
+            <input type="tel" id="phone" name="phone" placeholder="+60123456789" value="{{ old('phone') }}">
+        </div>
+
         <button type="submit" class="btn-register">✨ Create Account</button>
     </form>
 
@@ -206,6 +244,71 @@
   </footer>
 
   <script>
+    // School data by district
+    const schoolsByDistrict = {
+      'Pengerang': [
+        { code: 'JPG0001', name: 'SMK Pengerang Utama' },
+        { code: 'JPG0002', name: 'SMK Pengerang' },
+        { code: 'JPG1001', name: 'SK Pengerang' },
+        { code: 'JPG1002', name: 'SK Sungai Rengit' },
+      ],
+      'Johor Bahru': [
+        { code: 'JJB0001', name: 'SMK Taman Universiti' },
+        { code: 'JJB0002', name: 'SMK Dato\' Onn' },
+        { code: 'JJB1001', name: 'SK Taman Universiti 2' },
+        { code: 'JJB1002', name: 'SK Seri Permai' },
+      ],
+      'Kota Tinggi': [
+        { code: 'JKT0001', name: 'SMK Kota Tinggi' },
+        { code: 'JKT1001', name: 'SK Kota Tinggi' },
+      ],
+      'Mersing': [
+        { code: 'JMS0001', name: 'SMK Mersing' },
+        { code: 'JMS1001', name: 'SK Mersing' },
+      ],
+      'Batu Pahat': [
+        { code: 'JBP0001', name: 'SMK Dato\' Bentara Luar' },
+        { code: 'JBP1001', name: 'SK Batu Pahat' },
+      ],
+      'Kluang': [
+        { code: 'JKG0001', name: 'SMK Kluang' },
+        { code: 'JKG1001', name: 'SK Kluang' },
+      ],
+      'Pontian': [
+        { code: 'JPT0001', name: 'SMK Pontian' },
+        { code: 'JPT1001', name: 'SK Pontian' },
+      ],
+      'Segamat': [
+        { code: 'JSG0001', name: 'SMK Segamat' },
+        { code: 'JSG1001', name: 'SK Segamat' },
+      ],
+      'Muar': [
+        { code: 'JMR0001', name: 'SMK Muar' },
+        { code: 'JMR1001', name: 'SK Muar' },
+      ],
+    };
+
+    // Handle district change
+    const districtSelect = document.getElementById('district');
+    const schoolSelect = document.getElementById('school_code');
+
+    function updateSchools() {
+      const selectedDistrict = districtSelect.value;
+      schoolSelect.innerHTML = '<option value="">-- Select School --</option>';
+
+      if (selectedDistrict && schoolsByDistrict[selectedDistrict]) {
+        const schools = schoolsByDistrict[selectedDistrict];
+        schools.forEach(school => {
+          const option = document.createElement('option');
+          option.value = school.code;
+          option.textContent = school.name;
+          schoolSelect.appendChild(option);
+        });
+      }
+    }
+
+    districtSelect.addEventListener('change', updateSchools);
+
     // Apply dark theme based on system preference or localStorage
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const savedTheme = localStorage.getItem('theme');
