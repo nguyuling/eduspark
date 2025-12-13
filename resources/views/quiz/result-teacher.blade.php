@@ -1,53 +1,134 @@
-@extends('layouts.app') {{-- Assume a master layout file for the teacher panel --}}
+@extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card shadow-lg">
-                <div class="card-header bg-danger text-white">
-                    <h2 class="mb-0">Class Results for: {{ $quiz->title }}</h2>
+<div class="app">
+    <main class="main">
+        <div class="header">
+            <div>
+                <div class="title">Quiz Results: {{ $quiz->title }}</div>
+                <div class="sub">Class performance analysis and individual scores</div>
+            </div>
+            <a href="{{ route('teacher.quizzes.index') }}" class="btn btn-secondary">
+                ← Back to Quizzes
+            </a>
+        </div>
+
+        <!-- Class Performance Overview -->
+        <section class="panel panel-spaced" style="margin-top: 60px;">
+            <div class="panel-header">Class Performance Overview</div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 20px;">
+                <!-- Total Submissions -->
+                <div style="padding: 16px; background: rgba(106, 77, 247, 0.05); border-radius: 8px; border-left: 3px solid var(--accent);">
+                    <div style="color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px;">Total Submissions</div>
+                    <div style="font-size: 28px; font-weight: 700; color: var(--accent);">{{ $statistics['total_students'] }}</div>
                 </div>
 
-                <div class="card-body">
-                    
-                    {{-- 1. Class Performance Analysis (UC0012-02) --}}
-                    <h4 class="mb-4">Class Performance Overview</h4>
-                    <div class="row text-center mb-5">
-                        <div class="col-md-3">
-                            <div class="p-3 border rounded bg-light">
-                                <p class="text-muted mb-0">Total Submissions</p>
-                                <h3 class="text-danger">{{ $statistics['total_students'] }}</h3>
+                <!-- Average Score -->
+                <div style="padding: 16px; background: rgba(42, 157, 143, 0.05); border-radius: 8px; border-left: 3px solid var(--success);">
+                    <div style="color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px;">Average Score</div>
+                    <div style="font-size: 28px; font-weight: 700; color: var(--success);">{{ $statistics['average'] }}%</div>
+                </div>
+
+                <!-- Highest Score -->
+                <div style="padding: 16px; background: rgba(212, 197, 249, 0.05); border-radius: 8px; border-left: 3px solid #d4c5f9;">
+                    <div style="color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px;">Highest Score</div>
+                    <div style="font-size: 28px; font-weight: 700;">{{ $statistics['highest'] }}</div>
+                </div>
+
+                <!-- Lowest Score -->
+                <div style="padding: 16px; background: rgba(230, 57, 70, 0.05); border-radius: 8px; border-left: 3px solid var(--danger);">
+                    <div style="color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px;">Lowest Score</div>
+                    <div style="font-size: 28px; font-weight: 700; color: var(--danger);">{{ $statistics['lowest'] }}</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Individual Results Table -->
+        <section class="panel panel-spaced" style="margin-top: 20px;">
+            <div class="panel-header">Individual Student Results</div>
+
+            <table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #d4c5f9;">
+                        <th style="padding: 12px; text-align: left; font-weight: 700; color: var(--muted); font-size: 13px;">Student Name</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 700; color: var(--muted); font-size: 13px;">Score</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 700; color: var(--muted); font-size: 13px;">Percentage</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 700; color: var(--muted); font-size: 13px;">Submission Time</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 700; color: var(--muted); font-size: 13px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($attempts as $attempt)
+                        <tr style="border-bottom: 1px solid #e5e1f2;">
+                            <td style="padding: 16px 12px; vertical-align: middle;">
+                                <div style="font-weight: 600;">{{ $attempt->user->name }}</div>
+                                <div style="color: var(--muted); font-size: 13px;">{{ $attempt->user->email }}</div>
+                            </td>
+                            <td style="padding: 16px 12px; text-align: center; vertical-align: middle;">
+                                <div style="font-weight: 700;">{{ $attempt->obtained_marks }} / {{ $quiz->questions->sum('points') }}</div>
+                            </td>
+                            <td style="padding: 16px 12px; text-align: center; vertical-align: middle;">
+                                <div style="font-weight: 700; font-size: 16px;">{{ round(($attempt->obtained_marks / $quiz->questions->sum('points')) * 100) }}%</div>
+                            </td>
+                            <td style="padding: 16px 12px; text-align: center; vertical-align: middle; font-size: 13px;">
+                                {{ $attempt->submitted_at ? $attempt->submitted_at->format('M d, Y H:i') : 'N/A' }}
+                            </td>
+                            <td style="padding: 16px 12px; text-align: center; vertical-align: middle;">
+                                @if ($attempt->submitted_at)
+                                    <span class="badge" style="background: var(--success); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Submitted</span>
+                                @else
+                                    <span class="badge" style="background: var(--yellow); color: #0b1220; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">In Progress</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" style="padding: 40px; text-align: center;">
+                                <div class="empty-state">
+                                    <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+                                    <div style="color: var(--muted); font-size: 16px;">No student submissions yet</div>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Question Analysis -->
+        <section class="panel panel-spaced" style="margin-top: 20px;">
+            <div class="panel-header">Question Analysis</div>
+
+            <div style="margin-top: 20px;">
+                @forelse ($quiz->questions as $question)
+                    <div style="background: transparent; border-radius: 12px; border: 2px solid #d4c5f9; padding: 16px; margin-bottom: 12px;">
+                        <div style="font-weight: 700; margin-bottom: 12px;">{{ $question->question_text }}</div>
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px;">
+                            <div>
+                                <div style="color: var(--muted); font-weight: 600; margin-bottom: 4px;">Correct Answers</div>
+                                <div style="font-weight: 700; color: var(--success);">
+                                    {{ $question->correct_answers_count ?? 0 }} / {{ $statistics['total_students'] }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="p-3 border rounded bg-light">
-                                <p class="text-muted mb-0">Average Score</p>
-                                <h3 class="text-primary">{{ $statistics['average'] }}%</h3>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="p-3 border rounded bg-light">
-                                <p class="text-muted mb-0">Highest Score</p>
-                                <h3 class="text-success">{{ $statistics['highest'] }}</h3>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="p-3 border rounded bg-light">
-                                <p class="text-muted mb-0">Lowest Score</p>
-                                <h3 class="text-warning">{{ $statistics['lowest'] }}</h3>
+                            <div>
+                                <div style="color: var(--muted); font-weight: 600; margin-bottom: 4px;">Success Rate</div>
+                                <div style="font-weight: 700;">
+                                    {{ $statistics['total_students'] > 0 ? round((($question->correct_answers_count ?? 0) / $statistics['total_students']) * 100) : 0 }}%
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <hr>
-
-                    {{-- 2. Individual Scores Table (UC0012-02) --}}
-                    <h4 class="mt-4 mb-3">Individual Student Results</h4>
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Student Name</th>
+                @empty
+                    <div style="color: var(--muted); text-align: center; padding: 20px;">
+                        No questions in this quiz
+                    </div>
+                @endforelse
+            </div>
+        </section>
+    </main>
+</div>
+@endsection
                                 <th>Attempt #</th>
                                 <th>Score</th>
                                 <th>Submitted At</th>
