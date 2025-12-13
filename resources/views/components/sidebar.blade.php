@@ -39,10 +39,11 @@ body.dark .sidebar{
 .nav-icon { width:20px; height:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .nav-icon svg { width:100%; height:100%; stroke:currentColor; fill:none; stroke-width:2; }
 
-.profile-section { width:100%; margin-top:auto; padding-top:12px; border-top:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; gap:10px; }
-.profile-link { display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; color:var(--muted); text-decoration:none; font-weight:600; font-size:14px; transition:all .2s ease; width:100%; }
-.profile-link:hover { color:var(--accent); background:rgba(106,77,247,0.1); }
-.profile-icon { width:20px; height:20px; display:flex; align-items:center; justify-content:center; background:currentColor; border-radius:50%; color:#fff; font-weight:700; font-size:11px; flex-shrink:0; }
+.profile-section { width:100%; margin-top:auto; padding-top:8px; border-top:1.5px solid rgba(106,77,247,0.4); display:flex; flex-direction:column; align-items:center; gap:8px; }
+.profile-link { display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; color:var(--muted); text-decoration:none; font-weight:600; font-size:14px; transition:all .2s ease; width:100%; overflow: hidden; background-clip: padding-box; background:transparent; flex-direction:column; justify-content:center; }
+.profile-link:hover { color:var(--accent) !important; background:rgba(106,77,247,0.15) !important; }
+.profile-link.active { color:#ffffff !important; background: #6A4DF7 !important; }
+.profile-icon { display:none; }
 
 @media (max-width:920px){ .sidebar{ display:none; } }
 </style>
@@ -80,12 +81,9 @@ body.dark .sidebar{
   </nav>
   <div class="profile-section">
     @auth
-      <a href="{{ route('profile.show') }}" class="profile-link">
+      <a href="{{ route('profile.show') }}" class="profile-link {{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}">
         <div class="profile-icon">{{ substr(Auth::user()->name, 0, 1) }}</div>
-        <div style="flex:1; text-align:left; overflow:hidden;">
-          <div style="font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ Auth::user()->name }}</div>
-          <div style="font-size:11px; color:var(--muted); text-transform:capitalize;">{{ Auth::user()->role }}</div>
-        </div>
+        <div style="font-size:13px; font-weight:700; text-align:center;">Profil</div>
       </a>
     @else
       <a href="{{ url('/login') }}" class="profile-link" style="justify-content:center;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;">
