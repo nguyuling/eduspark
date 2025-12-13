@@ -105,8 +105,10 @@
 </head>
 <body class="light">
     <div id="app">
-        {{-- Sidebar Component --}}
-        @include('components.sidebar')
+        {{-- Sidebar Component - Only show to authenticated users --}}
+        @auth
+            @include('components.sidebar')
+        @endauth
         
         {{-- Page Content --}}
         <div class="page-content">
