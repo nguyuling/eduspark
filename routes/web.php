@@ -37,8 +37,10 @@ Route::middleware('auth')->get('/lessons/preview/{id}', [LessonController::class
 
 Route::middleware(['auth'])->group(function () {
     
-    // 2.1. HOME ROUTE (The New Central Dashboard after login)
-    Route::get('/home', [DashboardController::class, 'index'])->name('home');
+    // 2.1. HOME ROUTE (Redirect to Performance/Prestasi page)
+    Route::get('/home', function () {
+        return redirect()->route('performance.student_view');
+    })->name('home');
 
     // 2.2. PROFILE ROUTES
     Route::get('/profile', [UserController::class, 'profile'])->name('profile.show');

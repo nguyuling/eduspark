@@ -49,8 +49,8 @@ class LoginController extends Controller
         } 
         
         if ($user->role === 'student') {
-            // Redirect students to the student dashboard route
-            return route('student.quizzes.index');
+            // Redirect students to the performance/Prestasi page
+            return route('performance.student_view');
         }
 
         // Fallback to the generic home route
