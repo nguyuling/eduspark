@@ -47,38 +47,38 @@ body.dark .panel { background: #0f1724; }
   <main class="main" style="flex:1;">
     <div class="header" style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:40px; margin-top:40px; margin-left:40px; margin-right:40px;">
       <div>
-        <div class="title" style="font-weight:700;font-size:28px;">My Profile</div>
-        <div class="sub" style="color:var(--muted);font-size:13px;">View and manage your account information</div>
+        <div class="title" style="font-weight:700;font-size:28px;">Profil Saya</div>
+        <div class="sub" style="color:var(--muted);font-size:13px;">Lihat dan urus maklumat akaun anda</div>
       </div>
     </div>
 
     <!-- Personal Information -->
     <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px;">
       <div class="panel-header" style="margin:0 0 20px 0;">
-        <h3>Personal Information</h3>
+        <h3>Maklumat Peribadi</h3>
       </div>
       <div class="info-grid">
         <div class="info-item">
-          <div class="info-label">Full Name</div>
+          <div class="info-label">Nama Penuh</div>
           <div class="info-value">{{ $user->name }}</div>
         </div>
         <div class="info-item">
-          <div class="info-label">Email</div>
+          <div class="info-label">E-mel</div>
           <div class="info-value">{{ $user->email }}</div>
         </div>
         <div class="info-item">
-          <div class="info-label">Phone</div>
+          <div class="info-label">Telefon</div>
           <div class="info-value">{{ $user->phone ?: '—' }}</div>
         </div>
         <div class="info-item">
-          <div class="info-label">Role</div>
-          <div class="info-value">{{ $user->role === 'teacher' ? 'Teacher' : 'Student' }}</div>
+          <div class="info-label">Peranan</div>
+          <div class="info-value">{{ $user->role === 'teacher' ? 'Guru' : 'Pelajar' }}</div>
         </div>
       </div>
       <div class="panel-footer">
         <div></div>
         <a href="{{ route('profile.edit') }}" style="cursor: pointer; padding:12px 20px; border-radius:10px; border:none; background: linear-gradient(90deg, var(--accent), var(--accent-2)); color:#fff; font-weight:700; font-size:15px; transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; box-shadow: 0 6px 18px rgba(8, 12, 32, 0.25);">
-          Edit Profile
+          Edit Profil
         </a>
       </div>
     </section>
@@ -86,7 +86,7 @@ body.dark .panel { background: #0f1724; }
     <!-- Organization Details -->
     <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px;">
       <div class="panel-header" style="margin:0 0 20px 0;">
-        <h3>Organization Details</h3>
+        <h3>Butiran Organisasi</h3>
       </div>
       @php
         $schoolNames = ['JEA3060' => 'SMK Pengerang Utama', 'JEA3061' => 'SMK Pengerang'];
@@ -94,19 +94,19 @@ body.dark .panel { background: #0f1724; }
       @endphp
       <div class="info-grid">
         <div class="info-item">
-          <div class="info-label">District</div>
+          <div class="info-label">Daerah</div>
           <div class="info-value">{{ $user->district }}</div>
         </div>
         <div class="info-item">
-          <div class="info-label">School</div>
+          <div class="info-label">Sekolah</div>
           <div class="info-value">{{ $schoolName }}</div>
         </div>
         <div class="info-item">
-          <div class="info-label">Member Since</div>
+          <div class="info-label">Ahli Sejak</div>
           <div class="info-value">{{ $user->created_at->format('j M Y') }}</div>
         </div>
         <div class="info-item">
-          <div class="info-label">User ID</div>
+          <div class="info-label">ID Pengguna</div>
           <div class="info-value"><span class="badge">{{ $user->user_id }}</span></div>
         </div>
       </div>
@@ -115,12 +115,12 @@ body.dark .panel { background: #0f1724; }
     <!-- Account Security -->
     <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px;">
       <div class="panel-header" style="margin:0 0 20px 0;">
-        <h3>Account Security</h3>
+        <h3>Keamanan Akaun</h3>
       </div>
-      <p style="margin: 0 0 16px 0; color: var(--muted);">Password is set and secured.</p>
+      <p style="margin: 0 0 16px 0; color: var(--muted);">Kata laluan telah ditetapkan dan diamankan.</p>
       <div style="display: flex; justify-content: flex-end;">
         <a href="{{ route('profile.password.edit') }}" style="cursor: pointer; padding:12px 20px; border-radius:10px; border:none; background: var(--danger); color:#fff; font-weight:700; font-size:15px; transition: transform .08s ease, opacity .12s ease; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; box-shadow: none;">
-          Change Password
+          Ubah Kata Laluan
         </a>
       </div>
     </section>
