@@ -82,8 +82,8 @@
         <thead>
           <tr>
             <th style="width:58%">Kuiz</th>
-            <th style="width:20%">Info Lanjut</th>
-            <th style="width:22%">Tindakan</th>
+            <th style="width:12%">Bil. Soalan</th>
+            <th style="width:30%">Tindakan</th>
           </tr>
         </thead>
         <tbody>
@@ -113,13 +113,13 @@
                   @endif
                 </div>
               </td>
-              <td style="width:20%; text-align:center;">
+              <td style="width:10%; text-align:center;">
                 <div style="font-size:12px;">
                   <div style="margin-bottom:2px;">{{ $quiz->questions_count ?? 0 }} soalan</div>
                 </div>
               </td>
-              <td style="width:22%; text-align:center;">
-                <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+              <td style="width:32%; text-align:center;">
+                <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
                   @if ($isMyQuiz)
                     <!-- Edit Button (Only for my quizzes) -->
                     <a href="{{ route('teacher.quizzes.edit', $quiz->id) }}" style="display:inline-block; padding:10px 14px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; transition:transform .2s ease, box-shadow .2s ease;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
