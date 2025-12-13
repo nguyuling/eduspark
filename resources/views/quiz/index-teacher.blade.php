@@ -128,7 +128,7 @@
                   @else
                     <!-- View Button (For other teachers' quizzes) -->
                     <a href="{{ route('teacher.quizzes.show', $quiz->id) }}" style="display:inline-block; padding:10px 14px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-                      👁️ Lihat
+                      Lihat
                     </a>
                   @endif
 
