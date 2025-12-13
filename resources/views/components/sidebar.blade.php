@@ -150,7 +150,7 @@ body.dark #themeToggle::before {
 
   <div class="logo-text" aria-hidden="true" style="font-weight:700;font-size:18px;text-align:center;width:100%;">
     @if($isTeacher)
-      <span style="color:#1D5DCD;">Pen</span><span style="color:#E63946;">gajar</span>
+      <span style="color:#1D5DCD;">Gu</span><span style="color:#E63946;">ru</span>
     @else
       <span style="color:#1D5DCD;">Pel</span><span style="color:#E63946;">ajar</span>
     @endif

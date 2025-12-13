@@ -1,129 +1,148 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="app">
-    <main class="main">
-        <div class="header">
-            <div>
-                <div class="title">Create New Quiz</div>
-                <div class="sub">Set up your quiz with questions and options</div>
-            </div>
-            <a href="{{ route('teacher.quizzes.index') }}" class="btn btn-secondary">
-                ← Back to Quizzes
-            </a>
+  <!-- Main -->
+  <main class="main">
+    <div class="header">
+      <div>
+        <div class="title">Cipta Kuiz Baru</div>
+        <div class="sub">Sediakan kuiz anda dengan soalan dan pilihan</div>
+      </div>
+      <a href="{{ route('teacher.quizzes.index') }}" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
+        ← Kembali ke Kuiz
+      </a>
+    </div>
+
+    @if (session('error'))
+      <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
+    @endif
+
+    <!-- Error Messages -->
+    @if ($errors->any())
+      <section style="margin-left:40px; margin-right:40px; margin-bottom:20px; background: rgba(230, 57, 70, 0.1); border-left: 3px solid var(--danger); padding:16px 18px; border-radius:var(--card-radius);">
+        <div style="font-weight: 700; color: var(--danger); margin-bottom: 8px;">Sila betulkan ralat berikut:</div>
+        <ul style="margin: 0; padding-left: 20px; color: var(--danger); font-size: 14px;">
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </section>
+    @endif
+
+    <!-- Quiz Setup Form -->
+    <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+      <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Persediaan Kuiz</h2>
+
+      <form method="POST" action="{{ route('teacher.quizzes.store') }}" style="margin-top: 20px;">
+        @csrf
+
+        <!-- Title -->
+        <div style="margin-bottom: 16px;">
+          <label for="title" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Tajuk Kuiz <span style="color: var(--danger);">*</span></label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            placeholder="Contoh: Penilaian Bab 1"
+            value="{{ old('title') }}" 
+            required
+            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box;" 
+            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+          >
+          @error('title')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
         </div>
 
-        <!-- Error Messages -->
-        @if ($errors->any())
-            <section class="panel panel-spaced" style="margin-top: 60px; background: rgba(230, 57, 70, 0.1); border-left: 3px solid var(--danger);">
-                <div style="margin-bottom: 12px;">
-                    <div style="font-weight: 700; color: var(--danger); margin-bottom: 8px;">Please fix the following errors:</div>
-                    <ul style="margin: 0; padding-left: 20px; color: var(--danger);">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </section>
-        @endif
+        <!-- Max Attempts -->
+        <div style="margin-bottom: 16px;">
+          <label for="max_attempts" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Percubaan Maksimum <span style="color: var(--danger);">*</span></label>
+          <input 
+            type="number" 
+            id="max_attempts" 
+            name="max_attempts" 
+            value="{{ old('max_attempts', 1) }}" 
+            min="1"
+            required
+            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box;"
+            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+          >
+          @error('max_attempts')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
+        </div>
 
-        <!-- Quiz Setup Form -->
-        <section class="panel panel-spaced" style="margin-top: 60px; max-width: 800px;">
-            <div class="panel-header">Quiz Setup</div>
+        <!-- Due Date -->
+        <div style="margin-bottom: 16px;">
+          <label for="due_at" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Tarikh Akhir (Pilihan)</label>
+          <input 
+            type="datetime-local" 
+            id="due_at" 
+            name="due_at" 
+            value="{{ old('due_at') }}"
+            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box;"
+            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+          >
+          @error('due_at')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
+        </div>
 
-            <form method="POST" action="{{ route('teacher.quizzes.store') }}" style="margin-top: 20px;">
-                @csrf
+        <!-- Description -->
+        <div style="margin-bottom: 16px;">
+          <label for="description" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Penerangan (Pilihan)</label>
+          <textarea 
+            id="description" 
+            name="description" 
+            rows="3"
+            placeholder="Tambah arahan atau maklumat tambahan..."
+            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; resize: vertical; box-sizing: border-box;"
+            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+          >{{ old('description') }}</textarea>
+          @error('description')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
+        </div>
 
-                <!-- Title -->
-                <div class="form-group">
-                    <label for="title">Quiz Title</label>
-                    <input 
-                        type="text" 
-                        id="title" 
-                        name="title" 
-                        class="form-input"
-                        placeholder="e.g. Chapter 1 Assessment"
-                        value="{{ old('title') }}" 
-                        required
-                    >
-                    @error('title')<span class="error-msg">{{ $message }}</span>@enderror
-                </div>
+        <!-- Publish Checkbox -->
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding: 12px; background: rgba(106,77,247,0.05); border-radius: 8px;">
+          <input 
+            type="checkbox" 
+            id="is_published" 
+            name="is_published"
+            {{ old('is_published') ? 'checked' : '' }}
+            style="width: 18px; height: 18px; cursor: pointer;"
+          >
+          <label for="is_published" style="margin: 0; cursor: pointer; font-weight: 500;">Terbitkan Kuiz Segera</label>
+        </div>
 
-                <!-- Max Attempts -->
-                <div class="form-group">
-                    <label for="max_attempts">Max Attempts Allowed</label>
-                    <input 
-                        type="number" 
-                        id="max_attempts" 
-                        name="max_attempts" 
-                        class="form-input"
-                        value="{{ old('max_attempts', 1) }}" 
-                        min="1"
-                        required
-                    >
-                    @error('max_attempts')<span class="error-msg">{{ $message }}</span>@enderror
-                </div>
+        <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 2px solid #d4c5f9;">
+          <button type="submit" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+            Simpan Kuiz
+          </button>
+          <a href="{{ route('teacher.quizzes.index') }}" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
+            Batal
+          </a>
+        </div>
+      </form>
+    </section>
 
-                <!-- Due Date -->
-                <div class="form-group">
-                    <label for="due_at">Due Date (Optional)</label>
-                    <input 
-                        type="datetime-local" 
-                        id="due_at" 
-                        name="due_at" 
-                        class="form-input"
-                        value="{{ old('due_at') }}"
-                    >
-                    @error('due_at')<span class="error-msg">{{ $message }}</span>@enderror
-                </div>
-
-                <!-- Description -->
-                <div class="form-group">
-                    <label for="description">Description (Optional)</label>
-                    <textarea 
-                        id="description" 
-                        name="description" 
-                        rows="3"
-                        placeholder="Add instructions or additional information..."
-                        style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--control-border); background: var(--input-bg); color: inherit; font-size: 14px; outline: none; transition: box-shadow 0.12s ease, border-color 0.12s ease; resize: vertical; box-sizing: border-box;"
-                    >{{ old('description') }}</textarea>
-                    @error('description')<span class="error-msg">{{ $message }}</span>@enderror
-                </div>
-
-                <!-- Publish Checkbox -->
-                <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-                    <input 
-                        type="checkbox" 
-                        id="is_published" 
-                        name="is_published"
-                        {{ old('is_published') ? 'checked' : '' }}
-                        style="width: 20px; height: 20px; cursor: pointer;"
-                    >
-                    <label for="is_published" style="margin: 0; cursor: pointer;">Publish Quiz Immediately</label>
-                </div>
-
-                <!-- Questions Container -->
-                <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #d4c5f9;">
-                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 16px;">Questions <span style="color: var(--danger);">*</span></div>
-                    <div id="questions-container"></div>
-                    
-                    <button type="button" class="btn btn-secondary" id="add-question-btn" style="margin-top: 16px; margin-bottom: 24px;">
-                        ➕ Add Question
-                    </button>
-                </div>
-
-                <!-- Form Actions -->
-                <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 2px solid #d4c5f9;">
-                    <button type="submit" class="btn btn-primary">
-                        ✨ Save & Publish Quiz
-                    </button>
-                    <a href="{{ route('teacher.quizzes.index') }}" class="btn btn-secondary">
-                        Cancel
-                    </a>
-                </div>
-            </form>
-        </section>
-    </main>
+    <!-- Questions Section -->
+    <section style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+      <div style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">Soalan <span style="color: var(--danger);">*</span></div>
+      <div id="questions-container"></div>
+      
+      <button type="button" id="add-question-btn" style="display:inline-block; padding:10px 18px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer; margin-top: 16px; margin-bottom: 24px;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
+        ➕ Tambah Soalan
+      </button>
+    </section>
+  </main>
 </div>
 
 <script>
@@ -142,43 +161,45 @@
     
     // Template for a new question card
     const questionTemplate = (index) => `
-        <div class="card mb-3 question-card" data-index="${index}">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Question #${index + 1}</h5>
-                <button type="button" class="btn btn-sm btn-outline-danger remove-question-btn" data-index="${index}">Remove</button>
+        <section style="margin-left:0; margin-right:0; margin-bottom:16px; border-radius:var(--card-radius); padding:20px; animation:fadeInUp 0.4s ease; background:transparent; border:2px solid #d4c5f9; backdrop-filter:blur(6px); box-shadow:0 2px 12px rgba(2, 6, 23, 0.18); transition:border-color 0.2s ease, transform 0.12s ease, box-shadow 0.12s ease;" onmouseover="this.style.borderColor='var(--accent)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 20px rgba(106, 77, 247, 0.2)';" onmouseout="this.style.borderColor='#d4c5f9'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 12px rgba(2, 6, 23, 0.18)';" question-card data-index="${index}">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid rgba(106,77,247,0.2);">
+                <h5 style="margin:0; font-size:15px; font-weight:700;">Soalan #${index + 1}</h5>
+                <button type="button" style="background:transparent; color:var(--danger); border:2px solid var(--danger); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-question-btn" data-index="${index}">Buang</button>
             </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-7">  <label class="form-label">Question Text <span class="text-danger">*</span></label>
-                        <textarea name="questions[${index}][question_text]" class="form-control" rows="2" required></textarea>
+            <div>
+                <div style="display:grid; grid-template-columns:1.5fr 0.5fr 1fr; gap:12px; margin-bottom:12px;">
+                    <div>
+                        <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Teks Soalan <span style="color: var(--danger);">*</span></label>
+                        <textarea name="questions[${index}][question_text]" rows="2" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"></textarea>
                     </div>
-                    <div class="col-md-1">  <label class="form-label">Points <span class="text-danger">*</span></label>
-                        <input type="number" name="questions[${index}][points]" class="form-control" value="1" min="1" required>
+                    <div>
+                        <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Markah <span style="color: var(--danger);">*</span></label>
+                        <input type="number" name="questions[${index}][points]" value="1" min="1" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"/>
                     </div>
-                    <div class="col-md-4">  <label class="form-label">Type <span class="text-danger">*</span></label>
-                        <select name="questions[${index}][type]" class="form-select question-type-select" data-index="${index}" required>
-                            <option value="${QUESTION_TYPES.MC}">Multiple Choice</option>
-                            <option value="${QUESTION_TYPES.CHECKBOX}">Checkbox</option>
-                            <option value="${QUESTION_TYPES.SA}">Short Answer</option>
-                            <option value="${QUESTION_TYPES.TF}">True/False</option>
+                    <div>
+                        <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Jenis <span style="color: var(--danger);">*</span></label>
+                        <select name="questions[${index}][type]" class="question-type-select" data-index="${index}" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease; cursor: pointer;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
+                            <option value="${QUESTION_TYPES.MC}">Pilihan Berganda</option>
+                            <option value="${QUESTION_TYPES.CHECKBOX}">Kotak Semak</option>
+                            <option value="${QUESTION_TYPES.SA}">Jawapan Pendek</option>
+                            <option value="${QUESTION_TYPES.TF}">Benar/Salah</option>
                         </select>
                     </div>
                 </div>
 
-                <hr class="mt-0">
+                <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(106,77,247,0.2);">
                 <div class="answers-container" id="answers-container-${index}">
-                    ${optionTemplate(index, QUESTION_TYPES.MC)} </div>
+                    ${optionTemplate(index, QUESTION_TYPES.MC)} 
+                </div>
             </div>
-        </div>
+        </section>
     `;
-  
 
     // Template for the Short Answer input (Only one text box)
     const shortAnswerTemplate = (index) => `
-        <div class="mb-3">
-            <label class="form-label text-success">Correct Answer <span class="text-danger">*</span></label>
-            {{-- CRITICAL FIX: The key 'correct_answer' holds the text for short answer --}}
-            <input type="text" name="questions[${index}][correct_answer]" class="form-control" placeholder="Enter the exact correct short answer" required>
+        <div style="margin-top:12px;">
+            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color: var(--success);">Jawapan Betul <span style="color: var(--danger);">*</span></label>
+            <input type="text" name="questions[${index}][correct_answer]" placeholder="Masukkan jawapan yang tepat" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
         </div>
     `;
 
@@ -187,66 +208,59 @@
         const rowTemplate = (type === QUESTION_TYPES.CHECKBOX) ? checkboxOptionRow : optionRow;
 
         return `
-            <h6 class="mb-2">Options & Correct Answer(s) <span class="text-danger">*</span></h6>
-            <div class="options-list" data-q-index="${qIndex}">
-                
+            <h6 style="margin:0 0 12px 0; font-weight:600; font-size:13px;">Pilihan & Jawapan Betul <span style="color: var(--danger);">*</span></h6>
+            <div class="options-list" data-q-index="${qIndex}" style="display:flex; flex-direction:column; gap:8px;">
                 ${rowTemplate(qIndex, 0)}
                 ${rowTemplate(qIndex, 1)}
-
             </div>
-            <button type="button" class="btn btn-sm btn-outline-primary mt-2 add-option-btn" data-q-index="${qIndex}">
-                + Add Option
+            <button type="button" style="display:inline-block; padding:8px 14px; background:transparent; color:var(--accent); border:1px solid var(--accent); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; cursor:pointer; margin-top:12px;" class="add-option-btn" data-q-index="${qIndex}">
+                + Tambah Pilihan
             </button>
         `;
     };
     
     // Template for a single option row (Radio button for MC/TF)
     const optionRow = (qIndex, oIndex) => `
-        <div class="input-group mb-2 option-row" data-o-index="${oIndex}">
-            <div class="input-group-text">
-                {{-- CRITICAL FIX: The value sent is the option's text itself, simplifying controller logic --}}
-                <input class="form-check-input mt-0 correct-option-radio" type="radio" 
-                       name="questions[${qIndex}][correct_answer]" 
-                       value="" 
-                       data-option-text-target 
-                       ${oIndex === 0 ? 'checked' : ''} required>
-            </div>
-            {{-- CRITICAL FIX: Changed name to option_text and used empty [] to send an array of options --}}
+        <div style="display:flex; gap:8px; align-items:flex-start;" class="option-row" data-o-index="${oIndex}">
+            <input class="form-check-input mt-0 correct-option-radio" type="radio" 
+                   name="questions[${qIndex}][correct_answer]" 
+                   value="" 
+                   data-option-text-target 
+                   ${oIndex === 0 ? 'checked' : ''} required style="width:18px; height:18px; margin-top:11px; cursor:pointer;">
             <input type="text" 
                    name="questions[${qIndex}][options][]" 
-                   class="form-control option-text-input" 
-                   placeholder="Option Text" 
-                   required 
-                   oninput="updateRadioValue(this)">
-            <button type="button" class="btn btn-outline-danger remove-option-btn" data-o-index="${oIndex}">X</button>
+                   class="option-text-input" 
+                   placeholder="Teks Pilihan" 
+                   required
+                   oninput="updateRadioValue(this)"
+                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
+            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); padding:8px 10px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
         </div>
     `;
 
     // Template for a single option row (Checkbox)
     const checkboxOptionRow = (qIndex, oIndex) => `
-        <div class="input-group mb-2 option-row" data-o-index="${oIndex}">
-            <div class="input-group-text">
-                {{-- CRITICAL FIX: The name is now an array to capture multiple correct answers --}}
-                <input class="form-check-input mt-0 correct-option-checkbox" type="checkbox" 
-                       name="questions[${qIndex}][correct_answers][]" 
-                       value="" 
-                       data-option-text-target> 
-            </div>
-            {{-- CRITICAL FIX: Changed name to option_text and used empty [] to send an array of options --}}
+        <div style="display:flex; gap:8px; align-items:flex-start;" class="option-row" data-o-index="${oIndex}">
+            <input class="form-check-input mt-0 correct-option-checkbox" type="checkbox" 
+                   name="questions[${qIndex}][correct_answers][]" 
+                   value="" 
+                   data-option-text-target
+                   style="width:18px; height:18px; margin-top:11px; cursor:pointer;">
             <input type="text" 
                    name="questions[${qIndex}][options][]" 
-                   class="form-control option-text-input" 
-                   placeholder="Option Text" 
+                   class="option-text-input" 
+                   placeholder="Teks Pilihan" 
                    required
-                   oninput="updateCheckboxValue(this)">
-            <button type="button" class="btn btn-outline-danger remove-option-btn" data-o-index="${oIndex}">X</button>
+                   oninput="updateCheckboxValue(this)"
+                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
+            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); padding:8px 10px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
         </div>
     `;
 
     // Function to dynamically update the radio button's value when the option text changes
     function updateRadioValue(inputElement) {
         const optionText = inputElement.value;
-        const radio = inputElement.closest('.input-group').querySelector('[data-option-text-target]');
+        const radio = inputElement.closest('div').querySelector('[data-option-text-target]');
         if (radio && radio.type === 'radio') {
             radio.value = optionText;
         }
@@ -255,7 +269,7 @@
     // Function to dynamically update the checkbox button's value when the option text changes
     function updateCheckboxValue(inputElement) {
         const optionText = inputElement.value;
-        const checkbox = inputElement.closest('.input-group').querySelector('[data-option-text-target]');
+        const checkbox = inputElement.closest('div').querySelector('[data-option-text-target]');
         if (checkbox && checkbox.type === 'checkbox') {
             checkbox.value = optionText;
         }
@@ -287,21 +301,17 @@
             if (type === QUESTION_TYPES.TF) {
                 const optionsList = container.querySelector('.options-list');
                 optionsList.innerHTML = `
-                    <div class="input-group mb-2 option-row" data-o-index="0">
-                        <div class="input-group-text">
-                            <input class="form-check-input mt-0 correct-option-radio" type="radio" 
-                                   name="questions[${qIndex}][correct_answer]" value="True" checked required>
-                        </div>
-                        <input type="text" name="questions[${qIndex}][options][]" class="form-control option-text-input" value="True" readonly oninput="updateRadioValue(this)">
-                        <button type="button" class="btn btn-outline-secondary" disabled>X</button>
+                    <div style="display:flex; gap:8px; align-items:flex-start;" class="option-row" data-o-index="0">
+                        <input class="form-check-input mt-0 correct-option-radio" type="radio" 
+                               name="questions[${qIndex}][correct_answer]" value="True" checked required style="width:18px; height:18px; margin-top:11px; cursor:pointer;">
+                        <input type="text" name="questions[${qIndex}][options][]" class="option-text-input" value="Benar" readonly style="flex:1; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--control-border); background: var(--input-bg); color: inherit; font-size: 14px; outline: none; box-sizing: border-box;" oninput="updateRadioValue(this)">
+                        <button type="button" style="background:transparent; color:var(--muted); border:1px solid var(--muted); padding:8px 10px; border-radius:6px; font-size:12px; font-weight:600; cursor:not-allowed; opacity:0.5;" disabled>✕</button>
                     </div>
-                    <div class="input-group mb-2 option-row" data-o-index="1">
-                        <div class="input-group-text">
-                            <input class="form-check-input mt-0 correct-option-radio" type="radio" 
-                                   name="questions[${qIndex}][correct_answer]" value="False" required>
-                        </div>
-                        <input type="text" name="questions[${qIndex}][options][]" class="form-control option-text-input" value="False" readonly oninput="updateRadioValue(this)">
-                        <button type="button" class="btn btn-outline-secondary" disabled>X</button>
+                    <div style="display:flex; gap:8px; align-items:flex-start;" class="option-row" data-o-index="1">
+                        <input class="form-check-input mt-0 correct-option-radio" type="radio" 
+                               name="questions[${qIndex}][correct_answer]" value="False" required style="width:18px; height:18px; margin-top:11px; cursor:pointer;">
+                        <input type="text" name="questions[${qIndex}][options][]" class="option-text-input" value="Salah" readonly style="flex:1; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--control-border); background: var(--input-bg); color: inherit; font-size: 14px; outline: none; box-sizing: border-box;" oninput="updateRadioValue(this)">
+                        <button type="button" style="background:transparent; color:var(--muted); border:1px solid var(--muted); padding:8px 10px; border-radius:6px; font-size:12px; font-weight:600; cursor:not-allowed; opacity:0.5;" disabled>✕</button>
                     </div>
                 `;
                 container.querySelector('.add-option-btn').style.display = 'none'; // Hide add button
@@ -313,7 +323,7 @@
     const addOptionRow = (qIndex, optionsList, rowTemplate) => {
         const currentOptions = optionsList.querySelectorAll('.option-row').length;
         if (currentOptions >= 10) { 
-            alert("A question cannot have more than 10 options.");
+            alert("Soalan tidak boleh mempunyai lebih daripada 10 pilihan.");
             return;
         }
         
@@ -347,15 +357,15 @@
             
             // Remove Question
             if (e.target.classList.contains('remove-question-btn')) {
-                const card = e.target.closest('.question-card');
-                const questionCards = container.querySelectorAll('.question-card');
+                const card = e.target.closest('[question-card]');
+                const questionCards = container.querySelectorAll('[question-card]');
                 if (questionCards.length > 1) {
                      // Get the index of the card being removed
                      const removedIndex = parseInt(card.getAttribute('data-index'));
                      card.remove();
                      
                      // Re-index all cards that came after the removed one
-                     container.querySelectorAll('.question-card').forEach((qCard, i) => {
+                     container.querySelectorAll('[question-card]').forEach((qCard, i) => {
                          const currentCardIndex = parseInt(qCard.getAttribute('data-index'));
                          
                          // Only process cards that need re-indexing
@@ -366,7 +376,7 @@
                              qCard.setAttribute('data-index', newIndex);
                              
                              // Update display number
-                             qCard.querySelector('.card-header h5').textContent = `Question #${newIndex + 1}`;
+                             qCard.querySelector('h5').textContent = `Soalan #${newIndex + 1}`;
                              
                              // Update all names and IDs within the card using regex
                              qCard.innerHTML = qCard.innerHTML.replace(new RegExp(`questions\\[${currentCardIndex}\\]`, 'g'), `questions[${newIndex}]`)
@@ -381,7 +391,7 @@
                      questionIndex--; // Decrement the global counter
                      
                 } else {
-                    alert("A quiz must have at least one question.");
+                    alert("Kuiz mesti mempunyai sekurang-kurangnya satu soalan.");
                 }
             }
             
@@ -409,7 +419,7 @@
                 } else if (type === QUESTION_TYPES.SA) {
                     // Do nothing, Short Answer is handled by its own template
                 } else {
-                    alert("Multiple Choice/True False/Checkbox questions must have at least two options.");
+                    alert("Soalan Pilihan Berganda/Benar-Salah/Kotak Semak mesti mempunyai sekurang-kurangnya dua pilihan.");
                 }
             }
 
@@ -436,4 +446,5 @@
         
     });
 </script>
+
 @endsection
