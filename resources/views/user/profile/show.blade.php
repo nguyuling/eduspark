@@ -124,6 +124,22 @@ body.dark .panel { background: #0f1724; }
         </a>
       </div>
     </section>
+
+    <!-- Logout -->
+    <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px;">
+      <div class="panel-header" style="margin:0 0 20px 0;">
+        <h3>Keluar</h3>
+      </div>
+      <p style="margin: 0 0 16px 0; color: var(--muted);">Keluar dari akaun anda dengan selamat.</p>
+      <div style="display: flex; justify-content: flex-end;">
+        <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+          @csrf
+          <button type="submit" style="cursor: pointer; padding:12px 20px; border-radius:10px; border:none; background: var(--danger); color:#fff; font-weight:700; font-size:15px; transition: transform .08s ease, opacity .12s ease; display: inline-flex; align-items: center; gap: 6px; box-shadow: none;">
+            Keluar
+          </button>
+        </form>
+      </div>
+    </section>
   </main>
 </div>
 @endsection
