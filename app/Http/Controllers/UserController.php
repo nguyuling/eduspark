@@ -53,8 +53,8 @@ class UserController extends Controller
             'user_id' => $user_id,
         ]);
 
-        return redirect('/register')
-            ->with('success', "Account succesfully created! You can now log in.");
+        return redirect('/login')
+            ->with('success', "Account successfully created! You can now log in.");
     }
 
     // Login (unchanged — keeps your JSON API behavior)
