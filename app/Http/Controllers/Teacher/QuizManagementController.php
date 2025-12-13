@@ -70,7 +70,7 @@ class QuizManagementController extends Controller
         $quizzes = $query->latest('created_at')->paginate(10); // Or use latest('updated_at')
         
         // Ensure you return the view that corresponds to the 'teacher.quizzes.index' route
-        return view('quizzes.index-teacher', compact('quizzes', 'filters'));
+        return view('quiz.index-teacher', compact('quizzes', 'filters'));
     }
 
 
@@ -81,7 +81,7 @@ class QuizManagementController extends Controller
     public function create()
     {
         // This is the simplest possible implementation.
-        return view('quizzes.create');
+        return view('quiz.create');
     }
 
 
@@ -190,7 +190,7 @@ class QuizManagementController extends Controller
         // NOTE: We load 'options' so they are available in the Blade's @json($quiz->questions)
         $quiz->load('questions.options');
         
-        return view('quizzes.edit', compact('quiz'));
+        return view('quiz.edit', compact('quiz'));
     }
 
 
@@ -383,7 +383,7 @@ class QuizManagementController extends Controller
         $quiz->load('questions.options'); 
 
         // STEP 3: Return the page.
-        return view('quizzes.show', compact('quiz'));
+        return view('quiz.show', compact('quiz'));
     }
 
     // QuizPolicy.php (The Security Guard)
