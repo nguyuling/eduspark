@@ -1,48 +1,202 @@
-@extends('layouts.app') {{-- Assume a master layout file for the teacher panel --}}
+@extends('layouts.app')
 
 @section('content')
+<div class="app">
+    <main class="main">
+        <div class="header">
+            <div>
+                <div class="title">Manage Quizzes</div>
+                <div class="sub">Create and manage your quiz materials</div>
+            </div>
+            <a href="{{ route('teacher.quizzes.create') }}" class="btn btn-primary">
+                ✨ Create New Quiz
+            </a>
+        </div>
 
-{{-- Safely initialize $filters --}}
-@php
-$filters = $filters ?? [];
-// Ensure all filter keys are present for default values
-$filters = array_merge([
-'unique_id' => '',
-'title' => '',
-'creator_email' => '',
-'publish_date_range' => '',
-'scope' => 'all'
-], $filters);
+        <!-- Success/Error Messages -->
+        @if (session('success'))
+            <section class="panel panel-spaced" style="margin-top: 60px; background: rgba(42, 157, 143, 0.1); border-left: 3px solid var(--success);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">✓</span>
+                    <span>{{ session('success') }}</span>
+                </div>
+            </section>
+        @endif
 
-// The checkbox represents 'mine'. If scope is 'all', it should be unchecked.
-// If we receive a query string, we honor that. If not, the default is 'all'.
-$isMineChecked = $filters['scope'] === 'mine';
-@endphp
+        @if (session('error'))
+            <section class="panel panel-spaced" style="margin-top: 60px; background: rgba(230, 57, 70, 0.1); border-left: 3px solid var(--danger);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">✕</span>
+                    <span>{{ session('error') }}</span>
+                </div>
+            </section>
+        @endif
 
-<div class="container">
-<div class="row justify-content-center">
-<div class="col-md-12">
-<h1 class="mb-4 fw-bold text-primary">Manage Quiz</h1>
-{{-- Alert Block for Success and Error messages (Crucial for displaying permissions errors) --}}
-@if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
+        <!-- Filter Section -->
+        <section class="panel panel-spaced" style="margin-top: 60px;">
+            <div class="panel-header">Search & Filter</div>
 
-@if (session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-x-octagon-fill me-2"></i> {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
+            <form method="GET" action="{{ route('teacher.quizzes.index') }}" style="margin-top: 20px;">
+                <div class="filter-form">
+                    <div class="form-row">
+                        <label for="unique_id" style="margin-bottom: 6px;">Quiz ID</label>
+                        <input 
+                            type="text" 
+                            id="unique_id" 
+                            name="unique_id" 
+                            placeholder="Search ID..."
+                            value="{{ request('unique_id') }}"
+                            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--control-border); background: var(--input-bg); color: inherit; font-size: 14px; outline: none;"
+                        >
+                    </div>
 
-{{-- FILTERING CARD (Detailed and Responsive Filter) --}}
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-light">
-        <h5 class="mb-0">Search</h5>
-    </div>
+                    <div class="form-row">
+                        <label for="title" style="margin-bottom: 6px;">Quiz Title</label>
+                        <input 
+                            type="text" 
+                            id="title" 
+                            name="title" 
+                            placeholder="Search title..."
+                            value="{{ request('title') }}"
+                            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--control-border); background: var(--input-bg); color: inherit; font-size: 14px; outline: none;"
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <label for="creator_email" style="margin-bottom: 6px;">Creator Email</label>
+                        <input 
+                            type="email" 
+                            id="creator_email" 
+                            name="creator_email" 
+                            placeholder="teacher@email.com"
+                            value="{{ request('creator_email') }}"
+                            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--control-border); background: var(--input-bg); color: inherit; font-size: 14px; outline: none;"
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <label for="publish_date_range" style="margin-bottom: 6px;">Publish Date</label>
+                        <select 
+                            id="publish_date_range" 
+                            name="publish_date_range"
+                            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--control-border); background: var(--input-bg); color: inherit; font-size: 14px; outline: none;"
+                        >
+                            <option value="">All Time</option>
+                            <option value="today" {{ request('publish_date_range') === 'today' ? 'selected' : '' }}>Today</option>
+                            <option value="month" {{ request('publish_date_range') === 'month' ? 'selected' : '' }}>This Month</option>
+                            <option value="3months" {{ request('publish_date_range') === '3months' ? 'selected' : '' }}>Last 3 Months</option>
+                            <option value="year" {{ request('publish_date_range') === 'year' ? 'selected' : '' }}>This Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <a href="{{ route('teacher.quizzes.index') }}" class="btn btn-secondary">Clear Filters</a>
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Quizzes Table -->
+        <section class="panel panel-spaced" style="margin-top: 20px;">
+            <div class="panel-header">Quizzes ({{ $quizzes->count() }})</div>
+
+            <table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #d4c5f9;">
+                        <th style="padding: 12px; text-align: left; font-weight: 700; color: var(--muted); font-size: 13px;">Quiz Details</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 700; color: var(--muted); font-size: 13px;">Questions</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 700; color: var(--muted); font-size: 13px;">Attempts</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 700; color: var(--muted); font-size: 13px;">Deadline</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 700; color: var(--muted); font-size: 13px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($quizzes as $quiz)
+                        <tr style="border-bottom: 1px solid #e5e1f2; transition: background 0.2s ease;">
+                            <!-- Quiz Details -->
+                            <td style="padding: 16px 12px; vertical-align: top;">
+                                <div style="font-weight: 700; font-size: 15px; margin-bottom: 6px;">
+                                    {{ $quiz->title }}
+                                </div>
+                                <div style="color: var(--muted); font-size: 13px; margin-bottom: 10px; line-height: 1.4;">
+                                    {{ Str::limit($quiz->description, 100) }}
+                                </div>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    @if ($quiz->is_published)
+                                        <span class="badge" style="background: var(--success); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Published</span>
+                                    @else
+                                        <span class="badge" style="background: var(--yellow); color: #0b1220; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Draft</span>
+                                    @endif
+                                    <span class="badge" style="background: rgba(106, 77, 247, 0.1); color: var(--accent); padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">ID: {{ $quiz->unique_code }}</span>
+                                </div>
+                            </td>
+
+                            <!-- Questions Count -->
+                            <td style="padding: 16px 12px; text-align: center; vertical-align: middle;">
+                                <div style="font-weight: 700; font-size: 16px;">{{ $quiz->questions_count ?? 0 }}</div>
+                            </td>
+
+                            <!-- Attempts Count -->
+                            <td style="padding: 16px 12px; text-align: center; vertical-align: middle;">
+                                <div style="font-weight: 700; font-size: 16px;">{{ $quiz->attempts_count ?? 0 }}</div>
+                            </td>
+
+                            <!-- Deadline -->
+                            <td style="padding: 16px 12px; text-align: center; vertical-align: middle; font-size: 13px;">
+                                @if ($quiz->due_at)
+                                    <div style="{{ $quiz->due_at->isPast() ? 'color: var(--danger);' : '' }}">
+                                        {{ $quiz->due_at->format('M d, Y') }}
+                                    </div>
+                                    <div style="color: var(--muted); font-size: 12px;">{{ $quiz->due_at->format('h:i A') }}</div>
+                                @else
+                                    <div style="color: var(--muted);">No Deadline</div>
+                                @endif
+                            </td>
+
+                            <!-- Actions -->
+                            <td style="padding: 16px 12px; text-align: center; vertical-align: middle;">
+                                <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+                                    <a href="{{ route('teacher.quizzes.show', $quiz->id) }}" class="btn btn-small" style="background: transparent; color: var(--accent); border: 1px solid rgba(106, 77, 247, 0.3); padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">
+                                        👁️ View
+                                    </a>
+                                    <a href="{{ route('teacher.quizzes.edit', $quiz->id) }}" class="btn btn-small" style="background: transparent; color: var(--accent); border: 1px solid rgba(106, 77, 247, 0.3); padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">
+                                        ✏️ Edit
+                                    </a>
+                                    <form action="{{ route('teacher.quizzes.destroy', $quiz->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete this quiz?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-small" style="background: transparent; color: var(--danger); border: 1px solid rgba(230, 57, 70, 0.3); padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                                            🗑️ Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" style="padding: 40px; text-align: center;">
+                                <div class="empty-state">
+                                    <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
+                                    <div style="color: var(--muted); font-size: 16px;">No quizzes found</div>
+                                    <div style="color: var(--muted); font-size: 13px; margin-top: 6px;">Click "Create New Quiz" to get started</div>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            @if (method_exists($quizzes, 'links'))
+                <div style="margin-top: 20px;">
+                    {{ $quizzes->links() }}
+                </div>
+            @endif
+        </section>
+    </main>
+</div>
+@endsection
     <div class="card-body">
         <form method="GET" action="{{ route('teacher.quizzes.index') }}">
             <div class="row g-3">

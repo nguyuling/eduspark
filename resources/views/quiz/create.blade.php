@@ -1,84 +1,129 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
+<div class="app">
+    <main class="main">
+        <div class="header">
+            <div>
+                <div class="title">Create New Quiz</div>
+                <div class="sub">Set up your quiz with questions and options</div>
+            </div>
+            <a href="{{ route('teacher.quizzes.index') }}" class="btn btn-secondary">
+                ← Back to Quizzes
+            </a>
+        </div>
 
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
+        <!-- Error Messages -->
+        @if ($errors->any())
+            <section class="panel panel-spaced" style="margin-top: 60px; background: rgba(230, 57, 70, 0.1); border-left: 3px solid var(--danger);">
+                <div style="margin-bottom: 12px;">
+                    <div style="font-weight: 700; color: var(--danger); margin-bottom: 8px;">Please fix the following errors:</div>
+                    <ul style="margin: 0; padding-left: 20px; color: var(--danger);">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
-            @endif
+            </section>
+        @endif
 
-            <div class="card shadow-lg">
-                <div class="card-header bg-success text-white">
-                    <h2>Create New Quiz</h2>
+        <!-- Quiz Setup Form -->
+        <section class="panel panel-spaced" style="margin-top: 60px; max-width: 800px;">
+            <div class="panel-header">Quiz Setup</div>
+
+            <form method="POST" action="{{ route('teacher.quizzes.store') }}" style="margin-top: 20px;">
+                @csrf
+
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="title">Quiz Title</label>
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title" 
+                        class="form-input"
+                        placeholder="e.g. Chapter 1 Assessment"
+                        value="{{ old('title') }}" 
+                        required
+                    >
+                    @error('title')<span class="error-msg">{{ $message }}</span>@enderror
                 </div>
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('teacher.quizzes.store') }}">
-                        @csrf
-
-                        {{-- === QUIZ HEADER DETAILS === --}}
-                        <div class="mb-4 p-3 border rounded bg-light">
-                            <h4>Quiz Setup</h4>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="title" class="form-label">Quiz Title</label>
-                                    <input type="text" class="form-control" id="title" name="title" value="{{ old('title') }}" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="max_attempts" class="form-label">Max Attempts Allowed</label>
-                                    <input type="number" class="form-control" id="max_attempts" name="max_attempts" value="{{ old('max_attempts', 1) }}" min="1" required>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="due_at" class="form-label">Due Date (Optional)</label>
-                                    <input type="datetime-local" class="form-control" id="due_at" name="due_at" value="{{ old('due_at') }}">
-                                </div>
-                                <div class="col-md-6 mb-3 d-flex align-items-end">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="is_published" id="is_published" {{ old('is_published') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_published">
-                                            Publish Quiz Immediately
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description (Optional)</label>
-                                <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
-                            </div>
-                        </div>
-
-
-                        {{-- === QUESTION CONTAINER (Dynamically managed by JavaScript) === --}}
-                        <h4 class="mt-4 mb-3">Questions <span class="text-danger">*</span></h4>
-                        <div id="questions-container">
-                            {{-- Initial question template will be rendered here --}}
-                        </div>
-
-                        <button type="button" class="btn btn-outline-secondary btn-sm mb-4" id="add-question-btn">
-                            + Add Another Question
-                        </button>
-
-                        <div class="mt-4 border-top pt-3">
-                            <button type="submit" class="btn btn-success btn-lg">Save & Publish Quiz</button>
-                            <a href="{{ route('teacher.quizzes.index') }}" class="btn btn-secondary btn-lg">Cancel</a>
-                        </div>
-                    </form>
+                <!-- Max Attempts -->
+                <div class="form-group">
+                    <label for="max_attempts">Max Attempts Allowed</label>
+                    <input 
+                        type="number" 
+                        id="max_attempts" 
+                        name="max_attempts" 
+                        class="form-input"
+                        value="{{ old('max_attempts', 1) }}" 
+                        min="1"
+                        required
+                    >
+                    @error('max_attempts')<span class="error-msg">{{ $message }}</span>@enderror
                 </div>
-            </div>
-        </div>
-    </div>
+
+                <!-- Due Date -->
+                <div class="form-group">
+                    <label for="due_at">Due Date (Optional)</label>
+                    <input 
+                        type="datetime-local" 
+                        id="due_at" 
+                        name="due_at" 
+                        class="form-input"
+                        value="{{ old('due_at') }}"
+                    >
+                    @error('due_at')<span class="error-msg">{{ $message }}</span>@enderror
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="description">Description (Optional)</label>
+                    <textarea 
+                        id="description" 
+                        name="description" 
+                        rows="3"
+                        placeholder="Add instructions or additional information..."
+                        style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--control-border); background: var(--input-bg); color: inherit; font-size: 14px; outline: none; transition: box-shadow 0.12s ease, border-color 0.12s ease; resize: vertical; box-sizing: border-box;"
+                    >{{ old('description') }}</textarea>
+                    @error('description')<span class="error-msg">{{ $message }}</span>@enderror
+                </div>
+
+                <!-- Publish Checkbox -->
+                <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <input 
+                        type="checkbox" 
+                        id="is_published" 
+                        name="is_published"
+                        {{ old('is_published') ? 'checked' : '' }}
+                        style="width: 20px; height: 20px; cursor: pointer;"
+                    >
+                    <label for="is_published" style="margin: 0; cursor: pointer;">Publish Quiz Immediately</label>
+                </div>
+
+                <!-- Questions Container -->
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #d4c5f9;">
+                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 16px;">Questions <span style="color: var(--danger);">*</span></div>
+                    <div id="questions-container"></div>
+                    
+                    <button type="button" class="btn btn-secondary" id="add-question-btn" style="margin-top: 16px; margin-bottom: 24px;">
+                        ➕ Add Question
+                    </button>
+                </div>
+
+                <!-- Form Actions -->
+                <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 2px solid #d4c5f9;">
+                    <button type="submit" class="btn btn-primary">
+                        ✨ Save & Publish Quiz
+                    </button>
+                    <a href="{{ route('teacher.quizzes.index') }}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </section>
+    </main>
 </div>
 
 <script>
