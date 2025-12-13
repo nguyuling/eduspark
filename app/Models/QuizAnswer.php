@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class StudentAnswer extends Model
+class QuizAnswer extends Model
 {
     protected $fillable = [
     'attempt_id', 
@@ -24,16 +24,16 @@ class StudentAnswer extends Model
 
     public function question(): BelongsTo
     {
-        return $this->belongsTo(Question::class);
+        return $this->belongsTo(QuizQuestion::class);
     }
 
     public function selectedOption(): BelongsTo
     {
-        return $this->belongsTo(Option::class, 'selected_option_id');
+        return $this->belongsTo(QuizOption::class, 'selected_option_id');
     }
 
     public function options(): BelongsToMany
     {
-        return $this->belongsToMany(Option::class, 'student_answer_options', 'student_answer_id', 'option_id');
+        return $this->belongsToMany(QuizOption::class, 'student_answer_options', 'student_answer_id', 'option_id');
     }
 }

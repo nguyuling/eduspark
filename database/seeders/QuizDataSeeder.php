@@ -7,8 +7,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use App\Models\Quiz;
 use App\Models\User;
-use App\Models\Question;
-use App\Models\Option;
+use App\Models\QuizQuestion;
+use App\Models\QuizOption;
 use Illuminate\Support\Facades\DB; // Added DB transaction for safety
 
 class QuizDataSeeder extends Seeder

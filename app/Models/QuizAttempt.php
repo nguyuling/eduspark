@@ -46,6 +46,6 @@ class QuizAttempt extends Model
     public function answers(): HasMany
     {
         // Links the attempt to all submitted StudentAnswer records
-        return $this->hasMany(StudentAnswer::class, 'attempt_id');
+        return $this->hasMany(QuizAnswer::class, 'attempt_id');
     }
 }

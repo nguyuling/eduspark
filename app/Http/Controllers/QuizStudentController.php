@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
-use App\Models\StudentAnswer;
+use App\Models\QuizAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
-use App\Models\Question; 
+use App\Models\QuizQuestion; 
 use Carbon\Carbon;
 
 class QuizStudentController extends Controller
@@ -164,7 +164,7 @@ class QuizStudentController extends Controller
         $totalScore = 0;
 
         foreach ($submittedAnswers as $questionId => $studentAnswer) {
-            $question = Question::with('options')->find($questionId);
+            $question = QuizQuestion::with('options')->find($questionId);
 
             if (!$question) continue;
 
@@ -216,7 +216,7 @@ class QuizStudentController extends Controller
 
 
             // Use StudentAnswer model for creation
-            $answerRecord = StudentAnswer::create([
+            $answerRecord = QuizAnswer::create([
                 'attempt_id' => $attempt->id,
                 'question_id' => $question->id,
                 'is_correct' => $isCorrect,

@@ -45,7 +45,7 @@
                             <div class="card-body">
                                 <p class="card-text fw-bold">{{ $question->question_text }}</p>
 
-                                @if ($question->type === App\Models\Question::TYPE_SHORT_ANSWER)
+                                @if ($question->type === App\Models\QuizQuestion::TYPE_SHORT_ANSWER)
                                     <div class="alert alert-success mt-2">
                                         <strong>Correct Answer:</strong> {{ $question->correct_answer }}
                                     </div>
