@@ -90,7 +90,7 @@ class QuizController extends Controller
         $quizzes = $query->orderBy('due_at', 'asc')->get();        
     
         // Pass the quizzes and the filters back to the view
-        return view('quizzes.index', compact('quizzes', 'filters'));
+        return view('quizzes.index-student', compact('quizzes', 'filters'));
     }
 
     /**
@@ -267,6 +267,6 @@ class QuizController extends Controller
         ]);
 
         // This view will display: Total Score, Correct answers for wrong questions, Teacher's remark.
-        return view('quizzes.result', compact('attempt'));
+        return view('quizzes.result-student', compact('attempt'));
     }
 }
