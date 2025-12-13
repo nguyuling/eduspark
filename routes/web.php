@@ -2,11 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\QuizController; 
-use App\Http\Controllers\TeacherController; 
+use App\Http\Controllers\QuizStudentController; 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerformanceController;
-use App\Http\Controllers\Teacher\QuizManagementController; 
+use App\Http\Controllers\QuizTeacherController; 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LessonController;
 
@@ -62,28 +61,28 @@ Route::middleware(['auth'])->group(function () {
 
 // --- 3. STUDENT QUIZ ROUTES ---
 Route::prefix('quizzes')->middleware(['auth', 'role:student'])->group(function () {
-    Route::get('/', [QuizController::class, 'index'])->name('student.quizzes.index');
-    // Route::get('/{quiz}/attempt/{attempt}', [QuizController::class, 'showAttempt'])->name('student.quizzes.attempt.show');
-    Route::get('/{quiz}/attempt', [QuizController::class, 'start'])->name('student.quizzes.attempt.start');
-    Route::post('/{quiz}/submit', [QuizController::class, 'submit'])->name('student.quizzes.submit');
-    // Route::delete('/{quiz}/quit', action: [QuizController::class, 'quit'])->name('student.quizzes.attempt.quit');
-    Route::delete('/quit/{attempt}', [QuizController::class, 'quit'])->name('student.quizzes.attempt.quit');
-    Route::get('/result/{attempt}', [QuizController::class, 'showResult'])->name('student.quizzes.result'); 
+    Route::get('/', [QuizStudentController::class, 'index'])->name('student.quizzes.index');
+    // Route::get('/{quiz}/attempt/{attempt}', [QuizStudentController::class, 'showAttempt'])->name('student.quizzes.attempt.show');
+    Route::get('/{quiz}/attempt', [QuizStudentController::class, 'start'])->name('student.quizzes.attempt.start');
+    Route::post('/{quiz}/submit', [QuizStudentController::class, 'submit'])->name('student.quizzes.submit');
+    // Route::delete('/{quiz}/quit', action: [QuizStudentController::class, 'quit'])->name('student.quizzes.attempt.quit');
+    Route::delete('/quit/{attempt}', [QuizStudentController::class, 'quit'])->name('student.quizzes.attempt.quit');
+    Route::get('/result/{attempt}', [QuizStudentController::class, 'showResult'])->name('student.quizzes.result'); 
 });
 
 
 // --- 4. TEACHER QUIZ ROUTES ---
 Route::prefix('teacher/quizzes')->middleware(['auth', 'role:teacher'])->group(function () {
 
-    Route::get('/', [QuizManagementController::class, 'index'])->name('teacher.quizzes.index');
-    Route::get('/create', [QuizManagementController::class, 'create'])->name('teacher.quizzes.create');
-    Route::post('/', [QuizManagementController::class, 'store'])->name('teacher.quizzes.store');
-    Route::get('/{quiz}', [QuizManagementController::class, 'show'])->name('teacher.quizzes.show');
-    Route::get('/{quiz}/edit', [QuizManagementController::class, 'edit'])->name('teacher.quizzes.edit');
-    Route::put('/{quiz}', [QuizManagementController::class, 'update'])->name('teacher.quizzes.update');
-    Route::delete('/{quiz}', [QuizManagementController::class, 'destroy'])->name('teacher.quizzes.destroy');
-    Route::get('/{quiz}/results', [QuizManagementController::class, 'results'])->name('teacher.quizzes.results');
-    Route::post('/teacher/attempts/{attempt}/remark', [QuizManagementController::class, 'addRemark'])
+    Route::get('/', [QuizTeacherController::class, 'index'])->name('teacher.quizzes.index');
+    Route::get('/create', [QuizTeacherController::class, 'create'])->name('teacher.quizzes.create');
+    Route::post('/', [QuizTeacherController::class, 'store'])->name('teacher.quizzes.store');
+    Route::get('/{quiz}', [QuizTeacherController::class, 'show'])->name('teacher.quizzes.show');
+    Route::get('/{quiz}/edit', [QuizTeacherController::class, 'edit'])->name('teacher.quizzes.edit');
+    Route::put('/{quiz}', [QuizTeacherController::class, 'update'])->name('teacher.quizzes.update');
+    Route::delete('/{quiz}', [QuizTeacherController::class, 'destroy'])->name('teacher.quizzes.destroy');
+    Route::get('/{quiz}/results', [QuizTeacherController::class, 'results'])->name('teacher.quizzes.results');
+    Route::post('/teacher/attempts/{attempt}/remark', [QuizTeacherController::class, 'addRemark'])
     ->name('teacher.attempts.remark')
     ->middleware(['auth', 'role:teacher']);
 });

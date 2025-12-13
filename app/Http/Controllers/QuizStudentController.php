@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use App\Models\Question; 
 use Carbon\Carbon;
 
-class QuizController extends Controller
+class QuizStudentController extends Controller
 {
     /**
      * Display a listing of available quizzes with dynamic filtering.
