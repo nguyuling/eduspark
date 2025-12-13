@@ -11,6 +11,10 @@ class QuizOption extends Model
     
     protected $fillable = ['question_id', 'option_text', 'is_correct', 'sort_order'];
 
+    protected $casts = [
+        'is_correct' => 'boolean',
+    ];
+
     // An Option belongs to one Question
     public function question(): BelongsTo
     {

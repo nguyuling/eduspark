@@ -140,7 +140,8 @@ class QuizTeacherController extends Controller
                     if (in_array($questionType, [QuizQuestion::TYPE_MULTIPLE_CHOICE, QuizQuestion::TYPE_CHECKBOX, QuizQuestion::TYPE_TRUE_FALSE])) {
                         
                         $optionsData = $questionData['options'] ?? [];
-                        $correctAnswers = $questionData['correct_answer'] ?? [];
+                        // Handle both 'correct_answer' (radio) and 'correct_answers' (checkbox array)
+                        $correctAnswers = $questionData['correct_answers'] ?? $questionData['correct_answer'] ?? [];
                         
                         if (!is_array($correctAnswers)) {
                             $correctAnswers = [$correctAnswers]; 
@@ -268,8 +269,8 @@ class QuizTeacherController extends Controller
                         // The 'options' array now contains only the option text strings due to the Blade fix
                         $optionsData = $questionData['options'] ?? [];
                         
-                        // The 'correct_answer' field now holds the option text(s) for the correct answer(s)
-                        $correctAnswers = $questionData['correct_answer'] ?? []; 
+                        // Handle both 'correct_answer' (radio) and 'correct_answers' (checkbox array)
+                        $correctAnswers = $questionData['correct_answers'] ?? $questionData['correct_answer'] ?? []; 
                         
                         // Ensure it's an array for consistency
                         if (!is_array($correctAnswers)) {

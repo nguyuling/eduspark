@@ -13,11 +13,7 @@ require __DIR__ . '/auth.php';
 
 Route::get('/', function() {
     if (auth()->check()) {
-        // Redirect based on role
         $user = auth()->user();
-        if ($user->role === 'teacher') {
-            return redirect('/lesson');
-        }
         return redirect('/performance');
     }
     return redirect('/login');
