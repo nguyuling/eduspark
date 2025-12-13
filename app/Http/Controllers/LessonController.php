@@ -69,6 +69,19 @@ class LessonController extends Controller
     }
 
     /**
+     * Show create lesson form (teacher only)
+     */
+    public function create()
+    {
+        $user = Auth::user();
+        if ($user && $user->role === 'teacher') {
+            return view('lesson.create');
+        }
+        
+        abort(403, 'Unauthorized');
+    }
+
+    /**
      * Store a new lesson
      * POST /api/lessons
      */
