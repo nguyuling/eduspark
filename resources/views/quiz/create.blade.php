@@ -10,9 +10,6 @@
         <div class="title">Cipta Kuiz Baru</div>
         <div class="sub">Sediakan kuiz anda dengan soalan dan pilihan</div>
       </div>
-      <a href="{{ route('teacher.quizzes.index') }}" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-        ← Kembali ke Kuiz
-      </a>
     </div>
 
     @if (session('error'))
