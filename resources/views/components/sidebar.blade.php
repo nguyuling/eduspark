@@ -34,7 +34,7 @@ body.dark .sidebar{
 
 /* floating indicator pill */
 .nav-indicator{
-  display:block;
+  display:none;
   position:absolute;
   left:6px;
   width:4px;
@@ -47,6 +47,19 @@ body.dark .sidebar{
 .nav-icon svg { width:100%; height:100%; stroke:currentColor; fill:none; stroke-width:2; }
 
 .profile-icon { display:none; }
+
+#themeToggle { 
+  position: relative; 
+  z-index: 101 !important;
+  visibility: visible !important;
+  display: flex !important;
+  opacity: 1 !important;
+}
+
+.sidebar {
+  visibility: visible !important;
+  display: flex !important;
+}
 
 @media (max-width:920px){ .sidebar{ display:none; } }
 </style>
@@ -86,7 +99,7 @@ body.dark .sidebar{
 
     @endif
   </nav>
-  <button id="themeToggle" style="background:none;border:0;color:inherit;font-size:18px;cursor:pointer;padding:8px;border-radius:8px;transition:all .2s ease; margin:8px 0; width:100%;">☀️</button>
+  <button id="themeToggle" style="margin-top:auto; align-self:flex-end; background:none; border:0; color:inherit; font-size:22px; cursor:pointer; padding:10px; border-radius:8px; transition:all .2s ease; display:flex; align-items:center; justify-content:center;">☀️</button>
 </aside>
 <script>
   (function(){
@@ -128,5 +141,26 @@ body.dark .sidebar{
       const active = nav.querySelector('a.active') || navLinks[0];
       if(active) moveTo(active);
     });
+
+    // Theme toggle functionality
+    const themeToggle = document.querySelector('#themeToggle');
+    if(themeToggle){
+      // Initialize theme on page load
+      const isDark = localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if(isDark){
+        document.body.classList.add('dark');
+        themeToggle.textContent = '☀️';
+      } else {
+        document.body.classList.remove('dark');
+        themeToggle.textContent = '🌙';
+      }
+
+      // Toggle theme on click
+      themeToggle.addEventListener('click', () => {
+        const isDark = document.body.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        themeToggle.textContent = isDark ? '☀️' : '🌙';
+      });
+    }
   })();
 </script>

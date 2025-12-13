@@ -108,6 +108,9 @@
         {{-- Sidebar Component --}}
         @include('components.sidebar')
         
-        {{-- Sidebar --}}
-        @include('components.sidebar')
+        {{-- Page Content --}}
+        <div class="page-content">
             @yield('content')
+        </div>
+    </div></body>
+</html>
