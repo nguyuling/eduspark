@@ -51,6 +51,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/teacher/quizzes/create', [QuizTeacherController::class, 'create'])->name('teacher.quizzes.create');
     Route::post('/teacher/quizzes', [QuizTeacherController::class, 'store'])->name('teacher.quizzes.store');
     Route::get('/teacher/quizzes/{quiz}', [QuizTeacherController::class, 'show'])->name('teacher.quizzes.show');
+    Route::get('/teacher/quizzes/{quiz}/results', [QuizTeacherController::class, 'showResults'])->name('teacher.quizzes.results');
     Route::get('/teacher/quizzes/{quiz}/edit', [QuizTeacherController::class, 'edit'])->name('teacher.quizzes.edit');
     Route::put('/teacher/quizzes/{quiz}', [QuizTeacherController::class, 'update'])->name('teacher.quizzes.update');
     Route::delete('/teacher/quizzes/{quiz}', [QuizTeacherController::class, 'destroy'])->name('teacher.quizzes.destroy');

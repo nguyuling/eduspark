@@ -137,7 +137,7 @@ class QuizTeacherController extends Controller
                     ]);
 
                     // 2b. Handle Options for Multiple Choice/Checkbox Questions
-                    if (in_array($questionType, [Question::TYPE_MULTIPLE_CHOICE, Question::TYPE_CHECKBOX, Question::TYPE_TRUE_FALSE])) {
+                    if (in_array($questionType, [QuizQuestion::TYPE_MULTIPLE_CHOICE, QuizQuestion::TYPE_CHECKBOX, QuizQuestion::TYPE_TRUE_FALSE])) {
                         
                         $optionsData = $questionData['options'] ?? [];
                         $correctAnswers = $questionData['correct_answer'] ?? [];
@@ -263,7 +263,7 @@ class QuizTeacherController extends Controller
                     ]);
 
                     // 3b. Handle Options for Multiple Choice/Checkbox Questions
-                    if (in_array($questionType, [Question::TYPE_MULTIPLE_CHOICE, Question::TYPE_CHECKBOX, Question::TYPE_TRUE_FALSE])) {
+                    if (in_array($questionType, [QuizQuestion::TYPE_MULTIPLE_CHOICE, QuizQuestion::TYPE_CHECKBOX, QuizQuestion::TYPE_TRUE_FALSE])) {
                         
                         // The 'options' array now contains only the option text strings due to the Blade fix
                         $optionsData = $questionData['options'] ?? [];
@@ -385,6 +385,21 @@ class QuizTeacherController extends Controller
 
         // STEP 3: Return the page.
         return view('quiz.show', compact('quiz'));
+    }
+
+    /**
+     * Show quiz results for teacher.
+     */
+    public function showResults(Quiz $quiz)
+    {
+        $this->authorize('update', $quiz);
+        
+        // Load attempts with student and answer data
+        $attempts = $quiz->attempts()
+            ->with(['student', 'answers'])
+            ->get();
+        
+        return view('quiz.results', compact('quiz', 'attempts'));
     }
 
     // QuizPolicy.php (The Security Guard)
