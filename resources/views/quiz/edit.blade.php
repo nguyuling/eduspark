@@ -1,183 +1,164 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="app">
-    <main class="main">
-        <div class="header">
-            <div>
-                <div class="title">Edit Quiz: {{ $quiz->title }}</div>
-                <div class="sub">Modify your quiz questions and settings</div>
-            </div>
-            <a href="{{ route('teacher.quizzes.index') }}" class="btn btn-secondary">
-                ← Back to Quizzes
-            </a>
-        </div>
-
-        <!-- Error Messages -->
-        @if ($errors->any())
-            <section class="panel panel-spaced" style="margin-top: 60px; background: rgba(230, 57, 70, 0.1); border-left: 3px solid var(--danger);">
-                <div style="margin-bottom: 12px;">
-                    <div style="font-weight: 700; color: var(--danger); margin-bottom: 8px;">Please fix the following errors:</div>
-                    <ul style="margin: 0; padding-left: 20px; color: var(--danger);">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </section>
-        @endif
-
-        <!-- Warning Messages -->
-        @if (session('warning'))
-            <section class="panel panel-spaced" style="margin-top: 60px; background: rgba(244, 196, 48, 0.1); border-left: 3px solid var(--yellow);">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="font-size: 18px;">⚠️</span>
-                    <span>{{ session('warning') }}</span>
-                </div>
-            </section>
-        @endif
-
-        <!-- Quiz Edit Form -->
-        <section class="panel panel-spaced" style="margin-top: 60px; max-width: 800px;">
-            <div class="panel-header">Quiz Setup</div>
-
-            <form method="POST" action="{{ route('teacher.quizzes.update', $quiz->id) }}" style="margin-top: 20px;">
-                @csrf
-                @method('PUT')
-
-                <!-- Title -->
-                <div class="form-group">
-                    <label for="title">Quiz Title</label>
-                    <input 
-                        type="text" 
-                        id="title" 
-                        name="title" 
-                        class="form-input"
-                        value="{{ old('title', $quiz->title) }}" 
-                        required
-                    >
-                    @error('title')<span class="error-msg">{{ $message }}</span>@enderror
-                </div>
-
-                <!-- Max Attempts -->
-                <div class="form-group">
-                    <label for="max_attempts">Max Attempts Allowed</label>
-                    <input 
-                        type="number" 
-                        id="max_attempts" 
-                        name="max_attempts" 
-                        class="form-input"
-                        value="{{ old('max_attempts', $quiz->max_attempts) }}" 
-                        min="1"
-                        required
-                    >
-                    @error('max_attempts')<span class="error-msg">{{ $message }}</span>@enderror
-                </div>
-
-                <!-- Due Date -->
-                <div class="form-group">
-                    <label for="due_at">Due Date (Optional)</label>
-                    <input 
-                        type="datetime-local" 
-                        id="due_at" 
-                        name="due_at" 
-                        class="form-input"
-                        value="{{ old('due_at', $quiz->due_at?->format('Y-m-d\TH:i')) }}"
-                    >
-                    @error('due_at')<span class="error-msg">{{ $message }}</span>@enderror
-                </div>
-
-                <!-- Description -->
-                <div class="form-group">
-                    <label for="description">Description (Optional)</label>
-                    <textarea 
-                        id="description" 
-                        name="description" 
-                        rows="3"
-                        style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--control-border); background: var(--input-bg); color: inherit; font-size: 14px; outline: none; transition: box-shadow 0.12s ease, border-color 0.12s ease; resize: vertical; box-sizing: border-box;"
-                    >{{ old('description', $quiz->description) }}</textarea>
-                    @error('description')<span class="error-msg">{{ $message }}</span>@enderror
-                </div>
-
-                <!-- Publish Checkbox -->
-                <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-                    <input 
-                        type="checkbox" 
-                        id="is_published" 
-                        name="is_published"
-                        {{ old('is_published', $quiz->is_published) ? 'checked' : '' }}
-                        style="width: 20px; height: 20px; cursor: pointer;"
-                    >
-                    <label for="is_published" style="margin: 0; cursor: pointer;">Publish Quiz</label>
-                </div>
-
-                <!-- Questions Container -->
-                <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #d4c5f9;">
-                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 16px;">Questions <span style="color: var(--danger);">*</span></div>
-                    <div id="questions-container"></div>
-                    
-                    <button type="button" class="btn btn-secondary" id="add-question-btn" style="margin-top: 16px; margin-bottom: 24px;">
-                        ➕ Add Question
-                    </button>
-                </div>
-
-                <!-- Form Actions -->
-                <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 2px solid #d4c5f9;">
-                    <button type="submit" class="btn btn-primary">
-                        💾 Update Quiz
-                    </button>
-                    <a href="{{ route('teacher.quizzes.show', $quiz->id) }}" class="btn btn-secondary">
-                        Cancel
-                    </a>
-                </div>
-            </form>
-        </section>
-    </main>
-</div>
-
-<script>                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="due_at" class="form-label">Due Date (Optional)</label>
-                                    <input type="datetime-local" class="form-control" id="due_at" name="due_at" value="{{ old('due_at', optional($quiz->due_at)->format('Y-m-d\TH:i')) }}">
-                                </div>
-                                <div class="col-md-6 mb-3 d-flex align-items-end">
-                                    <div class="form-check">
-                                        {{-- FIX: Corrected name from 'publish' to 'is_published' --}}
-                                        <input class="form-check-input" type="checkbox" name="is_published" id="publish" {{ old('is_published', $quiz->is_published) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="publish">
-                                            Publish Quiz Immediately
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description (Optional)</label>
-                                <textarea class="form-control" id="description" name="description" rows="3">{{ old('description', $quiz->description) }}</textarea>
-                            </div>
-                        </div>
-
-
-                        {{-- === QUESTION CONTAINER (Dynamically managed by JavaScript) === --}}
-                        <h4 class="mt-4 mb-3">Questions <span class="text-danger">*</span></h4>
-                        <div id="questions-container">
-                            {{-- EXISTING QUESTIONS WILL BE POPULATED HERE BY JS --}}
-                        </div>
-
-                        <button type="button" class="btn btn-outline-secondary btn-sm mb-4" id="add-question-btn">
-                            + Add Another Question
-                        </button>
-
-                        <div class="mt-4 border-top pt-3">
-                            <button type="submit" class="btn btn-warning btn-lg">Update Quiz</button>
-                            <a href="{{ route('teacher.quizzes.index') }}" class="btn btn-secondary btn-lg">Cancel</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+  <!-- Main -->
+  <main class="main">
+    <div class="header">
+      <div>
+        <div class="title">Edit Kuiz: {{ $quiz->title }}</div>
+        <div class="sub">Ubah soalan dan tetapan kuiz anda</div>
+      </div>
+      <a href="{{ route('teacher.quizzes.index') }}" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
+        ← Kembali ke Kuiz
+      </a>
     </div>
+
+    @if (session('error'))
+      <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
+    @endif
+
+    <!-- Error Messages -->
+    @if ($errors->any())
+      <section style="margin-left:40px; margin-right:40px; margin-bottom:20px; background: rgba(230, 57, 70, 0.1); border-left: 3px solid var(--danger); padding:16px 18px; border-radius:var(--card-radius);">
+        <div style="font-weight: 700; color: var(--danger); margin-bottom: 8px;">Sila betulkan ralat berikut:</div>
+        <ul style="margin: 0; padding-left: 20px; color: var(--danger); font-size: 14px;">
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </section>
+    @endif
+
+    <!-- Start Main Form -->
+    <form method="POST" action="{{ route('teacher.quizzes.update', $quiz->id) }}" id="quiz-form">
+      @csrf
+      @method('PUT')
+
+      <!-- Quiz Format Section -->
+      <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+        <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Format Kuiz</h2>
+
+        <!-- Title -->
+        <div style="margin-bottom: 20px;">
+          <label for="title" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Tajuk Kuiz <span style="color: var(--danger);">*</span></label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            placeholder="Contoh: Penilaian Bab 1"
+            value="{{ old('title', $quiz->title) }}" 
+            required
+            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box;" 
+            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+          >
+          @error('title')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
+        </div>
+
+        <!-- Description -->
+        <div style="margin-bottom: 20px;">
+          <label for="description" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Penerangan (Pilihan)</label>
+          <textarea 
+            id="description" 
+            name="description" 
+            rows="3"
+            placeholder="Tambah arahan atau maklumat tambahan..."
+            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; resize: vertical; box-sizing: border-box;"
+            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+          >{{ old('description', $quiz->description) }}</textarea>
+          @error('description')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
+        </div>
+
+        <!-- Bottom Row: Due Date, Max Attempts, Publish Checkbox -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+          <!-- Due Date -->
+          <div>
+            <label for="due_at" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Tarikh Akhir (Pilihan)</label>
+            <input 
+              type="datetime-local" 
+              id="due_at" 
+              name="due_at" 
+              value="{{ old('due_at', $quiz->due_at?->format('Y-m-d\TH:i')) }}"
+              style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box;"
+              onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+              onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            >
+            @error('due_at')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
+          </div>
+
+          <!-- Max Attempts -->
+          <div>
+            <label for="max_attempts" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Percubaan Maksimum <span style="color: var(--danger);">*</span></label>
+            <input 
+              type="number" 
+              id="max_attempts" 
+              name="max_attempts" 
+              value="{{ old('max_attempts', $quiz->max_attempts) }}" 
+              min="1"
+              required
+              style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box;"
+              onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+              onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            >
+            @error('max_attempts')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
+          </div>
+
+          <!-- Publish Checkbox -->
+          <div style="display: flex; align-items: flex-end; padding-bottom: 2px;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: rgba(106,77,247,0.05); border-radius: 8px; border: 2px solid #d1d5db; width: 100%;">
+              <input 
+                type="checkbox" 
+                id="is_published" 
+                name="is_published"
+                {{ old('is_published', $quiz->is_published) ? 'checked' : '' }}
+                style="width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;"
+              >
+              <label for="is_published" style="margin: 0; cursor: pointer; font-weight: 500; font-size: 14px; white-space: nowrap;">Terbitkan Segera</label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Questions Header -->
+      <section style="margin-left:40px; margin-right:40px; margin-top:40px; margin-bottom:20px;">
+        <h2 style="margin:0; font-size:18px; font-weight:700;">Soalan <span style="color: var(--danger);">*</span></h2>
+      </section>
+
+      <!-- Questions Container - Each question appears as its own section -->
+      <div id="questions-container"></div>
+
+      <!-- Add Question Button -->
+      <section style="margin-left:40px; margin-right:40px; margin-bottom:40px;">
+        <button type="button" id="add-question-btn" style="display:inline-block; padding:10px 18px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
+          ➕ Tambah Soalan
+        </button>
+      </section>
+
+      <!-- Action Buttons - Outside all containers but inside form -->
+      <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0;">
+        <button type="submit" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+          Simpan Kuiz
+        </button>
+        <a href="{{ route('teacher.quizzes.show', $quiz->id) }}" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
+          Batal
+        </a>
+      </div>
+    </form>
+  </main>
 </div>
+
+<script>
 
 <script>
     // Define the question types based on the Question Model constants
