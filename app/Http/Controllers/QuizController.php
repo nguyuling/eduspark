@@ -90,7 +90,7 @@ class QuizController extends Controller
         $quizzes = $query->orderBy('due_at', 'asc')->get();        
     
         // Pass the quizzes and the filters back to the view
-        return view('quizzes.index-student', compact('quizzes', 'filters'));
+        return view('quiz.index-student', compact('quizzes', 'filters'));
     }
 
     /**
@@ -131,7 +131,7 @@ class QuizController extends Controller
             $quiz->load('questions.options'); // <--- Ensure this is executed
 
             // Return view with the existing attempt
-            return view('quizzes.attempt', compact('quiz', 'attempt')); 
+            return view('quiz.attempt', compact('quiz', 'attempt')); 
         }
 
         // 5. Create a new attempt record (if no open attempt exists)
@@ -146,7 +146,7 @@ class QuizController extends Controller
         $quiz->load('questions.options');
 
         // Return view with the newly created '$attempt' variable
-        return view('quizzes.attempt', compact('quiz', 'attempt'));
+        return view('quiz.attempt', compact('quiz', 'attempt'));
     }
 
     /**
@@ -267,6 +267,6 @@ class QuizController extends Controller
         ]);
 
         // This view will display: Total Score, Correct answers for wrong questions, Teacher's remark.
-        return view('quizzes.result-student', compact('attempt'));
+        return view('quiz.result-student', compact('attempt'));
     }
 }

@@ -266,7 +266,7 @@ class TeacherController extends Controller
             'total_students' => $attempts->count(),
         ];
 
-        return view('quizzes.result-teacher', compact('quiz', 'attempts', 'statistics'));
+        return view('quiz.result-teacher', compact('quiz', 'attempts', 'statistics'));
     }
 
     /**

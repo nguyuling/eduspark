@@ -51,7 +51,7 @@ Route::middleware(['auth'])->group(function () {
     
     // 2.3. CORE MODULE PLACEHOLDERS (Lessons, Forum, Game, Performance)
     Route::get('/lessons', function () { return view('lessons.index-student'); })->name('lessons.index');
-    Route::get('/lessons/create', function () { return view('lessons.create-lesson'); })->name('lessons.create');
+    Route::get('/lessons/create', function () { return view('lessons.create'); })->name('lessons.create');
     Route::get('/forum', function () { return view('forum.index'); })->name('forum.index');
     Route::get('/games', function () { return view('games.index'); })->name('games.index')->middleware('role:student');
     Route::get('/performance/teacher', function () { return view('performance.teacher_view'); })->name('performance.teacher_view')->middleware('role:teacher');
