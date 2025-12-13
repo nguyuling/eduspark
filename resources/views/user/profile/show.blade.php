@@ -47,7 +47,7 @@ body.dark .panel { background: #0f1724; }
   <main class="main" style="flex:1;">
     <div class="header" style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:40px; margin-top:40px; margin-left:40px; margin-right:40px;">
       <div>
-        <div class="title" style="font-weight:700;font-size:28px;">Profil Saya</div>
+        <div class="title" style="font-weight:700;font-size:28px;">Profil</div>
         <div class="sub" style="color:var(--muted);font-size:13px;">Lihat dan urus maklumat akaun anda</div>
       </div>
     </div>
@@ -115,7 +115,7 @@ body.dark .panel { background: #0f1724; }
     <!-- Account Security -->
     <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px;">
       <div class="panel-header" style="margin:0 0 20px 0;">
-        <h3>Keamanan Akaun</h3>
+        <h3>Sekuriti Akaun</h3>
       </div>
       <p style="margin: 0 0 16px 0; color: var(--muted);">Kata laluan telah ditetapkan dan diamankan.</p>
       <div style="display: flex; justify-content: flex-end;">
