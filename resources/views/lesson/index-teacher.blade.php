@@ -275,7 +275,12 @@ tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1
         <div class="title" style="font-weight:700;font-size:20px;">Lessons</div>
         <div class="sub" style="color:var(--muted);font-size:13px;">Manage lesson materials</div>
       </div>
-      <button id="themeToggle" style="background:none;border:0;color:inherit;font-weight:600;cursor:pointer;">🌙</button>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a href="{{ route('lesson.create') }}" style="text-decoration:none;">
+          <button style="background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:8px 16px;">Cipta Bahan</button>
+        </a>
+        <button id="themeToggle" style="background:none;border:0;color:inherit;font-weight:600;cursor:pointer;">🌙</button>
+      </div>
     </div>
 
     <!-- Cards (optional stats placeholders) -->
@@ -288,55 +293,6 @@ tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1
           </span>
         </div>
       </div>
-    </section>
-
-    <!-- Lesson Upload Panel -->
-    <section class="panel">
-      <h2 style="margin:0 0 10px 0; font-size:18px;">Add New Lesson</h2>
-      <form id="createLessonForm" enctype="multipart/form-data">
-        @csrf
-        <div style="margin-bottom:12px;">
-            <label>Title:</label>
-            <input type="text" name="title" required placeholder="e.g. Introduction to Algorithms">
-        </div>
-
-        <div style="margin-bottom:12px;">
-            <label>Description:</label>
-            <textarea name="description" rows="3" placeholder="Short description (optional)"></textarea>
-        </div>
-<!-- Class Group -->
-<div class="mt-3">
-    <label for="class_group" class="block text-sm font-medium text-gray-700">Class Group</label>
-    <select name="class_group" id="class_group"
-            class="mt-1 w-full border border-gray-300 rounded-md p-2">
-        <option value="4A">4A</option>
-        <option value="4B">4B</option>
-        <option value="4C">4C</option>
-        <option value="5A">5A</option>
-        <option value="5B">5B</option>
-    </select>
-</div>
-
-<!-- Visibility -->
-<div class="mt-3">
-    <label for="visibility" class="block text-sm font-medium text-gray-700">Visibility</label>
-    <select name="visibility" id="visibility"
-            class="mt-1 w-full border border-gray-300 rounded-md p-2">
-        <option value="class">Class Only</option>
-        <option value="public">Public (All Students)</option>
-    </select>
-</div>
-
-        <div style="margin-bottom:12px;">
-            <label>Upload File:</label>
-            <input type="file" name="file" accept=".pdf,.docx,.pptx,.txt,.jpg,.png">
-        </div>
-
-        <div style="display:flex; gap:10px; align-items:center;">
-          <button type="submit" style="min-width:120px;">Upload Lesson</button>
-          <div class="small-muted" style="font-size:13px;">Max file size: 10MB</div>
-        </div>
-      </form>
     </section>
 
     <!-- Lesson List Table -->
@@ -495,27 +451,6 @@ function escapeHtml(text) {
         return map[s];
     });
 }
-
-// Create lesson (kept same)
-document.getElementById('createLessonForm').addEventListener('submit', async function(e){
-    e.preventDefault();
-    const formData = new FormData(this);
-    try {
-        const response = await fetch('/api/lessons', {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': csrfToken },
-            body: formData
-        });
-        const data = await response.json();
-        if (!data.success) throw new Error(data.message || 'Unknown error');
-        alert('Lesson created successfully!');
-        this.reset();
-        loadLessons();
-    } catch(err){
-        console.error(err);
-        alert('Unexpected error: ' + err.message);
-    }
-});
 
 // Update lesson
 async function updateLesson(id) {
