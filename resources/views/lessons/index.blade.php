@@ -73,6 +73,9 @@ button:hover { transform: translateY(-3px); opacity:0.98; }
 button:active { transform: translateY(-1px); }
 .btn-small { padding:6px 10px; font-size:13px; border-radius:8px; }
 
+.btn { cursor:pointer; padding:8px 12px; border-radius:10px; border:none; font-weight:700; font-size:14px; transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease; display:inline-flex; align-items:center; gap:6px; text-decoration:none; }
+.btn-primary { background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; box-shadow: 0 6px 18px rgba(8,12,32,0.25); }
+.btn-primary:hover { transform: translateY(-3px); opacity:0.98; }
 table { width:100%; border-collapse:collapse; font-size:14px; margin-top:1rem; border: 2px solid #d4c5f9; border-radius: 8px; overflow: hidden; }
 thead th { text-align:center; font-weight:700; color:var(--muted); font-size:13px; padding:12px 10px; border-bottom: 2px solid #d4c5f9; background: rgba(212, 197, 249, 0.05); }
 tbody td { padding:12px 10px; border-bottom: 1px solid #e5e1f2; vertical-align: middle; background: transparent; border-right: 1px solid #e5e1f2; }
@@ -149,6 +152,7 @@ tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
     <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <h2 style="margin:0 0 10px 0; font-size:18px; font-weight:700;">Bahan Tersedia</h2>
+        <a href="{{ route('lessons.create') }}" class="btn btn-primary" style="padding:10px 18px; border-radius:10px; border:none; font-weight:700; font-size:14px; transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease; display:inline-flex; align-items:center; gap:6px; text-decoration:none;">Cipta Bahan</a>
       </div>
       
       <table style="margin-top:20px;">

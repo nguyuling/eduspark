@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <main class="main">
     <div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:24px;">
       <div class="page-header">
-        <h1>Edit Profile</h1>
+        <h1>Kemaskini Profil</h1>
         <div class="subtitle">Update your personal information</div>
       </div>
       <button id="themeToggle" style="background:none;border:0;color:inherit;font-weight:600;cursor:pointer;font-size:24px;">🌙</button>
