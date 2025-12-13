@@ -117,7 +117,7 @@ tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
     <!-- Search Lesson Panel -->
     <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
       <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700;">Cari Bahan</h2>
-      <form method="GET" action="{{ route('lessons.index') }}" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:20px;">
+      <form method="GET" action="{{ route('lesson.index') }}" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:20px;">
         <div>
           <label>Cari</label>
           <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Tajuk atau penerangan" style="height:40px;">
@@ -143,7 +143,7 @@ tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
         </div>
       </form>
       <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end; margin-top:20px;">
-        <a href="{{ route('lessons.index') }}" class="btn-small button-outline">Kosongkan Penapis</a>
+        <a href="{{ route('lesson.index') }}" class="btn-small button-outline">Kosongkan Penapis</a>
         <button onclick="document.querySelector('.panel form').submit();" class="btn-small">Gunakan Penapis</button>
       </div>
     </section>
