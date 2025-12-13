@@ -76,42 +76,49 @@
 
     input {
       width: 100%;
-      padding: 12px;
-      font-size: 15px;
-      border-radius: 10px;
-      border: 1px solid rgba(11,18,32,0.15);
-      background: white;
+      padding: 11px 14px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 2px solid #d1d5db;
+      background: transparent;
+      color: inherit;
+      outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease;
     }
 
     body.dark input {
-      background: #0d1525;
       color: white;
-      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    input:hover {
+      border-color: #9ca3af;
+      background: rgba(200, 200, 200, 0.08);
     }
 
     input:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(106,77,247,0.25);
+      background: rgba(200, 200, 200, 0.08);
     }
 
     .btn-login {
-      background: var(--accent);
+      background: linear-gradient(90deg, var(--accent), #7c5dff);
       color: white;
       width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: 600;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 700;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
       margin-top: 10px;
-      transition: 0.2s;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 12px rgba(106,77,247,0.3);
     }
 
     .btn-login:hover {
-      opacity: 0.9;
       transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(106,77,247,0.4);
     }
 
     .links {
@@ -148,7 +155,7 @@
 <body class="light">
   <div class="container">
     <h1>Welcome Back!</h1>
-    <p class="subtitle">Sign in to continue your learning journey.</p>
+    <p class="subtitle">Log in to continue your learning journey.</p>
 
     @if(session('success'))
       <div style="color: green; margin-bottom: 16px; font-weight: 500;">
@@ -191,7 +198,7 @@
         />
       </div>
 
-      <button type="submit" class="btn-login">🔐 Log In</button>
+      <button type="submit" class="btn-login">Log In</button>
     </form>
 
     <div class="links">
