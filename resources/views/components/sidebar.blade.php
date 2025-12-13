@@ -34,17 +34,7 @@ body.dark .sidebar{
 
 /* floating indicator pill */
 .nav-indicator{
-  position:absolute;
-  left:6px;
-  width:calc(100% - 12px);
-  height:44px;
-  border-radius:999px;
-  background:linear-gradient(90deg,var(--accent),var(--accent-2));
-  opacity:0.12;
-  transform:translateY(0);
-  transition: top .28s cubic-bezier(.2,.8,.2,1), height .2s .02s cubic-bezier(.2,.8,.2,1), opacity .18s ease;
-  pointer-events:none;
-  box-shadow: 0 10px 24px rgba(99,60,255,0.08);
+  display:none;
 }
 .nav-icon { width:20px; height:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .nav-icon svg { width:100%; height:100%; stroke:currentColor; fill:none; stroke-width:2; }
