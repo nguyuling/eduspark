@@ -1,263 +1,150 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>EduSpark • Create Lesson</title>
+@extends('layouts.app')
 
-<meta name="csrf-token" content="{{ csrf_token() }}">
+@section('content')
 
-<!-- Font & Tailwind (from your app.css) -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link href="{{ asset('css/app.css') }}" rel="stylesheet">
-
-<style>
-/* ---------- Theme variables (kept from original) ---------- */
-:root{
-  --bg-light:#f5f7ff;
-  --bg-dark:#071026;
-  --card-light:rgba(255,255,255,0.9);
-  --card-dark:#0f1724;
-  --accent:#6A4DF7;
-  --accent-2:#9C7BFF;
-  --muted:#98a0b3;
-  --success:#2A9D8F;
-  --danger:#E63946;
-  --yellow:#F4C430;
-  --glass: rgba(255,255,255,0.04);
-  --input-bg: rgba(255,255,255,0.02);
-  --control-border: rgba(255,255,255,0.08);
-  --radius: 10px;
-  --card-radius: 14px;
-  --focus-glow: 0 6px 20px rgba(106,77,247,0.12);
-  --shadow-soft: 0 6px 20px rgba(2,6,23,0.45);
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
-
-body.light { background:var(--bg-light); color:#0b1220; }
-body.dark  { background:var(--bg-dark); color:#e6eef8; }
-
-.app { display:flex; min-height:100vh; gap:28px; padding:28px; font-family: Inter, system-ui, sans-serif; }
-
-.sidebar{
-  width:240px; border-radius:var(--card-radius); padding:18px;
-  display:flex; flex-direction:column; align-items:center; gap:12px;
-  backdrop-filter: blur(8px) saturate(120%);
-  box-shadow: none;
-}
-body.light .sidebar{
-  background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.68));
-  border:1px solid rgba(13,18,25,0.05);
-}
-body.dark .sidebar{
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border:1px solid rgba(255,255,255,0.03);
-}
-.logo { width:110px; height:auto; margin-bottom:6px; }
-
-.nav { width:100%; margin-top:10px; padding-top:6px; }
-.nav a {
-  display:flex; align-items:center; gap:10px;
-  padding:10px 12px; border-radius:10px;
-  color:var(--muted); text-decoration:none; font-weight:600;
-  margin:6px 0; position:relative; font-size:14px;
-}
-.nav a.active { color:var(--accent); }
-
-.panel {
-  border-radius:var(--card-radius); padding:14px; animation: fadeInUp .4s ease; margin-bottom:20px;
-  background: transparent;
-  border: 1px solid var(--control-border);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 12px rgba(2,6,23,0.18);
-}
-body.light .panel { background: rgba(255,255,255,0.96); }
-body.dark .panel  { background:#0f1724; }
-
-input[type="text"],
-input[type="date"],
-textarea,
-select,
-input[type="file"] {
-  width:100%;
-  padding:11px 14px;
-  border-radius:8px;
-  border:1px solid var(--control-border);
-  background: var(--input-bg);
-  color: inherit;
-  font-size:14px;
-  outline: none;
-  transition: box-shadow .12s ease, border-color .12s ease, transform .06s ease;
-  resize: vertical;
-  box-sizing: border-box;
-}
-
-textarea { min-height:84px; line-height:1.45; }
-
-input[type="file"] {
-  padding:8px 12px;
-  border-radius:8px;
-}
-
-input[type="text"]:focus,
-textarea:focus,
-select:focus,
-input[type="date"]:focus,
-input[type="file"]:focus {
-  box-shadow: var(--focus-glow);
-  border-color: var(--accent);
-  transform: translateY(-1px);
-}
-
-::placeholder { color: rgba(255,255,255,0.45); }
-
-label { font-size:13px; color:var(--muted); font-weight:600; display:block; margin-bottom:6px; }
-
-.small-muted { color:var(--muted); font-size:13px; }
-
-button {
-  cursor:pointer;
-  padding:8px 12px;
-  border-radius:10px;
-  border:none;
-  background: linear-gradient(90deg,var(--accent),var(--accent-2));
-  color:#fff;
-  font-weight:700;
-  font-size:14px;
-  transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease;
-  box-shadow: 0 6px 18px rgba(8,12,32,0.25);
-}
-
-button[style*="background:transparent"],
-.button-outline {
-  background: transparent !important;
-  color: inherit;
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: none;
-}
-
-button.danger {
-  background: var(--danger);
-  box-shadow: none;
-}
-
-button:hover { transform: translateY(-3px); opacity:0.98; }
-button:active { transform: translateY(-1px); }
-
-.btn-small { padding:6px 10px; font-size:13px; border-radius:8px; }
-
-@keyframes fadeInUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
-
-.hidden { display:none; }
-</style>
-</head>
-
-<body class="dark">
 <div class="app">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <img src="{{ asset('logo.png') }}" alt="EduSpark logo" class="logo">
-    <div class="logo-text" aria-hidden="true" style="font-weight:700;font-size:18px;">
-      <span style="color:#1D5DCD;">edu</span><span style="color:#E63946;">Spark</span>
-    </div>
-    <nav class="nav">
-      <a href="{{ route('lesson.index') }}" class="active">Lessons</a>
-      <a href="#">Materials</a>
-      <a href="#">Assessments</a>
-      <a href="#">Forum</a>
-      <a href="#">Games</a>
-    </nav>
-  </aside>
-
   <!-- Main -->
-  <main class="main" style="flex:1;">
-    <div class="header" style="display:flex;justify-content:space-between;align-items:center; margin-bottom:20px;">
+  <main class="main">
+    <div class="header">
       <div>
-        <div class="title" style="font-weight:700;font-size:20px;">Create Lesson</div>
-        <div class="sub" style="color:var(--muted);font-size:13px;">Add a new lesson material for your class</div>
+        <div class="title">Cipta Bahan Baru</div>
+        <div class="sub">Tambah bahan pembelajaran baru untuk kelas anda</div>
       </div>
-      <button id="themeToggle" style="background:none;border:0;color:inherit;font-weight:600;cursor:pointer;">🌙</button>
     </div>
 
-    <!-- Add New Lesson Panel -->
-    <section class="panel">
-      <h2 style="margin:0 0 10px 0; font-size:18px;">Add New Lesson</h2>
-      <form id="createLessonForm" enctype="multipart/form-data">
-        @csrf
-        <div style="margin-bottom:12px;">
-            <label>Title:</label>
-            <input type="text" name="title" required placeholder="e.g. Introduction to Algorithms">
+    @if (session('error'))
+      <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
+    @endif
+
+    <!-- Error Messages -->
+    @if ($errors->any())
+      <section style="margin-left:40px; margin-right:40px; margin-bottom:20px; background: rgba(230, 57, 70, 0.1); border-left: 3px solid var(--danger); padding:16px 18px; border-radius:var(--card-radius);">
+        <div style="font-weight: 700; color: var(--danger); margin-bottom: 8px;">Sila betulkan ralat berikut:</div>
+        <ul style="margin: 0; padding-left: 20px; color: var(--danger); font-size: 14px;">
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </section>
+    @endif
+
+    <!-- Main Form -->
+    <form method="POST" action="{{ route('lesson.store') }}" enctype="multipart/form-data" id="lesson-form">
+      @csrf
+
+      <!-- Lesson Details Section -->
+      <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px; margin-top:20px;">
+        <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Butiran Bahan</h2>
+
+        <!-- Title -->
+        <div style="margin-bottom: 20px;">
+          <label for="title" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Tajuk <span style="color: var(--danger);">*</span></label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            placeholder="Contoh: Pengenalan kepada Algebra"
+            value="{{ old('title') }}" 
+            required
+            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box;" 
+            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            onfocus="this.style.borderColor='#6A4DF7'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+          >
         </div>
 
-        <div style="margin-bottom:12px;">
-            <label>Description:</label>
-            <textarea name="description" rows="3" placeholder="Short description (optional)"></textarea>
+        <!-- Description -->
+        <div style="margin-bottom: 20px;">
+          <label for="description" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Penerangan</label>
+          <textarea 
+            id="description" 
+            name="description" 
+            placeholder="Terangkan secara ringkas kandungan bahan pembelajaran ini..."
+            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; min-height: 100px; box-sizing: border-box; resize: vertical;" 
+            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            onfocus="this.style.borderColor='#6A4DF7'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+          >{{ old('description') }}</textarea>
         </div>
 
-        <div style="margin-bottom:12px;">
-            <label for="class_group" class="block text-sm font-medium">Class Group</label>
-            <select name="class_group" id="class_group">
-                <option value="4A">4A</option>
-                <option value="4B">4B</option>
-                <option value="4C">4C</option>
-                <option value="5A">5A</option>
-                <option value="5B">5B</option>
+        <!-- Class Group and Visibility in same row -->
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+          <div style="flex: 1;">
+            <label for="class_group" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Kelas <span style="color: var(--danger);">*</span></label>
+            <select 
+              id="class_group" 
+              name="class_group" 
+              required
+              style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box; height: 44px;" 
+              onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+              onfocus="this.style.borderColor='#6A4DF7'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            >
+              <option value="">-- Pilih Kelas --</option>
+              <option value="4A" {{ old('class_group') == '4A' ? 'selected' : '' }}>4A</option>
+              <option value="4B" {{ old('class_group') == '4B' ? 'selected' : '' }}>4B</option>
+              <option value="4C" {{ old('class_group') == '4C' ? 'selected' : '' }}>4C</option>
+              <option value="5A" {{ old('class_group') == '5A' ? 'selected' : '' }}>5A</option>
+              <option value="5B" {{ old('class_group') == '5B' ? 'selected' : '' }}>5B</option>
             </select>
-        </div>
+          </div>
 
-        <div style="margin-bottom:12px;">
-            <label for="visibility" class="block text-sm font-medium">Visibility</label>
-            <select name="visibility" id="visibility">
-                <option value="class">Class Only</option>
-                <option value="public">Public (All Students)</option>
+          <div style="flex: 1;">
+            <label for="visibility" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Keterlihatan <span style="color: var(--danger);">*</span></label>
+            <select 
+              id="visibility" 
+              name="visibility" 
+              required
+              style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box; height: 44px;" 
+              onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+              onfocus="this.style.borderColor='#6A4DF7'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            >
+              <option value="">-- Pilih Keterlihatan --</option>
+              <option value="class" {{ old('visibility') == 'class' ? 'selected' : '' }}>Kelas Sahaja</option>
+              <option value="public" {{ old('visibility') == 'public' ? 'selected' : '' }}>Awam (Semua Pelajar)</option>
             </select>
+          </div>
         </div>
+      </section>
 
-        <div style="margin-bottom:12px;">
-            <label>Upload File:</label>
-            <input type="file" name="file" accept=".pdf,.docx,.pptx,.txt,.jpg,.png">
-        </div>
+      <!-- File Upload Section -->
+      <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+        <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Muat Naik Fail</h2>
 
-        <div style="display:flex; gap:10px; align-items:center;">
-          <button type="submit" style="min-width:120px;">Upload Lesson</button>
-          <div class="small-muted" style="font-size:13px;">Max file size: 10MB</div>
+        <!-- File Upload -->
+        <div style="margin-bottom: 20px;">
+          <label for="file" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Fail (Pilihan)</label>
+          <input 
+            type="file" 
+            id="file" 
+            name="file" 
+            accept=".pdf,.docx,.pptx,.txt,.jpg,.png"
+            style="width: 100%; padding: 32px 24px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box; cursor: pointer; min-height: 120px; display: flex; align-items: center;" 
+            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            onfocus="this.style.borderColor='#6A4DF7'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+          >
+          <div style="margin-top: 6px; color: var(--muted); font-size: 13px;">Disokong: PDF, DOCX, PPTX, TXT, JPG, PNG (Saiz maksimum: 10MB)</div>
         </div>
-      </form>
-    </section>
+      </section>
+
+      <!-- Action Buttons -->
+      <section style="margin-left:40px; margin-right:40px; margin-bottom:20px; margin-top:40px; display:flex; gap:12px; align-items:center; justify-content:center;">
+        <button type="submit" style="background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:12px 24px; border:none; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+          Cipta Bahan
+        </button>
+        <a href="{{ route('lesson.index') }}" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
+          Batal
+        </a>
+      </section>
+    </form>
   </main>
 </div>
 
-<script>
-const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-// Theme toggle
-const body=document.body, toggle=document.getElementById('themeToggle');
-function applyTheme(mode){
-  if(mode==='light'){body.classList.replace('dark','light');toggle.textContent='☀️';}
-  else{body.classList.replace('light','dark');toggle.textContent='🌙';}
-}
-const saved=localStorage.getItem('theme')||'dark'; applyTheme(saved);
-toggle.addEventListener('click',()=>{const next=body.classList.contains('dark')?'light':'dark'; applyTheme(next); localStorage.setItem('theme',next);});
-
-// Create lesson
-document.getElementById('createLessonForm').addEventListener('submit', async function(e){
-    e.preventDefault();
-    const formData = new FormData(this);
-    try {
-        const response = await fetch('/api/lessons', {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': csrfToken },
-            body: formData
-        });
-        const data = await response.json();
-        if (!data.success) throw new Error(data.message || 'Unknown error');
-        alert('Lesson created successfully!');
-        window.location.href = '{{ route("lesson.index") }}';
-    } catch(err){
-        console.error(err);
-        alert('Unexpected error: ' + err.message);
-    }
-});
-</script>
-</body>
-</html>
+@endsection

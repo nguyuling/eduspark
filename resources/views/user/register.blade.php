@@ -72,41 +72,49 @@
 
     input, select {
       width: 100%;
-      padding: 12px;
-      font-size: 15px;
-      border-radius: 10px;
-      border: 1px solid rgba(11,18,32,0.15);
-      background: white;
+      padding: 11px 14px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 2px solid #d1d5db;
+      background: transparent;
+      color: inherit;
+      outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease;
     }
 
     body.dark input, body.dark select {
-      background: #0d1525;
       color: white;
-      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    input:hover, select:hover {
+      border-color: #9ca3af;
+      background: rgba(200, 200, 200, 0.08);
     }
 
     input:focus, select:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(106,77,247,0.25);
+      background: rgba(200, 200, 200, 0.08);
     }
 
     input[readonly] {
       opacity: 0.85;
+      cursor: not-allowed;
     }
 
     .btn-register {
-      background: var(--accent);
+      background: linear-gradient(90deg, var(--accent), #7c5dff);
       color: white;
       width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
       border: none;
       cursor: pointer;
       margin-top: 10px;
-      transition: 0.2s;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 12px rgba(106,77,247,0.3);
     }
     
     .btn-register:disabled {
@@ -116,8 +124,8 @@
     }
 
     .btn-register:hover:not(:disabled) {
-      opacity: 0.9;
       transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(106,77,247,0.4);
     }
 
     .links {
@@ -152,6 +160,18 @@
     /* Hide sections by default */
     .conditional-section {
       display: none;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>

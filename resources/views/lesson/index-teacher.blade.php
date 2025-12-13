@@ -1,671 +1,222 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>EduSpark • Lessons</title>
+@extends('layouts.app')
 
-<meta name="csrf-token" content="{{ csrf_token() }}">
+@section('content')
 
-<!-- Font & Tailwind (from your app.css) -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link href="{{ asset('css/app.css') }}" rel="stylesheet">
-
-<style>
-/* ---------- Theme variables (kept from original) ---------- */
-:root{
-  --bg-light:#f5f7ff;
-  --bg-dark:#071026;
-  --card-light:rgba(255,255,255,0.9);
-  --card-dark:#0f1724;
-  --accent:#6A4DF7;
-  --accent-2:#9C7BFF;
-  --muted:#98a0b3;
-  --success:#2A9D8F;
-  --danger:#E63946;
-  --yellow:#F4C430;
-  --glass: rgba(255,255,255,0.04);
-  --input-bg: rgba(255,255,255,0.02);
-  --control-border: rgba(255,255,255,0.08);
-  --radius: 10px;
-  --card-radius: 14px;
-  --focus-glow: 0 6px 20px rgba(106,77,247,0.12);
-  --shadow-soft: 0 6px 20px rgba(2,6,23,0.45);
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
-
-/* ---------- Keep layout, background and text color exactly the same ---------- */
-body.light { background:var(--bg-light); color:#0b1220; }
-body.dark  { background:var(--bg-dark); color:#e6eef8; }
-
-.app { display:flex; min-height:100vh; gap:28px; padding:28px; font-family: Inter, system-ui, sans-serif; }
-
-/* ---------- Sidebar & logo keep same structure but cleaner ---------- */
-.sidebar{
-  width:240px; border-radius:var(--card-radius); padding:18px;
-  display:flex; flex-direction:column; align-items:center; gap:12px;
-  backdrop-filter: blur(8px) saturate(120%);
-  box-shadow: none;
-}
-body.light .sidebar{
-  background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.68));
-  border:1px solid rgba(13,18,25,0.05);
-}
-body.dark .sidebar{
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border:1px solid rgba(255,255,255,0.03);
-}
-.logo { width:110px; height:auto; margin-bottom:6px; }
-
-/* ---------- Navigation ---------- */
-.nav { width:100%; margin-top:10px; padding-top:6px; }
-.nav a {
-  display:flex; align-items:center; gap:10px;
-  padding:10px 12px; border-radius:10px;
-  color:var(--muted); text-decoration:none; font-weight:600;
-  margin:6px 0; position:relative; font-size:14px;
-}
-.nav a.active { color:var(--accent); }
-
-/* ---------- Cards ---------- */
-.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; margin-bottom:20px; }
-.card {
-  border-radius:var(--card-radius); padding:14px 16px; display:flex; flex-direction:column;
-  align-items:flex-start; justify-content:center; text-align:left;
-  transition: transform .12s ease, box-shadow .12s ease;
-  background: transparent;
-}
-body.light .card { background:var(--card-light); border:1px solid rgba(11,18,32,0.04); }
-body.dark .card  { background:var(--card-dark); border:1px solid rgba(255,255,255,0.03); }
-.card .label { font-size:13px; color:var(--muted); font-weight:600; }
-.card .value { font-weight:700; font-size:20px; margin-top:6px; }
-
-/* ---------- Panels ---------- */
-.panel {
-  border-radius:var(--card-radius); padding:14px; animation: fadeInUp .4s ease; margin-bottom:20px;
-  background: transparent;
-  border: 1px solid var(--control-border);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 12px rgba(2,6,23,0.18);
-}
-body.light .panel { background: rgba(255,255,255,0.96); }
-body.dark .panel  { background:#0f1724; }
-
-/* ---------- Forms: Inputs, textarea, select, file ---------- */
-/* Modern, simple controls that respect theme colors */
-input[type="text"],
-input[type="date"],
-textarea,
-select,
-input[type="file"] {
-  width:100%;
-  padding:11px 14px;
-  border-radius:8px;
-  border:1px solid var(--control-border);
-  background: var(--input-bg);
-  color: inherit;
-  font-size:14px;
-  outline: none;
-  transition: box-shadow .12s ease, border-color .12s ease, transform .06s ease;
-  resize: vertical;
-  box-sizing: border-box;
-}
-
-/* slightly larger textarea */
-textarea { min-height:84px; line-height:1.45; }
-
-/* file input — hide default, use label-like appearance */
-input[type="file"] {
-  padding:8px 12px;
-  border-radius:8px;
-}
-
-/* focus state — keep accent but not too bright */
-input[type="text"]:focus,
-textarea:focus,
-select:focus,
-input[type="date"]:focus,
-input[type="file"]:focus {
-  box-shadow: var(--focus-glow);
-  border-color: var(--accent);
-  transform: translateY(-1px);
-}
-
-/* placeholder style subtle */
-::placeholder { color: rgba(255,255,255,0.45); }
-
-/* labels */
-label { font-size:13px; color:var(--muted); font-weight:600; display:block; margin-bottom:6px; }
-
-/* small muted text */
-.small-muted { color:var(--muted); font-size:13px; }
-
-/* ---------- Buttons ---------- */
-/* Primary action */
-button {
-  cursor:pointer;
-  padding:8px 12px;
-  border-radius:10px;
-  border:none;
-  background: linear-gradient(90deg,var(--accent),var(--accent-2));
-  color:#fff;
-  font-weight:700;
-  font-size:14px;
-  transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease;
-  box-shadow: 0 6px 18px rgba(8,12,32,0.25);
-}
-
-/* Secondary / outline style */
-button[style*="background:transparent"],
-.button-outline {
-  background: transparent !important;
-  color: inherit;
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: none;
-}
-
-/* Danger button (delete) */
-button.danger {
-  background: var(--danger);
-  box-shadow: none;
-}
-
-/* hover/focus */
-button:hover { transform: translateY(-3px); opacity:0.98; }
-button:active { transform: translateY(-1px); }
-
-/* compact sizing for small action buttons */
-.btn-small { padding:6px 10px; font-size:13px; border-radius:8px; }
-
-/* ---------- Table styling ---------- */
-table {
-  width:100%;
-  border-collapse:separate;
-  border-spacing:0;
-  font-size:14px;
-  margin-top:1rem;
-}
-thead th {
-  text-align:left;
-  font-weight:700;
-  color:var(--muted);
-  font-size:13px;
-  padding:12px 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-tbody td {
-  padding:12px 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-  vertical-align: middle;
-  background: transparent;
-}
-
-/* hover row */
-tbody tr:hover td { background: rgba(255,255,255,0.01); transform: translateY(-1px); }
-
-/* file label inside cell */
-.file-meta { display:flex; flex-direction:column; gap:6px; }
-
-/* action cell buttons grouped */
-.actions { display:flex; gap:8px; align-items:center; }
-
-/* responsive tweaks */
-@media (max-width:920px){
-  .sidebar{ display:none; }
-  .app{ padding:14px; }
-  thead th:nth-child(5), td:nth-child(5) { min-width: 160px; }
-}
-
-/* ---------- Modal styles (more mature) ---------- */
-.modal-backdrop {
-  position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-  background: rgba(0,0,0,0.5); z-index:50; padding:20px;
-}
-.modal {
-  width:100%; max-width:980px; height:82vh; background: var(--card-dark);
-  border-radius:12px; overflow:hidden; display:flex; flex-direction:column;
-  box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.03);
-}
-.modal header {
-  padding:12px 16px; display:flex; justify-content:space-between; align-items:center;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-}
-.modal header .info { color:var(--muted); font-size:13px; }
-.modal .content { flex:1; background: #fff; display:flex; align-items:stretch; justify-content:stretch; }
-
-/* iframe should take full area */
-.modal iframe { width:100%; height:100%; border:0; }
-
-/* progress bar */
-.progress-bar { height:6px; background:rgba(2,6,23,0.06); border-radius:6px; overflow:hidden; margin-top:6px; }
-.progress-bar > span { display:block; height:100%; width:0%; background: linear-gradient(90deg,var(--accent),var(--accent-2)); transition: width .15s ease; }
-
-/* subtle animations */
-@keyframes fadeInUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
-@keyframes fadeInDown { from{opacity:0; transform:translateY(-10px);} to{opacity:1; transform:none;} }
-
-/* utility */
-.hidden { display:none; }
-.center { display:flex; align-items:center; justify-content:center; }
-</style>
-</head>
-
-<body class="dark">
 <div class="app">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <img src="{{ asset('logo.png') }}" alt="EduSpark logo" class="logo">
-    <div class="logo-text" aria-hidden="true" style="font-weight:700;font-size:18px;">
-      <span style="color:#1D5DCD;">edu</span><span style="color:#E63946;">Spark</span>
-    </div>
-    <nav class="nav">
-      <a href="#" class="active">Lessons</a>
-      <a href="#">Materials</a>
-      <a href="#">Assessments</a>
-      <a href="#">Forum</a>
-      <a href="#">Games</a>
-    </nav>
-  </aside>
-
   <!-- Main -->
-  <main class="main" style="flex:1;">
-    <div class="header" style="display:flex;justify-content:space-between;align-items:center; margin-bottom:20px;">
+  <main class="main">
+    <div class="header">
       <div>
-        <div class="title" style="font-weight:700;font-size:20px;">Lessons</div>
-        <div class="sub" style="color:var(--muted);font-size:13px;">Manage lesson materials</div>
+        <div class="title">Bahan Pembelajaran</div>
+        <div class="sub">Kelola semua bahan pembelajaran</div>
       </div>
-      <div style="display:flex; gap:10px; align-items:center;">
-        <a href="{{ route('lesson.create') }}" style="text-decoration:none;">
-          <button style="background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:8px 16px;">Cipta Bahan</button>
-        </a>
-        <button id="themeToggle" style="background:none;border:0;color:inherit;font-weight:600;cursor:pointer;">🌙</button>
+      <div class="header-content" style="display:flex; gap:10px; align-items:center;">
+        <div class="card">
+          <div class="label">Total Bahan</div>
+          <div class="value">
+            <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:8px 12px; border-radius:999px;">
+              {{ \App\Models\Lesson::count() }}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Cards (optional stats placeholders) -->
-    <section class="cards">
-      <div class="card">
-        <div class="label">Total Lessons</div>
-        <div class="value">
-          <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:8px 12px; border-radius:999px;">
-            {{ \App\Models\Lesson::count() }}
-          </span>
+    <!-- Search Lesson Panel -->
+    <section class="panel panel-spaced" style="margin-top: 20px;">
+      <h2 class="section-heading">Cari Bahan</h2>
+      <form method="GET" action="{{ route('lesson.index') }}" class="filter-form">
+        <div class="form-row">
+          <label>Cari</label>
+          <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Tajuk atau penerangan" class="form-input-height">
         </div>
+        <div class="form-row">
+          <label>Jenis Fail</label>
+          <select name="file_type" class="form-input-height">
+            <option value="">Semua</option>
+            <option value="pdf" @if (isset($filters['file_type']) && $filters['file_type'] == 'pdf') selected @endif>PDF</option>
+            <option value="docx" @if (isset($filters['file_type']) && $filters['file_type'] == 'docx') selected @endif>DOCX</option>
+            <option value="pptx" @if (isset($filters['file_type']) && $filters['file_type'] == 'pptx') selected @endif>PPTX</option>
+            <option value="jpg" @if (isset($filters['file_type']) && $filters['file_type'] == 'jpg') selected @endif>JPG</option>
+            <option value="png" @if (isset($filters['file_type']) && $filters['file_type'] == 'png') selected @endif>PNG</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Dari</label>
+          <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="form-input-height">
+        </div>
+        <div class="form-row">
+          <label>Hingga</label>
+          <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="form-input-height">
+        </div>
+      </form>
+      <div class="filter-actions">
+        <a href="{{ route('lesson.index') }}" class="btn-small button-outline">Kosongkan Penapis</a>
+        <button onclick="document.querySelector('.panel form').submit();" class="btn-small">Gunakan Penapis</button>
       </div>
     </section>
 
-    <!-- Lesson List Table -->
-    <section class="panel">
-      <h2 style="margin:0 0 12px 0; font-size:18px;">Lesson List</h2>
-
-      <!-- Search & Filters (Sprint 3) -->
-      <div style="display:flex; gap:12px; margin-bottom:12px; align-items:end;">
-        <div style="flex:1;">
-          <label class="small-muted">Search (title, description, subject)</label>
-          <input type="text" id="searchInput" placeholder="Enter keyword...">
-        </div>
-
-        <div style="width:160px;">
-          <label class="small-muted">File type</label>
-          <select id="fileTypeFilter">
-            <option value="">All</option>
-            <option value="pdf">PDF</option>
-            <option value="docx">DOCX</option>
-            <option value="pptx">PPTX</option>
-            <option value="jpg">JPG</option>
-            <option value="png">PNG</option>
-            <option value="txt">TXT</option>
-          </select>
-        </div>
-
-        <div style="width:140px;">
-          <label class="small-muted">From</label>
-          <input type="date" id="dateFrom">
-        </div>
-
-        <div style="width:140px;">
-          <label class="small-muted">To</label>
-          <input type="date" id="dateTo">
-        </div>
-
-        <div style="width:110px;">
-          <button id="filterBtn" class="btn-small">Filter</button>
-        </div>
+    <!-- Lessons Available Panel -->
+    <section class="panel panel-spaced">
+      <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="margin:0; font-size:18px; font-weight:700;">Bahan Tersedia</h2>
+        <a href="{{ route('lesson.create') }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+          Cipta Bahan
+        </a>
       </div>
-
+      
       <table>
-          <thead>
-              <tr>
-                  <th style="width:48px">#</th>
-                  <th>Title</th>
-                  <th>Description</th>
-                  <th style="width:180px">File</th>
-                  <th style="width:120px">Class Group</th>
-
-                  <th style="width:220px">Actions</th>
-              </tr>
-          </thead>
-          <tbody id="lessonTableBody"></tbody>
+        <thead>
+          <tr>
+            <th style="width:50%">Bahan</th>
+            <th style="width:18%">Fail</th>
+            <th style="width:32%">Tindakan</th>
+          </tr>
+        </thead>
+        <tbody>
+          @forelse ($lessons ?? [] as $lesson)
+            <tr>
+              <td style="width:50%">
+                <div class="table-title">{{ $lesson->title }}</div>
+                <div class="table-subtitle">{{ $lesson->description ?: 'Tiada penerangan' }}</div>
+                <div class="table-meta">
+                  <span class="table-badge"><strong>Kelas:</strong> {{ $lesson->class_group ?? 'N/A' }}</span>
+                  <span class="table-badge">
+                    <strong>Dibuat:</strong> {{ $lesson->created_at->format('M d, Y') }}
+                  </span>
+                </div>
+              </td>
+              <td style="width:18%;" class="table-center">
+                @if ($lesson->file_path)
+                  <div class="table-title">{{ strtoupper(pathinfo($lesson->file_name ?? $lesson->file_path, PATHINFO_EXTENSION)) }}</div>
+                  <div class="table-subtitle">{{ $lesson->file_name ?? basename($lesson->file_path) }}</div>
+                @else
+                  <div class="table-subtitle">Tiada fail</div>
+                @endif
+              </td>
+              <td style="width:32%;" class="table-center">
+                <div class="table-actions">
+                  @if ($lesson->file_path)
+                    <a href="{{ route('lesson.preview.file', $lesson->id) }}" class="btn btn-secondary">Lihat</a>
+                    <a href="{{ route('lesson.download', $lesson->id) }}" download class="btn btn-secondary">Muat Turun</a>
+                  @endif
+                  <button onclick="editLesson({{ $lesson->id }}, '{{ addslashes($lesson->title) }}', '{{ addslashes($lesson->description ?? '') }}', '{{ $lesson->class_group }}', '{{ $lesson->visibility }}')" class="btn btn-secondary">Kemaskini</button>
+                  <button onclick="deleteLesson({{ $lesson->id }}, '{{ addslashes($lesson->title) }}')" class="btn btn-secondary" style="color:var(--danger); border-color:var(--danger);">Padam</button>
+                </div>
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="3" class="empty-state">Tiada bahan ditemui.</td>
+            </tr>
+          @endforelse
+        </tbody>
       </table>
-
-      <div id="noResults" style="display:none; margin-top:12px; color:var(--muted);">No results found.</div>
     </section>
   </main>
 </div>
 
-<!-- Modal Viewer (Option A) -->
-<div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-hidden="true">
-  <div class="modal" role="document">
-    <header>
-      <div>
-        <div id="modalTitle" style="font-weight:700;color:inherit;">Preview</div>
-        <div id="modalInfo" class="info" style="margin-top:6px;color:var(--muted);font-size:13px;"></div>
+<!-- Edit Modal -->
+<div id="editModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:50; align-items:center; justify-content:center;">
+  <div style="background:var(--card-dark); border-radius:12px; padding:24px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto;">
+    <h2 style="margin-bottom:16px;">Kemaskini Bahan</h2>
+    <form id="editLessonForm" enctype="multipart/form-data">
+      @csrf
+      <input type="hidden" id="editLessonId" name="lesson_id">
+      
+      <div style="margin-bottom:12px;">
+        <label>Tajuk:</label>
+        <input type="text" id="editTitle" name="title" required style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--control-border); background:var(--input-bg); color:inherit;">
       </div>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <button id="modalDownloadBtn" class="button-outline btn-small" style="padding:8px 10px;">Download</button>
-        <button id="modalCloseBtn" class="button-outline btn-small" style="padding:8px 10px;">✕</button>
+
+      <div style="margin-bottom:12px;">
+        <label>Penerangan:</label>
+        <textarea id="editDescription" name="description" rows="3" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--control-border); background:var(--input-bg); color:inherit;"></textarea>
       </div>
-    </header>
-    <div class="content" style="background:#fff;">
-      <iframe id="previewFrame" src="" frameborder="0"></iframe>
-    </div>
+
+      <div style="margin-bottom:12px;">
+        <label>Kumpulan Kelas:</label>
+        <select id="editClassGroup" name="class_group" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--control-border); background:var(--input-bg); color:inherit;">
+          <option value="4A">4A</option>
+          <option value="4B">4B</option>
+          <option value="4C">4C</option>
+          <option value="5A">5A</option>
+          <option value="5B">5B</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label>Keterlihatan:</label>
+        <select id="editVisibility" name="visibility" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--control-border); background:var(--input-bg); color:inherit;">
+          <option value="class">Kelas Sahaja</option>
+          <option value="public">Awam (Semua Pelajar)</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label>Fail (Tinggalkan kosong untuk tidak mengubah):</label>
+        <input type="file" name="file" accept=".pdf,.docx,.pptx,.txt,.jpg,.png" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--control-border); background:var(--input-bg); color:inherit;">
+      </div>
+
+      <div style="display:flex; gap:8px;">
+        <button type="submit" class="btn btn-primary">Simpan</button>
+        <button type="button" onclick="closeEditModal()" class="btn" style="background:transparent; border:1px solid var(--control-border); color:inherit;">Batal</button>
+      </div>
+    </form>
   </div>
 </div>
 
+@endsection
+
 <script>
-/* ----------------- Existing JS (kept intact) ----------------- */
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-// Theme toggle (same as before)
-const body=document.body, toggle=document.getElementById('themeToggle');
-function applyTheme(mode){
-  if(mode==='light'){body.classList.replace('dark','light');toggle.textContent='☀️';}
-  else{body.classList.replace('light','dark');toggle.textContent='🌙';}
-}
-const saved=localStorage.getItem('theme')||'dark'; applyTheme(saved);
-toggle.addEventListener('click',()=>{const next=body.classList.contains('dark')?'light':'dark'; applyTheme(next); localStorage.setItem('theme',next);});
-
-// Helpers for building query string
-function buildQuery(params) {
-    return Object.keys(params).filter(k => params[k]).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`).join('&');
+function editLesson(id, title, description, classGroup, visibility) {
+  document.getElementById('editLessonId').value = id;
+  document.getElementById('editTitle').value = title;
+  document.getElementById('editDescription').value = description;
+  document.getElementById('editClassGroup').value = classGroup;
+  document.getElementById('editVisibility').value = visibility;
+  document.getElementById('editModal').style.display = 'flex';
 }
 
-// Load lessons (supports search & filters)
-async function loadLessons() {
-    const q = document.getElementById('searchInput').value.trim();
-    const file_type = document.getElementById('fileTypeFilter').value;
-    const date_from = document.getElementById('dateFrom').value;
-    const date_to = document.getElementById('dateTo').value;
+function closeEditModal() {
+  document.getElementById('editModal').style.display = 'none';
+}
 
-    const qs = buildQuery({ q, file_type, date_from, date_to });
-    const url = '/api/lessons' + (qs ? ('?' + qs) : '');
-
-    const response = await fetch(url);
-    if (!response.ok) {
-        alert('Failed to load lessons.');
-        return;
-    }
-    const lessons = await response.json();
-    const tableBody = document.getElementById('lessonTableBody');
-    tableBody.innerHTML = '';
-
-    if (!lessons || lessons.length === 0) {
-        document.getElementById('noResults').style.display = 'block';
-        return;
-    } else {
-        document.getElementById('noResults').style.display = 'none';
-    }
-
-    lessons.forEach((lesson, index) => {
-    const fileLabel = lesson.file_path ? `${lesson.file_name}` : 'No file';
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>${index + 1}</td>
-        <td><input type="text" id="title-${lesson.id}" value="${escapeHtml(lesson.title)}"></td>
-        <td><textarea id="desc-${lesson.id}">${escapeHtml(lesson.description || '')}</textarea></td>
-        <td>
-            ${lesson.file_path ? `<div class="file-meta">
-                <div style="font-weight:700">${escapeHtml(fileLabel)}</div>
-                <div class="small-muted" style="font-size:12px">${lesson.file_ext ? lesson.file_ext.toUpperCase() : ''} • ${lesson.created_at ? new Date(lesson.created_at).toLocaleString() : ''}</div>
-            </div>` : 'No file'}
-            <input type="file" id="file-${lesson.id}" accept=".pdf,.docx,.pptx,.txt,.jpg,.png" style="margin-top:6px;">
-        </td>
-        <td class="actions">
-            <button onclick="updateLesson(${lesson.id})" class="btn-small">Edit</button>
-            <button onclick="deleteLesson(${lesson.id})" class="btn-small danger">Delete</button>
-            ${lesson.file_path ? `<button onclick="viewLesson(${lesson.id})" class="btn-small button-outline" style="margin-left:6px;">View</button>
-            <button onclick="downloadLesson(${lesson.id}, this)" class="btn-small button-outline" style="margin-left:6px;">Download</button>` : ''}
-        </td>
-    `;
-    tableBody.appendChild(row);
+document.getElementById('editLessonForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const lessonId = document.getElementById('editLessonId').value;
+  const formData = new FormData(this);
+  
+  try {
+    const response = await fetch(`/api/lessons/${lessonId}`, {
+      method: 'POST',
+      headers: { 'X-CSRF-TOKEN': csrfToken },
+      body: formData
+    });
+    const data = await response.json();
+    if (!data.success) throw new Error(data.message || 'Error');
+    alert('Bahan dikemaskini!');
+    location.reload();
+  } catch(err) {
+    alert('Ralat: ' + err.message);
+  }
 });
 
+function deleteLesson(id, title) {
+  if (confirm('Adakah anda pasti ingin memadamkan "' + title + '"?')) {
+    fetch(`/api/lessons/${id}/delete`, {
+      method: 'POST',
+      headers: { 'X-CSRF-TOKEN': csrfToken }
+    }).then(r => r.json()).then(data => {
+      alert(data.message || 'Bahan dipadamkan');
+      location.reload();
+    }).catch(e => alert('Ralat: ' + e.message));
+  }
 }
 
-// XSS helper
-function escapeHtml(text) {
-    if (!text) return '';
-    return text.replace(/[&<>"'\/]/g, function (s) {
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '/': '&#x2F;' };
-        return map[s];
-    });
-}
-
-// Update lesson
-async function updateLesson(id) {
-    const formData = new FormData();
-    formData.append('title', document.getElementById(`title-${id}`).value);
-    formData.append('description', document.getElementById(`desc-${id}`).value);
-    formData.append('_method', 'PUT');
-
-    const fileInput = document.getElementById(`file-${id}`);
-    if (fileInput && fileInput.files[0]) {
-        formData.append('file', fileInput.files[0]);
-    }
-
-    try {
-        const response = await fetch(`/api/lessons/${id}`, {
-            method: 'POST', // Laravel handles PUT via _method
-            headers: { 'X-CSRF-TOKEN': csrfToken },
-            body: formData
-        });
-        const data = await response.json();
-        if (!data.success) throw new Error(data.message || 'Unknown error');
-        alert(data.message || 'Lesson updated successfully!');
-        loadLessons();
-    } catch(err){
-        console.error(err);
-        alert('Unexpected error: ' + err.message);
-    }
-}
-
-
-// Delete lesson
-async function deleteLesson(id) {
-    if (!confirm('Are you sure you want to delete this lesson?')) return;
-    const formData = new FormData();
-    try {
-        const response = await fetch(`/api/lessons/${id}/delete`, {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': csrfToken },
-            body: formData
-        });
-        const data = await response.json();
-        alert(data.message || 'Lesson deleted');
-        loadLessons();
-    } catch(err){
-        console.error(err);
-        alert('Unexpected error: ' + err.message);
-    }
-}
-
-// Filter button
-document.getElementById('filterBtn').addEventListener('click', () => loadLessons());
-document.getElementById('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadLessons(); });
-
-// --------------- View (Modal preview) ---------------
-const modalBackdrop = document.getElementById('modalBackdrop');
-const previewFrame = document.getElementById('previewFrame');
-const modalTitle = document.getElementById('modalTitle');
-const modalInfo = document.getElementById('modalInfo');
-const modalCloseBtn = document.getElementById('modalCloseBtn');
-const modalDownloadBtn = document.getElementById('modalDownloadBtn');
-
-modalCloseBtn.addEventListener('click', closeModal);
-modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) closeModal(); });
-
-function openModal() {
-    modalBackdrop.style.display = 'flex';
-    modalBackdrop.setAttribute('aria-hidden', 'false');
-}
-function closeModal() {
-    previewFrame.src = '';
-    modalBackdrop.style.display = 'none';
-    modalBackdrop.setAttribute('aria-hidden', 'true');
-    modalTitle.textContent = 'Preview';
-    modalInfo.textContent = '';
-}
-
-// Determine if mime / ext is previewable in iframe
-function isPreviewable(ext, mime) {
-    const previewableExts = ['pdf', 'jpg', 'jpeg', 'png', 'txt'];
-    if (!ext) return false;
-    ext = ext.toLowerCase();
-    if (previewableExts.includes(ext)) return true;
-    if (mime && mime.startsWith('image/')) return true;
-    if (mime === 'application/pdf') return true;
-    return false;
-}
-
-async function viewLesson(id) {
-    try {
-        const res = await fetch(`/api/lessons/${id}/preview`);
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-            alert(data.message || 'Cannot preview this file.');
-            return;
-        }
-
-        const { url, mime, file_name, file_ext, lesson } = data;
-
-        modalTitle.textContent = lesson.title || file_name || 'Preview';
-        modalInfo.textContent = `${file_name} • ${mime || (file_ext?file_ext.toUpperCase():'')}`;
-
-        modalDownloadBtn.onclick = () => downloadLesson(id, modalDownloadBtn);
-
-        if (isPreviewable(file_ext, mime)) {
-            previewFrame.src = url;
-        } else {
-            previewFrame.src = 'about:blank';
-            if (confirm('This file cannot be previewed in the browser. Would you like to download it instead?')) {
-                downloadLesson(id, modalDownloadBtn);
-                return;
-            } else {
-                return;
-            }
-        }
-
-        openModal();
-    } catch (err) {
-        console.error(err);
-        alert('Error while trying to preview file.');
-    }
-}
-
-// --------------- Download with progress (Sprint 4) ---------------
-function downloadLesson(id, button) {
-    button = button || null;
-    const originalText = button ? button.textContent : null;
-    if (button) { button.textContent = 'Downloading...'; button.disabled = true; }
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', `/lessons/download/${id}`, true);
-    xhr.responseType = 'blob';
-    xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-
-    let progressBarWrapper = null;
-    let progressBar = null;
-    if (button) {
-        progressBarWrapper = document.createElement('div');
-        progressBarWrapper.style.width = '100%';
-        progressBarWrapper.style.maxWidth = '220px';
-        progressBarWrapper.style.marginTop = '6px';
-        const wrapperInner = document.createElement('div');
-        wrapperInner.className = 'progress-bar';
-        progressBar = document.createElement('span');
-        progressBar.style.width = '0%';
-        wrapperInner.appendChild(progressBar);
-        progressBarWrapper.appendChild(wrapperInner);
-        button.parentNode.insertBefore(progressBarWrapper, button.nextSibling);
-    }
-
-    xhr.onprogress = function(e) {
-        if (!e.lengthComputable) return;
-        const percent = Math.round((e.loaded / e.total) * 100);
-        if (progressBar) progressBar.style.width = percent + '%';
-    };
-
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            const disposition = xhr.getResponseHeader('Content-Disposition') || '';
-            let filename = 'download';
-            const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
-            if (matches != null && matches[1]) {
-                filename = matches[1].replace(/['"]/g, '');
-            } else {
-                // fallback - try to use lesson title via preview endpoint
-            }
-
-            (async () => {
-                try {
-                    if (!filename || filename === 'download') {
-                        const p = await fetch(`/api/lessons/${id}/preview`);
-                        if (p.ok) {
-                            const pd = await p.json();
-                            if (pd && pd.file_name) filename = pd.file_name;
-                        }
-                    }
-                } catch(e) { }
-
-                const blob = xhr.response;
-                const link = document.createElement('a');
-                const url = window.URL.createObjectURL(blob);
-                link.href = url;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-                window.URL.revokeObjectURL(url);
-
-                if (button) {
-                    button.textContent = 'Downloaded';
-                    setTimeout(() => {
-                        button.textContent = originalText;
-                        button.disabled = false;
-                        if (progressBarWrapper) progressBarWrapper.remove();
-                    }, 1200);
-                } else {
-                    alert('Download complete');
-                }
-            })();
-        } else {
-            alert('Download failed (server error).');
-            if (button) { button.textContent = originalText; button.disabled = false; if (progressBarWrapper) progressBarWrapper.remove(); }
-        }
-    };
-
-    xhr.onerror = function() {
-        alert('Download failed (network error).');
-        if (button) { button.textContent = originalText; button.disabled = false; if (progressBarWrapper) progressBarWrapper.remove(); }
-    };
-
-    xhr.send();
-}
-
-// initial load
-loadLessons();
-
+document.addEventListener('click', e => {
+  if (e.target.id === 'editModal') closeEditModal();
+});
 </script>
-</body>
-</html>
