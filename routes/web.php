@@ -50,7 +50,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/password/update', [UserController::class, 'updatePassword'])->name('profile.password.update');
     
     // 2.3. CORE MODULE PLACEHOLDERS (Lessons, Forum, Game, Performance)
-    Route::get('/lessons', function () { return view('lessons.index'); })->name('lessons.index');
+    Route::get('/lessons', function () { return view('lessons.index-student'); })->name('lessons.index');
     Route::get('/lessons/create', function () { return view('lessons.create-lesson'); })->name('lessons.create');
     Route::get('/forum', function () { return view('forum.index'); })->name('forum.index');
     Route::get('/games', function () { return view('games.index'); })->name('games.index')->middleware('role:student');
