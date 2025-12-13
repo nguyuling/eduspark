@@ -39,23 +39,6 @@ body.dark .panel { background: #0f1724; }
 }
 </style>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const themeToggle = document.getElementById('themeToggle');
-  if(themeToggle) {
-    themeToggle.addEventListener('click', function() {
-      const isDark = document.body.classList.contains('dark');
-      const newTheme = isDark ? 'light' : 'dark';
-      document.body.classList.replace(isDark ? 'dark' : 'light', newTheme);
-      localStorage.setItem('theme', newTheme);
-      themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
-    });
-    const isDark = document.body.classList.contains('dark');
-    themeToggle.textContent = isDark ? '🌙' : '☀️';
-  }
-});
-</script>
-
 <div class="app">
   <main class="main">
     <div style="display:flex;justify-content:space-between;align-items:center; margin-bottom:24px; margin-top:40px; margin-left:40px; margin-right:40px;">

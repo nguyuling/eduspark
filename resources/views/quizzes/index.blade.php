@@ -283,7 +283,6 @@ input[type="checkbox"]:checked {
 
 <script>
 const body=document.body;
-// Theme toggle is now in sidebar
 
 function copyToClipboard(text, btn) {
   navigator.clipboard.writeText(text).then(() => {
