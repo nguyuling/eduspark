@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Teacher;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Question;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB; // Ensure DB facade is imported
 
-class QuizManagementController extends Controller
+class QuizTeacherController extends Controller
 {
 
     /**
