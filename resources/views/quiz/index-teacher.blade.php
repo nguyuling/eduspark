@@ -41,7 +41,7 @@
           <input type="text" name="title" value="{{ request('title') ?? '' }}" placeholder="Sains Komputer" style="height:40px;">
         </div>
         <div>
-          <label>Email Pembuat</label>
+          <label>Email Pencipta</label>
           <input type="email" name="creator_email" value="{{ request('creator_email') ?? '' }}" placeholder="guru@email.com" style="height:40px;">
         </div>
         <div>
@@ -96,7 +96,7 @@
                 <div style="font-weight:700; margin-bottom:4px;">{{ $quiz->title }}</div>
                 <div style="font-size:13px; color:var(--muted); margin-bottom:8px; line-height:1.4;">{{ Str::limit($quiz->description, 100) }}</div>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:11px; align-items:center;">
-                  <span style="background:rgba(106,77,247,0.08); padding:4px 8px; border-radius:4px;"><strong>Pembuat:</strong> {{ $quiz->creator->name ?? 'N/A' }}</span>
+                  <span style="background:rgba(106,77,247,0.08); padding:4px 8px; border-radius:4px;"><strong>Pencipta:</strong> {{ $quiz->creator->name ?? 'N/A' }}</span>
                   <span style="background:rgba(106,77,247,0.08); padding:4px 8px; border-radius:4px; display:flex; align-items:center; gap:4px;">
                     <strong>ID:</strong> {{ $quiz->unique_code ?? 'N/A' }}
                     <button type="button" onclick="copyToClipboard('{{ $quiz->unique_code }}', this)" style="background:none; border:none; cursor:pointer; padding:0; color:var(--accent); font-weight:600; font-size:12px;" title="Salin ID">📋</button>
