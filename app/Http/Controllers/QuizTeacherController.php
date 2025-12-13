@@ -100,6 +100,7 @@ class QuizTeacherController extends Controller
 
         // Automatically set the necessary fields
         $validatedQuizData['teacher_id'] = Auth::id();
+        $validatedQuizData['user_id'] = Auth::id();
         $validatedQuizData['is_published'] = $request->has('is_published');
         // Generate a unique code (using Str::random is a common, simple approach)
         $validatedQuizData['unique_code'] = \Illuminate\Support\Str::random(8); 
