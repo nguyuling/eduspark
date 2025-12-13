@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Question extends Model
+class QuizQuestion extends Model
 {
     public const TYPE_MULTIPLE_CHOICE = 'multiple_choice';
     public const TYPE_SHORT_ANSWER = 'short_answer';
@@ -22,6 +22,6 @@ class Question extends Model
     // A Question has many Options
     public function options(): HasMany
     {
-        return $this->hasMany(Option::class);
+        return $this->hasMany(QuizOption::class);
     }
 }

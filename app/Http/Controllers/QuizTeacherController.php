@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Question;
+use App\Models\QuizQuestion;
 use App\Models\Quiz;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -123,14 +123,14 @@ class QuizTeacherController extends Controller
                         continue; 
                     }
                     
-                    $questionType = $questionData['type'] ?? Question::TYPE_MULTIPLE_CHOICE;
+                    $questionType = $questionData['type'] ?? QuizQuestion::TYPE_MULTIPLE_CHOICE;
                     
                     // 2a. Create the NEW Question record
                     $question = $quiz->questions()->create([
                         'question_text' => $questionData['question_text'],
                         'type' => $questionType, 
                         'points' => $questionData['points'] ?? 1,          
-                        'correct_answer' => ($questionType === Question::TYPE_SHORT_ANSWER) 
+                        'correct_answer' => ($questionType === QuizQuestion::TYPE_SHORT_ANSWER) 
                                             ? ($questionData['correct_answer'] ?? null)
                                             : null,
                     ]);
@@ -248,7 +248,7 @@ class QuizTeacherController extends Controller
                         continue; 
                     }
                     
-                    $questionType = $questionData['type'] ?? Question::TYPE_MULTIPLE_CHOICE;
+                    $questionType = $questionData['type'] ?? QuizQuestion::TYPE_MULTIPLE_CHOICE;
                     
                     // 3a. Create the NEW Question record
                     $question = $quiz->questions()->create([
@@ -256,7 +256,7 @@ class QuizTeacherController extends Controller
                         'type' => $questionType, 
                         'points' => $questionData['points'] ?? 1,          
                         // FIX: Pulls 'correct_answer' for Short Answer from the request
-                        'correct_answer' => ($questionType === Question::TYPE_SHORT_ANSWER) 
+                        'correct_answer' => ($questionType === QuizQuestion::TYPE_SHORT_ANSWER) 
                                             ? ($questionData['correct_answer'] ?? null)
                                             : null,
                     ]);
@@ -332,7 +332,7 @@ class QuizTeacherController extends Controller
             // Assuming QuizAttempt does NOT cascade delete answers:
             $attemptIds = $quiz->attempts()->pluck('id');
             if ($attemptIds->isNotEmpty()) {
-                \App\Models\StudentAnswer::whereIn('attempt_id', $attemptIds)->delete();
+                \App\Models\QuizAnswer::whereIn('attempt_id', $attemptIds)->delete();
             }
 
             // 1b. Delete all Quiz Attempts related to this quiz
@@ -342,7 +342,7 @@ class QuizTeacherController extends Controller
             // This is complex, but safe: find all options belonging to all questions in this quiz
             $questionIds = $quiz->questions()->pluck('id');
             if ($questionIds->isNotEmpty()) {
-                \App\Models\Option::whereIn('question_id', $questionIds)->delete();
+                \App\Models\QuizOption::whereIn('question_id', $questionIds)->delete();
             }
             
             // 1d. Delete all Questions related to this quiz
