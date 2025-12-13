@@ -1,6 +1,7 @@
 <style>
 .sidebar{
   width:240px; border-radius:14px; padding:18px;
+  padding-top:40px;
   display:flex; flex-direction:column; align-items:flex-start; gap:12px;
   backdrop-filter: blur(8px) saturate(120%);
   box-shadow: none;
@@ -18,9 +19,9 @@ body.dark .sidebar{
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   border:1px solid rgba(255,255,255,0.03);
 }
-.logo { width:110px; height:auto; margin:0 auto 6px; }
+.logo { width:200px; height:auto; margin:0 auto -4px; }
 
-.nav { width:100%; margin-top:10px; padding-top:6px; padding-left:6px; position:relative; }
+.nav { width:100%; margin-top:14px; padding-top:6px; padding-left:6px; position:relative; }
 .nav a {
   display:block; padding:12px 16px; padding-left:28px; border-radius:12px;
   color:var(--muted); text-decoration:none; font-weight:600;
@@ -147,7 +148,7 @@ body.dark #themeToggle::before {
     }
   @endphp
 
-  <div class="logo-text" aria-hidden="true" style="font-weight:700;font-size:18px;">
+  <div class="logo-text" aria-hidden="true" style="font-weight:700;font-size:18px;text-align:center;width:100%;">
     @if($isTeacher)
       <span style="color:#1D5DCD;">Pen</span><span style="color:#E63946;">gajar</span>
     @else
