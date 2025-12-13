@@ -34,15 +34,18 @@ body.dark .sidebar{
 
 /* floating indicator pill */
 .nav-indicator{
-  display:none;
+  display:block;
+  position:absolute;
+  left:6px;
+  width:4px;
+  background:var(--accent);
+  border-radius:2px;
+  transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity:0;
 }
 .nav-icon { width:20px; height:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .nav-icon svg { width:100%; height:100%; stroke:currentColor; fill:none; stroke-width:2; }
 
-.profile-section { width:100%; margin-top:auto; padding-top:8px; border-top:1.5px solid rgba(106,77,247,0.4); display:flex; flex-direction:column; align-items:center; gap:8px; }
-.profile-link { display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; color:var(--muted); text-decoration:none; font-weight:600; font-size:14px; transition:all .2s ease; width:100%; overflow: hidden; background-clip: padding-box; background:transparent; flex-direction:column; justify-content:center; }
-.profile-link:hover { color:var(--accent) !important; background:rgba(106,77,247,0.15) !important; }
-.profile-link.active { color:#ffffff !important; background: #6A4DF7 !important; }
 .profile-icon { display:none; }
 
 @media (max-width:920px){ .sidebar{ display:none; } }
@@ -71,33 +74,25 @@ body.dark .sidebar{
       <a href="{{ Route::has('teacher.quizzes.index') ? route('teacher.quizzes.index') : url('/teacher/quizzes') }}" class="{{ request()->is('teacher/quizzes*') ? 'active' : '' }}">Kuiz</a>
       <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}" class="{{ request()->is('forum*') ? 'active' : '' }}">Forum</a>
       <a href="{{ Route::has('games.index') ? route('games.index') : url('/games') }}" class="{{ request()->is('games*') ? 'active' : '' }}">Permainan</a>
+      <a href="{{ route('profile.show') }}" class="{{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}">Profil</a>
+
     @else
       <a href="{{ Route::has('performance.student_view') ? route('performance.student_view') : url('/performance/student') }}" class="{{ request()->is('performance*') ? 'active' : '' }}">Prestasi</a>
       <a href="{{ Route::has('lessons.index') ? route('lessons.index') : url('/lessons') }}" class="{{ request()->is('lessons*') ? 'active' : '' }}">Bahan</a>
       <a href="{{ Route::has('student.quizzes.index') ? route('student.quizzes.index') : url('/quizzes') }}" class="{{ request()->is('quizzes*') ? 'active' : '' }}">Kuiz</a>
       <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}" class="{{ request()->is('forum*') ? 'active' : '' }}">Forum</a>
       <a href="{{ Route::has('games.index') ? route('games.index') : url('/games') }}" class="{{ request()->is('games*') ? 'active' : '' }}">Permainan</a>
+      <a href="{{ route('profile.show') }}" class="{{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}">Profil</a>
+
     @endif
   </nav>
-  <div class="profile-section">
-    @auth
-      <a href="{{ route('profile.show') }}" class="profile-link {{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}">
-        <div class="profile-icon">{{ substr(Auth::user()->name, 0, 1) }}</div>
-        <div style="font-size:13px; font-weight:700; text-align:center;">Profil</div>
-      </a>
-    @else
-      <a href="{{ url('/login') }}" class="profile-link" style="justify-content:center;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;">
-        Log in
-      </a>
-    @endauth
-
-    <button id="themeToggle" style="background:none;border:0;color:inherit;font-size:18px;cursor:pointer;padding:8px;border-radius:8px;transition:all .2s ease;">☀️</button>
-  </div>
+  <button id="themeToggle" style="background:none;border:0;color:inherit;font-size:18px;cursor:pointer;padding:8px;border-radius:8px;transition:all .2s ease; margin:8px 0; width:100%;">☀️</button>
 </aside>
 <script>
   (function(){
     const nav = document.querySelector('.nav');
     if(!nav) return;
+    
     // create indicator
     let indicator = nav.querySelector('.nav-indicator');
     if(!indicator){
@@ -106,7 +101,8 @@ body.dark .sidebar{
       nav.insertBefore(indicator, nav.firstChild);
     }
 
-    const links = Array.from(nav.querySelectorAll('a'));
+    const navLinks = Array.from(nav.querySelectorAll('a'));
+    
     function moveTo(el){
       if(!el) return;
       const top = el.offsetTop;
@@ -116,20 +112,20 @@ body.dark .sidebar{
       indicator.style.opacity = '1';
     }
 
-    links.forEach(link => {
+    navLinks.forEach(link => {
       link.addEventListener('mouseenter', () => moveTo(link));
       link.addEventListener('focus', () => moveTo(link));
       link.addEventListener('click', () => moveTo(link));
     });
 
     nav.addEventListener('mouseleave', () => {
-      const active = nav.querySelector('a.active') || links[0];
+      const active = nav.querySelector('a.active') || navLinks[0];
       if(active) moveTo(active); else indicator.style.opacity = '0';
     });
 
     // initial position on load
     window.requestAnimationFrame(()=>{
-      const active = nav.querySelector('a.active') || links[0];
+      const active = nav.querySelector('a.active') || navLinks[0];
       if(active) moveTo(active);
     });
   })();
