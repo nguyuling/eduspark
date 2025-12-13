@@ -19,7 +19,7 @@ Route::post('/register', [UserController::class, 'register'])->name('register.po
 // Login Routes
 Route::get('/login', fn() => view('user.login'))->name('login');
 Route::post('/login', [UserController::class, 'login'])->name('login.post');
-
+// ewqdew
 // 🔑 NEW: LOGOUT ROUTE ADDED HERE to resolve 'Route [logout] not defined'
 Route::post('/logout', function () {
     Auth::logout();
