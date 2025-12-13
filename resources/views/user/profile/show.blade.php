@@ -9,12 +9,14 @@
 .page-header h1 { font-weight: 700; font-size: 28px; margin: 0 0 6px 0; }
 .page-header .subtitle { color: var(--muted); font-size: 14px; }
 
-.panel { border-radius: var(--card-radius); padding: 20px; margin-bottom: 20px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); transition: border-color .2s ease; }
+.panel { border-radius: var(--card-radius); padding: 20px; animation: fadeInUp .4s ease; margin-bottom: 20px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); transition: border-color .2s ease, transform .12s ease, box-shadow .12s ease; }
 body.light .panel { background: rgba(255, 255, 255, 0.96); }
 body.dark .panel { background: #0f1724; }
 
-.panel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-.panel-header h3 { font-weight: 700; font-size: 16px; margin: 0; }
+.panel:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2); }
+
+.panel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 0; border-bottom: none; }
+.panel-header h3 { font-weight: 700; font-size: 18px; margin: 0; }
 
 .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .info-item { display: flex; flex-direction: column; }
@@ -33,6 +35,8 @@ body.dark .panel { background: #0f1724; }
 
 .badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: rgba(106, 77, 247, 0.15); color: var(--accent); }
 
+@keyframes fadeInUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
+
 @media (max-width: 920px) {
   .app { margin-left: 0; }
   .info-grid { grid-template-columns: 1fr; }
@@ -40,18 +44,18 @@ body.dark .panel { background: #0f1724; }
 </style>
 
 <div class="app">
-  <main class="main">
-    <div style="display:flex;justify-content:space-between;align-items:center; margin-bottom:24px; margin-top:40px; margin-left:40px; margin-right:40px;">
-      <div class="page-header">
-        <h1>My Profile</h1>
-        <div class="subtitle">View and manage your account information</div>
+  <main class="main" style="flex:1;">
+    <div class="header" style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:40px; margin-top:40px; margin-left:40px; margin-right:40px;">
+      <div>
+        <div class="title" style="font-weight:700;font-size:28px;">My Profile</div>
+        <div class="sub" style="color:var(--muted);font-size:13px;">View and manage your account information</div>
       </div>
     </div>
 
     <!-- Personal Information -->
-    <div class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
-      <div class="panel-header" style="margin:0 0 10px 0; padding-bottom:12px;">
-        <h3 style="font-size:18px;">Personal Information</h3>
+    <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px;">
+      <div class="panel-header" style="margin:0 0 20px 0;">
+        <h3>Personal Information</h3>
       </div>
       <div class="info-grid">
         <div class="info-item">
@@ -77,12 +81,12 @@ body.dark .panel { background: #0f1724; }
           Edit Profile
         </a>
       </div>
-    </div>
+    </section>
 
     <!-- Organization Details -->
-    <div class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
-      <div class="panel-header" style="margin:0 0 10px 0; padding-bottom:12px;">
-        <h3 style="font-size:18px;">Organization Details</h3>
+    <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px;">
+      <div class="panel-header" style="margin:0 0 20px 0;">
+        <h3>Organization Details</h3>
       </div>
       @php
         $schoolNames = ['JEA3060' => 'SMK Pengerang Utama', 'JEA3061' => 'SMK Pengerang'];
@@ -106,12 +110,12 @@ body.dark .panel { background: #0f1724; }
           <div class="info-value"><span class="badge">{{ $user->user_id }}</span></div>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- Account Security -->
-    <div class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;\">
-      <div class="panel-header" style="margin:0 0 10px 0; padding-bottom:12px;">
-        <h3 style="font-size:18px;">Account Security</h3>
+    <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px;">
+      <div class="panel-header" style="margin:0 0 20px 0;">
+        <h3>Account Security</h3>
       </div>
       <p style="margin: 0 0 16px 0; color: var(--muted);">Password is set and secured.</p>
       <div style="display: flex; justify-content: flex-end;">
@@ -119,7 +123,7 @@ body.dark .panel { background: #0f1724; }
           Change Password
         </a>
       </div>
-    </div>
+    </section>
   </main>
 </div>
 @endsection
