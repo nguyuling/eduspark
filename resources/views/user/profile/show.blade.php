@@ -46,7 +46,6 @@ body.dark .panel { background: #0f1724; }
         <h1>My Profile</h1>
         <div class="subtitle">View and manage your account information</div>
       </div>
-      <button id="themeToggle" style="background:none;border:0;color:inherit;font-weight:600;cursor:pointer;font-size:24px;">🌙</button>
     </div>
 
     <!-- Personal Information -->
