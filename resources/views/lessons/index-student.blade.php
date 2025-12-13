@@ -152,7 +152,6 @@ tbody tr:hover td { background: rgba(212, 197, 249, 0.08); }
     <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <h2 style="margin:0 0 10px 0; font-size:18px; font-weight:700;">Bahan Tersedia</h2>
-        <a href="{{ route('lessons.create') }}" class="btn btn-primary" style="padding:10px 18px; border-radius:10px; border:none; font-weight:700; font-size:14px; transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease; display:inline-flex; align-items:center; gap:6px; text-decoration:none;">Cipta Bahan</a>
       </div>
       
       <table style="margin-top:20px;">
