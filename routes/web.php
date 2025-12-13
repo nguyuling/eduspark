@@ -13,6 +13,11 @@ require __DIR__ . '/auth.php';
 
 Route::get('/', function() {
     if (auth()->check()) {
+        // Redirect based on role
+        $user = auth()->user();
+        if ($user->role === 'teacher') {
+            return redirect('/lesson');
+        }
         return redirect('/performance');
     }
     return redirect('/login');
@@ -30,6 +35,7 @@ Route::middleware('auth')->group(function () {
 // Lesson routes (authenticated only)
 Route::middleware('auth')->group(function () {
     Route::get('/lesson', [LessonController::class, 'index'])->name('lesson.index');
+    Route::get('/lesson/create', [LessonController::class, 'create'])->name('lesson.create');
     Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
     Route::post('/lesson', [LessonController::class, 'store'])->name('lesson.store');
     Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
