@@ -1,47 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-.app { margin-left: 268px; padding: 28px; font-family: Inter, system-ui, sans-serif; }
-.main { flex: 1; }
-
-.page-header { margin-bottom: 28px; }
-.page-header h1 { font-weight: 700; font-size: 28px; margin: 0 0 6px 0; }
-.page-header .subtitle { color: var(--muted); font-size: 14px; }
-
-.panel { border-radius: var(--card-radius); padding: 20px; animation: fadeInUp .4s ease; margin-bottom: 20px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); transition: border-color .2s ease, transform .12s ease, box-shadow .12s ease; }
-body.light .panel { background: rgba(255, 255, 255, 0.96); }
-body.dark .panel { background: #0f1724; }
-
-.panel:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2); }
-
-.panel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 0; border-bottom: none; }
-.panel-header h3 { font-weight: 700; font-size: 18px; margin: 0; }
-
-.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.info-item { display: flex; flex-direction: column; }
-.info-label { color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-.info-value { font-weight: 700; font-size: 15px; }
-
-.panel-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; margin-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
-
-.btn { cursor: pointer; padding: 8px 12px; border-radius: 10px; border: none; font-weight: 700; font-size: 14px; transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
-.btn-primary { background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: #fff; box-shadow: 0 6px 18px rgba(8, 12, 32, 0.25); }
-.btn-primary:hover { transform: translateY(-3px); opacity: 0.98; }
-.btn-secondary { background: transparent; color: inherit; border: 1px solid rgba(255, 255, 255, 0.06); }
-.btn-secondary:hover { background: rgba(255, 255, 255, 0.05); }
-.btn-danger { background: var(--danger); color: #fff; box-shadow: none; }
-.btn-danger:hover { opacity: 0.9; }
-
-.badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: rgba(106, 77, 247, 0.15); color: var(--accent); }
-
-@keyframes fadeInUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
-
-@media (max-width: 920px) {
-  .app { margin-left: 0; }
-  .info-grid { grid-template-columns: 1fr; }
-}
-</style>
 
 <div class="app">
   <main class="main" style="flex:1;">
@@ -53,8 +12,8 @@ body.dark .panel { background: #0f1724; }
     </div>
 
     <!-- Personal Information -->
-    <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px;">
-      <div class="panel-header" style="margin:0 0 20px 0;">
+    <section class="panel panel-spaced">
+      <div class="panel-header">
         <h3>Maklumat Peribadi</h3>
       </div>
       <div class="info-grid">
@@ -77,15 +36,15 @@ body.dark .panel { background: #0f1724; }
       </div>
       <div class="panel-footer">
         <div></div>
-        <a href="{{ route('profile.edit') }}" style="cursor: pointer; padding:12px 20px; border-radius:10px; border:none; background: linear-gradient(90deg, var(--accent), var(--accent-2)); color:#fff; font-weight:700; font-size:15px; transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; box-shadow: 0 6px 18px rgba(8, 12, 32, 0.25);">
-          Edit Profil
+        <a href="{{ route('profile.edit') }}" class="btn btn-primary">
+          Kemaskini Profil
         </a>
       </div>
     </section>
 
     <!-- Organization Details -->
-    <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px;">
-      <div class="panel-header" style="margin:0 0 20px 0;">
+    <section class="panel panel-spaced">
+      <div class="panel-header">
         <h3>Butiran Organisasi</h3>
       </div>
       @php
@@ -113,28 +72,28 @@ body.dark .panel { background: #0f1724; }
     </section>
 
     <!-- Account Security -->
-    <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px;">
-      <div class="panel-header" style="margin:0 0 20px 0;">
+    <section class="panel panel-spaced">
+      <div class="panel-header">
         <h3>Sekuriti Akaun</h3>
       </div>
       <p style="margin: 0 0 16px 0; color: var(--muted);">Kata laluan telah ditetapkan dan diamankan.</p>
       <div style="display: flex; justify-content: flex-end;">
-        <a href="{{ route('profile.password.edit') }}" style="cursor: pointer; padding:12px 20px; border-radius:10px; border:none; background: var(--danger); color:#fff; font-weight:700; font-size:15px; transition: transform .08s ease, opacity .12s ease; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; box-shadow: none;">
-          Ubah Kata Laluan
+        <a href="{{ route('profile.password.edit') }}" class="btn btn-danger">
+          Kemaskini Kata Laluan
         </a>
       </div>
     </section>
 
     <!-- Logout -->
-    <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px;">
-      <div class="panel-header" style="margin:0 0 20px 0;">
+    <section class="panel panel-spaced">
+      <div class="panel-header">
         <h3>Keluar</h3>
       </div>
       <p style="margin: 0 0 16px 0; color: var(--muted);">Keluar dari akaun anda dengan selamat.</p>
       <div style="display: flex; justify-content: flex-end;">
         <form method="POST" action="{{ route('logout') }}" style="display: inline;">
           @csrf
-          <button type="submit" style="cursor: pointer; padding:12px 20px; border-radius:10px; border:none; background: var(--danger); color:#fff; font-weight:700; font-size:15px; transition: transform .08s ease, opacity .12s ease; display: inline-flex; align-items: center; gap: 6px; box-shadow: none;">
+          <button type="submit" class="btn btn-danger">
             Keluar
           </button>
         </form>

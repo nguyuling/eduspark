@@ -2,59 +2,6 @@
 
 @section('content')
 
-<style>
-.app { display:flex; min-height:100vh; gap:28px; padding:28px; font-family: Inter, system-ui, sans-serif; margin-left:268px; }
-
-.main { flex:1; }
-
-.panel { border-radius:var(--card-radius); padding:20px; animation: fadeInUp .4s ease; margin-bottom:20px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); box-shadow: 0 2px 12px rgba(2,6,23,0.18); transition: border-color .2s ease; }
-body.light .panel { background: rgba(255,255,255,0.96); }
-body.dark .panel  { background:#0f1724; }
-
-.panel:hover { border-color: var(--accent); }
-
-.question-card { border-radius:var(--card-radius); padding:18px; margin-bottom:16px; background: transparent; border: 2px solid #d4c5f9; backdrop-filter: blur(6px); }
-body.light .question-card { background: rgba(255,255,255,0.96); }
-body.dark .question-card { background:#0f1724; }
-
-.question-header { font-weight:700; font-size:15px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; }
-.question-points { background:rgba(106,77,247,0.1); padding:4px 10px; border-radius:6px; font-size:12px; color:var(--accent); font-weight:600; }
-.question-text { font-size:14px; margin-bottom:16px; line-height:1.5; }
-.result-badge { display:inline-block; padding:6px 12px; border-radius:6px; font-weight:600; font-size:13px; margin-bottom:12px; }
-.result-badge.correct { background:rgba(42,157,143,0.1); color:var(--success); }
-.result-badge.incorrect { background:rgba(230,57,70,0.1); color:var(--danger); }
-
-.option-list { list-style:none; padding:0; margin:8px 0; }
-.option-list li { padding:8px 12px; margin-bottom:6px; border-radius:6px; font-size:13px; display:flex; align-items:center; gap:8px; }
-.option-list li.correct { background:rgba(42,157,143,0.08); border-left:3px solid var(--success); }
-.option-list li.incorrect { background:rgba(230,57,70,0.08); border-left:3px solid var(--danger); }
-.option-list li.neutral { background:rgba(152,160,179,0.05); border-left:3px solid var(--muted); }
-
-.score-card { background:linear-gradient(135deg, rgba(106,77,247,0.1), rgba(156,123,255,0.05)); border:2px solid #d4c5f9; border-radius:var(--card-radius); padding:24px; text-align:center; margin-bottom:20px; }
-.score-title { color:var(--muted); font-size:13px; font-weight:600; margin-bottom:8px; }
-.score-value { font-size:32px; font-weight:700; color:var(--accent); }
-
-.remark-card { background:rgba(42,157,143,0.08); border:2px solid rgba(42,157,143,0.3); border-radius:var(--card-radius); padding:16px; margin-bottom:20px; }
-.remark-label { color:var(--success); font-weight:600; margin-bottom:8px; }
-.remark-text { color:inherit; font-size:14px; line-height:1.5; }
-
-.actions { display:flex; gap:12px; margin-top:28px; justify-content:center; flex-wrap:wrap; }
-.actions a { padding:12px 24px; border-radius:10px; text-decoration:none; font-weight:600; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; }
-.actions a.btn-back { background:var(--muted); color:#fff; box-shadow: 0 4px 12px rgba(152,160,179,0.3); }
-.actions a.btn-back:hover { transform:translateY(-2px); box-shadow: 0 6px 16px rgba(152,160,179,0.4); }
-.actions a.btn-retry { background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; box-shadow: 0 4px 12px rgba(106,77,247,0.3); }
-.actions a.btn-retry:hover { transform:translateY(-2px); box-shadow: 0 6px 16px rgba(106,77,247,0.4); }
-
-@media (max-width:920px){
-  .sidebar{ display:none; }
-  .main { margin-left:0; }
-  .app{ padding:14px; gap:14px; }
-}
-
-@keyframes fadeInUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
-.hidden { display:none; }
-</style>
-
 <div class="app">
   <!-- Sidebar -->
   <aside class="sidebar">
@@ -116,18 +63,18 @@ body.dark .question-card { background:#0f1724; }
     <!-- Teacher Remark -->
     @if ($attempt->teacher_remark)
       <div class="remark-card">
-        <div class="remark-label">📝 Teacher's Remark</div>
+        <div class="remark-label">Cadangan daripada guru</div>
         <div class="remark-text">{{ $attempt->teacher_remark }}</div>
       </div>
     @else
       <div class="remark-card" style="background:rgba(152,160,179,0.05); border-color:rgba(152,160,179,0.2);">
-        <div style="color:var(--muted); font-size:13px;">No remarks have been added by the teacher yet.</div>
+        <div style="color:var(--muted); font-size:13px;">Tiada cadangan daripada guru setakat ini.</div>
       </div>
     @endif
 
     <!-- Detailed Answers -->
     <div style="margin-top:28px;">
-      <h3 style="font-weight:700; margin-bottom:16px;">Detailed Answers</h3>
+      <h3 style="font-weight:700; margin-bottom:16px;">Jawapan Terperinci</h3>
 
       @foreach ($attempt->answers as $index => $studentAnswer)
         @php
@@ -139,7 +86,7 @@ body.dark .question-card { background:#0f1724; }
         <div class="question-card">
           <div class="question-header">
             <div>
-              <span style="font-size:15px; font-weight:700;">Question {{ $index + 1 }}</span>
+              <span style="font-size:15px; font-weight:700;">Soalan {{ $index + 1 }}</span>
               <div style="font-size:13px; line-height:1.5; margin-top:8px; color:inherit;">{{ $question->question_text }}</div>
             </div>
             <span class="question-points">{{ $question->points }} Points</span>
