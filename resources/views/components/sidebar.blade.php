@@ -56,6 +56,80 @@ body.dark .sidebar{
   opacity: 1 !important;
 }
 
+/* Theme Toggle Switch Styling */
+#themeToggle {
+  width: 80px;
+  height: 36px;
+  background: rgba(106, 77, 247, 0.3);
+  border: 1px solid rgba(106, 77, 247, 0.5);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .3s ease;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 8px;
+  position: relative;
+  font-size: 16px;
+  margin-top: auto !important;
+  align-self: flex-end !important;
+}
+
+#themeToggle::before {
+  content: '☀';
+  font-size: 18px;
+  z-index: 1;
+  transition: opacity .3s ease;
+  color: #FDB813;
+  text-shadow: 0 0 2px #000, 0 0 4px rgba(0,0,0,0.5);
+  filter: drop-shadow(0 0 1px #000);
+}
+
+#themeToggle::after {
+  content: '☽';
+  font-size: 18px;
+  z-index: 1;
+  transition: opacity .3s ease;
+  color: #f5f5f5;
+  text-shadow: 0 0 2px #000, 0 0 4px rgba(0,0,0,0.5);
+  filter: drop-shadow(0 0 1px #000);
+}
+
+/* Sliding indicator circle */
+#themeToggle .toggle-slider {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+  border-radius: 50%;
+  left: 4px;
+  transition: left .4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 0;
+}
+
+body.dark #themeToggle .toggle-slider {
+  left: calc(100% - 32px);
+}
+
+body.light #themeToggle {
+  background: rgba(106, 77, 247, 0.3);
+  border-color: rgba(106, 77, 247, 0.5);
+}
+
+body.dark #themeToggle {
+  background: rgba(106, 77, 247, 0.6);
+  border-color: rgba(106, 77, 247, 0.8);
+}
+
+body.light #themeToggle::after {
+  opacity: 0.4;
+}
+
+body.dark #themeToggle::before {
+  opacity: 0.4;
+}
+
 .sidebar {
   visibility: visible !important;
   display: flex !important;
@@ -99,7 +173,7 @@ body.dark .sidebar{
 
     @endif
   </nav>
-  <button id="themeToggle" style="margin-top:auto; align-self:flex-end; background:none; border:0; color:inherit; font-size:22px; cursor:pointer; padding:10px; border-radius:8px; transition:all .2s ease; display:flex; align-items:center; justify-content:center;">☀️</button>
+  <button id="themeToggle"><div class="toggle-slider"></div></button>
 </aside>
 <script>
   (function(){
@@ -149,17 +223,14 @@ body.dark .sidebar{
       const isDark = localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
       if(isDark){
         document.body.classList.add('dark');
-        themeToggle.textContent = '☀️';
       } else {
         document.body.classList.remove('dark');
-        themeToggle.textContent = '🌙';
       }
 
       // Toggle theme on click
       themeToggle.addEventListener('click', () => {
         const isDark = document.body.classList.toggle('dark');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        themeToggle.textContent = isDark ? '☀️' : '🌙';
       });
     }
   })();
