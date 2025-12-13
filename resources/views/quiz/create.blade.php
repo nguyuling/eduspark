@@ -31,15 +31,15 @@
       </section>
     @endif
 
-    <!-- Quiz Setup Form -->
+    <!-- Quiz Format Section -->
     <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
-      <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Persediaan Kuiz</h2>
+      <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Format Kuiz</h2>
 
-      <form method="POST" action="{{ route('teacher.quizzes.store') }}" style="margin-top: 20px;">
+      <form method="POST" action="{{ route('teacher.quizzes.store') }}" id="quiz-form">
         @csrf
 
         <!-- Title -->
-        <div style="margin-bottom: 16px;">
+        <div style="margin-bottom: 20px;">
           <label for="title" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Tajuk Kuiz <span style="color: var(--danger);">*</span></label>
           <input 
             type="text" 
@@ -57,44 +57,8 @@
           @error('title')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
         </div>
 
-        <!-- Max Attempts -->
-        <div style="margin-bottom: 16px;">
-          <label for="max_attempts" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Percubaan Maksimum <span style="color: var(--danger);">*</span></label>
-          <input 
-            type="number" 
-            id="max_attempts" 
-            name="max_attempts" 
-            value="{{ old('max_attempts', 1) }}" 
-            min="1"
-            required
-            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box;"
-            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
-            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
-            onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
-            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
-          >
-          @error('max_attempts')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
-        </div>
-
-        <!-- Due Date -->
-        <div style="margin-bottom: 16px;">
-          <label for="due_at" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Tarikh Akhir (Pilihan)</label>
-          <input 
-            type="datetime-local" 
-            id="due_at" 
-            name="due_at" 
-            value="{{ old('due_at') }}"
-            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box;"
-            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
-            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
-            onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
-            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
-          >
-          @error('due_at')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
-        </div>
-
         <!-- Description -->
-        <div style="margin-bottom: 16px;">
+        <div style="margin-bottom: 20px;">
           <label for="description" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Penerangan (Pilihan)</label>
           <textarea 
             id="description" 
@@ -110,38 +74,84 @@
           @error('description')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
         </div>
 
-        <!-- Publish Checkbox -->
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding: 12px; background: rgba(106,77,247,0.05); border-radius: 8px;">
-          <input 
-            type="checkbox" 
-            id="is_published" 
-            name="is_published"
-            {{ old('is_published') ? 'checked' : '' }}
-            style="width: 18px; height: 18px; cursor: pointer;"
-          >
-          <label for="is_published" style="margin: 0; cursor: pointer; font-weight: 500;">Terbitkan Kuiz Segera</label>
+        <!-- Bottom Row: Due Date, Max Attempts, Publish Checkbox -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+          <!-- Due Date -->
+          <div>
+            <label for="due_at" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Tarikh Akhir (Pilihan)</label>
+            <input 
+              type="datetime-local" 
+              id="due_at" 
+              name="due_at" 
+              value="{{ old('due_at') }}"
+              style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box;"
+              onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+              onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            >
+            @error('due_at')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
+          </div>
+
+          <!-- Max Attempts -->
+          <div>
+            <label for="max_attempts" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Percubaan Maksimum <span style="color: var(--danger);">*</span></label>
+            <input 
+              type="number" 
+              id="max_attempts" 
+              name="max_attempts" 
+              value="{{ old('max_attempts', 1) }}" 
+              min="1"
+              required
+              style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box;"
+              onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+              onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            >
+            @error('max_attempts')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
+          </div>
+
+          <!-- Publish Checkbox -->
+          <div style="display: flex; align-items: flex-end; padding-bottom: 2px;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: rgba(106,77,247,0.05); border-radius: 8px; border: 2px solid #d1d5db; width: 100%;">
+              <input 
+                type="checkbox" 
+                id="is_published" 
+                name="is_published"
+                {{ old('is_published') ? 'checked' : '' }}
+                style="width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;"
+              >
+              <label for="is_published" style="margin: 0; cursor: pointer; font-weight: 500; font-size: 14px; white-space: nowrap;">Terbitkan Segera</label>
+            </div>
+          </div>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 2px solid #d4c5f9;">
-          <button type="submit" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-            Simpan Kuiz
-          </button>
-          <a href="{{ route('teacher.quizzes.index') }}" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-            Batal
-          </a>
-        </div>
-      </form>
+    <!-- Questions Header -->
+    <section style="margin-left:40px; margin-right:40px; margin-top:40px; margin-bottom:20px;">
+      <h2 style="margin:0; font-size:18px; font-weight:700;">Soalan <span style="color: var(--danger);">*</span></h2>
     </section>
 
-    <!-- Questions Section -->
-    <section style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
-      <div style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">Soalan <span style="color: var(--danger);">*</span></div>
-      <div id="questions-container"></div>
-      
-      <button type="button" id="add-question-btn" style="display:inline-block; padding:10px 18px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer; margin-top: 16px; margin-bottom: 24px;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
+    <!-- Questions Container - Each question appears as its own section -->
+    <div id="questions-container"></div>
+
+    <!-- Add Question Button -->
+    <section style="margin-left:40px; margin-right:40px; margin-bottom:40px;">
+      <button type="button" id="add-question-btn" style="display:inline-block; padding:10px 18px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
         ➕ Tambah Soalan
       </button>
     </section>
+      </form>
+
+    <!-- Action Buttons - Outside all containers -->
+    <div style="display:flex; gap:12px; justify-content:center; margin-top:60px; margin-bottom:40px; padding:0;">
+      <button form="quiz-form" type="submit" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+        Simpan Kuiz
+      </button>
+      <a href="{{ route('teacher.quizzes.index') }}" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
+        Batal
+      </a>
+    </div>
   </main>
 </div>
 
@@ -161,24 +171,26 @@
     
     // Template for a new question card
     const questionTemplate = (index) => `
-        <section style="margin-left:0; margin-right:0; margin-bottom:16px; border-radius:var(--card-radius); padding:20px; animation:fadeInUp 0.4s ease; background:transparent; border:2px solid #d4c5f9; backdrop-filter:blur(6px); box-shadow:0 2px 12px rgba(2, 6, 23, 0.18); transition:border-color 0.2s ease, transform 0.12s ease, box-shadow 0.12s ease;" onmouseover="this.style.borderColor='var(--accent)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 20px rgba(106, 77, 247, 0.2)';" onmouseout="this.style.borderColor='#d4c5f9'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 12px rgba(2, 6, 23, 0.18)';" question-card data-index="${index}">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid rgba(106,77,247,0.2);">
-                <h5 style="margin:0; font-size:15px; font-weight:700;">Soalan #${index + 1}</h5>
+        <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #d4c5f9;">
+                <h3 style="margin:0; font-size:16px; font-weight:700;">Soalan ${index + 1}</h3>
                 <button type="button" style="background:transparent; color:var(--danger); border:2px solid var(--danger); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-question-btn" data-index="${index}">Buang</button>
             </div>
-            <div>
-                <div style="display:grid; grid-template-columns:1.5fr 0.5fr 1fr; gap:12px; margin-bottom:12px;">
-                    <div>
-                        <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Teks Soalan <span style="color: var(--danger);">*</span></label>
-                        <textarea name="questions[${index}][question_text]" rows="2" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"></textarea>
-                    </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
+                <!-- Left: Teks Soalan -->
+                <div>
+                    <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Teks Soalan <span style="color: var(--danger);">*</span></label>
+                    <textarea name="questions[${index}][question_text]" rows="5" placeholder="Masukkan teks soalan di sini..." required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"></textarea>
+                </div>
+                <!-- Right: Markah and Jenis -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
                     <div>
                         <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Markah <span style="color: var(--danger);">*</span></label>
-                        <input type="number" name="questions[${index}][points]" value="1" min="1" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"/>
+                        <input type="number" name="questions[${index}][points]" value="1" min="1" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"/>
                     </div>
                     <div>
-                        <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Jenis <span style="color: var(--danger);">*</span></label>
-                        <select name="questions[${index}][type]" class="question-type-select" data-index="${index}" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease; cursor: pointer;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
+                        <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Jenis Soalan <span style="color: var(--danger);">*</span></label>
+                        <select name="questions[${index}][type]" class="question-type-select" data-index="${index}" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease; cursor: pointer;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
                             <option value="${QUESTION_TYPES.MC}">Pilihan Berganda</option>
                             <option value="${QUESTION_TYPES.CHECKBOX}">Kotak Semak</option>
                             <option value="${QUESTION_TYPES.SA}">Jawapan Pendek</option>
@@ -186,11 +198,10 @@
                         </select>
                     </div>
                 </div>
+            </div>
 
-                <hr style="margin: 12px 0; border: none; border-top: 1px solid rgba(106,77,247,0.2);">
-                <div class="answers-container" id="answers-container-${index}">
-                    ${optionTemplate(index, QUESTION_TYPES.MC)} 
-                </div>
+            <div class="answers-container" id="answers-container-${index}" style="margin-top:20px;">
+                ${optionTemplate(index, QUESTION_TYPES.MC)} 
             </div>
         </section>
     `;

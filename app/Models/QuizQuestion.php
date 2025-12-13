@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class QuizQuestion extends Model
 {
+    protected $table = 'questions';
+    
     public const TYPE_MULTIPLE_CHOICE = 'multiple_choice';
     public const TYPE_SHORT_ANSWER = 'short_answer';
     public const TYPE_TRUE_FALSE = 'true_false';
@@ -22,6 +24,6 @@ class QuizQuestion extends Model
     // A Question has many Options
     public function options(): HasMany
     {
-        return $this->hasMany(QuizOption::class);
+        return $this->hasMany(QuizOption::class, 'question_id', 'id');
     }
 }

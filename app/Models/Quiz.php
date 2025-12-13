@@ -15,6 +15,7 @@ class Quiz extends Model
 
     // 1. COMBINE: Use a single, comprehensive list for $fillable
     protected $fillable = [
+        'user_id',
         'teacher_id', 
         'title', 
         'description', 

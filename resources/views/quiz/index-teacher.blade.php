@@ -120,7 +120,7 @@
                   @if ($isMyQuiz)
                     <!-- Edit Button (Only for my quizzes) -->
                     <a href="{{ route('teacher.quizzes.edit', $quiz->id) }}" style="display:inline-block; padding:10px 14px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; transition:transform .2s ease, box-shadow .2s ease;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                      ✏️ Kemaskini
+                      Kemaskini
                     </a>
                   @else
                     <!-- View Button (For other teachers' quizzes) -->
@@ -131,7 +131,7 @@
 
                   <!-- Results Button (For all quizzes) -->
                   <a href="{{ route('teacher.quizzes.results', $quiz->id) }}" style="display:inline-block; padding:10px 14px; background:transparent; color:var(--success); border:2px solid var(--success); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; transition:all .2s ease;" onmouseover="this.style.background='rgba(42,157,143,0.1)';" onmouseout="this.style.background='transparent';">
-                    📊 Keputusan
+                    Keputusan
                   </a>
 
                   <!-- Delete Button (Only for my quizzes) -->
@@ -140,7 +140,7 @@
                       @csrf
                       @method('DELETE')
                       <button type="submit" style="display:inline-block; padding:10px 14px; background:transparent; color:var(--danger); border:2px solid var(--danger); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; transition:all .2s ease; cursor:pointer;" onmouseover="this.style.background='rgba(230,57,70,0.1)';" onmouseout="this.style.background='transparent';">
-                        🗑️ Padam
+                        Padam
                       </button>
                     </form>
                   @endif
