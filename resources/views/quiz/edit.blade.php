@@ -44,9 +44,7 @@
       <section class="panel" style="margin-bottom:20px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">
           <h2 style="margin:0; font-size:18px; font-weight:700;">Format Kuiz</h2>
-          <button type="button" id="delete-quiz-btn" style="display:inline-flex; align-items:center; gap:8px; padding:14px 26px; background:linear-gradient(90deg, #E63946, #D62828); color:#fff; border:none; text-decoration:none; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; transition:all 0.2s ease; box-shadow: 0 2px 8px rgba(230, 57, 70, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(230, 57, 70, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(230, 57, 70, 0.3)';">
-            <i class="bi bi-trash"></i>Buang Kuiz
-          </button>
+
         </div>
 
         <!-- Title -->
@@ -518,7 +516,7 @@
             }
         });
 
-        // 4. Type Change Listener (Delegation required for dynamic elements)
+        // 5. Type Change Listener (Delegation required for dynamic elements)
         container.addEventListener('change', function(e) {
             if (e.target.classList.contains('question-type-select')) {
                 const qIndex = e.target.getAttribute('data-index');
@@ -526,23 +524,6 @@
                 renderAnswerFields(qIndex, type);
             }
         });
-
-        // 5. Delete Quiz Button
-        const deleteBtn = document.getElementById('delete-quiz-btn');
-        if (deleteBtn) {
-            deleteBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const confirmed = confirm('Adakah anda pasti ingin menghapus kuiz ini? Tindakan ini tidak boleh dibatalkan!');
-                if (confirmed) {
-                    const deleteForm = document.createElement('form');
-                    deleteForm.method = 'POST';
-                    deleteForm.action = '{{ route("teacher.quizzes.destroy", $quiz->id) }}';
-                    deleteForm.innerHTML = '@csrf @method("DELETE")';
-                    document.body.appendChild(deleteForm);
-                    deleteForm.submit();
-                }
-            });
-        }
         
     });
 </script>
