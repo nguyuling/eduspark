@@ -16,23 +16,18 @@
 
     <div>
         {{-- Search Form --}}
-        <section class="panel" style="margin-bottom:20px;">
-            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700;">Cari Post</h2>
-            <form method="GET" action="{{ route('forum.index') }}" class="flex items-center gap-3">
-                <input type="text" name="search" value="{{ request('search') }}" 
-                       placeholder="Search posts..." 
-                       class="flex-1">
-                <button type="submit" class="btn-primary">
-                    <i class="bi bi-search"></i>
-                </button>
-                @if(request('search'))
-                    <a href="{{ route('forum.index') }}" class="btn-secondary">
-                        Clear
-                    </a>
-                @endif
-            </form>
+        <section class="panel" style="margin-bottom:20px; margin-top:20px;">
+        <form method="GET" action="{{ route('forum.index') }}" id="searchForm" style="display:flex; align-items:center; gap:12px;">
+            <input type="text" name="search" id="searchInput" value="{{ request('search') }}" 
+                    placeholder="Cari posts..." 
+                    style="flex:1; height:40px; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:14px; background:transparent; color:inherit; transition:border-color .2s ease, background .2s ease;" 
+                    onfocus="this.style.borderColor='var(--accent)'; this.style.background='rgba(106,77,247,0.05)';" 
+                    onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
+            <button type="submit" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; box-shadow:none; color:var(--accent); padding:0; border:none; cursor:pointer; font-size:20px; transition:opacity .2s ease;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Cari">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
         </section>
-
         {{-- Posts List --}}
         <div class="space-y-4">
             @forelse ($posts as $post)
@@ -95,7 +90,7 @@
 
                 </div>
             @empty
-                <p class="text-center py-12 opacity-60">No posts found.</p>
+                <p class="text-center py-12 opacity-60">Tiada post lagi.</p>
             @endforelse
         </div>
     </div>
@@ -105,6 +100,17 @@
             const form = document.getElementById('reply-form-' + postId);
             form.classList.toggle('hidden');
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchInput');
+            
+            searchForm.addEventListener('submit', function() {
+                setTimeout(function() {
+                    searchInput.value = '';
+                }, 100);
+            });
+        });
     </script>
 
     </main>
