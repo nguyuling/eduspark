@@ -38,7 +38,12 @@
 
       <!-- Quiz Format Section -->
       <section class="panel" style="margin-bottom:20px;">
-        <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Format Kuiz</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">
+          <h2 style="margin:0; font-size:18px; font-weight:700;">Format Kuiz</h2>
+          <button type="button" id="delete-quiz-btn" style="display:inline-flex; align-items:center; gap:8px; padding:14px 26px; background:linear-gradient(90deg, #E63946, #D62828); color:#fff; border:none; text-decoration:none; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; transition:all 0.2s ease; box-shadow: 0 2px 8px rgba(230, 57, 70, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(230, 57, 70, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(230, 57, 70, 0.3)';">
+            <i class="bi bi-trash"></i>Buang Kuiz
+          </button>
+        </div>
 
         <!-- Title -->
         <div style="margin-bottom: 20px;">
@@ -139,7 +144,7 @@
       <div id="questions-container"></div>
 
       <!-- Add Question Button -->
-      <section style="margin-left:40px; margin-right:40px; margin-bottom:40px;">
+      <section style="margin-left:5px; margin-bottom:40px;">
         <button type="button" id="add-question-btn" style="display:inline-block; padding:10px 18px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
           ➕ Tambah Soalan
         </button>
@@ -147,8 +152,8 @@
 
       <!-- Action Buttons Row -->
       <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0;">
-        <button type="submit" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-          Simpan Kuiz
+        <button type="submit" style="display:inline-block; padding:14px 26px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+          <i class="bi bi-save" style="margin-right: 12px;"></i>Simpan Kuiz
         </button>
     </form>
       </div>
@@ -175,7 +180,7 @@
         <section class="panel" style="margin-bottom:20px;" question-card data-index="${index}">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #d4c5f9;">
                 <h3 style="margin:0; font-size:16px; font-weight:700;">Soalan ${index + 1}</h3>
-                <button type="button" style="background:transparent; color:var(--danger); border:2px solid var(--danger); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-question-btn" data-index="${index}">Buang</button>
+                <button type="button" style="background:transparent; color:var(--danger); border:2px solid var(--danger); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-question-btn" data-index="${index}"><i class="bi bi-trash"></i></button>
             </div>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
                 <!-- Left: Teks Soalan -->
@@ -517,6 +522,23 @@
                 renderAnswerFields(qIndex, type);
             }
         });
+
+        // 5. Delete Quiz Button
+        const deleteBtn = document.getElementById('delete-quiz-btn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const confirmed = confirm('Adakah anda pasti ingin menghapus kuiz ini? Tindakan ini tidak boleh dibatalkan!');
+                if (confirmed) {
+                    const deleteForm = document.createElement('form');
+                    deleteForm.method = 'POST';
+                    deleteForm.action = '{{ route("teacher.quizzes.destroy", $quiz->id) }}';
+                    deleteForm.innerHTML = '@csrf @method("DELETE")';
+                    document.body.appendChild(deleteForm);
+                    deleteForm.submit();
+                }
+            });
+        }
         
     });
 </script>
