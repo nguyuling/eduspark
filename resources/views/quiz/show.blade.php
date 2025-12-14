@@ -10,11 +10,14 @@
         <div class="title">Lihat Kuiz: {{ $quiz->title }}</div>
         <div class="sub">Papar soalan dan tetapan kuiz</div>
       </div>
+        <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali" style="display:inline-block !important; margin-top:15px; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
+            <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+        </a>
     </div>
 
     <!-- Quiz Format Section (Read-Only) -->
-    <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px; margin-top:20px;">
-      <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Format Kuiz</h2>
+    <section class="panel">
+      <h2 style="margin:0 0 20px 0; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Format Kuiz</h2>
 
       <!-- Title -->
       <div style="margin-bottom: 20px;">
@@ -57,12 +60,12 @@
     </section>
 
     <!-- Questions Header -->
-    <section style="margin-left:40px; margin-right:40px; margin-top:40px; margin-bottom:20px;">
+    <section style="margin-top:40px; margin-bottom:20px;">
       <h2 style="margin:0; font-size:18px; font-weight:700;">Soalan ({{ $quiz->questions->count() }})</h2>
     </section>
 
     <!-- Questions Container - Each question appears as its own section -->
-    <div id="questions-container" style="margin-left:40px; margin-right:40px;">
+    <div id="questions-container">
       @forelse($quiz->questions as $index => $question)
         <section class="panel" style="margin-bottom:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #d4c5f9;">
@@ -130,13 +133,6 @@
           <div style="color:var(--muted); font-size:14px;">Kuiz ini tidak mempunyai soalan</div>
         </section>
       @endforelse
-    </div>
-
-    <!-- Action Buttons -->
-    <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0; margin-left:40px; margin-right:40px;">
-      <a href="{{ route('teacher.quizzes.index', $quiz->id) }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-        Tutup
-      </a>
     </div>
   </main>
 </div>

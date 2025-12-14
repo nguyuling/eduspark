@@ -17,7 +17,9 @@ class DatabaseSeeder extends Seeder
         // quiz
         $this->call([
             UserSeeder::class, // Must run first to create teacher/student
-            QuizDataSeeder::class, // Depends on UserSeeder
+            QuizSeeder::class, // Depends on UserSeeder
+            ForumSeeder::class, // Depends on UserSeeder
+            LessonSeeder::class, // Depends on UserSeeder
         ]);
     }
 }

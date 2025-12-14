@@ -10,80 +10,77 @@
         <div class="title">Kuiz</div>
         <div class="sub">Cipta dan uruskan kuiz anda</div>
       </div>
-      <div class="card" style="margin:0; min-width:120px;">
-        <div class="label">Jumlah Kuiz</div>
-        <div class="value">
-          <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:8px 12px; border-radius:999px;">
-            {{ $quizzes->count() }}
-          </span>
-        </div>
-      </div>
+      <a href="{{ route('teacher.quizzes.create') }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer; margin-top:15px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+        <i class="bi bi-plus-lg"></i>
+        Cipta Kuiz
+      </a>
     </div>
 
     @if (session('success'))
-      <div style="background:var(--success);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('success') }}</div>
+      <div class="alert-success">{{ session('success') }}</div>
     @endif
 
     @if (session('error'))
       <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
     @endif
 
-    <!-- Quiz Filter Panel -->
-    <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
-      <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700;">Cari Kuiz</h2>
-      <form method="GET" action="{{ route('teacher.quizzes.index') }}" id="filter-form">
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:20px;">
-          <div>
-            <label>ID Unik</label>
-            <input type="text" name="unique_id" value="{{ request('unique_id') ?? '' }}" placeholder="A1b2C3d4" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box;">
-          </div>
-          <div>
-            <label>Tajuk</label>
-            <input type="text" name="title" value="{{ request('title') ?? '' }}" placeholder="Sains Komputer" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box;">
-          </div>
-          <div>
-            <label>Email Pencipta</label>
-            <input type="email" name="creator_email" value="{{ request('creator_email') ?? '' }}" placeholder="guru@email.com" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box;">
-          </div>
-          <div>
-            <label>Tarikh Diterbitkan</label>
-            <select name="publish_date_range" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box;">
-              <option value="">Semua Masa</option>
-              <option value="today" @if (request('publish_date_range') === 'today') selected @endif>Hari Ini</option>
-              <option value="month" @if (request('publish_date_range') === 'month') selected @endif>Bulan Ini</option>
-              <option value="3months" @if (request('publish_date_range') === '3months') selected @endif>3 Bulan Terakhir</option>
-              <option value="year" @if (request('publish_date_range') === 'year') selected @endif>Tahun Ini</option>
-            </select>
-          </div>
-        </div>
-        <div style="display:flex; gap:10px; align-items:center; margin-bottom:20px; justify-content:space-between;">
-          <div style="display:flex; align-items:center; gap:6px;">
-            <input type="checkbox" id="created_by_me" name="scope" value="mine" @if (request('scope') === 'mine') checked @endif style="width:18px; height:18px; cursor:pointer;">
-            <label for="created_by_me" style="margin-bottom:0;font-size:14px; cursor:pointer;">Hanya tunjukkan kuiz yang saya cipta</label>
-          </div>
-          <div style="display:flex; gap:10px; align-items:center;">
-            <a href="{{ route('teacher.quizzes.index') }}" style="display:inline-block; padding:10px 20px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">Kosongkan Penapis</a>
-            <button type="submit" style="display:inline-block; padding:10px 20px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; border:none; cursor:pointer; transition:all .2s ease;" onmouseover="this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.boxShadow='none';">Gunakan Penapis</button>
-          </div>
-        </div>
-      </form>
-    </section>
-
     <!-- Quiz List Table -->
-    <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 style="margin:0; font-size:18px; font-weight:700;">Kuiz Tersedia</h2>
-        <a href="{{ route('teacher.quizzes.create') }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-          Cipta Kuiz
-        </a>
+    <section class="panel" style="margin-bottom:20px; margin-top:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <h2 style="margin:0; padding:0; font-size:18px; font-weight:700; line-height:1;">Senarai Kuiz</h2>
+          <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px;">
+            {{ count($quizzes) }}
+          </span>
+        </div>
+        <button type="button" onclick="toggleFilterPanel()" style="background:transparent; border:2px solid var(--accent); color:var(--accent); padding:8px 12px; border-radius:6px; cursor:pointer; font-size:16px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';" title="Tunjukkan/Sembunyikan Penapis">
+          <i class="bi bi-funnel"></i>
+        </button>
       </div>
-      
+      <!-- Filter Panel (Collapsible) -->
+      <div id="filter-panel" style="display:{{ !empty(array_filter(['unique_id' => request('unique_id'), 'title' => request('title'), 'creator_email' => request('creator_email'), 'publish_date_range' => request('publish_date_range'), 'scope' => request('scope')])) ? 'block' : 'none' }}; margin-bottom:20px; padding-bottom:20px;">
+        <form method="GET" action="{{ route('teacher.quizzes.index') }}" id="filter-form">
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:15px;">
+            <div>
+              <label style="font-size:12px;">ID Unik</label>
+              <input type="text" name="unique_id" value="{{ request('unique_id') ?? '' }}" placeholder="A1b2C3d4" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:12px;">Tajuk</label>
+              <input type="text" name="title" value="{{ request('title') ?? '' }}" placeholder="Sains Komputer" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:12px;">Email Pencipta</label>
+              <input type="email" name="creator_email" value="{{ request('creator_email') ?? '' }}" placeholder="guru@email.com" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+            </div>
+            <div style="display:flex; flex-direction:column;">
+              <label style="font-size:12px;">Tarikh Diterbitkan</label>
+              <div style="display:flex; gap:8px; align-items:flex-start; height:40px;">
+                <select name="publish_date_range" onchange="autoSubmitForm()" style="height:100%; flex:1; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+                  <option value="">Semua Masa</option>
+                  <option value="today" @if (request('publish_date_range') === 'today') selected @endif>Hari Ini</option>
+                  <option value="month" @if (request('publish_date_range') === 'month') selected @endif>Bulan Ini</option>
+                  <option value="3months" @if (request('publish_date_range') === '3months') selected @endif>3 Bulan Terakhir</option>
+                  <option value="year" @if (request('publish_date_range') === 'year') selected @endif>Tahun Ini</option>
+                </select>
+                <a href="{{ route('teacher.quizzes.index') }}" onclick="keepFilterPanelOpen(); return true;" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:8px; cursor:pointer; font-size:24px; transition:all .2s ease; text-decoration:none; white-space:nowrap; height:40px; width:40px;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Ulang Penapis">
+                  <i class="bi bi-arrow-repeat"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="created_by_me" name="scope" value="mine" onchange="autoSubmitForm()" @if (request('scope') === 'mine') checked @endif style="width:18px; height:18px; cursor:pointer;">
+            <label for="created_by_me" style="margin-bottom:0; font-size:12px; cursor:pointer;">Hanya tunjukkan kuiz yang saya cipta</label>
+          </div>
+        </form>
+      </div>      
       <table>
         <thead>
           <tr>
-            <th style="width:58%">Kuiz</th>
-            <th style="width:12%">Bil. Soalan</th>
-            <th style="width:30%">Tindakan</th>
+            <th style="width:65%">Kuiz</th>
+            <th style="width:15%">Bil. Soalan</th>
+            <th style="width:20%">Tindakan</th>
           </tr>
         </thead>
         <tbody>
@@ -118,23 +115,30 @@
                   <div style="margin-bottom:2px;">{{ $quiz->questions_count ?? 0 }} soalan</div>
                 </div>
               </td>
-              <td style="width:32%; text-align:center;">
-                <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+              <td style="width:12%; text-align:center;">
+                <div style="display:flex; gap:20px; justify-content:center; flex-wrap:nowrap;">
                   @if ($isMyQuiz)
                     <!-- Edit Button (Only for my quizzes) -->
-                    <a href="{{ route('teacher.quizzes.edit', $quiz->id) }}" style="display:inline-block; padding:10px 14px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; transition:transform .2s ease, box-shadow .2s ease;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                      Kemaskini
+                    <a href="{{ route('teacher.quizzes.edit', $quiz->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Kemaskini">
+                      <i class="bi bi-pencil-square"></i>
                     </a>
                   @else
                     <!-- View Button (For other teachers' quizzes) -->
-                    <a href="{{ route('teacher.quizzes.show', $quiz->id) }}" style="display:inline-block; padding:10px 14px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-                      Lihat
+                    <a href="{{ route('teacher.quizzes.show', $quiz->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Lihat">
+                      <i class="bi bi-eye-fill"></i>
                     </a>
                   @endif
 
+                  @if ($isMyQuiz)
+                    <!-- Delete Button (Only for my quizzes) -->
+                    <button type="button" onclick="deleteQuiz({{ $quiz->id }})" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; box-shadow:none; color:var(--danger); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Buang">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  @endif
+
                   <!-- Results Button (For all quizzes) -->
-                  <a href="{{ route('teacher.quizzes.results', $quiz->id) }}" style="display:inline-block; padding:10px 14px; background:transparent; color:var(--success); border:2px solid var(--success); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; transition:all .2s ease;" onmouseover="this.style.background='rgba(42,157,143,0.1)';" onmouseout="this.style.background='transparent';">
-                    Keputusan
+                  <a href="{{ route('teacher.quizzes.results', $quiz->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--success); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Keputusan">
+                    <i class="bi bi-bar-chart"></i>
                   </a>
                 </div>
               </td>
@@ -171,6 +175,44 @@ function copyToClipboard(text, btn) {
     setTimeout(() => { btn.textContent = originalText; }, 1500);
   });
 }
+
+function deleteQuiz(quizId) {
+  const confirmed = confirm('Adakah anda pasti ingin menghapus kuiz ini? Tindakan ini tidak boleh dibatalkan!');
+  if (confirmed) {
+    const deleteForm = document.createElement('form');
+    deleteForm.method = 'POST';
+    deleteForm.action = '/teacher/quizzes/' + quizId;
+    deleteForm.innerHTML = '@csrf @method("DELETE")';
+    document.body.appendChild(deleteForm);
+    deleteForm.submit();
+  }
+}
+
+function toggleFilterPanel() {
+  const filterPanel = document.getElementById('filter-panel');
+  if (filterPanel.style.display === 'none') {
+    filterPanel.style.display = 'block';
+  } else {
+    filterPanel.style.display = 'none';
+  }
+}
+
+function keepFilterPanelOpen() {
+  sessionStorage.setItem('keepFilterOpen', 'true');
+}
+
+function autoSubmitForm() {
+  document.getElementById('filter-form').submit();
+}
+
+// Keep filter panel open if flag is set
+document.addEventListener('DOMContentLoaded', function() {
+  if (sessionStorage.getItem('keepFilterOpen') === 'true') {
+    const filterPanel = document.getElementById('filter-panel');
+    filterPanel.style.display = 'block';
+    sessionStorage.removeItem('keepFilterOpen');
+  }
+});
 </script>
 
 @endsection
