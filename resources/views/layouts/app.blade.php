@@ -112,7 +112,6 @@
         @endauth
         
         {{-- Page Content --}}
-        <div class="page-content">
             @yield('content')
         </div>
     </div></body>
