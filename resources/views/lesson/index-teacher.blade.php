@@ -10,16 +10,10 @@
         <div class="title">Bahan Pembelajaran</div>
         <div class="sub">Kelola semua bahan pembelajaran</div>
       </div>
-      <div class="header-content" style="display:flex; gap:10px; align-items:center;">
-        <div class="card">
-          <div class="label">Total Bahan</div>
-          <div class="value">
-            <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:8px 12px; border-radius:999px;">
-              {{ \App\Models\Lesson::count() }}
-            </span>
-          </div>
-        </div>
-      </div>
+      <a href="{{ route('lesson.create') }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer; margin-top:15px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+        <i class="bi bi-plus-lg"></i>
+        Cipta Bahan
+      </a>
     </div>
 
     <!-- Search Lesson Panel -->
@@ -60,9 +54,12 @@
     <section class="panel panel-spaced">
       <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h2 style="margin:0; font-size:18px; font-weight:700;">Bahan Tersedia</h2>
-        <a href="{{ route('lesson.create') }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-          Cipta Bahan
-        </a>
+        <div class="card" style="margin:0; min-width:180px; display:flex; justify-content:space-between; align-items:center;">
+          <div class="label" style="margin-bottom:0;">Total Bahan</div>
+          <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:8px 12px; border-radius:999px; font-weight:700;">
+            {{ \App\Models\Lesson::count() }}
+          </span>
+        </div>
       </div>
       
       <table>
