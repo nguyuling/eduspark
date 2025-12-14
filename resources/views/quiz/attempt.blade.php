@@ -5,11 +5,14 @@
 <div class="app">
   <!-- Main Content -->
   <main class="main">
-    <div style="display:flex;justify-content:space-between;align-items:center; margin-bottom:24px; margin-left:40px; margin-right:40px; margin-top:20px;">
-      <div>
-        <div style="font-weight:700;font-size:24px;">{{ $quiz->title }}</div>
-        <div style="color:var(--muted);font-size:13px;margin-top:4px;">Attempt {{ $attempt->attempt_number }} of {{ $quiz->max_attempts }}</div>
-      </div>
+    <div class="header">
+        <div>
+            <div class="title">{{ $quiz->title }}</div>
+            <div class="sub">Attempt {{ $attempt->attempt_number }} of {{ $quiz->max_attempts }}</div>
+        </div>
+        <a href="{{ route('student.quizzes.index') }}" class="btn-kembali" style="display:inline-block !important; margin-top:15px; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
+            <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+        </a>
     </div>
 
     <!-- Quiz Header Info -->
@@ -31,17 +34,19 @@
     </section>
 
     <!-- Questions Section -->
-    <section class="panel" style="margin-bottom:20px;">
-      <div id="quiz-questions-wrapper">
-        <input type="hidden" id="_token" value="{{ csrf_token() }}">
+    <div id="quiz-questions-wrapper">
+      <input type="hidden" id="_token" value="{{ csrf_token() }}">
 
-        @if ($quiz->questions->isEmpty())
+      @if ($quiz->questions->isEmpty())
+        <section class="panel" style="margin-bottom:20px;">
           <div style="text-align:center; padding:24px; color:var(--muted);">
             <div style="font-size:14px;">This quiz has no questions available to attempt.</div>
           </div>
-        @else
-          @foreach ($quiz->questions as $key => $question)
-            <div class="question-card" data-question-id="{{ $question->id }}" style="margin-bottom:20px; padding:16px; background:rgba(106,77,247,0.03); border-radius:8px; border-left:4px solid var(--accent);">
+        </section>
+      @else
+        @foreach ($quiz->questions as $key => $question)
+          <section class="panel" style="margin-bottom:20px;">
+            <div class="question-card" data-question-id="{{ $question->id }}">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <span style="font-weight:600;">Question {{ $key + 1 }}</span>
                 <span style="background:rgba(106,77,247,0.1); padding:4px 8px; border-radius:4px; font-size:12px; font-weight:600;">{{ $question->points }} Points</span>
@@ -87,26 +92,22 @@
                 </div>
               @endif
             </div>
-          @endforeach
-        @endif
-      </div>
+          </section>
+        @endforeach
+      @endif
+    </div>
 
-      <!-- Action Buttons -->
-      <div style="display:flex; gap:12px; margin-top:20px; padding-top:20px; border-top:2px solid #e5e7eb;">
-        <a href="{{ route('student.quizzes.quit', $attempt->id) }}" style="flex:1; display:flex; align-items:center; justify-content:center; padding:12px 24px; background:transparent; border:2px solid var(--danger); color:var(--danger); border-radius:8px; font-weight:700; cursor:pointer; font-size:14px; transition:all .2s ease; text-decoration:none;" 
-            onmouseover="this.style.background='rgba(230,57,70,0.08)';" 
-            onmouseout="this.style.background='transparent';"
-            onclick="return confirm('Are you sure you want to quit this quiz?\nYour progress will not be saved.')">
-          Quit Quiz
-        </a>
-        
-        <button type="button" onclick="submitQuizData()" style="flex:1; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:14px; transition:all .2s ease; box-shadow:0 4px 12px rgba(106,77,247,0.3);"
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-          Submit Quiz
+    <!-- Action Buttons -->
+    <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0;">
+        <button type="button" onclick="submitQuizData()" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
+            <i class="bi bi-check-lg"></i>Hantar Kuiz
         </button>
-      </div>
-    </section>
+    </div>
+    <!-- <button type="button" onclick="submitQuizData()" style="flex:1; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:14px; transition:all .2s ease; box-shadow:0 4px 12px rgba(106,77,247,0.3);"
+        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';"
+        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+        Submit Quiz
+    </button> -->
   </main>
 </div>
 
