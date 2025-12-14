@@ -1,100 +1,92 @@
-<x-forum-layout>
-    <h1 class="text-3xl font-bold mb-6">Forum Posts</h1>
+@extends('layouts.app')
 
-    <div class="flex justify-between mb-6">
-        <h1 class="text-2xl font-bold">Forum</h1>
-        <a href="{{ route('forum.create') }}"
-           class="flex items-center gap-2 px-5 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm transition">
-           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-           </svg>
-           Create Post
+@section('content')
+<div class="app">
+    <main class="main">
+        <div class="header">
+        <div>
+            <div class="title">Forum</div>
+            <div class="sub">Perbincangan dan pertanyaan komuniti</div>
+        </div>
+        <a href="{{ route('forum.create') }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer; margin-top:15px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+            <i class="bi bi-plus-lg"></i>
+            Cipta Post
         </a>
     </div>
 
-    {{-- Search Form --}}
-    <div class="mb-6">
-        <form method="GET" action="{{ route('forum.index') }}" class="flex items-center gap-2">
-            <input type="text" name="search" value="{{ request('search') }}" 
-                   placeholder="Search posts..." 
-                   class="border rounded px-4 py-2 w-full md:w-1/3 text-lg">
-            <button type="submit" 
-                    class="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm transition">
-                Search
-            </button>
-            @if(request('search'))
-                <a href="{{ route('forum.index') }}" 
-                   class="px-5 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 shadow-sm transition">
-                   Clear
-                </a>
-            @endif
-        </form>
-    </div>
+    <div class="panel-spaced">
+        {{-- Search Form --}}
+        <section class="panel" style="margin-bottom:20px;">
+            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700;">Cari Post</h2>
+            <form method="GET" action="{{ route('forum.index') }}" class="flex items-center gap-3">
+                <input type="text" name="search" value="{{ request('search') }}" 
+                       placeholder="Search posts..." 
+                       class="flex-1">
+                <button type="submit" class="btn-primary">
+                    <i class="bi bi-search"></i>
+                </button>
+                @if(request('search'))
+                    <a href="{{ route('forum.index') }}" class="btn-secondary">
+                        Clear
+                    </a>
+                @endif
+            </form>
+        </section>
 
-    <div class="space-y-6">
-        @forelse ($posts as $post)
-            <div class="bg-white shadow-lg rounded-lg border border-gray-200 p-6">
+        {{-- Posts List --}}
+        <div class="space-y-4">
+            @forelse ($posts as $post)
+                <div class="card" style="position:relative;">
+                    {{-- ACTION BUTTONS - Only show for post creator --}}
+                    @if(Auth::user() && Auth::user()->id === $post->user_id)
+                    <div style="display:flex; gap:12px; position:absolute; top:20px; right:20px;">
+                        <a href="{{ route('forum.edit', $post->id) }}" 
+                           style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" 
+                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4);'" 
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3);'">
+                            <i class="bi bi-pencil" style="margin-right:6px;"></i>Kemaskini
+                        </a>
 
-                {{-- Author Info --}}
-                <div class="flex items-center mb-4">
-                    <img src="{{ $post->author_avatar }}" class="w-12 h-12 rounded-full mr-4">
-                    <div>
-                        <p class="font-semibold text-lg">{{ $post->author_name }}</p>
-                        <p class="text-sm text-gray-500">{{ $post->created_at->diffForHumans() }}</p>
+                        <form action="{{ route('forum.destroy', $post->id) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" 
+                                    style="display:inline-block; padding:12px 24px; background:var(--danger); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(230,57,70,0.3); border:none; cursor:pointer;" 
+                                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(230,57,70,0.4);'" 
+                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(230,57,70,0.3);'"
+                                    onclick="return confirm('Anda pasti ingin memadam post ini?')">
+                                <i class="bi bi-trash" style="margin-right:6px;"></i>Padam
+                            </button>
+                        </form>
                     </div>
-                </div>
+                    @endif
 
-                {{-- Post Title & Content --}}
-                <h2 class="text-2xl font-bold mb-2">
-                    <a href="{{ route('forum.show', $post->id) }}" class="text-blue-700 hover:underline">
-                        {{ $post->title }}
-                    </a>
-                </h2>
-                <p class="text-gray-700 text-lg mt-2">{{ Str::limit($post->content, 200) }}</p>
+                    {{-- Post Header --}}
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <img src="{{ $post->user->avatar ?? $post->author_avatar }}" class="w-12 h-12 rounded-full object-cover">
+                            <div>
+                                <p class="font-semibold">{{ $post->user->name ?? $post->author_name }}</p>
+                                <p class="text-xs opacity-60">{{ $post->created_at->diffForHumans() }}</p>
+                            </div>
+                        </div>
+                    </div>
 
-                {{-- Action Buttons --}}
-                <div class="mt-4 flex flex-wrap gap-3">
-
-                    {{-- Edit --}}
-                    <a href="{{ route('forum.edit', $post->id) }}" 
-                       class="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm transition">
-                       Edit
-                    </a>
-
-                    {{-- Delete --}}
-                    <form action="{{ route('forum.destroy', $post->id) }}" method="POST" onsubmit="return confirm('Are you sure?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" 
-                                class="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm transition">
-                            Delete
-                        </button>
-                    </form>
-
-                    {{-- Reply --}}
-                    <button onclick="toggleReplyForm({{ $post->id }})"
-                            class="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm transition">
-                        Reply
-                    </button>
+                    {{-- Post Title & Content --}}
+                    <div class="mb-4" style="margin-left:16px;">
+                        <h2 class="text-xl font-bold mb-2">
+                            <a href="{{ route('forum.show', $post->id) }}" class="link-primary hover:opacity-80 transition">
+                                {{ $post->title }}
+                            </a>
+                        </h2>
+                        <p class="opacity-80">{{ Str::limit($post->content, 200) }}</p>
+                    </div>
 
                 </div>
-
-                {{-- Reply Form --}}
-                <div id="reply-form-{{ $post->id }}" class="mt-4 hidden">
-                    <form action="{{ route('forum.reply', $post->id) }}" method="POST">
-                        @csrf
-                        <textarea name="content" class="w-full border p-3 rounded mb-2 text-lg" rows="3" placeholder="Write your reply..."></textarea>
-                        <button type="submit" 
-                                class="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm transition">
-                            Submit Reply
-                        </button>
-                    </form>
-                </div>
-
-            </div>
-        @empty
-            <p class="text-gray-500 text-lg">No posts found.</p>
-        @endforelse
+            @empty
+                <p class="text-center py-12 opacity-60">No posts found.</p>
+            @endforelse
+        </div>
     </div>
 
     <script>
@@ -104,4 +96,6 @@
         }
     </script>
 
-</x-forum-layout>
+    </main>
+</div>
+@endsection
