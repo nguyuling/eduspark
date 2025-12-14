@@ -6,9 +6,14 @@
   <main class="main">
     <div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:24px; margin-left:40px; margin-right:40px; margin-top:40px;">
       <div class="page-header">
-        <h1>Kemaskini Profil</h1>
+        <h1>
+            Kemaskini Profil
+        </h1>
         <div class="subtitle">Kemaskini maklumat peribadi anda</div>
       </div>
+      <a href="{{ route('profile.show') }}" class="btn-kembali" style="display:inline-block !important; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; margin-top:15px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
+        <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+      </a>
     </div>
 
     @if(session('success'))
@@ -38,6 +43,7 @@
 
       <form method="POST" action="{{ route('profile.update') }}">
         @csrf
+        @method('PUT')
 
         <div class="form-group">
           <label for="name">Nama Penuh</label>
@@ -68,27 +74,12 @@
           @enderror
         </div>
 
-        <div class="panel-footer">
-          <a href="{{ route('profile.show') }}" class="btn btn-secondary">
-            ← Kembali ke Profil
-          </a>
+        <div class="panel-footer" style="display:flex;justify-content:center;">
           <button type="submit" class="btn btn-primary">
             Simpan Perubahan
           </button>
         </div>
       </form>
-    </div>
-
-    <div class="panel panel-spaced">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <h3 style="margin: 0 0 4px 0; font-weight: 700;">Keselamatan Kata Laluan</h3>
-          <p style="margin: 0; color: var(--muted); font-size: 13px;">Kemaskini kata laluan anda untuk menjaga keamanan akaun.</p>
-        </div>
-        <a href="{{ route('profile.password.edit') }}" class="btn btn-primary">
-          Tukar Kata Laluan
-        </a>
-      </div>
     </div>
   </main>
 </div>
