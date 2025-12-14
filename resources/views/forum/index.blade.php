@@ -38,24 +38,26 @@
             @forelse ($posts as $post)
                 <div class="card" style="position:relative;">
                     {{-- ACTION BUTTONS - Only show for post creator --}}
-                    @if(Auth::user() && Auth::user()->id === $post->user_id)
+                    @if(Auth::check() && Auth::id() === $post->author_id)
                     <div style="display:flex; gap:12px; position:absolute; top:20px; right:20px;">
                         <a href="{{ route('forum.edit', $post->id) }}" 
-                           style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" 
-                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4);'" 
-                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3);'">
-                            <i class="bi bi-pencil" style="margin-right:6px;"></i>Kemaskini
+                           style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" 
+                           onmouseover="this.style.opacity='0.7';" 
+                           onmouseout="this.style.opacity='1';" 
+                           title="Kemaskini">
+                            <i class="bi bi-pencil-square"></i>
                         </a>
 
                         <form action="{{ route('forum.destroy', $post->id) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" 
-                                    style="display:inline-block; padding:12px 24px; background:var(--danger); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(230,57,70,0.3); border:none; cursor:pointer;" 
-                                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(230,57,70,0.4);'" 
-                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(230,57,70,0.3);'"
+                                    style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--danger); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" 
+                                    onmouseover="this.style.opacity='0.7';" 
+                                    onmouseout="this.style.opacity='1';" 
+                                    title="Padam"
                                     onclick="return confirm('Anda pasti ingin memadam post ini?')">
-                                <i class="bi bi-trash" style="margin-right:6px;"></i>Padam
+                                <i class="bi bi-trash"></i>
                             </button>
                         </form>
                     </div>
