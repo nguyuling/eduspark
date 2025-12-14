@@ -10,6 +10,9 @@
         <div class="title">Cipta Kuiz Baru</div>
         <div class="sub">Sediakan kuiz anda dengan soalan dan pilihan</div>
       </div>
+      <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali" style="display:inline-block !important; margin-top:15px; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
+        <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+      </a>
     </div>
 
     @if (session('error'))
@@ -33,7 +36,7 @@
       @csrf
 
       <!-- Quiz Format Section -->
-      <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+      <section class="panel" style="margin-bottom:20px;">
         <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Format Kuiz</h2>
 
         <!-- Title -->
@@ -127,7 +130,7 @@
       </section>
 
       <!-- Questions Header -->
-      <section style="margin-left:40px; margin-right:40px; margin-top:40px; margin-bottom:20px;">
+      <section style="margin-top:40px; margin-bottom:20px;">
         <h2 style="margin:0; font-size:18px; font-weight:700;">Soalan <span style="color: var(--danger);">*</span></h2>
       </section>
 
@@ -135,20 +138,17 @@
       <div id="questions-container"></div>
 
       <!-- Add Question Button -->
-      <section style="margin-left:40px; margin-right:40px; margin-bottom:40px;">
-        <button type="button" id="add-question-btn" style="display:inline-block; padding:10px 18px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-          ➕ Tambah Soalan
+      <section style="margin-bottom:40px;">
+        <button type="button" id="add-question-btn" class="btn-add-question" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:10px 18px !important; background:transparent !important; color:var(--accent) !important; border:2px solid var(--accent) !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important;" onmouseover="this.style.background='rgba(168, 85, 247, 0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='transparent'; this.style.borderColor='var(--accent)'">
+          <i class="bi bi-plus-lg"></i>Tambah Soalan
         </button>
       </section>
 
       <!-- Action Buttons - Outside all containers but inside form -->
       <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0;">
-        <button type="submit" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-          Simpan Kuiz
+        <button type="submit" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
+          <i class="bi bi-check-lg"></i>Simpan Kuiz
         </button>
-        <a href="{{ route('teacher.quizzes.index') }}" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-          Batal
-        </a>
       </div>
     </form>
   </main>
@@ -170,10 +170,10 @@
     
     // Template for a new question card
     const questionTemplate = (index) => `
-        <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;" question-card data-index="${index}">
+        <section class="panel" style="margin-bottom:20px;" question-card data-index="${index}">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #d4c5f9;">
                 <h3 style="margin:0; font-size:16px; font-weight:700;">Soalan ${index + 1}</h3>
-                <button type="button" style="background:transparent; color:var(--danger); border:2px solid var(--danger); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-question-btn" data-index="${index}">Buang</button>
+                <button type="button" style="background:transparent; color:var(--danger); border:2px solid var(--danger); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-question-btn" data-index="${index}"><i class="bi bi-trash"></i></button>
             </div>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
                 <!-- Left: Teks Soalan -->
@@ -224,7 +224,7 @@
                 ${rowTemplate(qIndex, 1)}
             </div>
             <button type="button" style="display:inline-block; padding:8px 14px; background:transparent; color:var(--accent); border:1px solid var(--accent); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; cursor:pointer; margin-top:12px;" class="add-option-btn" data-q-index="${qIndex}">
-                + Tambah Pilihan
+                <i class="bi bi-plus-lg"></i> Tambah Pilihan
             </button>
         `;
     };

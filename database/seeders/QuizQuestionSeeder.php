@@ -7,6 +7,7 @@ return [
     // QUIZ 1: Java - Asas Sintaks dan Jenis Data (Based on Form 4/Basic Java)
     // ----------------------------------------------------------------------
     [
+        'teacher_id' => 1,
         'title' => 'Java: Asas Sintaks dan Jenis Data',
         'description' => 'Kuiz ini menguji pengetahuan asas tentang sintaks Java, pemboleh ubah, dan jenis data primitif.',
         'max_attempts' => 5,
@@ -102,6 +103,7 @@ return [
     // QUIZ 2: Java - Konsep Pengaturcaraan Berorientasi Objek (OOP)
     // ----------------------------------------------------------------------
     [
+        'teacher_id' => 2,
         'title' => 'Java: Konsep Pengaturcaraan Berorientasi Objek (OOP)',
         'description' => 'Kuiz ini menguji pemahaman anda tentang Kelas, Objek, Pewarisan, dan Polimorfisme.',
         'max_attempts' => 3,
@@ -238,6 +240,7 @@ return [
     // QUIZ 3: Java - Struktur Kawalan
     // ----------------------------------------------------------------------
     [
+        'teacher_id' => 3,
         'title' => 'Java: Struktur Kawalan dan Titasusunan (Array) ',
         'description' => 'Kuiz mengenai pernyataan if-else, loops, dan manipulasi tatasusunan (arrays).',
         'max_attempts' => 5,
@@ -353,6 +356,7 @@ return [
     // (Assumed Chapter 1 based on snippets: Ethics, Phishing)
     // ----------------------------------------------------------------------
     [
+        'teacher_id' => 4,
         'title' => 'Tingkatan 5, Bab 1: Etika Komputer dan Undang-undang Siber',
         'description' => 'Kuiz ini merangkumi konsep etika dalam pengkomputeran, hak cipta, dan undang-undang siber.',
         'max_attempts' => 2,
@@ -490,6 +494,7 @@ return [
     // (Assumed Chapter 1 based on snippets: Scripting Language, Website Design)
     // ----------------------------------------------------------------------
     [
+        'teacher_id' => 5,
         'title' => 'Tingkatan 5, Bab 1: Pembangunan Aplikasi Laman Web (Asas)',
         'description' => 'Kuiz ini menguji asas pembangunan aplikasi web termasuk bahasa skrip.',
         'max_attempts' => 4,

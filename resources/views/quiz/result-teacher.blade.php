@@ -14,7 +14,7 @@
         </div>
 
         <!-- Class Performance Overview -->
-        <section class="panel panel-spaced" style="margin-top: 60px;">
+        <section class="panel" style="margin-top: 60px;">
             <div class="panel-header">Class Performance Overview</div>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 20px;">
@@ -45,7 +45,7 @@
         </section>
 
         <!-- Individual Results Table -->
-        <section class="panel panel-spaced" style="margin-top: 20px;">
+        <section class="panel" style="margin-top: 20px;">
             <div class="panel-header">Individual Student Results</div>
 
             <table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
@@ -97,7 +97,7 @@
         </section>
 
         <!-- Question Analysis -->
-        <section class="panel panel-spaced" style="margin-top: 20px;">
+        <section class="panel" style="margin-top: 20px;">
             <div class="panel-header">Question Analysis</div>
 
             <div style="margin-top: 20px;">

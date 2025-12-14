@@ -1,7 +1,5 @@
 /* ===== LAYOUT ===== */
 .app { 
-  margin-left: 268px; 
-  padding: 28px; 
   font-family: Inter, system-ui, sans-serif; 
   display: flex; 
   min-height: 80vh; 
@@ -117,7 +115,7 @@ body.dark .card {
 /* ===== PANELS WITH MARGINS ===== */
 .panel {
   border-radius: var(--card-radius);
-  padding: 20px;
+  padding: 25px;
   animation: fadeInUp 0.4s ease;
   margin-bottom: 20px;
   background: transparent;
@@ -128,9 +126,7 @@ body.dark .card {
 }
 
 .panel-spaced {
-  margin-left: 40px;
-  margin-right: 40px;
-  margin-bottom: 20px;
+  /* Layout handles page margins */
 }
 
 body.light .panel {
@@ -185,9 +181,6 @@ body.dark .panel {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 20px;
-  margin-top: 40px;
-  margin-left: 40px;
-  margin-right: 40px;
 }
 
 .header-content {
@@ -842,4 +835,95 @@ label {
 
 .post-action-delete:hover {
   opacity: 0.8;
+}
+
+/* ===== BUTTON STYLES ===== */
+.btn-kembali {
+  display: inline-block !important;
+  padding: 12px 24px !important;
+  background: transparent !important;
+  color: #6A4DF7 !important;
+  border: 2px solid #6A4DF7 !important;
+  text-decoration: none !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  margin-top: 15px !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  line-height: 1 !important;
+  height: auto !important;
+  opacity: 1 !important;
+}
+
+.btn-kembali:hover {
+  background: rgba(106, 77, 247, 0.1) !important;
+  color: #6A4DF7 !important;
+  text-decoration: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.btn-kembali:focus {
+  background: rgba(106, 77, 247, 0.1) !important;
+  color: #6A4DF7 !important;
+  text-decoration: none !important;
+  opacity: 1 !important;
+}
+
+.btn-kembali:active {
+  background: transparent !important;
+  color: #6A4DF7 !important;
+}
+
+.btn-kembali i {
+  margin-right: 6px !important;
+}
+
+/* ===== ADD QUESTION BUTTON ===== */
+.btn-add-question {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-add-question:hover {
+  background: rgba(106, 77, 247, 0.1);
+}
+
+/* ===== SUBMIT BUTTON ===== */
+.btn-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 26px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 12px rgba(106, 77, 247, 0.3);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(106, 77, 247, 0.4);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
 }

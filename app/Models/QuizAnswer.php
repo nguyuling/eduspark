@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class QuizAnswer extends Model
 {
+    protected $table = 'student_answers';
+    
     protected $fillable = [
     'attempt_id', 
     'question_id', 
