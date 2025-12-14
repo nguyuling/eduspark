@@ -13,7 +13,7 @@
         </a>
     </div>
 
-    <div class="panel-spaced">
+    <div>
         <section class="panel">
             <form action="{{ route('forum.store') }}" method="POST" class="space-y-6">
                 @csrf

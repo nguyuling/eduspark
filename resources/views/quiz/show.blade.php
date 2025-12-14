@@ -16,7 +16,7 @@
     </div>
 
     <!-- Quiz Format Section (Read-Only) -->
-    <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px; margin-top:20px;">
+    <section class="panel" style="margin-bottom:20px; margin-top:20px;">
       <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Format Kuiz</h2>
 
       <!-- Title -->

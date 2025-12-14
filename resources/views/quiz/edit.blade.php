@@ -37,7 +37,7 @@
       @method('PUT')
 
       <!-- Quiz Format Section -->
-      <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+      <section class="panel" style="margin-bottom:20px;">
         <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Format Kuiz</h2>
 
         <!-- Title -->
@@ -172,7 +172,7 @@
 
     // Template for a new question card
     const questionTemplate = (index) => `
-        <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;" question-card data-index="${index}">
+        <section class="panel" style="margin-bottom:20px;" question-card data-index="${index}">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #d4c5f9;">
                 <h3 style="margin:0; font-size:16px; font-weight:700;">Soalan ${index + 1}</h3>
                 <button type="button" style="background:transparent; color:var(--danger); border:2px solid var(--danger); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-question-btn" data-index="${index}">Buang</button>

@@ -1,7 +1,7 @@
 /* ===== LAYOUT ===== */
 .app { 
   margin-left: 268px; 
-  padding: 28px 60px; 
+  padding: 28px 80px; 
   font-family: Inter, system-ui, sans-serif; 
   display: flex; 
   min-height: 80vh; 
@@ -128,8 +128,8 @@ body.dark .card {
 }
 
 .panel-spaced {
-  margin-left: 40px;
-  margin-right: 40px;
+  margin-left: 60px;
+  margin-right: 60px;
   margin-bottom: 20px;
 }
 
@@ -186,8 +186,8 @@ body.dark .panel {
   align-items: flex-start;
   margin-bottom: 40px;
   margin-top: 40px;
-  margin-left: 40px;
-  margin-right: 40px;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .header-content {

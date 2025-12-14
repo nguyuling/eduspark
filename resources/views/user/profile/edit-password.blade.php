@@ -34,7 +34,7 @@
       </div>
     @endif
 
-    <div class="panel panel-spaced">
+    <div class="panel">
       <div class="panel-header">
         <h3>Kemaskini Kata Laluan</h3>
       </div>
