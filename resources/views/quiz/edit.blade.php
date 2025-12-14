@@ -10,7 +10,7 @@
         <div class="title">Kemaskini Kuiz: {{ $quiz->title }}</div>
         <div class="sub">Ubah soalan dan tetapan kuiz anda</div>
       </div>
-        <a href="{{ route('teacher.quizzes.index', $quiz->id) }}" class="btn-kembali" style="display:inline-block !important; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; margin-top:15px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'" onclick="return confirm('Adakah anda pasti? Perubahan yang tidak disimpan akan hilang.');">
+        <a href="{{ route('teacher.quizzes.index', $quiz->id) }}" class="btn-kembali" style="display:inline-block !important; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'" onclick="return confirm('Adakah anda pasti? Perubahan yang tidak disimpan akan hilang.');">
             <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
         </a>
     </div>
@@ -149,15 +149,15 @@
 
       <!-- Add Question Button -->
       <section style="margin-left:5px; margin-bottom:40px;">
-        <button type="button" id="add-question-btn" style="display:inline-block; padding:10px 18px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-          <i class="bi bi-add" style="margin-right: 12px;">Tambah Soalan
+        <button type="button" id="add-question-btn" class="btn-add-question" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:10px 18px !important; background:transparent !important; color:var(--accent) !important; border:2px solid var(--accent) !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important;" onmouseover="this.style.background='rgba(168, 85, 247, 0.1)'; this.style.borderColor='var(--accent)'" onmouseout="this.style.background='transparent'; this.style.borderColor='var(--accent)'">
+          <i class="bi bi-plus-lg"></i>Tambah Soalan
         </button>
       </section>
 
       <!-- Action Buttons Row -->
       <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0;">
-        <button type="submit" style="display:inline-block; padding:14px 26px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-          <i class="bi bi-save" style="margin-right: 12px;"></i>Simpan Kuiz
+        <button type="submit" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
+          <i class="bi bi-save"></i>Simpan Kuiz
         </button>
     </form>
       </div>

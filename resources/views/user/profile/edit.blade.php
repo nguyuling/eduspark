@@ -4,7 +4,7 @@
 
 <div class="app">
   <main class="main">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:24px; margin-left:40px; margin-right:40px; margin-top:40px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:24px; margin-top:40px;">
       <div class="page-header">
         <h1>
             Kemaskini Profil
