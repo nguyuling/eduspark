@@ -184,7 +184,7 @@ body.dark .panel {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   margin-top: 40px;
   margin-left: 40px;
   margin-right: 40px;
@@ -845,4 +845,108 @@ label {
 
 .post-action-delete:hover {
   opacity: 0.8;
+}
+
+/* ===== BUTTON STYLES ===== */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(106, 77, 247, 0.3);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  border: 1px solid var(--control-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.btn-secondary:hover {
+  background: var(--glass);
+  border-color: var(--accent);
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(230, 57, 70, 0.1);
+  color: var(--danger);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.btn-danger:hover {
+  background: rgba(230, 57, 70, 0.2);
+}
+
+.btn-sm {
+  padding: 8px 10px !important;
+  font-size: 13px !important;
+}
+
+/* ===== INPUT STYLES ===== */
+.input-field {
+  border-radius: var(--radius);
+  border: 1px solid var(--control-border);
+  padding: 10px 12px;
+  background: var(--input-bg);
+  color: inherit;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-glow);
+  background: rgba(106, 77, 247, 0.05);
+}
+
+.input-field::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+/* ===== LINK STYLES ===== */
+.link-primary {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.link-primary:hover {
+  color: var(--accent-2);
 }
