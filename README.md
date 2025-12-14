@@ -10,6 +10,8 @@ EduSpark is an innovative web application specifically designed for secondary sc
 The platform supports two primary user roles: Students (student/Pelajar) and Teachers (teacher/Pengajar), providing customized access to relevant tools and performance data.
 </details>
 
+---
+
 <h3 align="center">
 Aplex Tech | SECB3104_25261 Application Development
 </h3>
