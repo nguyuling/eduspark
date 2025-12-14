@@ -15,7 +15,7 @@
 
         <div style="margin-top:0;">
             {{-- POST CONTENT SECTION --}}
-            <section class="panel" style="margin-left:0; margin-right:0; margin-top:0; margin-bottom:20px; padding:20px;">
+            <section class="panel" style="margin-left:40px; margin-right:40px; margin-top:20px; margin-bottom:20px; padding:20px;">
                 {{-- AUTHOR INFO --}}
                 <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px; padding-bottom:16px; border-bottom:2px solid rgba(0,0,0,0.05);">
                     <img src="{{ $post->user->avatar ?? $post->author_avatar }}" alt="{{ $post->user->name ?? $post->author_name }}" style="width:52px; height:52px; border-radius:50%; object-fit:cover; border:2px solid var(--accent);">
@@ -32,7 +32,7 @@
             </section>
 
             {{-- REPLIES SECTION --}}
-            <section class="panel">
+            <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <h2 style="margin:0; font-size:18px; font-weight:700;">Balasan ({{ $post->replies->count() }})</h2>
                     <button type="button" onclick="toggleReplyForm()" 
@@ -58,9 +58,11 @@
                             @enderror
                         </div>
 
-                        <button type="submit" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4);'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3);'">
-                            <i class="bi bi-send" style="margin-right:6px;"></i>Hantar
-                        </button>
+                        <div style="text-align:center;">
+                            <button type="submit" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4);'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3);'">
+                                <i class="bi bi-send" style="margin-right:6px;"></i>Hantar
+                            </button>
+                        </div>
                     </form>
                 </div>
 

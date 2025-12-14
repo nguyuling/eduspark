@@ -52,7 +52,7 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit" 
-                                    style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--danger); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" 
+                                    style="display:inline-flex; align-items:center; justify-content:center; background:transparent; box-shadow: none; border:none; color:var(--danger); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" 
                                     onmouseover="this.style.opacity='0.7';" 
                                     onmouseout="this.style.opacity='1';" 
                                     title="Padam"
