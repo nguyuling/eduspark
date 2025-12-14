@@ -2,174 +2,151 @@
 
 @section('content')
 
-<div class="app">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <img src="{{ asset('logo.png') }}" alt="EduSpark logo" class="logo">
-    <div class="logo-text" aria-hidden="true" style="font-weight:700;font-size:18px;">
-      <span style="color:#1D5DCD;">edu</span><span style="color:#E63946;">Spark</span>
-    </div>
-    <nav class="nav">
-      <a href="{{ route('home') }}"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19h16v2H4zm0-6h16v2H4zm0-6h16v2H4zM4 1h16v2H4z"/></svg></span>Lessons</a>
-      <a href="#"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V4l8 5 8-5v2z"/></svg></span>Forum</a>
-      <a href="#"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 6h-2v9c0 .55-.45 1-1 1h-1c-.55 0-1-.45-1-1V4c0-1.1-.9-2-2-2h-3.5C10.88 2 10 2.88 10 4v3H5c-1.1 0-2 .9-2 2v11h2v2h2v-2h8v2h2v-2h2V9c0-.55-.45-1-1-1zm-4-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"/></svg></span>Games</a>
-      <a href="{{ Auth::user()->role === 'teacher' ? route('teacher.quizzes.index') : route('student.quizzes.index') }}" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>Quiz</a>
-      <a href="#"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg></span>Performance</a>
-    </nav>
-    <div class="profile-section">
-      <a href="{{ route('profile.show') }}" class="profile-link">
-        <div class="profile-icon">{{ substr(Auth::user()->name, 0, 1) }}</div>
-        <div style="flex:1; text-align:left; overflow:hidden;">
-          <div style="font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ Auth::user()->name }}</div>
-          <div style="font-size:11px; color:var(--muted); text-transform:capitalize;">{{ Auth::user()->role }}</div>
-        </div>
-      </a>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="main">
-    <div style="display:flex;justify-content:space-between;align-items:center; margin-bottom:24px;">
-      <div>
-        <div style="font-weight:700;font-size:24px;">{{ $attempt->quiz->title }}</div>
-        <div style="color:var(--muted);font-size:13px;margin-top:4px;">Quiz Results</div>
-      </div>
-      <button id="themeToggle" style="background:none;border:0;color:inherit;font-weight:600;cursor:pointer;font-size:24px;">🌙</button>
-    </div>
-
-    <!-- Score Summary Card -->
-    <div class="score-card">
-      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:0;">
-        <div>
-          <div class="score-title">Student</div>
-          <div style="font-size:16px; font-weight:700;">{{ $attempt->student->name }}</div>
-        </div>
-        <div>
-          <div class="score-title">Attempt</div>
-          <div style="font-size:16px; font-weight:700;">{{ $attempt->attempt_number }} of {{ $attempt->quiz->max_attempts }}</div>
-        </div>
-        <div>
-          <div class="score-title">Submitted</div>
-          <div style="font-size:16px; font-weight:700;">{{ $attempt->submitted_at->format('M d, Y h:i A') }}</div>
-        </div>
-      </div>
-      <hr style="border-top: 1px solid rgba(106,77,247,0.2); margin:16px 0;">
-      <div>
-        <div class="score-title">TOTAL SCORE</div>
-        <div class="score-value">{{ $attempt->score }}<span style="font-size:20px;">/{{ $attempt->quiz->questions->sum('points') }}</span></div>
-      </div>
-    </div>
-
-    <!-- Teacher Remark -->
-    @if ($attempt->teacher_remark)
-      <div class="remark-card">
-        <div class="remark-label">Cadangan daripada guru</div>
-        <div class="remark-text">{{ $attempt->teacher_remark }}</div>
-      </div>
-    @else
-      <div class="remark-card" style="background:rgba(152,160,179,0.05); border-color:rgba(152,160,179,0.2);">
-        <div style="color:var(--muted); font-size:13px;">Tiada cadangan daripada guru setakat ini.</div>
-      </div>
-    @endif
-
-    <!-- Detailed Answers -->
-    <div style="margin-top:28px;">
-      <h3 style="font-weight:700; margin-bottom:16px;">Jawapan Terperinci</h3>
-
-      @foreach ($attempt->answers as $index => $studentAnswer)
-        @php
-            $isCorrect = $studentAnswer->is_correct;
-            $question = $studentAnswer->question;
-            $selectedOptionIds = $studentAnswer->options->pluck('id')->toArray();
-        @endphp
-
-        <div class="question-card">
-          <div class="question-header">
-            <div>
-              <span style="font-size:15px; font-weight:700;">Soalan {{ $index + 1 }}</span>
-              <div style="font-size:13px; line-height:1.5; margin-top:8px; color:inherit;">{{ $question->question_text }}</div>
-            </div>
-            <span class="question-points">{{ $question->points }} Points</span>
-          </div>
-          
-          <div class="result-badge {{ $isCorrect ? 'correct' : 'incorrect' }}">
-            @if ($isCorrect)
-              ✓ Correct! (+{{ $studentAnswer->score_gained ?? $question->points }} points)
-            @else
-              ✗ Incorrect (0 points)
-            @endif
-          </div>
-
-          {{-- SHORT ANSWER --}}
-          @if ($question->type === 'short_answer')
-            <div style="margin-top:12px;">
-              <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:6px;">Your Answer:</div>
-              <div style="padding:10px 12px; background:rgba(200,200,200,0.08); border:1px solid #d1d5db; border-radius:6px; font-size:13px;">{{ $studentAnswer->submitted_text ?? 'N/A' }}</div>
-            </div>
-            <div style="margin-top:12px;">
-              <div style="font-size:12px; color:var(--success); font-weight:600; margin-bottom:6px;">Correct Answer:</div>
-              <div style="padding:10px 12px; background:rgba(42,157,143,0.08); border:1px solid rgba(42,157,143,0.3); border-radius:6px; font-size:13px; font-weight:600; color:var(--success);">{{ $question->options->where('is_correct', true)->first()->option_text ?? 'N/A' }}</div>
-            </div>
-          @else
-            {{-- MULTIPLE CHOICE / TRUE-FALSE / CHECKBOX --}}
-            <ul class="option-list">
-            @foreach ($question->options as $option)
-              @php
-                  $isStudentChoice = in_array($option->id, $selectedOptionIds);
-                  $isActualCorrect = $option->is_correct;
-                  
-                  if ($isActualCorrect) {
-                      $optionClass = 'correct';
-                  } elseif ($isStudentChoice && !$isActualCorrect) {
-                      $optionClass = 'incorrect';
-                  } else {
-                      $optionClass = 'neutral';
-                  }
-              @endphp
-              <li class="{{ $optionClass }}">
-                @if ($isActualCorrect && $isStudentChoice)
-                  ✓
-                @elseif ($isActualCorrect)
-                  ✓
-                @elseif ($isStudentChoice)
-                  ✗
-                @else
-                  ○
-                @endif
-                {{ $option->option_text }}
-                @if ($isActualCorrect)
-                  <span style="margin-left:auto; font-size:11px; font-weight:600; opacity:0.7;">(Correct)</span>
-                @endif
-              </li>
-            @endforeach
-            </ul>
-          @endif
-        </div>
-      @endforeach
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="actions">
-      <a href="{{ route('student.quizzes.index') }}" class="btn-back">← Back to Quiz List</a>
-      
-      @php
-          $quiz = $attempt->quiz; 
-          $attemptsMade = $quiz->attempts()->where('student_id', Auth::id())->count();
-      @endphp
-
-      @if ($attemptsMade < $quiz->max_attempts && (!$quiz->due_at || $quiz->due_at->isFuture()))
-        <a href="{{ route('student.quizzes.attempt.start', $quiz->id) }}" class="btn-retry">↻ Re-attempt Quiz ({{ $attemptsMade }}/{{ $quiz->max_attempts }})</a>
-      @endif
-    </div>
-  </main>
+<div style="display:flex;justify-content:space-between;align-items:center; margin-bottom:24px; margin-left:40px; margin-right:40px; margin-top:20px;">
+  <div>
+    <div style="font-weight:700;font-size:24px;">{{ $attempt->quiz->title }}</div>
+    <div style="color:var(--muted);font-size:13px;margin-top:4px;">Quiz Results</div>
+  </div>
 </div>
 
-<script>
-const body=document.body, toggle=document.getElementById('themeToggle');
-function applyTheme(mode){
-  if(mode==='light'){body.classList.replace('dark','light');toggle.textContent='☀️';}
-  else{body.classList.replace('light','dark');toggle.textContent='🌙';}
-}
-const saved=localStorage.getItem('theme')||'dark'; applyTheme(saved);
-toggle.addEventListener('click',()=>{const next=body.classList.contains('dark')?'light':'dark'; applyTheme(next); localStorage.setItem('theme',next);});
-</script>
+<!-- Score Summary Card -->
+<section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:0;">
+    <div>
+      <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:4px;">Student</div>
+      <div style="font-size:16px; font-weight:700;">{{ $attempt->student->name }}</div>
+    </div>
+    <div>
+      <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:4px;">Attempt</div>
+      <div style="font-size:16px; font-weight:700;">{{ $attempt->attempt_number }} of {{ $attempt->quiz->max_attempts }}</div>
+    </div>
+    <div>
+      <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:4px;">Submitted</div>
+      <div style="font-size:16px; font-weight:700;">{{ $attempt->submitted_at->format('M d, Y h:i A') }}</div>
+    </div>
+  </div>
+  <hr style="border-top: 1px solid rgba(106,77,247,0.2); margin:16px 0;">
+  <div>
+    <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:8px; text-transform:uppercase;">Total Score</div>
+    <div style="font-size:32px; font-weight:700; color:var(--accent);">{{ $attempt->score }}<span style="font-size:18px; font-weight:600;">/{{ $attempt->quiz->questions->sum('points') }}</span></div>
+  </div>
+</section>
+
+<!-- Teacher Remark -->
+<section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+  @if ($attempt->teacher_remark)
+    <div>
+      <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:8px;">Cadangan daripada guru</div>
+      <div style="font-size:14px; line-height:1.6;">{{ $attempt->teacher_remark }}</div>
+    </div>
+  @else
+    <div style="color:var(--muted); font-size:13px;">Tiada cadangan daripada guru setakat ini.</div>
+  @endif
+</section>
+
+<!-- Detailed Answers -->
+<section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+  <h3 style="font-weight:700; margin-bottom:20px; font-size:16px;">Jawapan Terperinci</h3>
+
+  @foreach ($attempt->answers as $index => $studentAnswer)
+    @php
+        $isCorrect = $studentAnswer->is_correct;
+        $question = $studentAnswer->question;
+        $selectedOptionIds = $studentAnswer->options->pluck('id')->toArray();
+    @endphp
+
+    <div style="margin-bottom:20px; padding:16px; background:rgba(106,77,247,0.03); border-radius:8px; border-left:4px solid {{ $isCorrect ? 'var(--success)' : 'var(--danger)' }};">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+        <div>
+          <span style="font-size:13px; font-weight:700;">Soalan {{ $index + 1 }}</span>
+          <div style="font-size:14px; line-height:1.5; margin-top:8px; font-weight:700;">{{ $question->question_text }}</div>
+        </div>
+        <span style="background:{{ $isCorrect ? 'rgba(42,157,143,0.1)' : 'rgba(230,57,70,0.1)' }}; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; color:{{ $isCorrect ? 'var(--success)' : 'var(--danger)' }}; white-space:nowrap;">
+          {{ $question->points }} Points
+        </span>
+      </div>
+
+      <div style="background:{{ $isCorrect ? 'rgba(42,157,143,0.1)' : 'rgba(230,57,70,0.1)' }}; padding:8px 12px; border-radius:6px; font-size:12px; font-weight:600; color:{{ $isCorrect ? 'var(--success)' : 'var(--danger)' }}; margin-bottom:12px;">
+        @if ($isCorrect)
+          ✓ Correct! (+{{ $studentAnswer->score_gained ?? $question->points }} points)
+        @else
+          ✗ Incorrect (0 points)
+        @endif
+      </div>
+
+      {{-- SHORT ANSWER --}}
+      @if ($question->type === 'short_answer')
+        <div style="margin-top:12px;">
+          <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:6px;">Your Answer:</div>
+          <div style="padding:10px 12px; background:rgba(200,200,200,0.08); border:1px solid #d1d5db; border-radius:6px; font-size:13px;">{{ $studentAnswer->submitted_text ?? 'N/A' }}</div>
+        </div>
+        <div style="margin-top:12px;">
+          <div style="font-size:12px; color:var(--success); font-weight:600; margin-bottom:6px;">Correct Answer:</div>
+          <div style="padding:10px 12px; background:rgba(42,157,143,0.08); border:1px solid rgba(42,157,143,0.3); border-radius:6px; font-size:13px; font-weight:600; color:var(--success);">{{ $question->options->where('is_correct', true)->first()->option_text ?? 'N/A' }}</div>
+        </div>
+      @else
+        {{-- MULTIPLE CHOICE / TRUE-FALSE / CHECKBOX --}}
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+        @foreach ($question->options as $option)
+          @php
+              $isStudentChoice = in_array($option->id, $selectedOptionIds);
+              $isActualCorrect = $option->is_correct;
+              
+              if ($isActualCorrect) {
+                  $bgColor = 'rgba(42,157,143,0.08)';
+                  $borderColor = 'rgba(42,157,143,0.3)';
+                  $textColor = 'var(--success)';
+                  $icon = '✓';
+              } elseif ($isStudentChoice && !$isActualCorrect) {
+                  $bgColor = 'rgba(230,57,70,0.08)';
+                  $borderColor = 'rgba(230,57,70,0.3)';
+                  $textColor = 'var(--danger)';
+                  $icon = '✗';
+              } else {
+                  $bgColor = 'transparent';
+                  $borderColor = '#d1d5db';
+                  $textColor = 'inherit';
+                  $icon = '○';
+              }
+          @endphp
+          <div style="display:flex; align-items:center; padding:10px 12px; background:{{ $bgColor }}; border:1px solid {{ $borderColor }}; border-radius:6px; font-size:13px; color:{{ $textColor }};">
+            <span style="margin-right:8px; font-weight:700;">{{ $icon }}</span>
+            <span>{{ $option->option_text }}</span>
+            @if ($isActualCorrect)
+              <span style="margin-left:auto; font-size:11px; font-weight:600; opacity:0.7;">(Correct)</span>
+            @endif
+          </div>
+        @endforeach
+        </div>
+      @endif
+    </div>
+  @endforeach
+</section>
+
+<!-- Action Buttons -->
+<section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:40px;">
+  <div style="display:flex; gap:12px;">
+    <a href="{{ route('student.quizzes.index') }}" style="flex:1; display:flex; align-items:center; justify-content:center; padding:12px 24px; background:transparent; border:2px solid var(--accent); color:var(--accent); border-radius:8px; font-weight:700; cursor:pointer; font-size:14px; transition:all .2s ease; text-decoration:none;" 
+        onmouseover="this.style.background='rgba(106,77,247,0.08)';" 
+        onmouseout="this.style.background='transparent';">
+      ← Back to Quiz List
+    </a>
+    
+    @php
+        $quiz = $attempt->quiz; 
+        $attemptsMade = $quiz->attempts()->where('student_id', Auth::id())->count();
+    @endphp
+
+    @if ($attemptsMade < $quiz->max_attempts && (!$quiz->due_at || $quiz->due_at->isFuture()))
+      <a href="{{ route('student.quizzes.start', $quiz->id) }}" style="flex:1; display:flex; align-items:center; justify-content:center; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:14px; transition:all .2s ease; box-shadow:0 4px 12px rgba(106,77,247,0.3); text-decoration:none;"
+          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+        ↻ Re-attempt Quiz ({{ $attemptsMade }}/{{ $quiz->max_attempts }})
+      </a>
+    @endif
+  </div>
+</section>
+
+<div style="height:60px;"></div>
+
+@endsection
