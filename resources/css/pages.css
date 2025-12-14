@@ -115,7 +115,7 @@ body.dark .card {
 /* ===== PANELS WITH MARGINS ===== */
 .panel {
   border-radius: var(--card-radius);
-  padding: 20px;
+  padding: 25px;
   animation: fadeInUp 0.4s ease;
   margin-bottom: 20px;
   background: transparent;
