@@ -10,6 +10,9 @@
         <div class="title">Cipta Bahan Baru</div>
         <div class="sub">Tambah bahan pembelajaran baru untuk kelas anda</div>
       </div>
+        <a href="{{ route('lesson.index') }}" class="btn-kembali" style="display:inline-block !important; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; margin-top:15px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
+            <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+        </a>
     </div>
 
     @if (session('error'))
@@ -139,9 +142,6 @@
         <button type="submit" style="background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:12px 24px; border:none; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
           Cipta Bahan
         </button>
-        <a href="{{ route('lesson.index') }}" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-          Batal
-        </a>
       </section>
     </form>
   </main>
