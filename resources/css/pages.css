@@ -843,3 +843,80 @@ label {
 .post-action-delete:hover {
   opacity: 0.8;
 }
+
+/* ===== BUTTON STYLES ===== */
+.btn-kembali,
+.header .btn-kembali,
+a.btn-kembali {
+  display: inline-block !important;
+  padding: 12px 24px !important;
+  background: transparent !important;
+  color: var(--accent) !important;
+  border: 2px solid var(--accent) !important;
+  text-decoration: none !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  margin-top: 15px !important;
+  box-shadow: none !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+}
+
+.btn-kembali,
+.btn-kembali:link,
+.btn-kembali:visited,
+.header .btn-kembali {
+  display: inline-block !important;
+  padding: 12px 24px !important;
+  background: transparent !important;
+  color: var(--accent) !important;
+  border: 2px solid var(--accent) !important;
+  text-decoration: none !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  margin-top: 15px !important;
+  box-shadow: none !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+}
+
+.btn-kembali:hover,
+.btn-kembali:focus,
+.header .btn-kembali:hover,
+a.btn-kembali:hover,
+a.btn-kembali:focus {
+  background: rgba(106, 77, 247, 0.1) !important;
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  opacity: 1 !important;
+}
+
+.btn-kembali:active,
+a.btn-kembali:active {
+  background: transparent !important;
+  color: var(--accent) !important;
+}
+
+.btn-kembali i,
+a.btn-kembali i {
+  margin-right: 6px !important;
+}
+
+.btn-kembali:active,
+.header .btn-kembali:active,
+a.btn-kembali:active {
+  background: transparent !important;
+  color: var(--accent) !important;
+}
+
+.btn-kembali i,
+.header .btn-kembali i,
+a.btn-kembali i {
+  margin-right: 6px !important;
+}
