@@ -131,8 +131,8 @@
       </section>
 
       <!-- Questions Header -->
-      <section style="margin-left:40px; margin-right:40px; margin-top:40px; margin-bottom:20px;">
-        <h2 style="margin:0; font-size:18px; font-weight:700;">Soalan <span style="color: var(--danger);">*</span></h2>
+      <section style="margin-left:5px; margin-top:40px; margin-bottom:20px;">
+        <h2 style="font-size:18px; font-weight:700;">Soalan <span style="color: var(--danger);">*</span></h2>
       </section>
 
       <!-- Questions Container - Each question appears as its own section -->
