@@ -21,8 +21,8 @@
     <section class="panel">
       <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;">
         <h3>Maklumat Peribadi</h3>
-        <a href="{{ route('profile.edit') }}" class="btn btn-primary" style="padding:14px 26px !important; font-weight:700 !important; font-size:14px !important;">
-          <i class="bi bi-pencil-square"></i>
+        <a href="{{ route('profile.edit') }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Kemaskini">
+            <i class="bi bi-pencil-square"></i>
         </a>
       </div>
       <div class="info-grid">
@@ -78,8 +78,8 @@
     <section class="panel">
       <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;">
         <h3>Sekuriti Akaun</h3>
-        <a href="{{ route('profile.password.edit') }}" class="btn btn-danger" style="display:inline-block !important; padding:14px 26px !important; background:linear-gradient(135deg, #E63946, #c92a2a) !important; color:#ffffff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.boxShadow='0 4px 12px rgba(230,57,70,0.4)'" onmouseout="this.style.boxShadow='none'">
-          Kemaskini Kata Laluan
+        <a href="{{ route('profile.password.edit') }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Kemaskini">
+            <i class="bi bi-pencil-square"></i>
         </a>
       </div>
       <p style="margin: 0; color: var(--muted);">Kata laluan telah ditetapkan dan diamankan.</p>
