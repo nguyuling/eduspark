@@ -15,6 +15,10 @@
         </a>
     </div>
 
+    @if (session('success'))
+      <div class="alert-success">{{ session('success') }}</div>
+    @endif
+
     @if (session('error'))
       <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
     @endif
@@ -146,7 +150,7 @@
       <!-- Add Question Button -->
       <section style="margin-left:5px; margin-bottom:40px;">
         <button type="button" id="add-question-btn" style="display:inline-block; padding:10px 18px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-          ➕ Tambah Soalan
+          <i class="bi bi-add" style="margin-right: 12px;">Tambah Soalan
         </button>
       </section>
 

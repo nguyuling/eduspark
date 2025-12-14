@@ -43,6 +43,42 @@ body.dark {
   color: #e6eef8;
 }
 
+/* ===== ALERT MESSAGES ===== */
+.alert-success {
+  background: var(--success);
+  color: #fff;
+  padding: 14px 26px;
+  border-radius: var(--card-radius);
+  margin-bottom: 20px;
+  font-size: 14px;
+  animation: slideOut 0.3s ease-in forwards 3s;
+  overflow: hidden;
+}
+
+@keyframes slideOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+    margin-bottom: 20px;
+    padding: 14px 26px;
+    height: auto;
+  }
+  99% {
+    opacity: 0;
+    transform: translateY(-10px);
+    margin-bottom: 20px;
+    padding: 14px 26px;
+    height: auto;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+    margin-bottom: 0;
+    padding: 0 26px;
+    height: 0;
+  }
+}
+
 /* ===== CARDS & PANELS ===== */
 .cards {
   display: grid;
