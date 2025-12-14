@@ -1,16 +1,54 @@
-<x-forum-layout>
-    <h1 class="text-2xl font-bold mb-4">Edit Post</h1>
+@extends('layouts.app')
 
-    <form action="{{ route('forum.update', $post->id) }}" method="POST">
-        @csrf
-        @method('PUT')
+@section('content')
+<div class="app">
+    <main class="main">
+        <div class="header">
+            <div>
+                <div class="title">Kemaskini Post</div>
+                <div class="sub">Ubah tajuk atau kandungan post anda</div>
+            </div>
+            <a href="{{ route('forum.show', $post->id) }}" class="btn-kembali" style="display:inline-block !important; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; margin-top:15px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
+                <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+            </a>
+        </div>
 
-        <label class="block font-semibold">Title</label>
-        <input name="title" class="w-full border p-2 rounded mb-3" value="{{ $post->title }}">
+        <div class="panel-spaced">
+            <section class="panel">
+                <form action="{{ route('forum.update', $post->id) }}" method="POST" class="space-y-6">
+                    @csrf
+                    @method('PUT')
 
-        <label class="block font-semibold">Content</label>
-        <textarea name="content" class="w-full border p-2 rounded mb-3">{{ $post->content }}</textarea>
+                    {{-- Title Field --}}
+                    <div>
+                        <label style="display:block; font-size:14px; font-weight:600; margin-bottom:8px; color:inherit;">Tajuk Post</label>
+                        <input type="text" name="title" value="{{ $post->title }}" placeholder="Masukkan tajuk post anda..." 
+                               class="form-input-height" style="width:100%; height:44px; padding:11px 14px; border:2px solid #d1d5db; background:transparent; color:inherit; box-sizing:border-box; border-radius:8px; transition:border-color .2s ease, background .2s ease; font-size:14px;" required>
+                        @error('title')
+                            <p style="color:var(--danger); font-size:12px; margin-top:4px;">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-        <button class="bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
-    </form>
-</x-forum-layout>
+                    {{-- Content Field --}}
+                    <div>
+                        <label style="display:block; font-size:14px; font-weight:600; margin-bottom:8px; color:inherit;">Kandungan</label>
+                        <textarea name="content" placeholder="Tulis kandungan post anda..." rows="8"
+                                  style="width:100%; padding:11px 14px; border:2px solid #d1d5db; background:transparent; color:inherit; box-sizing:border-box; border-radius:8px; transition:border-color .2s ease, background .2s ease; font-size:14px; font-family:inherit; resize:vertical;" required>{{ $post->content }}</textarea>
+                        @error('content')
+                            <p style="color:var(--danger); font-size:12px; margin-top:4px;">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Action Buttons --}}
+                    <div class="flex items-center justify-center gap-3 pt-4">
+                        <button type="submit" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+                            <i class="bi bi-check-lg"></i>
+                            Kemaskini
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+</div>
+@endsection
