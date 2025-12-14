@@ -85,7 +85,7 @@
                 <div class="table-meta">
                   <span class="table-badge"><strong>Kelas:</strong> {{ $lesson->class_group ?? 'N/A' }}</span>
                   <span class="table-badge">
-                    <strong>Dibuat:</strong> {{ $lesson->created_at->format('M d, Y') }}
+                    <strong>Dicipta:</strong> {{ $lesson->created_at->format('M d, Y') }}
                   </span>
                 </div>
               </td>
