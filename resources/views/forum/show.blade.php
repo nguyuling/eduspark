@@ -49,11 +49,11 @@
                         @csrf
 
                         <div style="margin-bottom:12px;">
-                            <textarea name="reply"
+                            <textarea name="content"
                                       style="width:100%; padding:12px 14px; border:2px solid #d1d5db; background:transparent; color:inherit; box-sizing:border-box; border-radius:8px; transition:border-color .2s ease, background .2s ease; font-size:14px; font-family:inherit; resize:vertical;"
                                       rows="3"
                                       placeholder="Tulis balasan anda..."></textarea>
-                            @error('reply')
+                            @error('content')
                                 <p style="color:var(--danger); font-size:12px; margin-top:4px;">{{ $message }}</p>
                             @enderror
                         </div>
