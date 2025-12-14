@@ -79,7 +79,7 @@
         <tbody>
           @forelse ($lessons ?? [] as $lesson)
             <tr>
-              <td style="width:50%">
+              <td style="width:55%">
                 <div class="table-title">{{ $lesson->title }}</div>
                 <div class="table-subtitle">{{ $lesson->description ?: 'Tiada penerangan' }}</div>
                 <div class="table-meta">
@@ -89,7 +89,7 @@
                   </span>
                 </div>
               </td>
-              <td style="width:18%;" class="table-center">
+              <td style="width:20%;" class="table-center">
                 @if ($lesson->file_path)
                   <div class="table-title">{{ strtoupper(pathinfo($lesson->file_name ?? $lesson->file_path, PATHINFO_EXTENSION)) }}</div>
                   <div class="table-subtitle">{{ $lesson->file_name ?? basename($lesson->file_path) }}</div>
@@ -97,14 +97,22 @@
                   <div class="table-subtitle">Tiada fail</div>
                 @endif
               </td>
-              <td style="width:32%;" class="table-center">
-                <div class="table-actions">
+              <td style="width:25%;" class="table-center">
+                <div style="display:flex; gap:20px; justify-content:center;">
                   @if ($lesson->file_path)
-                    <a href="{{ route('lesson.preview-file', $lesson->id) }}" class="btn btn-secondary">Lihat</a>
-                    <a href="{{ route('lesson.download', $lesson->id) }}" download class="btn btn-secondary">Muat Turun</a>
+                    <a href="{{ route('lesson.preview-file', $lesson->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Lihat">
+                      <i class="bi bi-eye-fill"></i>
+                    </a>
+                    <a href="{{ route('lesson.download', $lesson->id) }}" download style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Muat Turun">
+                      <i class="bi bi-download"></i>
+                    </a>
                   @endif
-                  <button onclick="editLesson({{ $lesson->id }}, '{{ addslashes($lesson->title) }}', '{{ addslashes($lesson->description ?? '') }}', '{{ $lesson->class_group }}', '{{ $lesson->visibility }}')" class="btn btn-secondary">Kemaskini</button>
-                  <button onclick="deleteLesson({{ $lesson->id }}, '{{ addslashes($lesson->title) }}')" class="btn btn-secondary" style="color:var(--danger); border-color:var(--danger);">Padam</button>
+                  <button onclick="editLesson({{ $lesson->id }}, '{{ addslashes($lesson->title) }}', '{{ addslashes($lesson->description ?? '') }}', '{{ $lesson->class_group }}', '{{ $lesson->visibility }}')" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Kemaskini">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button onclick="deleteLesson({{ $lesson->id }}, '{{ addslashes($lesson->title) }}')" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--danger); padding:0; font-size:24px; transition:opacity .2s ease; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Padam">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </div>
               </td>
             </tr>
