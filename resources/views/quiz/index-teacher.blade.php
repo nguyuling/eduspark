@@ -24,53 +24,48 @@
       <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
     @endif
 
-    <!-- Quiz Filter Panel -->
-    <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
-      <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700;">Cari Kuiz</h2>
-      <form method="GET" action="{{ route('teacher.quizzes.index') }}" id="filter-form">
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:20px;">
-          <div>
-            <label>ID Unik</label>
-            <input type="text" name="unique_id" value="{{ request('unique_id') ?? '' }}" placeholder="A1b2C3d4" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box;">
-          </div>
-          <div>
-            <label>Tajuk</label>
-            <input type="text" name="title" value="{{ request('title') ?? '' }}" placeholder="Sains Komputer" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box;">
-          </div>
-          <div>
-            <label>Email Pencipta</label>
-            <input type="email" name="creator_email" value="{{ request('creator_email') ?? '' }}" placeholder="guru@email.com" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box;">
-          </div>
-          <div>
-            <label>Tarikh Diterbitkan</label>
-            <select name="publish_date_range" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box;">
-              <option value="">Semua Masa</option>
-              <option value="today" @if (request('publish_date_range') === 'today') selected @endif>Hari Ini</option>
-              <option value="month" @if (request('publish_date_range') === 'month') selected @endif>Bulan Ini</option>
-              <option value="3months" @if (request('publish_date_range') === '3months') selected @endif>3 Bulan Terakhir</option>
-              <option value="year" @if (request('publish_date_range') === 'year') selected @endif>Tahun Ini</option>
-            </select>
-          </div>
-        </div>
-        <div style="display:flex; gap:10px; align-items:center; margin-bottom:20px; justify-content:space-between;">
-          <div style="display:flex; align-items:center; gap:6px;">
-            <input type="checkbox" id="created_by_me" name="scope" value="mine" @if (request('scope') === 'mine') checked @endif style="width:18px; height:18px; cursor:pointer;">
-            <label for="created_by_me" style="margin-bottom:0;font-size:14px; cursor:pointer;">Hanya tunjukkan kuiz yang saya cipta</label>
-          </div>
-          <div style="display:flex; gap:10px; align-items:center;">
-            <a href="{{ route('teacher.quizzes.index') }}" style="display:inline-block; padding:10px 20px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">Kosongkan Penapis</a>
-            <button type="submit" style="display:inline-block; padding:10px 20px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; border:none; cursor:pointer; transition:all .2s ease;" onmouseover="this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.boxShadow='none';">Gunakan Penapis</button>
-          </div>
-        </div>
-      </form>
-    </section>
-
     <!-- Quiz List Table -->
-    <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 style="margin:0; font-size:18px; font-weight:700;">Kuiz Tersedia</h2>
+    <section class="panel panel-spaced" style="margin-left:40px; margin-right:40px; margin-bottom:20px; margin-top:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+        <h2 style="margin:0; padding:0; font-size:18px; font-weight:700; line-height:1;">Senarai Kuiz</h2>
+        <button type="button" onclick="toggleFilterPanel()" style="background:transparent; border:2px solid var(--accent); color:var(--accent); padding:8px 12px; border-radius:6px; cursor:pointer; font-size:16px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';" title="Tunjukkan/Sembunyikan Penapis">
+          <i class="bi bi-funnel"></i>
+        </button>
       </div>
-      
+      <!-- Filter Panel (Collapsible) -->
+      <div id="filter-panel" style="display:{{ !empty(array_filter(['unique_id' => request('unique_id'), 'title' => request('title'), 'creator_email' => request('creator_email'), 'publish_date_range' => request('publish_date_range'), 'scope' => request('scope')])) ? 'block' : 'none' }}; margin-bottom:20px; padding-bottom:20px;">
+        <form method="GET" action="{{ route('teacher.quizzes.index') }}" id="filter-form">
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:15px;">
+            <div>
+              <label style="font-size:12px;">ID Unik</label>
+              <input type="text" name="unique_id" value="{{ request('unique_id') ?? '' }}" placeholder="A1b2C3d4" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:12px;">Tajuk</label>
+              <input type="text" name="title" value="{{ request('title') ?? '' }}" placeholder="Sains Komputer" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:12px;">Email Pencipta</label>
+              <input type="email" name="creator_email" value="{{ request('creator_email') ?? '' }}" placeholder="guru@email.com" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:12px;">Tarikh Diterbitkan</label>
+              <select name="publish_date_range" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+                <option value="">Semua Masa</option>
+                <option value="today" @if (request('publish_date_range') === 'today') selected @endif>Hari Ini</option>
+                <option value="month" @if (request('publish_date_range') === 'month') selected @endif>Bulan Ini</option>
+                <option value="3months" @if (request('publish_date_range') === '3months') selected @endif>3 Bulan Terakhir</option>
+                <option value="year" @if (request('publish_date_range') === 'year') selected @endif>Tahun Ini</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="created_by_me" name="scope" value="mine" onchange="autoSubmitForm()" @if (request('scope') === 'mine') checked @endif style="width:18px; height:18px; cursor:pointer;">
+            <label for="created_by_me" style="margin-bottom:0; font-size:12px; cursor:pointer;">Hanya tunjukkan kuiz yang saya cipta</label>
+            <a href="{{ route('teacher.quizzes.index') }}" onclick="keepFilterPanelOpen()" style="margin-left:auto; display:inline-block; padding:8px 16px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">Ulang</a>
+          </div>
+        </form>
+      </div>      
       <table>
         <thead>
           <tr>
@@ -116,17 +111,20 @@
                   @if ($isMyQuiz)
                     <!-- Edit Button (Only for my quizzes) -->
                     <a href="{{ route('teacher.quizzes.edit', $quiz->id) }}" style="display:inline-block; padding:10px 14px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; transition:transform .2s ease, box-shadow .2s ease;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                      <i class="bi bi-pencil-square"></i>
                       Kemaskini
                     </a>
                   @else
                     <!-- View Button (For other teachers' quizzes) -->
                     <a href="{{ route('teacher.quizzes.show', $quiz->id) }}" style="display:inline-block; padding:10px 14px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-                      Lihat
+                        <i class="bi bi-eye-fill"></i>  
+                        Lihat
                     </a>
                   @endif
 
                   <!-- Results Button (For all quizzes) -->
                   <a href="{{ route('teacher.quizzes.results', $quiz->id) }}" style="display:inline-block; padding:10px 14px; background:transparent; color:var(--success); border:2px solid var(--success); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; transition:all .2s ease;" onmouseover="this.style.background='rgba(42,157,143,0.1)';" onmouseout="this.style.background='transparent';">
+                    <i class="bi bi-bar-chart"></i>
                     Keputusan
                   </a>
                 </div>
@@ -164,6 +162,32 @@ function copyToClipboard(text, btn) {
     setTimeout(() => { btn.textContent = originalText; }, 1500);
   });
 }
+
+function toggleFilterPanel() {
+  const filterPanel = document.getElementById('filter-panel');
+  if (filterPanel.style.display === 'none') {
+    filterPanel.style.display = 'block';
+  } else {
+    filterPanel.style.display = 'none';
+  }
+}
+
+function keepFilterPanelOpen() {
+  sessionStorage.setItem('keepFilterOpen', 'true');
+}
+
+function autoSubmitForm() {
+  document.getElementById('filter-form').submit();
+}
+
+// Keep filter panel open if flag is set
+document.addEventListener('DOMContentLoaded', function() {
+  if (sessionStorage.getItem('keepFilterOpen') === 'true') {
+    const filterPanel = document.getElementById('filter-panel');
+    filterPanel.style.display = 'block';
+    sessionStorage.removeItem('keepFilterOpen');
+  }
+});
 </script>
 
 @endsection

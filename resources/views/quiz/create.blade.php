@@ -10,6 +10,9 @@
         <div class="title">Cipta Kuiz Baru</div>
         <div class="sub">Sediakan kuiz anda dengan soalan dan pilihan</div>
       </div>
+      <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali" style="display:inline-block !important; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; margin-top:15px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
+        <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+      </a>
     </div>
 
     @if (session('error'))
@@ -137,7 +140,8 @@
       <!-- Add Question Button -->
       <section style="margin-left:40px; margin-right:40px; margin-bottom:40px;">
         <button type="button" id="add-question-btn" style="display:inline-block; padding:10px 18px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-          ➕ Tambah Soalan
+            <i class="bi bi-plus-lg"></i>  
+            Tambah Soalan
         </button>
       </section>
 
@@ -147,9 +151,6 @@
           <i class="bi bi-check-lg"></i>
             Simpan Kuiz
         </button>
-        <a href="{{ route('teacher.quizzes.index') }}" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-          Batal
-        </a>
       </div>
     </form>
   </main>

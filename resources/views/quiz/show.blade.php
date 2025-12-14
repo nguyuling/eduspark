@@ -10,6 +10,9 @@
         <div class="title">Lihat Kuiz: {{ $quiz->title }}</div>
         <div class="sub">Papar soalan dan tetapan kuiz</div>
       </div>
+        <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali" style="display:inline-block !important; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; margin-top:15px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
+            <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+        </a>
     </div>
 
     <!-- Quiz Format Section (Read-Only) -->
@@ -130,13 +133,6 @@
           <div style="color:var(--muted); font-size:14px;">Kuiz ini tidak mempunyai soalan</div>
         </section>
       @endforelse
-    </div>
-
-    <!-- Action Buttons -->
-    <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0; margin-left:40px; margin-right:40px;">
-      <a href="{{ route('teacher.quizzes.index', $quiz->id) }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-        Tutup
-      </a>
     </div>
   </main>
 </div>
