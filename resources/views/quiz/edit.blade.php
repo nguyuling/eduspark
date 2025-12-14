@@ -10,13 +10,9 @@
         <div class="title">Kemaskini Kuiz: {{ $quiz->title }}</div>
         <div class="sub">Ubah soalan dan tetapan kuiz anda</div>
       </div>
-      <form action="{{ route('teacher.quizzes.destroy', $quiz->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Padam kuiz ini?');">
-        @csrf
-        @method('DELETE')
-        <button type="submit" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--danger); border:2px solid var(--danger); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease; cursor:pointer;" onmouseover="this.style.background='rgba(230,57,70,0.1)';" onmouseout="this.style.background='transparent';">
-          Padam
-        </button>
-      </form>
+        <a href="{{ route('teacher.quizzes.index', $quiz->id) }}" class="btn-kembali" style="display:inline-block !important; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; margin-top:15px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'" onclick="return confirm('Adakah anda pasti? Perubahan yang tidak disimpan akan hilang.');">
+            <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+        </a>
     </div>
 
     @if (session('error'))
@@ -154,9 +150,6 @@
         <button type="submit" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
           Simpan Kuiz
         </button>
-        <a href="{{ route('teacher.quizzes.index') }}" style="display:inline-block; padding:12px 24px; background:transparent; color:var(--accent); border:2px solid var(--accent); text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';">
-          Batal
-        </a>
     </form>
       </div>
   </main>
