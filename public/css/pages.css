@@ -1,7 +1,7 @@
 /* ===== LAYOUT ===== */
 .app { 
   margin-left: 268px; 
-  padding: 28px; 
+  padding: 28px 60px; 
   font-family: Inter, system-ui, sans-serif; 
   display: flex; 
   min-height: 80vh; 
