@@ -4,10 +4,10 @@
 
 <div class="app">
   <main class="main">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:24px; margin-top:40px; margin-left:40px; margin-right:40px;">
-      <div class="page-header">
-        <h1>Tukar Kata Laluan</h1>
-        <div class="subtitle">Kemaskini kata laluan anda untuk menjaga keamanan akaun</div>
+    <div class="header">
+      <div>
+        <div class="title">Tukar Kata Laluan</div>
+        <div class="sub">Kemaskini kata laluan anda untuk menjaga keamanan akaun</div>
       </div>
         <a href="{{ route('profile.show') }}" class="btn-kembali" style="display:inline-block !important; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; margin-top:15px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
             <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
@@ -91,7 +91,7 @@
         </div>
 
         <div class="panel-footer" style="display:flex;justify-content:center;">
-          <button type="submit" class="btn btn-danger" style="display:inline-block !important; padding:12px 24px !important; background:linear-gradient(135deg, #E63946, #c92a2a) !important; color:#ffffff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.boxShadow='0 4px 12px rgba(230,57,70,0.4)'" onmouseout="this.style.boxShadow='none'">
+          <button type="submit" class="btn btn-danger" style="display:inline-block !important; padding:14px 26px !important; background:linear-gradient(135deg, #E63946, #c92a2a) !important; color:#ffffff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.boxShadow='0 4px 12px rgba(230,57,70,0.4)'" onmouseout="this.style.boxShadow='none'">
             Simpan Kata Laluan Baru
           </button>
         </div>
