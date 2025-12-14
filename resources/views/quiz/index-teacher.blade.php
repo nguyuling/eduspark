@@ -129,6 +129,13 @@
                     </a>
                   @endif
 
+                  @if ($isMyQuiz)
+                    <!-- Delete Button (Only for my quizzes) -->
+                    <button type="button" onclick="deleteQuiz({{ $quiz->id }})" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--danger); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Buang">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  @endif
+
                   <!-- Results Button (For all quizzes) -->
                   <a href="{{ route('teacher.quizzes.results', $quiz->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--success); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Keputusan">
                     <i class="bi bi-bar-chart"></i>
@@ -167,6 +174,18 @@ function copyToClipboard(text, btn) {
     btn.textContent = '✓ Disalin!';
     setTimeout(() => { btn.textContent = originalText; }, 1500);
   });
+}
+
+function deleteQuiz(quizId) {
+  const confirmed = confirm('Adakah anda pasti ingin menghapus kuiz ini? Tindakan ini tidak boleh dibatalkan!');
+  if (confirmed) {
+    const deleteForm = document.createElement('form');
+    deleteForm.method = 'POST';
+    deleteForm.action = '/teacher/quizzes/' + quizId;
+    deleteForm.innerHTML = '@csrf @method("DELETE")';
+    document.body.appendChild(deleteForm);
+    deleteForm.submit();
+  }
 }
 
 function toggleFilterPanel() {
