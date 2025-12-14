@@ -74,7 +74,8 @@
 
         <div class="panel-footer" style="display:flex;justify-content:center;">
           <button type="submit" class="btn btn-primary" style="padding:14px 26px">
-            Simpan Perubahan
+            <i class="bi bi-check-lg"></i>
+            Kemaskini
           </button>
         </div>
       </form>
