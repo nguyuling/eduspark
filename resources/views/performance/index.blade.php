@@ -12,9 +12,9 @@
     </div>
 
     <!-- Performance Cards (2x2 Grid) -->
-    <section class="cards performance-cards">
-      <div class="card">
-        <div class="panel-header">
+    <section class="cards performance-cards" style="margin-bottom:20px; margin-top:20px;">
+      <div class="card" style="text-align:center;">
+        <div class="panel-header" style="justify-content:center;">
             <h3>Purata Skor Kuiz</h3>
         </div>
         <div class="value">
@@ -24,8 +24,8 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="panel-header">
+      <div class="card" style="text-align:center;">
+        <div class="panel-header" style="justify-content:center;">
             <h3>Purata Skor Permainan</h3>
         </div>
         <div class="value">
@@ -35,9 +35,9 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" style="text-align:center;">
         <!-- <div class="label">Topik Paling Lemah</div> -->
-         <div class="panel-header">
+         <div class="panel-header" style="justify-content:center;">
             <h3>Topik Paling Lemah</h3>
         </div>
         <div class="value">
@@ -47,8 +47,8 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="panel-header">
+      <div class="card" style="text-align:center;">
+        <div class="panel-header" style="justify-content:center;">
             <h3>Kuiz Diselesaikan</h3>
         </div>
         <div class="value">
@@ -60,7 +60,7 @@
     </section>
 
     <!-- Chart Panel -->
-    <section class="panel">
+    <section class="panel" style="margin-bottom:20px; margin-top:20px;">
       <div class="panel-header">
         <div>
           <h3>Trend Prestasi</h3>
