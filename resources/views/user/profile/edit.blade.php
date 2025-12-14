@@ -36,7 +36,7 @@
       </div>
     @endif
 
-    <div class="panel panel-spaced">
+    <div class="panel">
       <div class="panel-header">
         <h3>Butiran Peribadi</h3>
       </div>

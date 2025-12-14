@@ -13,7 +13,7 @@
     </div>
 
     <!-- Quiz Header Info -->
-    <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+    <section class="panel" style="margin-bottom:20px;">
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:0;">
         <div>
           <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:4px;">Description</div>
@@ -31,7 +31,7 @@
     </section>
 
     <!-- Questions Section -->
-    <section class="panel" style="margin-left:40px; margin-right:40px; margin-bottom:20px;">
+    <section class="panel" style="margin-bottom:20px;">
       <div id="quiz-questions-wrapper">
         <input type="hidden" id="_token" value="{{ csrf_token() }}">
 

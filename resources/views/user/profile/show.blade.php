@@ -4,7 +4,7 @@
 
 <div class="app">
   <main class="main" style="flex:1;">
-    <div class="header" style="display:flex;justify-content:space-between;align-items:flex-start; margin-bottom:40px; margin-top:40px; margin-left:40px; margin-right:40px;">
+    <div class="header">
       <div>
         <div class="title" style="font-weight:700;font-size:28px;">Profil</div>
         <div class="sub" style="color:var(--muted);font-size:13px;">Lihat dan urus maklumat akaun anda</div>
@@ -18,7 +18,7 @@
     </div>
 
     <!-- Personal Information -->
-    <section class="panel panel-spaced">
+    <section class="panel">
       <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;">
         <h3>Maklumat Peribadi</h3>
         <a href="{{ route('profile.edit') }}" class="btn btn-primary" style="padding:12px 24px !important; font-weight:700 !important; font-size:14px !important;">
@@ -46,7 +46,7 @@
     </section>
 
     <!-- Organization Details -->
-    <section class="panel panel-spaced">
+    <section class="panel">
       <div class="panel-header">
         <h3>Butiran Organisasi</h3>
       </div>
@@ -75,7 +75,7 @@
     </section>
 
     <!-- Account Security -->
-    <section class="panel panel-spaced">
+    <section class="panel">
       <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;">
         <h3>Sekuriti Akaun</h3>
         <a href="{{ route('profile.password.edit') }}" class="btn btn-danger" style="display:inline-block !important; padding:12px 24px !important; background:linear-gradient(135deg, #E63946, #c92a2a) !important; color:#ffffff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.boxShadow='0 4px 12px rgba(230,57,70,0.4)'" onmouseout="this.style.boxShadow='none'">

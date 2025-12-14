@@ -14,7 +14,7 @@
         </a>
     </div>
 
-    <div class="panel-spaced">
+    <div>
         {{-- Search Form --}}
         <section class="panel" style="margin-bottom:20px;">
             <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700;">Cari Post</h2>

@@ -16,7 +16,7 @@
             </a>
         </div>
 
-        <div class="panel-spaced" style="margin-left:40; margin-right:40; margin-top:0;">
+        <div style="margin-top:0;">
             {{-- POST CONTENT SECTION --}}
             <section class="panel" style="margin-left:0; margin-right:0; margin-top:0; margin-bottom:20px; padding:20px;">
                 {{-- AUTHOR INFO --}}

@@ -13,11 +13,11 @@
     </div>
 
     @if (session('error'))
-      <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
+      <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;font-size:14px;">{{ session('error') }}</div>
     @endif
 
     <!-- Quiz List Table -->
-    <section class="panel panel-spaced" style="margin-left:40px; margin-right:40px; margin-bottom:20px; margin-top:20px;">
+    <section class="panel" style="margin-bottom:20px; margin-top:20px;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
         <div style="display:flex; gap:8px; align-items:center;">
           <h2 style="margin:0; padding:0; font-size:18px; font-weight:700; line-height:1;">Senarai Kuiz</h2>
