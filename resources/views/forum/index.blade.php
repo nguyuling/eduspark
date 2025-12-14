@@ -66,9 +66,18 @@
                     {{-- Post Header --}}
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex items-center gap-3">
-                            <img src="{{ $post->user->avatar ?? $post->author_avatar }}" class="w-12 h-12 rounded-full object-cover">
+                            @php
+                                $userName = $post->user->name ?? $post->author_name;
+                                $firstLetter = strtoupper(substr($userName, 0, 1));
+                                $colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B88B', '#52C41A'];
+                                $colorIndex = abs(crc32($userName)) % count($colors);
+                                $bgColor = $colors[$colorIndex];
+                            @endphp
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg" style="background-color: {{ $bgColor }};">
+                                {{ $firstLetter }}
+                            </div>
                             <div>
-                                <p class="font-semibold">{{ $post->user->name ?? $post->author_name }}</p>
+                                <p class="font-semibold">{{ $userName }}</p>
                                 <p class="text-xs opacity-60">{{ $post->created_at->diffForHumans() }}</p>
                             </div>
                         </div>
