@@ -16,8 +16,8 @@
     </div>
 
     <!-- Quiz Format Section (Read-Only) -->
-    <section class="panel" style="margin-bottom:20px; margin-top:20px;">
-      <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Format Kuiz</h2>
+    <section class="panel">
+      <h2 style="margin:0 0 20px 0; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Format Kuiz</h2>
 
       <!-- Title -->
       <div style="margin-bottom: 20px;">
@@ -60,12 +60,12 @@
     </section>
 
     <!-- Questions Header -->
-    <section style="margin-left:40px; margin-right:40px; margin-top:40px; margin-bottom:20px;">
+    <section style="margin-top:40px; margin-bottom:20px;">
       <h2 style="margin:0; font-size:18px; font-weight:700;">Soalan ({{ $quiz->questions->count() }})</h2>
     </section>
 
     <!-- Questions Container - Each question appears as its own section -->
-    <div id="questions-container" style="margin-left:40px; margin-right:40px;">
+    <div id="questions-container">
       @forelse($quiz->questions as $index => $question)
         <section class="panel" style="margin-bottom:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #d4c5f9;">

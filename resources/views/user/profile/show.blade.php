@@ -22,7 +22,7 @@
       <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;">
         <h3>Maklumat Peribadi</h3>
         <a href="{{ route('profile.edit') }}" class="btn btn-primary" style="padding:14px 26px !important; font-weight:700 !important; font-size:14px !important;">
-          Kemaskini Profil
+          <i class="bi bi-pencil-square"></i>
         </a>
       </div>
       <div class="info-grid">
