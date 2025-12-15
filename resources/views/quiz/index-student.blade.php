@@ -85,8 +85,14 @@
               $canAttempt = ($attemptsUsed < $quiz->max_attempts) && $isFutureDue;
               $latestAttempt = $completedAttempts->sortByDesc('submitted_at')->first();
               $statusBadge = 'New';
-              if ($latestAttempt) $statusBadge = 'Completed';
-              elseif ($quiz->due_at && $quiz->due_at->isPast()) $statusBadge = 'Due';
+              $badgeStyle = 'background:rgba(106,77,247,0.1); color:inherit;';
+              if ($latestAttempt) {
+                $statusBadge = 'Completed';
+                $badgeStyle = 'background:#6A4DF7; color:#fff;';
+              } elseif ($quiz->due_at && $quiz->due_at->isPast()) {
+                $statusBadge = 'Due';
+                $badgeStyle = 'background:rgba(230,57,70,0.15); color:#000;';
+              }
             @endphp
             <tr>
               <td style="width:75%; padding:12px;">
@@ -106,7 +112,7 @@
                 </div>
               </td>
               <td style="width:15%; text-align:center; padding:12px;">
-                <div style="font-weight:600; font-size:12px; margin-bottom:4px; padding:4px 8px; background:rgba(106,77,247,0.1); border-radius:6px; display:inline-block;">{{ $statusBadge }}</div>
+                <div style="font-weight:600; font-size:12px; margin-bottom:4px; padding:4px 8px; border-radius:6px; display:inline-block; {{ $badgeStyle }}">{{ $statusBadge }}</div>
                 <div style="font-size:12px; margin-top:4px;">
                   <div style="margin-bottom:2px;">{{ $attemptsUsed }}/{{ $quiz->max_attempts }} percubaan</div>
                   @if ($latestAttempt)

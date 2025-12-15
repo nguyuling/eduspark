@@ -17,8 +17,8 @@
         <div class="panel-header" style="justify-content:center;">
             <h3>Purata Skor Kuiz</h3>
         </div>
-        <div class="value">
-          <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2));">
+        <div class="value" style="margin-top:-10px;">
+          <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); font-size:14px; padding:6px 12px;">
             {{ $avgQuizScore }}%
           </span>
         </div>
@@ -28,20 +28,19 @@
         <div class="panel-header" style="justify-content:center;">
             <h3>Purata Skor Permainan</h3>
         </div>
-        <div class="value">
-          <span class="badge-pill" style="background:linear-gradient(90deg,var(--yellow),var(--accent));">
+        <div class="value" style="margin-top:-10px;">
+          <span class="badge-pill" style="background:linear-gradient(90deg,var(--yellow),var(--accent)); font-size:14px; padding:6px 12px;">
             {{ $avgGameScore }}%
           </span>
         </div>
       </div>
 
       <div class="card" style="text-align:center;">
-        <!-- <div class="label">Topik Paling Lemah</div> -->
          <div class="panel-header" style="justify-content:center;">
             <h3>Topik Paling Lemah</h3>
         </div>
-        <div class="value">
-          <span class="badge-pill" style="background:var(--danger);">
+        <div class="value" style="margin-top:-10px;">
+          <span class="badge-pill" style="background:var(--danger); font-size:14px; padding:6px 12px;">
             {{ $weakTopic ?? 'Tiada' }}
           </span>
         </div>
@@ -51,8 +50,8 @@
         <div class="panel-header" style="justify-content:center;">
             <h3>Kuiz Diselesaikan</h3>
         </div>
-        <div class="value">
-          <span class="badge-pill" style="background:linear-gradient(90deg,#2A9D8F,#4CAF50);">
+        <div class="value" style="margin-top:-10px;">
+          <span class="badge-pill" style="background:linear-gradient(90deg,#2A9D8F,#4CAF50); font-size:14px; padding:6px 12px;">
             {{ $totalQuizzes ?? 0 }}
           </span>
         </div>

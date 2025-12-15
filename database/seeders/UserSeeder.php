@@ -20,6 +20,7 @@ class UserSeeder extends Seeder
                 'district' => 'Johor Bahru',
                 'school_code' => 'JB001',
                 'phone' => '+60123456789',
+                'user_id' => 'G-JB001-a1b',
             ],
             [
                 'name' => 'Cikgu Farah',
@@ -29,6 +30,7 @@ class UserSeeder extends Seeder
                 'district' => 'Kuala Lumpur',
                 'school_code' => 'KL001',
                 'phone' => '+60187654321',
+                'user_id' => 'G-KL001-c2d',
             ],
             [
                 'name' => 'Cikgu Ravi',
@@ -38,6 +40,7 @@ class UserSeeder extends Seeder
                 'district' => 'Selangor',
                 'school_code' => 'SG001',
                 'phone' => '+60134567890',
+                'user_id' => 'G-SG001-e3f',
             ],
             [
                 'name' => 'Cikgu Siti',
@@ -47,6 +50,7 @@ class UserSeeder extends Seeder
                 'district' => 'Penang',
                 'school_code' => 'PN001',
                 'phone' => '+60145678901',
+                'user_id' => 'G-PN001-g4h',
             ],
             [
                 'name' => 'Cikgu Budi',
@@ -56,14 +60,18 @@ class UserSeeder extends Seeder
                 'district' => 'Kedah',
                 'school_code' => 'KD001',
                 'phone' => '+60156789012',
+                'user_id' => 'G-KD001-i5j',
             ],
         ];
 
         foreach ($teachers as $teacher) {
-            User::create($teacher);
+            User::firstOrCreate(
+                ['email' => $teacher['email']],
+                $teacher
+            );
         }
 
-        echo "5 Teachers created successfully.\n";
+        echo "5 Teachers created/verified successfully.\n";
 
         // Create 5 Students
         $students = [
@@ -75,6 +83,7 @@ class UserSeeder extends Seeder
                 'district' => 'Johor Bahru',
                 'school_code' => 'JB001',
                 'phone' => '+60211111111',
+                'user_id' => 'P-JB001-k6l',
             ],
             [
                 'name' => 'Nur Aisha',
@@ -84,6 +93,7 @@ class UserSeeder extends Seeder
                 'district' => 'Kuala Lumpur',
                 'school_code' => 'KL001',
                 'phone' => '+60212222222',
+                'user_id' => 'P-KL001-m7n',
             ],
             [
                 'name' => 'Rajesh Kumar',
@@ -93,6 +103,7 @@ class UserSeeder extends Seeder
                 'district' => 'Selangor',
                 'school_code' => 'SG001',
                 'phone' => '+60213333333',
+                'user_id' => 'P-SG001-o8p',
             ],
             [
                 'name' => 'Ying Ying Chen',
@@ -102,6 +113,7 @@ class UserSeeder extends Seeder
                 'district' => 'Penang',
                 'school_code' => 'PN001',
                 'phone' => '+60214444444',
+                'user_id' => 'P-PN001-q9r',
             ],
             [
                 'name' => 'Zain Zahari',
@@ -111,13 +123,17 @@ class UserSeeder extends Seeder
                 'district' => 'Kedah',
                 'school_code' => 'KD001',
                 'phone' => '+60215555555',
+                'user_id' => 'P-KD001-s0t',
             ],
         ];
 
         foreach ($students as $student) {
-            User::create($student);
+            User::firstOrCreate(
+                ['email' => $student['email']],
+                $student
+            );
         }
 
-        echo "5 Students created successfully.\n";
+        echo "5 Students created/verified successfully.\n";
     }
 }

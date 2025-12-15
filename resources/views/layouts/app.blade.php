@@ -116,7 +116,7 @@
         </div>
     </div>
 
-    <footer class="auth-footer">
+    <footer class="page-footer">
         © 2025 EduSpark • Belajar • Bermain • Berkembang
     </footer>
 </body>

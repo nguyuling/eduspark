@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>Log Masuk — EduSpark</title>
+  <title>Lupa Kata Laluan — EduSpark</title>
   <link href="https://fonts.bunny.net/css?family=Inter" rel="stylesheet">
   <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
   <style>
@@ -29,15 +29,15 @@
   <main class="main">
     <div class="header">
       <div>
-        <div class="title" style="text-align:center">Selamat Kembali</div>
-        <div class="sub" style="text-align:center">Log masuk ke akaun EduSpark anda untuk meneruskan pembelajaran.</div>
+        <div class="title" style="text-align:center">Lupa Kata Laluan</div>
+        <div class="sub" style="text-align:center">Masukkan alamat email anda dan kami akan menghantar pautan untuk tetapkan semula kata laluan.</div>
       </div>
     </div>
 
     <div class="auth-container" style="max-width:none;width:50%;margin:0;padding:30px 30px;">
 
-    @if(session('success'))
-      <div class="auth-success">✓ {{ session('success') }}</div>
+    @if(session('status'))
+      <div class="auth-success">✓ {{ session('status') }}</div>
     @endif
 
     @if($errors->any())
@@ -48,7 +48,7 @@
       </div>
     @endif
 
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('password.email') }}">
       @csrf
 
       <div class="auth-form-group">
@@ -60,56 +60,20 @@
           required 
           placeholder="anda@contoh.com"
           value="{{ old('email') }}"
+          autofocus
         />
       </div>
 
-      <div class="auth-form-group">
-        <label for="password">Kata Laluan</label>
-        <input 
-          type="password" 
-          id="password" 
-          name="password" 
-          required 
-          minlength="6"
-          placeholder="••••••••"
-        />
-      </div>
-
-      <button type="submit" id="submit-btn" class="auth-btn" disabled>Log Masuk</button>
+      <button type="submit" class="auth-btn">Hantar Pautan Tetapkan Semula</button>
     </form>
     </div>
 
     <div class="auth-links">
-      <p>Tidak mempunyai akaun? <a href="{{ route('register') }}">Daftar di sini</a></p>
-      <p><a href="{{ route('password.request') }}">Lupa kata laluan?</a></p>
+      <p><a href="{{ route('login') }}">Kembali ke Log Masuk</a></p>
     </div>
   </main>
 
   <script>
-    // Get form elements
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const submitBtn = document.getElementById('submit-btn');
-
-    // Check if both fields are filled
-    function updateButtonState() {
-      const emailFilled = emailInput.value.trim() !== '';
-      const passwordFilled = passwordInput.value.trim() !== '';
-      
-      if (emailFilled && passwordFilled) {
-        submitBtn.disabled = false;
-      } else {
-        submitBtn.disabled = true;
-      }
-    }
-
-    // Add event listeners
-    emailInput.addEventListener('input', updateButtonState);
-    passwordInput.addEventListener('input', updateButtonState);
-
-    // Initialize on page load (for old form values)
-    updateButtonState();
-
     // Apply dark theme based on system preference or localStorage
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const savedTheme = localStorage.getItem('theme');
