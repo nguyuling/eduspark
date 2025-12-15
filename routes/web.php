@@ -6,6 +6,7 @@ use App\Http\Controllers\QuizTeacherController;
 use App\Http\Controllers\QuizStudentController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\PerformanceController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
@@ -71,6 +72,8 @@ Route::middleware('auth')->group(function () {
 // Performance routes
 Route::middleware('auth')->group(function () {
     Route::get('/performance', [PerformanceController::class, 'index'])->name('performance.student_view');
+    // Reports landing for teachers
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 });
 
 // Forum routes
