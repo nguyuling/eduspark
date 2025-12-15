@@ -34,7 +34,7 @@
       </div>
     @endif
 
-    <div class="panel">
+    <section class="panel" style="margin-bottom:20px; margin-top:10px;">
       <div class="panel-header">
         <h3>Butiran Peribadi</h3>
       </div>
@@ -79,7 +79,7 @@
           </button>
         </div>
       </form>
-    </div>
+    </section>
   </main>
 </div>
 @endsection

@@ -17,7 +17,7 @@
     @endif
 
     <!-- Quiz List Table -->
-    <section class="panel" style="margin-bottom:20px; margin-top:20px;">
+    <section class="panel" style="margin-bottom:20px; margin-top:10px;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
         <div style="display:flex; gap:8px; align-items:center;">
           <h2 style="margin:0; padding:0; font-size:18px; font-weight:700; line-height:1;">Senarai Kuiz</h2>
