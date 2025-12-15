@@ -5,12 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Log Masuk — EduSpark</title>
+  <link href="https://fonts.bunny.net/css?family=Inter" rel="stylesheet">
   <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body.auth-page {
+      font-family: Inter, system-ui, sans-serif;
+    }
+
+    .auth-form-group input,
+    .auth-form-group select {
+      box-sizing: border-box;
+    }
+  </style>
 </head>
 
 <body class="light auth-page">
   <div class="auth-container">
-    <h1>Selamat Datang Kembali</h1>
+    <h1>Selamat Kembali</h1>
     <p class="auth-subtitle">Log masuk ke akaun EduSpark anda untuk meneruskan pembelajaran.</p>
 
     @if(session('success'))
@@ -52,7 +69,7 @@
         />
       </div>
 
-      <button type="submit" class="auth-btn">🔐 Log Masuk</button>
+      <button type="submit" id="submit-btn" class="auth-btn" disabled>Log Masuk</button>
     </form>
 
     <div class="auth-links">
@@ -66,6 +83,30 @@
   </footer>
 
   <script>
+    // Get form elements
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const submitBtn = document.getElementById('submit-btn');
+
+    // Check if both fields are filled
+    function updateButtonState() {
+      const emailFilled = emailInput.value.trim() !== '';
+      const passwordFilled = passwordInput.value.trim() !== '';
+      
+      if (emailFilled && passwordFilled) {
+        submitBtn.disabled = false;
+      } else {
+        submitBtn.disabled = true;
+      }
+    }
+
+    // Add event listeners
+    emailInput.addEventListener('input', updateButtonState);
+    passwordInput.addEventListener('input', updateButtonState);
+
+    // Initialize on page load (for old form values)
+    updateButtonState();
+
     // Apply dark theme based on system preference or localStorage
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const savedTheme = localStorage.getItem('theme');
