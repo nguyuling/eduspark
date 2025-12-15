@@ -86,14 +86,14 @@ class UserController extends Controller
     public function profile()
     {
         $user = auth()->user();
-        return view('user.profile.show', compact('user'));
+        return view('user.show', compact('user'));
     }
 
     // Edit main profile (name/email)
     public function editProfile()
     {
         $user = auth()->user();
-        return view('user.profile.edit', compact('user'));
+        return view('user.edit', compact('user'));
     }
 
     // Update name/email
@@ -121,7 +121,7 @@ class UserController extends Controller
     // Show password change form
     public function editPassword()
     {
-        return view('user.profile.edit-password');
+        return view('user.edit-password');
     }
 
     // Update password securely

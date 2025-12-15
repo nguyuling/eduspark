@@ -12,7 +12,7 @@
     </div>
 
     <!-- Performance Cards (2x2 Grid) -->
-    <section class="cards performance-cards" style="margin-bottom:20px; margin-top:20px;">
+    <section class="cards performance-cards" style="margin-bottom:20px; margin-top:10px;">
       <div class="card" style="text-align:center;">
         <div class="panel-header" style="justify-content:center;">
             <h3>Purata Skor Kuiz</h3>
@@ -60,7 +60,7 @@
     </section>
 
     <!-- Chart Panel -->
-    <section class="panel" style="margin-bottom:20px; margin-top:20px;">
+    <section class="panel" style="margin-bottom:20px; margin-top:10px;">
       <div class="panel-header">
         <div>
           <h3>Trend Prestasi</h3>

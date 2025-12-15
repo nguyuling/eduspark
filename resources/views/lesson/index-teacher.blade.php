@@ -17,7 +17,7 @@
     </div>
 
     <!-- Lessons Panel -->
-    <section class="panel" style="margin-top: 20px;">
+    <section class="panel" style="margin-bottom:20px; margin-top:10px;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
         <div style="display:flex; gap:8px; align-items:center;">
           <h2 style="margin:0; padding:0; font-size:18px; font-weight:700; line-height:1;">Senarai Bahan Pembelajaran</h2>

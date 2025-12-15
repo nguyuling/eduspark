@@ -36,7 +36,7 @@
       @csrf
 
       <!-- Lesson Details Section -->
-      <section class="panel" style="margin-bottom:20px; margin-top:20px;">
+      <section class="panel" style="margin-bottom:20px; margin-top:10px;">
         <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Butiran Bahan</h2>
 
         <!-- Title -->

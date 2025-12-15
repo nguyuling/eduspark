@@ -20,7 +20,7 @@ class QuizStudentController extends Controller
     public function index(Request $request)
     {   
         $studentId = Auth::id();
-        $filters = $request->only(keys: ['unique_id', 'creator_email', 'title', 'publish_date', 'attempted']); // Get all filters
+        $filters = $request->only(['unique_id', 'creator_email', 'title', 'publish_date', 'attempted']); // Get all filters
 
         $query = Quiz::where('is_published', true)
                     ->with([

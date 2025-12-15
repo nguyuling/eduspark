@@ -41,8 +41,8 @@
       @method('PUT')
 
       <!-- Quiz Format Section -->
-      <section class="panel" style="margin-bottom:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">
+    <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">
           <h2 style="margin:0; font-size:18px; font-weight:700;">Format Kuiz</h2>
 
         </div>

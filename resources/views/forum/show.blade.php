@@ -15,7 +15,7 @@
 
         <div style="margin-top:0;">
             {{-- POST CONTENT SECTION --}}
-            <section class="panel" style="margin-top:20px; margin-bottom:20px; padding:20px; position:relative;">
+            <section class="panel" style="margin-bottom:20px; margin-top:10px;">
                 {{-- REPLY BUTTON (TOP RIGHT) --}}
                 <button type="button" onclick="toggleReplyForm()" 
                         style="position:absolute; top:20px; right:20px; display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" 
@@ -79,7 +79,7 @@
             {{-- REPLIES LIST --}}
             <div style="margin-bottom:20px;">
                 @forelse ($post->replies as $reply)
-                    <section class="panel" style="margin-bottom:16px; padding:16px;">
+                    <section class="panel" style="margin-top:20px; margin-bottom:16px; padding:16px;">
                         {{-- REPLY HEADER --}}
                         <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px; padding-bottom:12px; border-bottom:2px solid rgba(0,0,0,0.05);">
                             @php
