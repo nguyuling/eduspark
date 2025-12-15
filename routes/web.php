@@ -14,7 +14,13 @@ require __DIR__ . '/auth.php';
 Route::get('/', function() {
     if (auth()->check()) {
         $user = auth()->user();
-        return redirect('/performance');
+        // If the authenticated user is a teacher, send them to the teacher "Laporan" view
+        if (isset($user->role) && $user->role === 'teacher') {
+            return redirect(Route::has('reports.index') ? route('reports.index') : url('/reports'));
+        }
+
+        // Otherwise send students (and other roles) to the student performance (Prestasi) view
+        return redirect(Route::has('performance.student_view') ? route('performance.student_view') : url('/performance'));
     }
     return redirect('/login');
 })->name('home');
