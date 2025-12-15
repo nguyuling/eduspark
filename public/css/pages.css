@@ -678,15 +678,6 @@ a:hover {
   margin-bottom: 6px;
 }
 
-.panel-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 16px;
-  margin-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
 .info-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -782,11 +773,6 @@ label {
 }
 
 @media (max-width: 920px) {
-  .panel-footer {
-    flex-direction: column;
-    gap: 12px;
-  }
-
   .info-grid {
     grid-template-columns: 1fr;
   }
@@ -1016,7 +1002,7 @@ body.auth-page .main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  min-height: auto;
   padding: 20px 0;
   width: 100%;
 }
@@ -1167,9 +1153,19 @@ body.dark .auth-form-group select {
   font-weight: 500;
 }
 
-.auth-footer {
+.page-footer {
   margin-top: -30px;
   margin-left: 268px;
+  padding: 20px 80px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  position: relative;
+  z-index: 10;
+}
+
+.auth-footer {
+  margin-top: -30px;
   padding: 20px 80px;
   text-align: center;
   font-size: 12px;

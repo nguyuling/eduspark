@@ -54,7 +54,13 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             // Try to drop unique constraint, but ignore if it doesn't exist (SQLite)
             try {
-                $table->dropUnique(['user_id']);
+                // First check if the index exists before dropping
+                if (Schema::hasColumn('users', 'user_id')) {
+                    $indexExists = DB::select("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='users' AND name LIKE '%user_id%'");
+                    if (!empty($indexExists)) {
+                        $table->dropUnique(['user_id']);
+                    }
+                }
             } catch (\Exception $e) {
                 // Index may not exist, that's ok
             }

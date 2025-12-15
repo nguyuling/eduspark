@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sahkan Email — EduSpark</title>
+  <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
 
   <style>
     :root {
@@ -122,7 +123,7 @@
     </form>
   </div>
 
-  <footer>
+  <footer class="page-footer" style="margin-left: 0;">
     © 2025 EduSpark • Belajar • Bermain • Berkembang
   </footer>
 

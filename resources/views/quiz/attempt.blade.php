@@ -25,9 +25,9 @@
         <div>
           <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:8px;">Quiz Details</div>
           <div style="font-size:13px; display:flex; flex-direction:column; gap:6px;">
-            <div><strong>Creator:</strong> {{ $quiz->creator->name ?? 'N/A' }}</div>
+            <div><strong>Pencipta:</strong> {{ $quiz->creator->name ?? 'N/A' }}</div>
             <div><strong>ID:</strong> {{ $quiz->unique_code ?? 'N/A' }}</div>
-            <div><strong>Deadline:</strong> @if ($quiz->due_at) {{ $quiz->due_at->format('M d, Y h:i A') }} @else N/A @endif</div>
+            <div><strong>Tarikh tutup:</strong> @if ($quiz->due_at) {{ $quiz->due_at->format('M d, Y h:i A') }} @else N/A @endif</div>
           </div>
         </div>
       </div>
