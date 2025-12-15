@@ -27,7 +27,7 @@
 
 <body class="light auth-page">
   <div class="auth-container">
-    <h1>Selamat Kembali</h1>
+    <h1 class="title">Selamat Kembali</h1>
     <p class="auth-subtitle">Log masuk ke akaun EduSpark anda untuk meneruskan pembelajaran.</p>
 
     @if(session('success'))
