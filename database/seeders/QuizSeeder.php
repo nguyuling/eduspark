@@ -7,8 +7,9 @@ use App\Models\QuizQuestion;
 use App\Models\QuizOption;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
-class QuestionSeeder extends Seeder
+class QuizSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -21,14 +22,16 @@ class QuestionSeeder extends Seeder
             $questions = $quiz_data['questions'] ?? [];
             unset($quiz_data['questions']);
 
-            // Create quiz
+            // Create quiz with unique code
             $quiz = Quiz::create([
+                'user_id' => $quiz_data['teacher_id'],
                 'title' => $quiz_data['title'],
                 'description' => $quiz_data['description'],
                 'teacher_id' => $quiz_data['teacher_id'],
                 'max_attempts' => $quiz_data['max_attempts'],
                 'due_at' => $quiz_data['due_at'],
                 'is_published' => $quiz_data['is_published'],
+                'unique_code' => Str::random(8),
             ]);
 
             // Create questions

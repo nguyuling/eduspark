@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ForumPostSeeder extends Seeder
+class ForumSeeder extends Seeder
 {
     /**
      * Run the database seeds.
