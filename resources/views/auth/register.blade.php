@@ -115,10 +115,6 @@
     </div>
   </main>
 
-  <footer class="auth-footer">
-    © 2025 EduSpark • Belajar • Bermain • Berkembang
-  </footer>
-
   <script>
     // School data by district
     const schoolsByDistrict = {
