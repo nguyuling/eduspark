@@ -18,7 +18,7 @@
     </div>
 
     <!-- Personal Information -->
-    <section class="panel">
+    <section class="panel" style="margin-bottom:20px; margin-top:10px;">
       <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;">
         <h3>Maklumat Peribadi</h3>
         <a href="{{ route('profile.edit') }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Kemaskini">

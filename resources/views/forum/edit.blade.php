@@ -14,7 +14,7 @@
         </div>
 
         <div>
-            <section class="panel">
+            <section class="panel" style="margin-bottom:20px; margin-top:10px;">
                 <form action="{{ route('forum.update', $post->id) }}" method="POST" class="space-y-6">
                     @csrf
                     @method('PUT')

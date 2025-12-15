@@ -16,7 +16,7 @@
 
     <div>
         {{-- Search Form --}}
-        <section class="panel" style="margin-bottom:20px; margin-top:20px;">
+        <section class="panel" style="margin-bottom:20px; margin-top:10px;">
         <form method="GET" action="{{ route('forum.index') }}" id="searchForm" style="display:flex; align-items:center; gap:12px;">
             <input type="text" name="search" id="searchInput" value="{{ request('search') }}" 
                     placeholder="Cari posts..." 
@@ -31,7 +31,7 @@
         {{-- Posts List --}}
         <div class="space-y-4">
             @forelse ($posts as $post)
-                <div class="card" style="position:relative;">
+                <div class="card" style="position:relative; margin-top:20px; margin-bottom:20px;">
                     {{-- ACTION BUTTONS - Only show for post creator --}}
                     @if(Auth::check() && Auth::id() === $post->author_id)
                     <div style="display:flex; gap:12px; position:absolute; top:20px; right:20px;">

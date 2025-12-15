@@ -114,5 +114,10 @@
         {{-- Page Content --}}
             @yield('content')
         </div>
-    </div></body>
+    </div>
+
+    <footer class="auth-footer">
+        © 2025 EduSpark • Belajar • Bermain • Berkembang
+    </footer>
+</body>
 </html>
