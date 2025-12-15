@@ -1,49 +1,197 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sahkan Kata Laluan — EduSpark</title>
 
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Confirm Password') }}</div>
+  <style>
+    :root {
+      --bg-light: #f5f7ff;
+      --bg-dark: #071026;
+      --card-light: rgba(255, 255, 255, 0.9);
+      --card-dark: #0f1724;
+      --accent: #6A4DF7;
+      --muted: #98a0b3;
+    }
 
-                <div class="card-body">
-                    {{ __('Please confirm your password before continuing.') }}
+    * { box-sizing: border-box; }
 
-                    <form method="POST" action="{{ route('password.confirm') }}">
-                        @csrf
+    body {
+      font-family: 'Inter', sans-serif;
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
 
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
+    body.light { background: var(--bg-light); color: #0b1220; }
+    body.dark { background: var(--bg-dark); color: #e6eef8; }
 
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
+    .container {
+      max-width: 500px;
+      width: 100%;
+      background: var(--card-light);
+      padding: 32px;
+      border-radius: 14px;
+      border: 1px solid rgba(11,18,32,0.06);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
 
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+    body.dark .container {
+      background: var(--card-dark);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
 
-                        <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Confirm Password') }}
-                                </button>
+    h1 {
+      margin-bottom: 8px;
+      font-size: 26px;
+    }
 
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+      width: 100%;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      border-radius: 10px;
+      border: 1px solid rgba(11,18,32,0.15);
+      background: white;
+    }
+
+    body.dark input {
+      background: #0d1525;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(106,77,247,0.25);
+    }
+
+    .btn-submit {
+      background: var(--accent);
+      color: white;
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.2s;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .error-message {
+      background: #fee;
+      color: #c33;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      border-left: 3px solid #c33;
+    }
+
+    body.dark .error-message {
+      background: rgba(206,51,51,0.1);
+      color: #ff6b6b;
+      border-left-color: #ff6b6b;
+    }
+
+    .links {
+      margin-top: 16px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .links a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body class="light">
+
+  <div class="container">
+    <h1>Sahkan Kata Laluan</h1>
+    <p class="subtitle">Sila sahkan kata laluan anda sebelum meneruskan ke halaman ini.</p>
+
+    @if($errors->any())
+        <div class="error-message">
+            {{ $errors->first() }}
         </div>
+    @endif
+
+    <form method="POST" action="{{ route('password.confirm') }}">
+        @csrf
+
+        <div class="form-group">
+            <label for="password">Kata Laluan Semasa</label>
+            <input type="password" id="password" name="password" required placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn-submit">🔐 Sahkan Kata Laluan</button>
+    </form>
+
+    <div class="links">
+        @if (Route::has('password.request'))
+            <p><a href="{{ route('password.request') }}">Lupa Kata Laluan?</a></p>
+        @endif
     </div>
-</div>
-@endsection
+  </div>
+
+  <footer>
+    © 2025 EduSpark • Belajar • Bermain • Berkembang
+  </footer>
+
+  <script>
+    // Apply dark theme based on system preference or localStorage
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme');
+    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    document.body.className = theme;
+  </script>
+</body>
+</html>

@@ -209,18 +209,21 @@ body.dark .panel {
 .title {
   font-weight: 700;
   font-size: 28px;
+  margin-bottom: 8px;
 }
 
 .sub {
   color: var(--muted);
   font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.6;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 40px;
+  margin-bottom: 0px;
   margin-top: 40px;
   margin-left: 0;
   margin-right: 0;
@@ -985,4 +988,192 @@ label {
 
 .link-primary:hover {
   color: var(--accent-2);
+}
+
+/* ===== AUTH PAGES (Login, Register, etc) ===== */
+.auth-page {
+  margin: 0;
+  padding: 24px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  background: var(--card-light);
+  padding: 40px;
+  border-radius: 14px;
+  border: 1px solid rgba(11,18,32,0.06);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+body.auth-page .main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px 0;
+  width: 100%;
+}
+
+body.auth-page .header {
+  text-align: center;
+  margin-bottom: 15px;
+  margin-top: 50px;
+}
+
+body.dark .auth-container {
+  background: var(--card-dark);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.auth-container h1 {
+  font-weight: 700;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.auth-form-group {
+  text-align: left;
+  margin-bottom: 18px;
+  width: 100%;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
+  max-height: 1000px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.auth-form-group[style*="display: none"] {
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: 0;
+  pointer-events: none;
+}
+
+.auth-form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.auth-form-group input,
+.auth-form-group select {
+  width: 100%;
+  padding: 11px 14px;
+  font-size: 14px;
+  height: 44px;
+  border-radius: 8px;
+  border: 2px solid #d1d5db;
+  background: transparent;
+  color: inherit;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  box-sizing: border-box;
+}
+
+body.dark .auth-form-group input,
+body.dark .auth-form-group select {
+  color: white;
+}
+
+.auth-form-group input:hover,
+.auth-form-group select:hover {
+  border-color: #9ca3af;
+  background: rgba(200, 200, 200, 0.08);
+}
+
+.auth-form-group input:focus,
+.auth-form-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(200, 200, 200, 0.08);
+}
+
+.auth-btn {
+  background: linear-gradient(90deg, var(--accent), #7c5dff);
+  color: white;
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 12px rgba(106,77,247,0.3);
+}
+
+.auth-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(106,77,247,0.4);
+}
+
+.auth-btn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  opacity: 0.6;
+}
+
+.auth-btn:not(:disabled) {
+  background: linear-gradient(90deg, var(--accent), #7c5dff);
+}
+
+.auth-links {
+  margin-top: 20px;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.auth-links p {
+  margin: 8px 0;
+}
+
+.auth-links a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}
+
+.auth-error {
+  color: #d45a5a;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.auth-success {
+  color: var(--success);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.auth-footer {
+  margin-top: -30px;
+  margin-left: 268px;
+  padding: 20px 80px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  position: relative;
+  z-index: 10;
 }
