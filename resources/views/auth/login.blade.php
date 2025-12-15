@@ -116,5 +116,9 @@
     const theme = savedTheme || (prefersDark ? 'dark' : 'light');
     document.body.className = theme + ' auth-page';
   </script>
+
+  <footer class="page-footer" style="margin-left: 0;">
+    © 2025 EduSpark • Belajar • Bermain • Berkembang
+  </footer>
 </body>
 </html>

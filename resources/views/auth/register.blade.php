@@ -35,7 +35,7 @@
       </div>
     </div>
 
-    <div class="auth-container" style="max-width:none;width:50%;margin:0;padding:30px 30px;">
+    <div class="auth-container" style="max-width:none;width:50%;padding:30px 30px;">
 
     {{-- Error Messages --}}
     @if($errors->any())
@@ -280,5 +280,9 @@
     const theme = savedTheme || (prefersDark ? 'dark' : 'light');
     document.body.className = theme + ' auth-page';
   </script>
+
+  <footer class="page-footer" style="margin-left: 0;">
+    © 2025 EduSpark • Belajar • Bermain • Berkembang
+  </footer>
 </body>
 </html>
