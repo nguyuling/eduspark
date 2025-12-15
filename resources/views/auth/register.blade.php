@@ -27,9 +27,15 @@
 
 <body class="light auth-page">
 
-  <div class="auth-container">
-    <h1>Daftar Masuk</h1>
-    <p class="auth-subtitle">Sertai EduSpark dan mulai pembelajaran anda</p>
+  <main class="main">
+    <div class="header">
+      <div>
+        <div class="title" style="text-align:center">Daftar Masuk</div>
+        <div class="sub" style="text-align:center">Sertai EduSpark dan mulai pembelajaran anda</div>
+      </div>
+    </div>
+
+    <div class="auth-container" style="max-width:none;width:50%;margin:0;padding:30px 30px;">
 
     {{-- Error Messages --}}
     @if($errors->any())
@@ -102,11 +108,12 @@
 
         <button type="submit" id="submit-btn" class="auth-btn" disabled>Daftar Masuk</button>
     </form>
+    </div>
 
     <div class="auth-links">
         <p>Sudah mempunyai akaun? <a href="{{ route('login') }}">Log masuk di sini</a></p>
     </div>
-  </div>
+  </main>
 
   <footer class="auth-footer">
     © 2025 EduSpark • Belajar • Bermain • Berkembang

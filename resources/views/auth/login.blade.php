@@ -26,9 +26,15 @@
 </head>
 
 <body class="light auth-page">
-  <div class="auth-container">
-    <h1 class="title">Selamat Kembali</h1>
-    <p class="auth-subtitle">Log masuk ke akaun EduSpark anda untuk meneruskan pembelajaran.</p>
+  <main class="main">
+    <div class="header">
+      <div>
+        <div class="title" style="text-align:center">Selamat Kembali</div>
+        <div class="sub" style="text-align:center">Log masuk ke akaun EduSpark anda untuk meneruskan pembelajaran.</div>
+      </div>
+    </div>
+
+    <div class="auth-container" style="max-width:none;width:50%;margin:0;padding:30px 30px;">
 
     @if(session('success'))
       <div class="auth-success">✓ {{ session('success') }}</div>
@@ -71,12 +77,13 @@
 
       <button type="submit" id="submit-btn" class="auth-btn" disabled>Log Masuk</button>
     </form>
+    </div>
 
     <div class="auth-links">
       <p>Tidak mempunyai akaun? <a href="{{ route('register') }}">Daftar di sini</a></p>
       <p><a href="{{ route('password.request') }}">Lupa kata laluan?</a></p>
     </div>
-  </div>
+  </main>
 
   <footer class="auth-footer">
     © 2025 EduSpark • Belajar • Bermain • Berkembang
