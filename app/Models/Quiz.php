@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Models\QuizQuestion; 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class Quiz extends Model
 {
@@ -30,6 +31,25 @@ class Quiz extends Model
         'due_at' => 'datetime',
         'is_published' => 'boolean',
     ];
+
+    /**
+     * Boot method to automatically generate unique code if not provided
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($model) {
+            if (empty($model->unique_code)) {
+                // Generate unique 8-character code
+                do {
+                    $code = Str::random(8);
+                } while (static::where('unique_code', $code)->exists());
+                
+                $model->unique_code = $code;
+            }
+        });
+    }
     
     public function creator(): BelongsTo
     {

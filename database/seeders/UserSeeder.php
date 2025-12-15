@@ -60,10 +60,13 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($teachers as $teacher) {
-            User::create($teacher);
+            User::firstOrCreate(
+                ['email' => $teacher['email']],
+                $teacher
+            );
         }
 
-        echo "5 Teachers created successfully.\n";
+        echo "5 Teachers created/verified successfully.\n";
 
         // Create 5 Students
         $students = [
@@ -115,9 +118,12 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($students as $student) {
-            User::create($student);
+            User::firstOrCreate(
+                ['email' => $student['email']],
+                $student
+            );
         }
 
-        echo "5 Students created successfully.\n";
+        echo "5 Students created/verified successfully.\n";
     }
 }
