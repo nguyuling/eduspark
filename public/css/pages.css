@@ -999,7 +999,7 @@ label {
 }
 
 .auth-container {
-  max-width: 450px;
+  max-width: 700px;
   width: 100%;
   background: var(--card-light);
   padding: 32px;
@@ -1015,13 +1015,13 @@ body.dark .auth-container {
 }
 
 .auth-container h1 {
-  font-size: 26px;
-  margin-bottom: 8px;
   font-weight: 700;
+  font-size: 28px;
+  margin-bottom: 8px;
 }
 
 .auth-subtitle {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--muted);
   margin-bottom: 20px;
   line-height: 1.6;
@@ -1031,6 +1031,17 @@ body.dark .auth-container {
   text-align: left;
   margin-bottom: 18px;
   width: 100%;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
+  max-height: 1000px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.auth-form-group[style*="display: none"] {
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: 0;
+  pointer-events: none;
 }
 
 .auth-form-group label {
@@ -1046,12 +1057,14 @@ body.dark .auth-container {
   width: 100%;
   padding: 11px 14px;
   font-size: 14px;
+  height: 44px;
   border-radius: 8px;
   border: 2px solid #d1d5db;
   background: transparent;
   color: inherit;
   outline: none;
   transition: border-color 0.2s ease, background 0.2s ease;
+  box-sizing: border-box;
 }
 
 body.dark .auth-form-group input,
@@ -1087,15 +1100,21 @@ body.dark .auth-form-group select {
   box-shadow: 0 4px 12px rgba(106,77,247,0.3);
 }
 
-.auth-btn:hover {
+.auth-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(106,77,247,0.4);
 }
 
 .auth-btn:disabled {
-  background: #ccc;
+  background: #d1d5db;
   cursor: not-allowed;
   transform: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  opacity: 0.6;
+}
+
+.auth-btn:not(:disabled) {
+  background: linear-gradient(90deg, var(--accent), #7c5dff);
 }
 
 .auth-links {
