@@ -169,11 +169,14 @@ body.dark .panel {
 .title {
   font-weight: 700;
   font-size: 28px;
+  margin-bottom: 8px;
 }
 
 .sub {
   color: var(--muted);
   font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.6;
 }
 
 .header {

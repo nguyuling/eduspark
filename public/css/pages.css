@@ -209,11 +209,14 @@ body.dark .panel {
 .title {
   font-weight: 700;
   font-size: 28px;
+  margin-bottom: 8px;
 }
 
 .sub {
   color: var(--muted);
   font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.6;
 }
 
 .header {
@@ -999,14 +1002,29 @@ label {
 }
 
 .auth-container {
-  max-width: 700px;
+  max-width: 1200px;
   width: 100%;
+  margin: 0 auto;
   background: var(--card-light);
-  padding: 32px;
+  padding: 40px;
   border-radius: 14px;
   border: 1px solid rgba(11,18,32,0.06);
-  text-align: center;
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+body.auth-page .main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px 0;
+  width: 100%;
+}
+
+body.auth-page .header {
+  text-align: center;
+  margin-bottom: 15px;
+  margin-top: 50px;
 }
 
 body.dark .auth-container {
@@ -1150,7 +1168,7 @@ body.dark .auth-form-group select {
 }
 
 .auth-footer {
-  margin-top: 25px;
+  margin-top: -100px;
   text-align: center;
   font-size: 12px;
   color: var(--muted);
