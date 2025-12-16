@@ -6,6 +6,7 @@ use App\Http\Controllers\QuizTeacherController;
 use App\Http\Controllers\QuizStudentController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\PerformanceController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
@@ -14,7 +15,13 @@ require __DIR__ . '/auth.php';
 Route::get('/', function() {
     if (auth()->check()) {
         $user = auth()->user();
-        return redirect('/performance');
+        // If the authenticated user is a teacher, send them to the teacher "Laporan" view
+        if (isset($user->role) && $user->role === 'teacher') {
+            return redirect(Route::has('reports.index') ? route('reports.index') : url('/reports'));
+        }
+
+        // Otherwise send students (and other roles) to the student performance (Prestasi) view
+        return redirect(Route::has('performance.student_view') ? route('performance.student_view') : url('/performance'));
     }
     return redirect('/login');
 })->name('home');
@@ -65,6 +72,24 @@ Route::middleware('auth')->group(function () {
 // Performance routes
 Route::middleware('auth')->group(function () {
     Route::get('/performance', [PerformanceController::class, 'index'])->name('performance.student_view');
+
+    // Reports landing for teachers
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
+    // AJAX / helper endpoints used by reports views
+    Route::get('/reports/students-by-class/{class}', [ReportController::class, 'studentsByClass']);
+    Route::get('/reports/student/{id}', [ReportController::class, 'studentReport']);
+
+    // Class report (AJAX via ?class=)
+    Route::get('/reports/class', [ReportController::class, 'classIndex']);
+
+    // Export routes
+    Route::get('/reports/student/{id}/export/csv', [ReportController::class, 'exportStudentCsv'])->name('reports.student.csv');
+    Route::get('/reports/student/{id}/export/pdf', [ReportController::class, 'exportStudentPdf'])->name('reports.student.pdf');
+    Route::get('/reports/student/{id}/export/xlsx', [ReportController::class, 'exportStudentExcel'])->name('reports.student.xlsx');
+
+    Route::get('/reports/class/{class}/export/csv', [ReportController::class, 'exportClassCsv']);
+    Route::get('/reports/class/{class}/export/pdf', [ReportController::class, 'exportClassPdf']);
 });
 
 // Forum routes

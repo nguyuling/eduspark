@@ -1,8 +1,8 @@
 <style>
 .sidebar{
-  width:240px; border-radius:14px; padding:18px;
+  width:320px; border-radius:14px; padding:28px;
   padding-top:40px;
-  display:flex; flex-direction:column; align-items:flex-start; gap:12px;
+  display:flex; flex-direction:column; align-items:flex-start; gap:20px;
   backdrop-filter: blur(8px) saturate(120%);
   box-shadow: none;
   position: fixed;
@@ -21,13 +21,13 @@ body.dark .sidebar{
 }
 .logo { width:200px; height:auto; margin:0 auto -4px; }
 
-.nav { width:100%; margin-top:14px; padding-top:6px; padding-left:6px; position:relative; }
+.nav { width:100%; margin-top:14px; padding-top:6px; padding-left:0; position:relative; }
 .nav a {
-  display:block; padding:12px 16px; padding-left:28px; border-radius:12px;
+  display:block; padding:16px 20px; padding-left:16px; border-radius:12px;
   color:var(--muted); text-decoration:none; font-weight:600;
-  margin:8px 0; position:relative; font-size:16px;
+  margin:14px 0; position:relative; font-size:18px;
   transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
-  width:calc(100% - 32px);
+  width:100%;
   overflow: hidden;
 }
 .nav a:hover { color:var(--accent) !important; background:rgba(106,77,247,0.15) !important; }

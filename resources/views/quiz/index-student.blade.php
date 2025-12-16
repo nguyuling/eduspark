@@ -2,8 +2,7 @@
 
 @section('content')
 
-<div class="app">
-  <!-- Main -->
+<!-- Main -->
   <main class="main">
     <div class="header">
       <div>
@@ -192,4 +191,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+</main>
 @endsection

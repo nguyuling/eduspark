@@ -28,6 +28,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // If the authenticated user is a teacher, send them to the reports (Laporan) page
+        $user = auth()->user();
+        if ($user && ($user->role ?? null) === 'teacher') {
+            return redirect()->route('reports.index');
+        }
+
         return redirect()->intended(route('home', absolute: false));
     }
 

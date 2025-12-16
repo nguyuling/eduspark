@@ -27,6 +27,7 @@ class QuizSeeder extends Seeder
                 'user_id' => $quiz_data['teacher_id'],
                 'title' => $quiz_data['title'],
                 'description' => $quiz_data['description'],
+                'user_id' => $quiz_data['teacher_id'],
                 'teacher_id' => $quiz_data['teacher_id'],
                 'max_attempts' => $quiz_data['max_attempts'],
                 'due_at' => $quiz_data['due_at'],
