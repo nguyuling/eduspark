@@ -52,7 +52,7 @@
       @csrf
 
       <div class="auth-form-group">
-        <label for="email">Alamat Email</label>
+        <label for="email">Alamat Email*</label>
         <input 
           type="email" 
           id="email" 
@@ -64,7 +64,7 @@
       </div>
 
       <div class="auth-form-group">
-        <label for="password">Kata Laluan</label>
+        <label for="password">Kata Laluan*</label>
         <input 
           type="password" 
           id="password" 

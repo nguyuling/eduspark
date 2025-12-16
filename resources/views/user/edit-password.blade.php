@@ -44,7 +44,7 @@
         @method('PUT')
 
         <div class="form-group">
-          <label for="current_password">Kata Laluan Semasa</label>
+          <label for="current_password">Kata Laluan Semasa*</label>
           <input
             type="password"
             id="current_password"
@@ -59,7 +59,7 @@
         </div>
 
         <div class="form-group">
-          <label for="password">Kata Laluan Baru</label>
+          <label for="password">Kata Laluan Baru*</label>
           <input
             type="password"
             id="password"
@@ -76,7 +76,7 @@
         </div>
 
         <div class="form-group">
-          <label for="password_confirmation">Sahkan Kata Laluan Baru</label>
+          <label for="password_confirmation">Sahkan Kata Laluan Baru*</label>
           <input
             type="password"
             id="password_confirmation"

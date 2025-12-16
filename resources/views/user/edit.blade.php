@@ -44,7 +44,7 @@
         @method('PUT')
 
         <div class="form-group">
-          <label for="name">Nama Penuh</label>
+          <label for="name">Nama Penuh*</label>
           <input
             type="text"
             id="name"
@@ -58,7 +58,7 @@
         </div>
 
         <div class="form-group">
-          <label for="email">Alamat E-mel</label>
+          <label for="email">Alamat E-mel*</label>
           <input
             type="email"
             id="email"
