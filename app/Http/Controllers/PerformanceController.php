@@ -34,28 +34,62 @@ class PerformanceController extends Controller
             $quizTable = Schema::hasTable('quiz_attempts') ? 'quiz_attempts' : 'quiz_attempt';
             $quizUserCol = Schema::hasColumn($quizTable, 'student_id') ? 'student_id' : (Schema::hasColumn($quizTable, 'user_id') ? 'user_id' : 'user_id');
 
-            $avgQuizScore = (float) DB::table($quizTable)
-                ->where($quizUserCol, $studentId)
-                ->avg('score') ?? 0;
+            // Calculate average as percentage: join to get total points per quiz
+            $avgPercentage = DB::table($quizTable . ' as a')
+                ->join('quizzes as q', 'a.quiz_id', '=', 'q.id')
+                ->join('questions as qn', 'q.id', '=', 'qn.quiz_id')
+                ->where("a.$quizUserCol", $studentId)
+                ->whereNotNull('a.score')
+                ->whereNotNull('a.submitted_at')
+                ->select(
+                    'a.id',
+                    DB::raw('a.score as earned'),
+                    DB::raw('SUM(qn.points) as total')
+                )
+                ->groupBy('a.id', 'a.score')
+                ->get()
+                ->map(function($row) {
+                    return $row->total > 0 ? ($row->earned / $row->total) * 100 : 0;
+                })
+                ->avg();
+
+            $avgQuizScore = round($avgPercentage ?? 0, 1);
 
             $totalQuizzes = DB::table($quizTable)
                 ->where($quizUserCol, $studentId)
+                ->whereNotNull('score')
+                ->whereNotNull('submitted_at')
                 ->count();
 
-            // weakest topic: join to quizzes/quizz table (try plural 'quizzes' first)
+            // weakest topic: calculate as percentage
             $quizMetaTable = Schema::hasTable('quizzes') ? 'quizzes' : (Schema::hasTable('quiz') ? 'quiz' : null);
 
             if ($quizMetaTable) {
-                $weakTopicRow = DB::table($quizTable . ' as a')
+                $topicPercentages = DB::table($quizTable . ' as a')
                     ->join($quizMetaTable . ' as q', 'a.quiz_id', '=', 'q.id')
+                    ->join('questions as qn', 'q.id', '=', 'qn.quiz_id')
                     ->where("a.$quizUserCol", $studentId)
-                    ->select('q.title', DB::raw('AVG(a.score) as avg_score'))
-                    ->groupBy('q.title')
-                    ->orderBy('avg_score', 'asc')
-                    ->limit(1)
-                    ->first();
+                    ->whereNotNull('a.score')
+                    ->whereNotNull('a.submitted_at')
+                    ->select(
+                        'q.id',
+                        'q.title',
+                        'a.score as earned',
+                        DB::raw('SUM(qn.points) as total')
+                    )
+                    ->groupBy('q.id', 'q.title', 'a.id', 'a.score')
+                    ->get()
+                    ->groupBy('title')
+                    ->map(function($attempts) {
+                        return $attempts->map(function($row) {
+                            return $row->total > 0 ? ($row->earned / $row->total) * 100 : 0;
+                        })->avg();
+                    })
+                    ->sortBy(function($percentage) {
+                        return $percentage;
+                    });
 
-                $weakTopic = $weakTopicRow->title ?? 'N/A';
+                $weakTopic = $topicPercentages->keys()->first() ?? 'N/A';
             }
 
             // Determine a timestamp column to use for ordering/display (safe fallback)
@@ -67,25 +101,32 @@ class PerformanceController extends Controller
                 }
             }
 
-            // Fetch recent quiz rows (only requested columns that exist)
-            $quizSelect = ['score', 'quiz_id'];
-            if ($quizTimestampCol) {
-                $quizSelect[] = $quizTimestampCol . ' as completed_at';
-            }
-
-            $recentQuizRows = DB::table($quizTable)
-                ->where($quizUserCol, $studentId)
-                ->orderBy($quizTimestampCol ?? 'id', 'desc') // fallback to id if no timestamp
+            // Fetch recent quiz rows with percentage calculation
+            $recentQuizRows = DB::table($quizTable . ' as a')
+                ->join('quizzes as q', 'a.quiz_id', '=', 'q.id')
+                ->join('questions as qn', 'q.id', '=', 'qn.quiz_id')
+                ->where("a.$quizUserCol", $studentId)
+                ->whereNotNull('a.score')
+                ->whereNotNull('a.submitted_at')
+                ->select(
+                    'a.id',
+                    'q.title',
+                    'a.score as earned',
+                    'a.submitted_at as completed_at',
+                    DB::raw('SUM(qn.points) as total')
+                )
+                ->groupBy('a.id', 'q.title', 'a.score', 'a.submitted_at')
+                ->orderBy('a.submitted_at', 'desc')
                 ->limit(6)
-                ->get($quizSelect);
+                ->get();
 
-            // normalize and push into recentCollection with a standard completed_at
+            // normalize and push into recentCollection with percentage scores
             foreach ($recentQuizRows as $r) {
-                $completedAt = property_exists($r, 'completed_at') ? $r->completed_at : null;
+                $percentage = $r->total > 0 ? round(($r->earned / $r->total) * 100, 1) : 0;
                 $recentCollection->push((object)[
-                    'title' => $r->quiz_id ? 'Kuiz #' . $r->quiz_id : 'Kuiz',
-                    'score' => (float) $r->score,
-                    'completed_at' => $completedAt,
+                    'title' => $r->title ?? ('Kuiz #' . $r->id),
+                    'score' => $percentage,
+                    'completed_at' => $r->completed_at,
                 ]);
             }
         }

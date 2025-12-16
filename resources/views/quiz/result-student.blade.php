@@ -2,9 +2,8 @@
 
 @section('content')
 
-<div class="app">
-  <!-- Main -->
-  <main class="main">
+<!-- Main -->
+<main class="main">
     <div class="header">
       <div>
         <div>
@@ -132,7 +131,6 @@
         </div>
       @endforelse
     </section>
-  </main>
-</div>
+</main>
 
 @endsection

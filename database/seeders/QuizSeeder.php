@@ -8,7 +8,7 @@ use App\Models\QuizOption;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
-class QuestionSeeder extends Seeder
+class QuizSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -25,6 +25,7 @@ class QuestionSeeder extends Seeder
             $quiz = Quiz::create([
                 'title' => $quiz_data['title'],
                 'description' => $quiz_data['description'],
+                'user_id' => $quiz_data['teacher_id'],
                 'teacher_id' => $quiz_data['teacher_id'],
                 'max_attempts' => $quiz_data['max_attempts'],
                 'due_at' => $quiz_data['due_at'],

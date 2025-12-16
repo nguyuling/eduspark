@@ -2,9 +2,8 @@
 
 @section('content')
 
-<div class="app">
-  <!-- Main Content -->
-  <main class="main">
+<!-- Main Content -->
+<main class="main">
     <div class="header">
         <div>
             <div class="title">{{ $quiz->title }}</div>
@@ -108,8 +107,7 @@
         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
         Submit Quiz
     </button> -->
-  </main>
-</div>
+</main>
 
 {{-- JavaScript --}}
 <script>

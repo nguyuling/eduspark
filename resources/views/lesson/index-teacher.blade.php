@@ -2,8 +2,7 @@
 
 @section('content')
 
-<div class="app">
-  <!-- Main -->
+<!-- Main -->
   <main class="main">
     <div class="header">
       <div>
@@ -257,3 +256,5 @@ document.addEventListener('click', e => {
   if (e.target.id === 'editModal') closeEditModal();
 });
 </script>
+</main>
+@endsection

@@ -2,8 +2,7 @@
 
 @section('content')
 
-<div class="app">
-  <main class="main" style="flex:1;">
+<main class="main" style="flex:1;">
     <div class="header">
       <div>
         <div class="title" style="font-weight:700;font-size:28px;">Profil</div>
@@ -86,6 +85,5 @@
     </section>
 
 
-  </main>
-</div>
+</main>
 @endsection

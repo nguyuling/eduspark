@@ -45,26 +45,7 @@
 
         body { margin:0; padding:0; }
 
-        /* ---------- Sidebar Styling ---------- */
-        .sidebar {
-          width:240px; border-radius:14px; padding:18px;
-          display:flex; flex-direction:column; align-items:flex-start; gap:12px;
-          backdrop-filter: blur(8px) saturate(120%);
-          box-shadow: none;
-          position: fixed;
-          left: 28px;
-          top: 28px;
-          height: calc(100vh - 56px);
-          z-index: 100;
-        }
-        body.light .sidebar {
-          background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.68));
-          border:1px solid rgba(13,18,25,0.05);
-        }
-        body.dark .sidebar {
-          background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-          border:1px solid rgba(255,255,255,0.03);
-        }
+        /* Sidebar styles are defined in components/sidebar.blade.php to avoid conflicts */
 
         /* Sidebar nav */
         .nav a {
@@ -102,22 +83,36 @@
         }
         .nav a:hover::before { transform:scaleY(1); }
         .nav a.active::before { transform:scaleY(1); }
+        /* Ensure main app content doesn't sit under the fixed sidebar
+           Calculation: sidebar left (28) + sidebar width (320) + sidebar padding (28*2) + small gap (16)
+           Total: 28 + 320 + 56 + 16 = 420px */
+        .app {
+          margin-left: 420px;
+          transition: margin .18s ease;
+        }
+
+        @media (max-width:920px){
+          .app { margin-left: 0; }
+        }
     </style>
 </head>
 <body class="light">
     <div id="app">
-        {{-- Sidebar Component - Only show to authenticated users --}}
-        @auth
-            @include('components.sidebar')
-        @endauth
-        
-        {{-- Page Content --}}
-            @yield('content')
-        </div>
+      {{-- Sidebar Component - Only show to authenticated users --}}
+      @auth
+        @include('components.sidebar')
+      @endauth
+
+      {{-- Page Content: wrap in .app so layout accounts for fixed sidebar --}}
+      <div class="app">
+        @yield('content')
+      </div>
     </div>
 
     <footer class="auth-footer">
         © 2025 EduSpark • Belajar • Bermain • Berkembang
     </footer>
+    {{-- Render page-specific scripts --}}
+    @yield('scripts')
 </body>
 </html>

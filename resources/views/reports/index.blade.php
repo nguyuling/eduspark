@@ -46,6 +46,8 @@
             'stats' => $dummyStats
         ])
     </div>
+
+
 </div>
 
 
@@ -80,13 +82,47 @@
 @section('scripts')
 <script>
 function fillStudentSelect(selectEl, items) {
+    // robustly replace options, then trigger change and a small focus/blur to force UI refresh
+    try {
+        console.debug('fillStudentSelect called, items:', items);
+    } catch (e) {}
     selectEl.innerHTML = '<option value="">{{ $studentPlaceholder ?? "-- pilih pelajar --" }}</option>';
-    items.forEach(it => {
-        const opt = document.createElement('option');
-        opt.value = it.id;
-        opt.textContent = it.name;
-        selectEl.appendChild(opt);
-    });
+    if (Array.isArray(items) && items.length > 0) {
+        items.forEach(it => {
+            const opt = document.createElement('option');
+            opt.value = it.id;
+            opt.textContent = it.name;
+            selectEl.appendChild(opt);
+        });
+    }
+    // ensure value reset and trigger change for any listeners/plugins
+    try {
+        // make sure option text is visible (in case CSS set color transparent)
+        selectEl.style.color = '';
+        selectEl.value = '';
+        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+
+        // If common plugins are present, try to refresh/reinit them so the visual widget updates
+        if (window.jQuery) {
+            try {
+                const $sel = window.jQuery(selectEl);
+                if ($sel && $sel.length) {
+                    if ($.fn.selectpicker && typeof $sel.selectpicker === 'function') {
+                        try { $sel.selectpicker('refresh'); } catch (e) {}
+                    }
+                    if ($.fn.select2 && typeof $sel.select2 === 'function') {
+                        try { $sel.trigger('change.select2'); } catch (e) {}
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // force a visual refresh for some UI libraries
+        selectEl.focus();
+        selectEl.blur();
+    } catch (e) {
+        // ignore
+    }
 }
 
 const classSelect = document.getElementById('class-select');
@@ -101,6 +137,7 @@ classSelect && classSelect.addEventListener('change', async function() {
         const data = await res.json();
         fillStudentSelect(studentSelect, data);
     } catch (err) {
+        console.error(err);
         alert('Tidak dapat memuatkan senarai pelajar.');
     }
 });
@@ -112,22 +149,35 @@ openStudentBtn.addEventListener('click', async () => {
 
     try {
         const res = await fetch(`/reports/student/${encodeURIComponent(id)}`, {
+            method: 'GET',
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
 
-        const json = await res.json();
-        // server returns { html: '...' } when AJAX
-        if (json && json.html) {
-            document.getElementById('student-panel-wrap').innerHTML = json.html;
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            // Server returned HTML instead of JSON — render it directly as page update
+            const html = await res.text();
+            document.getElementById('student-panel-wrap').innerHTML = html;
         } else {
-            // fallback — if server returned full page (not expected), redirect
-            window.location.href = `/reports/student/${id}`;
+            // Server returned JSON with HTML payload
+            const json = await res.json();
+            if (json && json.html) {
+                document.getElementById('student-panel-wrap').innerHTML = json.html;
+            } else {
+                alert('Unexpected response format');
+            }
         }
     } catch (err) {
-        console.error(err);
-        alert('Tidak dapat memuatkan laporan pelajar.');
+        console.error('Error loading student report:', err);
+        alert('Tidak dapat memuatkan laporan pelajar: ' + err.message);
     }
 });
+
+
 
 
 /* ========= CLASS AJAX LOAD ========= */

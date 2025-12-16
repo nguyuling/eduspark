@@ -2,17 +2,16 @@
 
 @section('content')
 
-<div class="app">
-  <main class="main">
-    <div class="header">
-      <div>
-        <div class="title">Prestasi</div>
-        <div class="sub">Gambaran pembelajaran peribadi & aktiviti terkini</div>
-      </div>
+<main class="main">
+  <div class="header">
+    <div>
+      <div class="title">Prestasi</div>
+      <div class="sub">Gambaran pembelajaran peribadi & aktiviti terkini</div>
     </div>
+  </div>
 
-    <!-- Performance Cards (2x2 Grid) -->
-    <section class="cards performance-cards" style="margin-bottom:20px; margin-top:10px;">
+  <!-- Performance Cards (2x2 Grid) -->
+  <section class="cards performance-cards" style="margin-bottom:20px; margin-top:10px;">
       <div class="card" style="text-align:center;">
         <div class="panel-header" style="justify-content:center;">
             <h3>Purata Skor Kuiz</h3>
@@ -69,8 +68,7 @@
       </div>
       <canvas id="trendChart"></canvas>
     </section>
-  </main>
-</div>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
