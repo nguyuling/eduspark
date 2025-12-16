@@ -31,6 +31,14 @@ class ReportController extends Controller
             }
         }
 
+        // Normalize classes: trim whitespace, remove empty and duplicate values
+        if (! empty($classes) && is_array($classes)) {
+            $classes = array_filter(array_map(function($v) {
+                return is_string($v) ? trim($v) : $v;
+            }, $classes));
+            $classes = array_values(array_unique($classes));
+        }
+
         $studentCount = Schema::hasTable('students') ? DB::table('students')->count() : 0;
 
         return view('reports.index', compact('classes','studentCount'));
@@ -41,49 +49,70 @@ class ReportController extends Controller
      */
     public function studentsByClass($class)
     {
+        // Try to find students by class — start by trying classrooms table
+        $rows = null;
         if (Schema::hasTable('classrooms')) {
             $classroom = DB::table('classrooms')->where('name', $class)->first();
-            if (! $classroom) return response()->json([]);
-            if (Schema::hasColumn('students', 'classroom_id')) {
+            if ($classroom && Schema::hasColumn('students', 'classroom_id')) {
                 $rows = DB::table('students')->where('classroom_id', $classroom->id)->get();
-            } else {
-                $rows = DB::table('students')->where('classroom', $class)->get();
+            } elseif ($classroom && Schema::hasColumn('students', 'classroom')) {
+                $rows = DB::table('students')->where('classroom', $classroom->name)->get();
             }
-
-            $result = [];
-            foreach ($rows as $r) {
-                $name = $r->name ?? $r->full_name ?? null;
-                if (! $name && isset($r->user_id) && Schema::hasTable('users')) {
-                    $u = DB::table('users')->where('id', $r->user_id)->first();
-                    $name = $u->name ?? null;
-                }
-                $result[] = ['id' => $r->id, 'name' => $name ?? 'N/A'];
-            }
-            return response()->json($result);
         }
 
-        if (Schema::hasTable('students')) {
+        // If classrooms didn't work, try direct class column in students
+        if (!$rows || $rows->isEmpty()) {
             $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
-            $classCol = null;
             foreach ($possible as $col) {
-                if (Schema::hasColumn('students', $col)) { $classCol = $col; break; }
-            }
-            if (! $classCol) return response()->json([]);
-
-            $rows = DB::table('students')->where($classCol, $class)->get();
-            $result = [];
-            foreach ($rows as $r) {
-                $name = $r->name ?? $r->full_name ?? null;
-                if (! $name && isset($r->user_id) && Schema::hasTable('users')) {
-                    $u = DB::table('users')->where('id', $r->user_id)->first();
-                    $name = $u->name ?? null;
+                if (Schema::hasColumn('students', $col)) {
+                    $rows = DB::table('students')->where($col, $class)->get();
+                    if ($rows && $rows->isNotEmpty()) break;
                 }
-                $result[] = ['id' => $r->id, 'name' => $name ?? 'N/A'];
             }
-            return response()->json($result);
         }
 
-        return response()->json([]);
+        if (!$rows || $rows->isEmpty()) return response()->json([]);
+
+        // detect available student name columns to avoid N/A
+        $studentNameCol = null;
+        if (Schema::hasColumn('students','name')) $studentNameCol = 'name';
+        elseif (Schema::hasColumn('students','full_name')) $studentNameCol = 'full_name';
+        elseif (Schema::hasColumn('students','fullName')) $studentNameCol = 'fullName';
+        elseif (Schema::hasColumn('students','first_name') && Schema::hasColumn('students','last_name')) $studentNameCol = 'first_last';
+
+        $map = [];
+        foreach ($rows as $r) {
+            $key = $r->user_id ?? $r->id;
+            if (isset($map[$key])) continue; // dedupe duplicates
+
+            $name = null;
+            // prefer linked users.name when available
+            if (isset($r->user_id) && Schema::hasTable('users')) {
+                $u = DB::table('users')->where('id', $r->user_id)->first();
+                $name = $u->name ?? null;
+            }
+
+            // fallback to student table columns in order of preference
+            if (! $name && $studentNameCol) {
+                if ($studentNameCol === 'first_last') {
+                    $fn = $r->first_name ?? '';
+                    $ln = $r->last_name ?? '';
+                    $name = trim($fn . ' ' . $ln);
+                } else {
+                    $name = $r->{$studentNameCol} ?? null;
+                }
+            }
+
+            // final fallbacks
+            if (! $name) $name = $r->name ?? $r->full_name ?? $r->fullName ?? null;
+
+            // skip entries without a valid name to avoid N/A in dropdown
+            if (! $name || strtoupper(trim($name)) === 'N/A') {
+                continue;
+            }
+            $map[$key] = ['id' => ($r->user_id ?? $r->id), 'name' => $name];
+        }
+        return response()->json(array_values($map));
     }
 
     /**
@@ -92,39 +121,56 @@ class ReportController extends Controller
      */
     public function studentReport(Request $request, $id)
     {
-        // Try to load student row (students table)
+        $displayStudent = (object)['id' => null, 'name' => 'N/A'];
+        $lookupUserId = null;
+
+        // $id could be either students.id or users.id (from AJAX dropdown)
+        // Strategy: try all possible lookups and prioritize user.name from dropdown
+        
         $studentRecord = null;
+        $userRecord = null;
+
+        // Prefer treating $id as users.id (what the dropdown sends) to avoid student/user id collisions
+        if (Schema::hasTable('users')) {
+            $userRecord = DB::table('users')->where('id', $id)->first();
+        }
         if (Schema::hasTable('students')) {
             $studentRecord = DB::table('students')->where('id', $id)->first();
         }
 
-        $displayStudent = (object)['id' => null, 'name' => 'N/A'];
-        $lookupUserId = null;
+        if ($userRecord) {
+            // Use user first
+            $displayStudent->id = $userRecord->id;
+            $displayStudent->name = $userRecord->name ?? 'N/A';
+            $lookupUserId = $userRecord->id;
 
-        if ($studentRecord) {
-            if (isset($studentRecord->name)) $displayStudent->name = $studentRecord->name;
-            elseif (isset($studentRecord->full_name)) $displayStudent->name = $studentRecord->full_name;
-
-            if (isset($studentRecord->user_id) && Schema::hasTable('users')) {
-                $u = DB::table('users')->where('id', $studentRecord->user_id)->first();
-                if ($u) $displayStudent->name = $u->name ?? $displayStudent->name;
-                $lookupUserId = $studentRecord->user_id;
-            }
-
-            // fallback: if quiz attempts reference students.id directly, use students.id
-            if (is_null($lookupUserId)) $lookupUserId = $studentRecord->id;
-
-            $displayStudent->id = $studentRecord->id;
-        } else {
-            // try to find user row directly
-            if (Schema::hasTable('users')) {
-                $u = DB::table('users')->where('id', $id)->first();
-                if ($u) {
-                    $displayStudent->id = $u->id;
-                    $displayStudent->name = $u->name;
-                    $lookupUserId = $u->id;
+            // If there is a student row linked to this user, prefer that for stats
+            if (Schema::hasTable('students')) {
+                $stu = DB::table('students')->where('user_id', $userRecord->id)->first();
+                if ($stu) {
+                    $studentRecord = $stu;
                 }
             }
+        }
+
+        if (!$userRecord && $studentRecord) {
+            // Fallback: only student found
+            $displayStudent->id = $studentRecord->id;
+            $studentName = null;
+            if (isset($studentRecord->name) && !empty($studentRecord->name) && $studentRecord->name !== 'N/A') {
+                $studentName = $studentRecord->name;
+            } elseif (isset($studentRecord->full_name) && !empty($studentRecord->full_name)) {
+                $studentName = $studentRecord->full_name;
+            }
+            if (isset($studentRecord->user_id) && $studentRecord->user_id && Schema::hasTable('users')) {
+                $linkedUser = DB::table('users')->where('id', $studentRecord->user_id)->first();
+                if ($linkedUser && isset($linkedUser->name)) {
+                    $studentName = $linkedUser->name;
+                    $lookupUserId = $studentRecord->user_id;
+                }
+            }
+            if ($studentName) $displayStudent->name = $studentName;
+            if (is_null($lookupUserId)) $lookupUserId = $studentRecord->id;
         }
 
         // Fetch attempts
@@ -529,6 +575,14 @@ class ReportController extends Controller
                     break;
                 }
             }
+        }
+
+        // Normalize classes: trim whitespace, remove empty and duplicate values
+        if (! empty($classes) && is_array($classes)) {
+            $classes = array_filter(array_map(function($v) {
+                return is_string($v) ? trim($v) : $v;
+            }, $classes));
+            $classes = array_values(array_unique($classes));
         }
 
         $students = collect();

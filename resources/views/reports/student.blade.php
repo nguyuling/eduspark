@@ -97,11 +97,11 @@
 
   <div style="display:flex;gap:10px;margin-top:12px;">
       @if(!empty($student->id))
-        <a href="{{ route('reports.student.csv', $student->id) }}"
+        <a href="/reports/student/{{ $student->id }}/export/csv"
            class="btn"
            style="text-decoration:none;padding:8px 14px;border-radius:8px;background:#f5f5f7;color:#111;">CSV</a>
 
-        <a href="{{ route('reports.student.print', $student->id) }}"
+        <a href="/reports/student/{{ $student->id }}/export/pdf"
            class="btn"
            style="text-decoration:none;padding:8px 14px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;">PDF</a>
       @else

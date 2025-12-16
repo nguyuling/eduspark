@@ -1,36 +1,30 @@
 {{-- resources/views/reports/partials/student_panel.blade.php --}}
-<div class="panel card" style="margin-top:18px;">
-  <div style="display:flex;justify-content:space-between;align-items:center;">
-    <div>
-      <strong style="font-size:18px;">Pelajar</strong>
-      <div style="color:var(--muted);font-size:13px">Prestasi pelajar terpilih</div>
-    </div>
-
-    <div style="text-align:right;">
-      @if(isset($student->id) && $student->id)
-        <div style="font-weight:700">{{ $student->name }}</div>
-        <div style="color:var(--muted);font-size:13px">ID: {{ $student->id }}</div>
-      @else
-        <div style="font-weight:700">N/A</div>
-        <div style="color:var(--muted);font-size:13px">ID: —</div>
-      @endif
-    </div>
+<div class="panel card" style="margin-top:18px;padding:18px;border-radius:14px;box-shadow:0 10px 20px rgba(0,0,0,0.05);display:flex;flex-direction:column;gap:14px;">
+  <div style="line-height:1.4;">
+    <div style="font-size:18px;font-weight:800;letter-spacing:0.3px;">Pelajar</div>
+    @if(isset($student->id) && $student->id)
+      <div style="font-size:17px;font-weight:700;margin-top:4px;">{{ $student->name }}</div>
+      <div style="color:var(--muted);font-size:13px;margin-top:1px;">ID: {{ $student->id }}</div>
+    @else
+      <div style="font-size:17px;font-weight:700;margin-top:4px;">N/A</div>
+      <div style="color:var(--muted);font-size:13px;margin-top:1px;">ID: —</div>
+    @endif
   </div>
 
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px;">
-    <div class="card" style="padding:10px;text-align:center;">
-      <div class="label">Average</div>
+  <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+    <div class="card" style="min-width:150px;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;">
+      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Average</div>
       <div class="value">
-        <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:5px 8px; font-size:13px;">
+        <span class="badge-pill" style="display:inline-block;margin-top:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
           {{ $stats['average_score'] ?? 'N/A' }}
         </span>
       </div>
     </div>
 
-    <div class="card" style="padding:10px;text-align:center;">
-      <div class="label">Highest</div>
+    <div class="card" style="min-width:150px;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;">
+      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Highest</div>
       <div class="value">
-        <span class="badge-pill" style="background:var(--success); padding:5px 8px; font-size:13px;">
+        <span class="badge-pill" style="display:inline-block;margin-top:8px;background:var(--success); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
           {{ $stats['highest_score'] ?? 'N/A' }}
         </span>
       </div>
@@ -39,10 +33,10 @@
       </div>
     </div>
 
-    <div class="card" style="padding:10px;text-align:center;">
-      <div class="label">Weakest</div>
+    <div class="card" style="min-width:150px;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;">
+      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Weakest</div>
       <div class="value">
-        <span class="badge-pill" style="background:var(--danger); padding:5px 8px; font-size:13px;">
+        <span class="badge-pill" style="display:inline-block;margin-top:8px;background:var(--danger); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
           {{ $stats['weakest_score'] ?? 'N/A' }}
         </span>
       </div>
@@ -52,9 +46,9 @@
     </div>
   </div>
 
-  <hr style="margin:14px 0;border:none;border-top:1px solid rgba(0,0,0,0.06)">
+  <hr style="margin:16px 0;border:none;border-top:1px solid rgba(0,0,0,0.08)">
 
-  <div style="font-weight:700;margin-bottom:8px;">Attempts</div>
+  <div style="font-weight:700;margin-bottom:10px;">Attempts</div>
 
   @if(!empty($stats['attempts']) && count($stats['attempts'])>0)
     <div style="overflow:auto;">
@@ -83,13 +77,13 @@
     <div style="color:var(--muted);padding:8px 0;">Tiada rekod percubaan.</div>
   @endif
 
-  <div style="display:flex;gap:10px;margin-top:12px;">
+  <div style="display:flex;justify-content:center;gap:12px;margin-top:14px;flex-wrap:wrap;">
     @if(isset($student->id) && $student->id)
-      <a href="{{ route('reports.student.csv', $student->id) }}" data-report="csv" class="btn" style="text-decoration:none;padding:8px 14px;border-radius:8px;background:#f5f5f7;color:#111;">CSV</a>
-      <a href="{{ route('reports.student.print', $student->id) }}" data-report="pdf" class="btn" style="text-decoration:none;padding:8px 14px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;">PDF</a>
+      <a href="{{ route('reports.student.csv', $student->id) }}" data-report="csv" class="btn" style="text-decoration:none;padding:9px 16px;border-radius:10px;background:#f5f5f7;color:#111;font-weight:700;">CSV</a>
+      <a href="{{ route('reports.student.pdf', $student->id) }}" data-report="pdf" class="btn" style="text-decoration:none;padding:9px 16px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;">PDF</a>
     @else
-      <button class="btn" disabled style="padding:8px 14px;border-radius:8px;background:#eee;color:#999;">CSV</button>
-      <button class="btn" disabled style="padding:8px 14px;border-radius:8px;background:#eee;color:#999;">PDF</button>
+      <button class="btn" disabled style="padding:9px 16px;border-radius:10px;background:#eee;color:#999;font-weight:700;">CSV</button>
+      <button class="btn" disabled style="padding:9px 16px;border-radius:10px;background:#eee;color:#999;font-weight:700;">PDF</button>
     @endif
   </div>
 </div>

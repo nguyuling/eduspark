@@ -1,36 +1,105 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ForumController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\QuizTeacherController;
+use App\Http\Controllers\QuizStudentController;
+use App\Http\Controllers\LessonController;
 use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ReportController;
+use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+// Include authentication routes
+require __DIR__ . '/auth.php';
+
+Route::get('/', function() {
+    if (auth()->check()) {
+        $user = auth()->user();
+        // If the authenticated user is a teacher, send them to the teacher "Laporan" view
+        if (isset($user->role) && $user->role === 'teacher') {
+            return redirect(Route::has('reports.index') ? route('reports.index') : url('/reports'));
+        }
+
+        // Otherwise send students (and other roles) to the student performance (Prestasi) view
+        return redirect(Route::has('performance.student_view') ? route('performance.student_view') : url('/performance'));
+    }
+    return redirect('/login');
+})->name('home');
+
+// Profile routes (authenticated only)
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [UserController::class, 'profile'])->name('profile.show');
+    Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('profile.edit');
+    Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/profile/edit-password', [UserController::class, 'editPassword'])->name('profile.password.edit');
+    Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password.update');
 });
 
-Route::get('/performance', [PerformanceController::class, 'index'])->name('performance.index');
+// Lesson routes (authenticated only)
+Route::middleware('auth')->group(function () {
+    Route::get('/lesson', [LessonController::class, 'index'])->name('lesson.index');
+    Route::get('/lesson/create', [LessonController::class, 'create'])->name('lesson.create');
+    Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
+    Route::post('/lesson', [LessonController::class, 'store'])->name('lesson.store');
+    Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
+    Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');
+    Route::get('/lesson/{id}/preview', [LessonController::class, 'preview'])->name('lesson.preview');
+    Route::get('/lesson/{id}/download', [LessonController::class, 'downloadLesson'])->name('lesson.download');
+    Route::get('/lesson/{id}/preview-file', [LessonController::class, 'previewFile'])->name('lesson.preview-file');
+});
 
-Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+// Quiz Teacher routes
+Route::middleware('auth')->group(function () {
+    Route::get('/teacher/quizzes', [QuizTeacherController::class, 'index'])->name('teacher.quizzes.index');
+    Route::get('/teacher/quizzes/create', [QuizTeacherController::class, 'create'])->name('teacher.quizzes.create');
+    Route::post('/teacher/quizzes', [QuizTeacherController::class, 'store'])->name('teacher.quizzes.store');
+    Route::get('/teacher/quizzes/{quiz}', [QuizTeacherController::class, 'show'])->name('teacher.quizzes.show');
+    Route::get('/teacher/quizzes/{quiz}/results', [QuizTeacherController::class, 'showResults'])->name('teacher.quizzes.results');
+    Route::get('/teacher/quizzes/{quiz}/edit', [QuizTeacherController::class, 'edit'])->name('teacher.quizzes.edit');
+    Route::put('/teacher/quizzes/{quiz}', [QuizTeacherController::class, 'update'])->name('teacher.quizzes.update');
+    Route::delete('/teacher/quizzes/{quiz}', [QuizTeacherController::class, 'destroy'])->name('teacher.quizzes.destroy');
+});
 
-Route::get('/reports/students-by-class/{class}', [ReportController::class, 'studentsByClass'])
-    ->name('reports.students.byClass');
+// Quiz Student routes
+Route::middleware('auth')->group(function () {
+    Route::get('/quizzes', [QuizStudentController::class, 'index'])->name('student.quizzes.index');
+    Route::get('/quizzes/{quiz}/start', [QuizStudentController::class, 'start'])->name('student.quizzes.start');
+    Route::post('/quizzes/{quiz}/submit', [QuizStudentController::class, 'submit'])->name('student.quizzes.submit');
+    Route::get('/quizzes/{attempt}/quit', [QuizStudentController::class, 'quit'])->name('student.quizzes.quit');
+    Route::get('/quizzes/{attempt}/result', [QuizStudentController::class, 'showResult'])->name('student.quizzes.result');
+});
 
-Route::get('/reports/student/{id}', [ReportController::class, 'studentReport'])->name('reports.student');
+// Performance routes
+Route::middleware('auth')->group(function () {
+    Route::get('/performance', [PerformanceController::class, 'index'])->name('performance.student_view');
 
-// Exports for student
-Route::get('/reports/student/{id}/export/csv', [ReportController::class, 'exportStudentCsv'])->name('reports.student.csv');
-Route::get('/reports/student/{id}/export/print', [ReportController::class, 'exportStudentPrintable'])->name('reports.student.print');
-Route::get('/reports/student/{id}/export/excel', [ReportController::class, 'exportStudentExcel'])->name('reports.student.excel');
-Route::get('/reports/student/{id}/export/pdf', [ReportController::class, 'exportStudentPdf'])->name('reports.student.pdf');
+    // Reports landing for teachers
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
-// Class report
-Route::get('/reports/class', [ReportController::class, 'classIndex'])->name('reports.class');
-Route::get('/reports/class/{class}/export/csv', [ReportController::class, 'exportClassCsv'])->name('reports.class.csv');
-Route::get('/reports/class/{class}/export/pdf', [ReportController::class, 'exportClassPdf'])->name('reports.class.pdf');
+    // AJAX / helper endpoints used by reports views
+    Route::get('/reports/students-by-class/{class}', [ReportController::class, 'studentsByClass']);
+    Route::get('/reports/student/{id}', [ReportController::class, 'studentReport']);
 
-// Optional list pages (kept)
-Route::middleware(['auth'])->group(function () {
-    Route::get('/reports/students', [ReportController::class, 'studentsPerformance'])->name('reports.students');
-    Route::get('/reports/students/export-csv', [ReportController::class, 'exportStudentsCsv'])->name('reports.students.csv');
-    Route::get('/reports/students/chart-data', [ReportController::class, 'studentsChartData'])->name('reports.students.chart');
+    // Class report (AJAX via ?class=)
+    Route::get('/reports/class', [ReportController::class, 'classIndex']);
+
+    // Export routes
+    Route::get('/reports/student/{id}/export/csv', [ReportController::class, 'exportStudentCsv'])->name('reports.student.csv');
+    Route::get('/reports/student/{id}/export/pdf', [ReportController::class, 'exportStudentPdf'])->name('reports.student.pdf');
+    Route::get('/reports/student/{id}/export/xlsx', [ReportController::class, 'exportStudentExcel'])->name('reports.student.xlsx');
+
+    Route::get('/reports/class/{class}/export/csv', [ReportController::class, 'exportClassCsv']);
+    Route::get('/reports/class/{class}/export/pdf', [ReportController::class, 'exportClassPdf']);
+});
+
+// Forum routes
+Route::middleware('auth')->group(function () {
+    Route::get('/forum', [ForumController::class, 'index'])->name('forum.index');
+    Route::get('/forum/create', [ForumController::class, 'create'])->name('forum.create');
+    Route::post('/forum', [ForumController::class, 'store'])->name('forum.store');
+    Route::get('/forum/{id}', [ForumController::class, 'show'])->name('forum.show');
+    Route::get('/forum/{id}/edit', [ForumController::class, 'edit'])->name('forum.edit');
+    Route::put('/forum/{id}', [ForumController::class, 'update'])->name('forum.update');
+    Route::delete('/forum/{id}', [ForumController::class, 'destroy'])->name('forum.destroy');
+    Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
 });
