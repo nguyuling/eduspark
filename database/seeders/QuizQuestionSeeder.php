@@ -983,5 +983,293 @@ return [
             ],
         ], // Total 10 Questions
     ],
+
+    // ----------------------------------------------------------------------
+    // QUIZ 3: Java - Soalan Kod OOP Mudah (5 Coding Questions)
+    // ----------------------------------------------------------------------
+    [
+        'teacher_id' => 10,
+        'title' => 'Java: Soalan Kod OOP Mudah',
+        'description' => 'Kuiz ini mengandungi 5 soalan pengaturcaraan tentang konsep OOP yang mudah dalam Java.',
+        'max_attempts' => 3,
+        'due_at' => Carbon::now()->addDays(45),
+        'is_published' => true,
+        'questions' => [
+            [
+                'text' => 'Tulis kod untuk mencipta kelas simple bernama "Kereta" dengan pemboleh ubah instance: brand (String), color (String), dan speed (int). Tambahkan kaedah constructor untuk menginisialisasi ketiga-tiga pemboleh ubah tersebut.',
+                'type' => 'coding', 'points' => 10,
+                'coding_template' => 'public class Kereta {
+    // Tambahkan pemboleh ubah instance di sini
+    
+    // Tambahkan constructor di sini
+}',
+                'coding_expected_output' => 'Kereta k = new Kereta("Toyota", "Merah", 120);
+System.out.println(k.brand); // Output: Toyota',
+            ],
+            [
+                'text' => 'Tulis kaedah bernama `displayInfo()` dalam kelas Person yang mencetak maklumat peribadi (nama, umur, email). Kelas Person mempunyai tiga pemboleh ubah: name, age, dan email.',
+                'type' => 'coding', 'points' => 10,
+                'coding_template' => 'public class Person {
+    private String name;
+    private int age;
+    private String email;
+    
+    public Person(String name, int age, String email) {
+        this.name = name;
+        this.age = age;
+        this.email = email;
+    }
+    
+    // Tulis kaedah displayInfo di sini
+}',
+                'coding_expected_output' => 'Nama: Ali
+Umur: 25
+Email: ali@example.com',
+            ],
+            [
+                'text' => 'Buat kelas Student yang mewarisi daripada kelas Person. Tambahkan pemboleh ubah studentID dan kaedah untuk mendapatkan (getter) studentID.',
+                'type' => 'coding', 'points' => 10,
+                'coding_template' => 'public class Person {
+    protected String name;
+    protected int age;
+    
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+
+public class Student extends Person {
+    // Tambahkan pemboleh ubah dan kaedah di sini
+}',
+                'coding_expected_output' => 'Student s = new Student("Siti", 17, "S12345");
+System.out.println(s.getStudentID()); // Output: S12345',
+            ],
+            [
+                'text' => 'Tulis kaedah bernama `calculateArea()` dalam kelas Rectangle yang menerima panjang (length) dan lebar (width), kemudian mengembalikan nilai luas segi empat tepat.',
+                'type' => 'coding', 'points' => 10,
+                'coding_template' => 'public class Rectangle {
+    // Tulis kaedah calculateArea di sini
+    
+    public static void main(String[] args) {
+        Rectangle rect = new Rectangle();
+        double area = rect.calculateArea(5, 10);
+        System.out.println("Luas: " + area);
+    }
+}',
+                'coding_expected_output' => 'Luas: 50.0',
+            ],
+            [
+                'text' => 'Tulis kaedah bernama `increaseAge()` dalam kelas Person yang menambah umur sebanyak 1 tahun setiap kali dipanggil. Paparkan umur selepas peningkatan.',
+                'type' => 'coding', 'points' => 10,
+                'coding_template' => 'public class Person {
+    private String name;
+    private int age;
+    
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    
+    // Tulis kaedah increaseAge di sini
+}',
+                'coding_expected_output' => 'Umur: 26',
+            ],
+        ], // Total 5 Coding Questions
+    ],
+
+    // ----------------------------------------------------------------------
+    // QUIZ 4: Java - OOP Characteristics (Encapsulation, Abstract, Inheritance)
+    // ----------------------------------------------------------------------
+    [
+        'teacher_id' => 11,
+        'title' => 'Java: Ciri-ciri OOP (Pengkapsulan, Abstrak, Pewarisan)',
+        'description' => 'Kuiz ini menguji pemahaman mendalam tentang pengkapsulan, kelas abstrak, dan pewarisan dalam OOP.',
+        'max_attempts' => 3,
+        'due_at' => Carbon::now()->addDays(50),
+        'is_published' => true,
+        'questions' => [
+            [
+                'text' => 'Apakah tujuan utama Pengkapsulan (Encapsulation) dalam OOP?',
+                'type' => 'multiple_choice', 'points' => 6,
+                'options' => [
+                    ['text' => 'Untuk menyembunyikan data dalam dan hanya mengekspos interface yang diperlukan', 'is_correct' => true],
+                    ['text' => 'Untuk mempertingkat kecepatan program', 'is_correct' => false],
+                    ['text' => 'Untuk mengurangkan saiz fail program', 'is_correct' => false],
+                    ['text' => 'Untuk memudahkan sintaks bahasa Java', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Kata kunci `private` dalam Java digunakan untuk membatasi akses ke ahli kelas kepada kelas itu sahaja.',
+                'type' => 'true_false', 'points' => 4,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => true],
+                    ['text' => 'False', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Apakah perbezaan antara kelas abstrak dan interface dalam Java?',
+                'type' => 'short_answer', 'points' => 8,
+                'correct_text' => 'Kelas abstrak boleh mempunyai pemboleh ubah dan kaedah konkrit, manakala interface hanya mempunyai kaedah abstrak dan pemalar (sebelum Java 8)',
+            ],
+            [
+                'text' => 'Kelas abstrak boleh diinstan (instantiated) secara langsung.',
+                'type' => 'true_false', 'points' => 4,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => false],
+                    ['text' => 'False', 'is_correct' => true],
+                ]
+            ],
+            [
+                'text' => 'Pilih semua kenyataan yang benar tentang Pewarisan (Inheritance).',
+                'type' => 'checkbox', 'points' => 8,
+                'options' => [
+                    ['text' => 'Kelas anak mewarisi semua kaedah dari kelas induk', 'is_correct' => true],
+                    ['text' => 'Kelas anak boleh mengubah suai kaedah kelas induk melalui overriding', 'is_correct' => true],
+                    ['text' => 'Java menyokong pewarisan berganda', 'is_correct' => false],
+                    ['text' => 'Kelas anak boleh menambah pemboleh ubah baru', 'is_correct' => true],
+                ]
+            ],
+            [
+                'text' => 'Apakah istilah untuk mengubah suai kaedah kelas induk dalam kelas anak?',
+                'type' => 'short_answer', 'points' => 6,
+                'correct_text' => 'Method Overriding',
+            ],
+            [
+                'text' => 'Kata kunci `abstract` digunakan untuk mengisytiharkan kaedah atau kelas yang tidak mempunyai pelaksanaan.',
+                'type' => 'true_false', 'points' => 4,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => true],
+                    ['text' => 'False', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Apakah kegunaan kaedah getter dan setter dalam pengkapsulan?',
+                'type' => 'multiple_choice', 'points' => 6,
+                'options' => [
+                    ['text' => 'Untuk mengawal akses kepada pemboleh ubah private', 'is_correct' => true],
+                    ['text' => 'Untuk mempercepatkan program', 'is_correct' => false],
+                    ['text' => 'Untuk membuat kod lebih pendek', 'is_correct' => false],
+                    ['text' => 'Untuk menghapus pemboleh ubah', 'is_correct' => false],
+                ]
+            ],
+        ], // Total 8 Questions
+    ],
+
+    // ----------------------------------------------------------------------
+    // QUIZ 5: Java - Program Komprehensif (2 Long Coding Questions - 30+ Lines Each)
+    // ----------------------------------------------------------------------
+    [
+        'teacher_id' => 12,
+        'title' => 'Java: Program Pengaturcaraan Komprehensif',
+        'description' => 'Kuiz ini mengandungi 2 soalan pengaturcaraan jarak panjang yang menguji kefahaman mendalam tentang konsep Java.',
+        'max_attempts' => 2,
+        'due_at' => Carbon::now()->addDays(60),
+        'is_published' => true,
+        'questions' => [
+            [
+                'text' => 'Tulis program lengkap untuk sistem pengurusan perpustakaan mudah dengan kelas Book, Library, dan Librarian. Program mestilah dapat menambah buku, membuang buku, mencari buku mengikut tajuk, dan memaparkan senarai semua buku.',
+                'type' => 'coding', 'points' => 25,
+                'coding_template' => 'import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Book {
+    private String title;
+    private String author;
+    private String isbn;
+    
+    public Book(String title, String author, String isbn) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+    }
+    
+    public String getTitle() { return title; }
+    public String getAuthor() { return author; }
+    public String getIsbn() { return isbn; }
+    
+    public void displayInfo() {
+        System.out.println("Tajuk: " + title + ", Pengarang: " + author + ", ISBN: " + isbn);
+    }
+}
+
+public class Library {
+    private ArrayList<Book> books = new ArrayList<>();
+    
+    // Tambahkan kaedah addBook di sini
+    // Tambahkan kaedah removeBook di sini
+    // Tambahkan kaedah searchBook di sini
+    // Tambahkan kaedah displayAllBooks di sini
+}
+
+public class Librarian {
+    public static void main(String[] args) {
+        Library library = new Library();
+        // Tulis program aplikasi di sini
+    }
+}',
+                'coding_expected_output' => 'Buku "Algoritma" ditambah
+Buku "Algoritma" dicari ditemui
+Senarai Buku:
+Tajuk: Algoritma, Pengarang: Aziz Deraman, ISBN: 123-456
+Tajuk: OOP Java, Pengarang: Tan Lee, ISBN: 789-012',
+            ],
+            [
+                'text' => 'Tulis program lengkap untuk sistem pengurusan pelajar dengan kelas Student, Course, dan Enrollment. Program mestilah dapat mendaftarkan pelajar dalam kursus, mencatat gred, mengira purata gred pelajar, dan memaparkan transkrip akademik lengkap setiap pelajar.',
+                'type' => 'coding', 'points' => 25,
+                'coding_template' => 'import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Student {
+    private String studentId;
+    private String name;
+    private ArrayList<String> courses;
+    private HashMap<String, Double> grades;
+    
+    public Student(String studentId, String name) {
+        this.studentId = studentId;
+        this.name = name;
+        this.courses = new ArrayList<>();
+        this.grades = new HashMap<>();
+    }
+    
+    public String getStudentId() { return studentId; }
+    public String getName() { return name; }
+    
+    // Tambahkan kaedah enrollCourse di sini
+    // Tambahkan kaedah setGrade di sini
+    // Tambahkan kaedah getAverageGrade di sini
+    // Tambahkan kaedah displayTranscript di sini
+}
+
+public class Course {
+    private String courseCode;
+    private String courseName;
+    private int credits;
+    
+    public Course(String courseCode, String courseName, int credits) {
+        this.courseCode = courseCode;
+        this.courseName = courseName;
+        this.credits = credits;
+    }
+    
+    public String getCourseCode() { return courseCode; }
+    public String getCourseName() { return courseName; }
+}
+
+public class Enrollment {
+    public static void main(String[] args) {
+        // Tulis kod sistem pengurusan pelajar di sini
+    }
+}',
+                'coding_expected_output' => 'Transkrip Akademik:
+Nombor Pelajar: S001
+Nama: Ali bin Mohamed
+Kursus: JAVA101 - Pengaturcaraan Java (3 kredit) - Gred: A (4.0)
+Kursus: WEB101 - Pembangunan Web (3 kredit) - Gred: B+ (3.5)
+Purata Gred Keseluruhan (GPA): 3.75',
+            ],
+        ], // Total 2 Long Coding Questions
+    ],
 ];
 

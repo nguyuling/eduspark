@@ -154,13 +154,23 @@
   </main>
 </div>
 
+<style>
+    .code-template-textarea {
+        background-image: 
+            linear-gradient(90deg, #f5f5f5 40px, transparent 40px);
+        background-attachment: local;
+        background-repeat: no-repeat;
+    }
+</style>
+
 <script>
     // Define the question types based on the Question Model constants
     const QUESTION_TYPES = {
         MC: 'multiple_choice',
         SA: 'short_answer',
         TF: 'true_false',
-        CHECKBOX: 'checkbox'
+        CHECKBOX: 'checkbox',
+        CODING: 'coding'
     };
     
     // Global counter for question indices
@@ -194,6 +204,7 @@
                             <option value="${QUESTION_TYPES.CHECKBOX}">Kotak Semak</option>
                             <option value="${QUESTION_TYPES.SA}">Jawapan Pendek</option>
                             <option value="${QUESTION_TYPES.TF}">Benar/Salah</option>
+                            <option value="${QUESTION_TYPES.CODING}">Pengaturcaraan</option>
                         </select>
                     </div>
                 </div>
@@ -212,6 +223,94 @@
             <input type="text" name="questions[${index}][correct_answer]" placeholder="Masukkan jawapan yang tepat" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
         </div>
     `;
+
+    // Template for the Coding question input (Java only)
+    const codingTemplate = (index) => {
+        return `<div style="margin-top:12px;">
+<div style="margin-bottom:12px;">
+<label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Templat Kod (Java) <span style="color: var(--muted); font-size: 12px;">(Pilihan)</span></label>
+<div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden;">
+<div id="code-lines-${index}" style="position: absolute; left: 0; top: 0; width: 40px; background: #e8e8e8; padding: 11px 0; text-align: right; font-size: 13px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none;">1</div>
+<textarea name="questions[${index}][coding_template]" class="code-template-textarea" data-index="${index}" rows="1" placeholder="Masukkan templat kod Java (pilihan)..." style="width: 100%; padding: 11px 8px 11px 50px; border: none; background: transparent; color: inherit; font-size: 13px; font-family: 'Courier New', monospace; outline: none; resize: none; box-sizing: border-box; line-height: 1.5; overflow: hidden;"></textarea>
+</div>
+</div>
+<div>
+<label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color: var(--success);">Output yang Dijangka <span style="color: var(--danger);">*</span></label>
+<div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden;">
+<div id="output-lines-${index}" style="position: absolute; left: 0; top: 0; width: 40px; background: #e8e8e8; padding: 11px 0; text-align: right; font-size: 13px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none;">1</div>
+<textarea name="questions[${index}][coding_expected_output]" class="code-output-textarea" data-index="${index}" rows="1" placeholder="Masukkan output yang dijangka" required style="width: 100%; padding: 11px 8px 11px 50px; border: none; background: transparent; color: inherit; font-size: 13px; font-family: 'Courier New', monospace; outline: none; resize: none; box-sizing: border-box; line-height: 1.5; overflow: hidden;"></textarea>
+</div>
+</div>
+<div style="margin-top:8px; font-size:12px; color:#888;">
+<i class="bi bi-info-circle"></i> Tekan ENTER untuk menampilkan baris seterusnya | Tekan TAB untuk 4 spasi
+</div>
+</div>`;
+    };
+
+    // Function to update line numbers in code template
+    function updateCodeLineNumbers(textarea, index) {
+        const lines = textarea.value.split('\n');
+        const lineNumbersDiv = document.getElementById(`code-lines-${index}`);
+        
+        // Auto-expand textarea based on content
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.max(textarea.scrollHeight, 30) + 'px';
+        
+        let lineNumbers = '';
+        for (let i = 1; i <= Math.max(lines.length, 1); i++) {
+            lineNumbers += i + '<br>';
+        }
+        lineNumbersDiv.innerHTML = lineNumbers;
+    }
+
+    // Function to update line numbers in output textarea
+    function updateOutputLineNumbers(textarea, index) {
+        const lines = textarea.value.split('\n');
+        const lineNumbersDiv = document.getElementById(`output-lines-${index}`);
+        
+        // Auto-expand textarea based on content
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.max(textarea.scrollHeight, 30) + 'px';
+        
+        let lineNumbers = '';
+        for (let i = 1; i <= Math.max(lines.length, 1); i++) {
+            lineNumbers += i + '<br>';
+        }
+        lineNumbersDiv.innerHTML = lineNumbers;
+    }
+
+    // Function to handle tab key for 4 spaces
+    function handleTabKey(event, index) {
+        const textarea = event.target;
+        if (event.code === 'Tab') {
+            event.preventDefault();
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            
+            // Insert 4 spaces at cursor position
+            textarea.value = textarea.value.substring(0, start) + '    ' + textarea.value.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + 4;
+            updateCodeLineNumbers(textarea, index);
+        }
+    }
+
+    // Function to handle enter key for progressive line reveal on output
+    function handleOutputEnterReveal(event, index) {
+        const textarea = event.target;
+        if (event.code === 'Enter') {
+            const lines = textarea.value.split('\n');
+            const currentLine = textarea.value.substring(0, textarea.selectionStart).split('\n').length - 1;
+            
+            // Show next line only if at the end of the last line
+            if (currentLine === lines.length - 1 && lines[currentLine].trim() !== '') {
+                event.preventDefault();
+                const start = textarea.selectionStart;
+                textarea.value = textarea.value.substring(0, start) + '\n' + textarea.value.substring(start);
+                textarea.selectionStart = start + 1;
+                updateOutputLineNumbers(textarea, index);
+            }
+        }
+    }
 
     // Template for Options container (used by MC, TF, and CHECKBOX)
     const optionTemplate = (qIndex, type) => {
@@ -297,6 +396,8 @@
 
         if (type === QUESTION_TYPES.SA) {
             container.innerHTML = shortAnswerTemplate(qIndex);
+        } else if (type === QUESTION_TYPES.CODING) {
+            container.innerHTML = codingTemplate(qIndex);
         } else if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF || type === QUESTION_TYPES.CHECKBOX) {
             
             container.innerHTML = optionTemplate(qIndex, type);
@@ -451,6 +552,38 @@
                 const qIndex = e.target.getAttribute('data-index');
                 const type = e.target.value;
                 renderAnswerFields(qIndex, type);
+                
+                // Setup code template listeners if coding type
+                if (type === QUESTION_TYPES.CODING) {
+                    setTimeout(() => {
+                        const codeTextarea = document.querySelector(`.code-template-textarea[data-index="${qIndex}"]`);
+                        const outputTextarea = document.querySelector(`.code-output-textarea[data-index="${qIndex}"]`);
+                        
+                        if (codeTextarea) {
+                            codeTextarea.addEventListener('input', function() {
+                                updateCodeLineNumbers(this, qIndex);
+                            });
+                            codeTextarea.addEventListener('keydown', function(e) {
+                                handleTabKey(e, qIndex);
+                                handleCodeEnterReveal(e, qIndex);
+                            });
+                            // Initialize line numbers
+                            updateCodeLineNumbers(codeTextarea, qIndex);
+                        }
+                        
+                        if (outputTextarea) {
+                            outputTextarea.addEventListener('input', function() {
+                                updateOutputLineNumbers(this, qIndex);
+                            });
+                            outputTextarea.addEventListener('keydown', function(e) {
+                                handleTabKey(e, qIndex);
+                                handleOutputEnterReveal(e, qIndex);
+                            });
+                            // Initialize line numbers
+                            updateOutputLineNumbers(outputTextarea, qIndex);
+                        }
+                    }, 0);
+                }
             }
         });
         

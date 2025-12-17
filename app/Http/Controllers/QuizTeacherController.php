@@ -134,6 +134,15 @@ class QuizTeacherController extends Controller
                         'correct_answer' => ($questionType === QuizQuestion::TYPE_SHORT_ANSWER) 
                                             ? ($questionData['correct_answer'] ?? null)
                                             : null,
+                        'coding_template' => ($questionType === 'coding')
+                                            ? ($questionData['coding_template'] ?? null)
+                                            : null,
+                        'coding_language' => ($questionType === 'coding')
+                                            ? ($questionData['coding_language'] ?? 'java')
+                                            : null,
+                        'coding_expected_output' => ($questionType === 'coding')
+                                                    ? ($questionData['coding_expected_output'] ?? null)
+                                                    : null,
                     ]);
 
                     // 2b. Handle Options for Multiple Choice/Checkbox Questions
