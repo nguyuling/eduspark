@@ -168,17 +168,45 @@
 <script>
 // Tab key handler for coding line inputs
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Tab' && e.target.classList.contains('coding-line-input')) {
-        e.preventDefault();
-        const input = e.target;
-        const start = input.selectionStart;
-        const end = input.selectionEnd;
-        
-        // Insert 4 spaces
-        input.value = input.value.substring(0, start) + '    ' + input.value.substring(end);
-        
-        // Move cursor after inserted spaces
-        input.selectionStart = input.selectionEnd = start + 4;
+    if (e.target.classList.contains('coding-line-input')) {
+        // Handle Tab key: Insert 4 spaces
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const input = e.target;
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            
+            // Insert 4 spaces
+            input.value = input.value.substring(0, start) + '    ' + input.value.substring(end);
+            
+            // Move cursor after inserted spaces
+            input.selectionStart = input.selectionEnd = start + 4;
+        }
+        // Handle Enter key: Go to next answerable line
+        else if (e.key === 'Enter') {
+            e.preventDefault();
+            const input = e.target;
+            const currentLineNum = parseInt(input.dataset.lineNumber);
+            const questionId = input.dataset.questionId;
+            
+            // Find all coding line inputs for this question
+            const allInputs = Array.from(document.querySelectorAll(`.coding-line-input[data-question-id="${questionId}"]`))
+                .sort((a, b) => parseInt(a.dataset.lineNumber) - parseInt(b.dataset.lineNumber));
+            
+            // Find the next answerable (hidden) line
+            let nextInput = null;
+            for (let i = 0; i < allInputs.length; i++) {
+                if (parseInt(allInputs[i].dataset.lineNumber) > currentLineNum) {
+                    nextInput = allInputs[i];
+                    break;
+                }
+            }
+            
+            // Focus on next answerable line if found
+            if (nextInput) {
+                nextInput.focus();
+            }
+        }
     }
 });
 

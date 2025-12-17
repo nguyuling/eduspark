@@ -46,25 +46,13 @@
       
       @forelse($attempt->answers as $index => $answer)
         <div style="margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid #e5e7eb;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
-            <div>
-              <div style="font-size:14px; font-weight:700; color:var(--muted);">Soalan {{ $index + 1 }}</div>
-              <div style="font-size:16px; font-weight:700; color:#0b1220; margin-top:4px;">{{ $answer->question->question_text }}</div>
-            </div>
-            <div style="text-align:right;">
-              @if($answer->is_correct)
-                <div style="background:rgba(42,157,143,0.15); color:#2A9D8F; padding:6px 12px; border-radius:6px; font-weight:700; font-size:13px;">
-                  ✓ Betul
-                </div>
-              @else
-                <div style="background:rgba(230,57,70,0.15); color:#E63946; padding:6px 12px; border-radius:6px; font-weight:700; font-size:13px;">
-                  ✗ Salah
-                </div>
-              @endif
-            </div>
+          <!-- Question Title -->
+          <div style="margin-bottom:16px;">
+            <div style="font-size:14px; font-weight:700; color:var(--muted);">Soalan {{ $index + 1 }}</div>
+            <div style="font-size:16px; font-weight:700; color:#0b1220; margin-top:4px;">{{ $answer->question->question_text }}</div>
           </div>
 
-          <!-- Your Answer -->
+          <!-- Answer -->
           <div style="margin:12px 0; padding:12px; background:rgba(0,0,0,0.02); border-radius:8px;">
             <div style="font-size:12px; color:var(--muted); margin-bottom:4px; font-weight:600;">Jawapan Anda:</div>
             
@@ -115,7 +103,7 @@
                         @if($isHidden)
                           {{-- Hidden line: show student's answer with status --}}
                           <div style="display:flex; gap:8px; align-items:center;">
-                            <span style="color:#0b1220; word-break:break-word; flex:1; padding:4px 6px; background:{{ $isCorrect ? 'rgba(42,157,143,0.1)' : 'rgba(230,57,70,0.1)' }}; border-radius:4px;">
+                            <span style="color:#0b1220; word-break:break-word; flex:1; padding:4px 6px; background:{{ $isCorrect ? 'rgba(42,157,143,0.1)' : 'rgba(230,57,70,0.1)' }}; border-radius:4px; font-family:monospace; white-space:pre;">
                               {{ $studentAnswer ?: '(Tidak dijawab)' }}
                             </span>
                             <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; background:{{ $isCorrect ? 'rgba(42,157,143,0.2)' : 'rgba(230,57,70,0.2)' }}; color:{{ $isCorrect ? '#2A9D8F' : '#E63946' }};white-space:nowrap;">
@@ -125,12 +113,12 @@
                           {{-- Show correct answer if wrong --}}
                           @if(!$isCorrect && $studentAnswer !== '')
                             <div style="margin-top:4px; font-size:12px; color:#666; padding-left:6px; border-left:2px solid #ddd;">
-                              Sepatutnya: <span style="color:#2A9D8F; font-weight:600;">{{ $expectedCode }}</span>
+                              Sepatutnya: <span style="color:#2A9D8F; font-weight:600; font-family:monospace; white-space:pre;">{{ $expectedCode }}</span>
                             </div>
                           @endif
                         @else
                           {{-- Non-hidden line: show as read-only --}}
-                          <span style="color:#666;">{{ trim($codeLine) }}</span>
+                          <span style="color:#666; font-family:monospace; white-space:pre;">{{ $codeLine }}</span>
                         @endif
                       </div>
                     </div>
@@ -172,7 +160,7 @@
                       @if($isHidden)
                         <div style="margin-bottom:4px; display:flex; gap:12px; align-items:center;">
                           <span style="color:#999; min-width:30px; text-align:right;">{{ $lineNum }}:</span>
-                          <span style="color:#2A9D8F; flex:1; word-break:break-word; font-weight:600; padding:4px 6px; background:rgba(42,157,143,0.1); border-radius:4px;">{{ trim($codeLine) }}</span>
+                          <span style="color:#2A9D8F; flex:1; word-break:break-word; font-weight:600; padding:4px 6px; background:rgba(42,157,143,0.1); border-radius:4px; font-family:monospace; white-space:pre;">{{ $codeLine }}</span>
                         </div>
                       @endif
                     @endforeach
