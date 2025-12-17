@@ -232,16 +232,15 @@
 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Kod Penuh<span style="color: var(--danger);">*</span></label>
 <div style="display: flex; gap: 0; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; background: #f5f5f5;">
   <!-- Checkbox Column -->
-  <div id="code-checkboxes-${index}" style="display: flex; flex-direction: column; background: #f0f0f0; border-right: 1px solid #d1d5db; min-width: 35px; padding: 11px 4px; overflow-y: auto; font-size: 13px; line-height: 1.5;">
-    <div style="color: #888; text-align: center; width: 27px;">☐</div>
+  <div id="code-checkboxes-${index}" style="display: flex; flex-direction: column; background: linear-gradient(to bottom, #fafafa, #f5f5f5); border-right: 2px solid #e5e7eb; min-width: 45px; padding: 11px 8px; overflow-y: auto; font-size: 13px; line-height: 1.5; gap: 2px;">
   </div>
   
   <!-- Line Numbers Column -->
-  <div id="code-lines-${index}" style="position: relative; background: #f0f0f0; padding: 11px 0; text-align: right; font-size: 13px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none; min-width: 35px;">1</div>
+  <div id="code-lines-${index}" style="position: relative; background: #f9fafb; padding: 11px 8px; text-align: right; font-size: 13px; font-family: 'Courier New', monospace; color: #9ca3af; border-right: 2px solid #e5e7eb; line-height: 1.5; user-select: none; min-width: 40px;">1</div>
   
   <!-- Code Textarea -->
   <div style="flex: 1; position: relative; overflow: hidden;">
-    <textarea name="questions[${index}][coding_full_code]" class="code-full-textarea" data-index="${index}" rows="8" placeholder="Masukkan kod Java lengkap di sini..." required style="width: 100%; padding: 11px 8px; border: none; background: transparent; color: inherit; font-size: 13px; font-family: 'Courier New', monospace; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;"></textarea>
+    <textarea name="questions[${index}][coding_full_code]" class="code-full-textarea" data-index="${index}" rows="8" placeholder="Masukkan kod Java lengkap di sini..." required style="width: 100%; padding: 11px 12px; border: none; background: transparent; color: inherit; font-size: 13px; font-family: 'Courier New', monospace; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;"></textarea>
   </div>
 </div>
 <div style="font-size:12px; color:#888; margin-top:8px; margin-bottom:12px;">
@@ -261,6 +260,7 @@
 </div>
 </div>
 </div>`;
+    };
     };
 
     // Function to update line numbers and refresh checkboxes
@@ -298,7 +298,30 @@
             const lineNum = i + 1;
             const isHidden = currentHidden.includes(lineNum);
             
-            html += `<input type="checkbox" class="code-line-checkbox" data-line="${lineNum}" ${isHidden ? 'checked' : ''} style="cursor:pointer; width:20px; height:20px;" title="Line ${lineNum}">`;
+            html += `<div class="checkbox-wrapper" data-line="${lineNum}" style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 24px;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                background: ${isHidden ? 'rgba(168, 85, 247, 0.15)' : 'transparent'};
+                border: 1.5px solid ${isHidden ? '#A855F7' : '#e5e7eb'};
+            " onmouseover="this.style.background='rgba(168, 85, 247, 0.08)'; this.style.borderColor='#C084FC';" onmouseout="this.style.background='${isHidden ? 'rgba(168, 85, 247, 0.15)' : 'transparent'}'; this.style.borderColor='${isHidden ? '#A855F7' : '#e5e7eb'}';">
+                <input 
+                    type="checkbox" 
+                    class="code-line-checkbox" 
+                    data-line="${lineNum}" 
+                    ${isHidden ? 'checked' : ''} 
+                    style="
+                        cursor: pointer;
+                        width: 16px;
+                        height: 16px;
+                        accent-color: #A855F7;
+                    "
+                >
+            </div>`;
         });
         
         checkboxesDiv.innerHTML = html;
