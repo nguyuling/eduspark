@@ -303,13 +303,9 @@
                 align-items: center;
                 justify-content: center;
                 height: 19px;
-                min-height: 19px;
-                border-radius: 2px;
                 cursor: pointer;
                 transition: all 0.2s ease;
-                background: ${isHidden ? 'rgba(168, 85, 247, 0.15)' : 'transparent'};
-                border: 1.5px solid ${isHidden ? '#A855F7' : '#e5e7eb'};
-            " onmouseover="this.style.background='rgba(168, 85, 247, 0.08)'; this.style.borderColor='#C084FC';" onmouseout="this.style.background='${isHidden ? 'rgba(168, 85, 247, 0.15)' : 'transparent'}'; this.style.borderColor='${isHidden ? '#A855F7' : '#e5e7eb'}';">
+            " onmouseover="this.style.background='${isHidden ? 'rgba(168, 85, 247, 0.1)' : 'rgba(0, 0, 0, 0.03)'}';" onmouseout="this.style.background='transparent';">
                 <input 
                     type="checkbox" 
                     class="code-line-checkbox" 
