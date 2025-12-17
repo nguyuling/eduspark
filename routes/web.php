@@ -64,7 +64,7 @@ Route::middleware('auth')->group(function () {
 
 // Performance routes
 Route::middleware('auth')->group(function () {
-    Route::get('/performance', [PerformanceController::class, 'index'])->name('performance.student_view');
+    Route::get('/performance', [PerformanceController::class, 'index'])->name('performance');
 });
 
 // Forum routes
