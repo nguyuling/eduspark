@@ -162,8 +162,8 @@
       <!-- Show More Section -->
       @if ($hasMore)
         <div style="text-align:center; margin-top:20px; padding:20px;">
-          <a href="{{ route('teacher.quizzes.index', array_merge(request()->query(), ['limit' => $nextLimit])) }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-            <i class="bi bi-download"></i> Tunjukkan 10 Kuiz Lagi ({{ $limit }} / {{ count($quizzes->union($quizzes)) + ($hasMore ? 10 : 0) }})
+          <a href="{{ route('teacher.quizzes.index', array_merge(request()->query(), ['limit' => $nextLimit])) }}" style="color:var(--accent); text-decoration:none; font-size:14px; cursor:pointer;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">
+            Tunjukkan 10 Kuiz Lagi
           </a>
         </div>
       @endif
