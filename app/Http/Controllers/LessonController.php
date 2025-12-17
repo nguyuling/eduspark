@@ -41,6 +41,20 @@ class LessonController extends Controller
 
         $lessons = $query->get();
 
+        // Get limit from request (default 10, increments by 10)
+        $limit = (int) $request->get('limit', 10);
+        if ($limit < 10) $limit = 10;
+        if ($limit > 1000) $limit = 1000; // Safety limit
+        
+        // Get lessons with the specified limit
+        $allLessons = $lessons;
+        $lessons = $allLessons->take($limit);
+        $hasMore = count($allLessons) > $limit;
+        $nextLimit = $limit + 10;
+        
+        // Prepare filters for view
+        $filters = $request->only(['q', 'file_type', 'date_from', 'date_to']);
+
         // Return JSON if API request, otherwise render view
         if ($request->expectsJson()) {
             return response()->json($lessons->map(function ($lesson) {
@@ -62,10 +76,10 @@ class LessonController extends Controller
         // Determine user role and show appropriate view
         $user = Auth::user();
         if ($user && $user->role === 'teacher') {
-            return view('lesson.index-teacher', compact('lessons'));
+            return view('lesson.index-teacher', compact('lessons', 'filters', 'limit', 'hasMore', 'nextLimit'));
         }
         
-        return view('lesson.index-student', compact('lessons'));
+        return view('lesson.index-student', compact('lessons', 'filters', 'limit', 'hasMore', 'nextLimit'));
     }
 
     /**

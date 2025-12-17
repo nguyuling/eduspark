@@ -71,13 +71,14 @@
       <table>
         <thead>
           <tr>
-            <th style="width:50%">Bahan</th>
+            <th style="width:5%">No.</th>
+            <th style="width:45%">Bahan</th>
             <th style="width:18%">Fail</th>
             <th style="width:32%">Tindakan</th>
           </tr>
         </thead>
         <tbody>
-          @forelse ($lessons ?? [] as $lesson)
+          @forelse ($lessons ?? [] as $index => $lesson)
             <tr>
               <td style="width:55%">
                 <div class="table-title">{{ $lesson->title }}</div>
