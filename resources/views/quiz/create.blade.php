@@ -261,7 +261,6 @@
 </div>
 </div>`;
     };
-    };
 
     // Function to update line numbers and refresh checkboxes
     function updateCodeLineNumbers(textarea, index) {
