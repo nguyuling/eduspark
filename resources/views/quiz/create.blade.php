@@ -265,15 +265,6 @@ Pilih Semua
 <div id="preview-code-${index}" style="margin-left:50px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit;">Masukkan kod di atas</div>
 </div>
 </div>
-
-<!-- Expected Output Section -->
-<div>
-<label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color: var(--success);">Output yang Dijangka <span style="color: var(--danger);">*</span></label>
-<div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden;">
-<div id="output-lines-${index}" style="position: absolute; left: 0; top: 0; width: 40px; background: #e8e8e8; padding: 11px 0; text-align: right; font-size: 13px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none;">1</div>
-<textarea name="questions[${index}][coding_expected_output]" class="code-output-textarea" data-index="${index}" rows="4" placeholder="Masukkan output yang dijangka" required style="width: 100%; padding: 11px 8px 11px 50px; border: none; background: transparent; color: inherit; font-size: 13px; font-family: 'Courier New', monospace; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;"></textarea>
-</div>
-</div>
 </div>`;
     };
 
@@ -730,7 +721,6 @@ Pilih Semua
                 if (type === QUESTION_TYPES.CODING) {
                     setTimeout(() => {
                         const fullCodeTextarea = document.querySelector(`.code-full-textarea[data-index="${qIndex}"]`);
-                        const outputTextarea = document.querySelector(`.code-output-textarea[data-index="${qIndex}"]`);
                         
                         if (fullCodeTextarea) {
                             fullCodeTextarea.addEventListener('input', function() {
@@ -741,17 +731,6 @@ Pilih Semua
                             });
                             // Initialize line numbers
                             updateCodeLineNumbers(fullCodeTextarea, qIndex);
-                        }
-                        
-                        if (outputTextarea) {
-                            outputTextarea.addEventListener('input', function() {
-                                updateOutputLineNumbers(this, qIndex);
-                            });
-                            outputTextarea.addEventListener('keydown', function(e) {
-                                handleTabKey(e, qIndex);
-                            });
-                            // Initialize line numbers
-                            updateOutputLineNumbers(outputTextarea, qIndex);
                         }
                     }, 0);
                 }
