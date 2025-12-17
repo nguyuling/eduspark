@@ -104,7 +104,7 @@
                   <!-- Pandangan Pelajar (Student View) - Matching edit form preview exactly -->
                   @if ($question->coding_full_code)
                     <div style="margin-top:20px;">
-                      <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px;">Pandangan Pelajar</label>
+                      <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px;">Jawapan</label>
                       <div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:0; min-height:100px; display: flex;">
                         @php
                           $hiddenLines = !empty($question->hidden_line_numbers) ? array_map('intval', explode(',', $question->hidden_line_numbers)) : [];

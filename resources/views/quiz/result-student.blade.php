@@ -102,8 +102,8 @@
                       <div style="flex:1;">
                         @if($isHidden)
                           {{-- Hidden line: show student's answer with status --}}
-                          <div style="display:flex; gap:8px; align-items:center;">
-                            <span style="color:#0b1220; word-break:break-word; flex:1; padding:4px 6px; background:{{ $isCorrect ? 'rgba(42,157,143,0.1)' : 'rgba(230,57,70,0.1)' }}; border-radius:4px; font-family:monospace; white-space:pre;">
+                          <div style="display:flex; gap:8px; align-items:flex-start;">
+                            <span style="color:#0b1220; word-break:break-word; flex:1; padding:0px; background:{{ $isCorrect ? 'rgba(42,157,143,0.1)' : 'rgba(230,57,70,0.1)' }}; border-radius:4px; font-family:monospace; white-space:pre;">
                               {{ $studentAnswer ?: '(Tidak dijawab)' }}
                             </span>
                             <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; background:{{ $isCorrect ? 'rgba(42,157,143,0.2)' : 'rgba(230,57,70,0.2)' }}; color:{{ $isCorrect ? '#2A9D8F' : '#E63946' }};white-space:nowrap;">
@@ -158,9 +158,9 @@
                         $isHidden = in_array($lineNum, $hiddenLineNumbers);
                       @endphp
                       @if($isHidden)
-                        <div style="margin-bottom:4px; display:flex; gap:12px; align-items:center;">
+                        <div style="margin-bottom:4px; display:flex; gap:12px; align-items:flex-start;">
                           <span style="color:#999; min-width:30px; text-align:right;">{{ $lineNum }}:</span>
-                          <span style="color:#2A9D8F; flex:1; word-break:break-word; font-weight:600; padding:4px 6px; background:rgba(42,157,143,0.1); border-radius:4px; font-family:monospace; white-space:pre;">{{ $codeLine }}</span>
+                          <span style="color:#2A9D8F; flex:1; word-break:break-word; font-weight:600; padding:0px; background:rgba(42,157,143,0.1); border-radius:4px; font-family:monospace; white-space:pre;">{{ $codeLine }}</span>
                         </div>
                       @endif
                     @endforeach
