@@ -22,13 +22,26 @@ class QuizTeacherController extends Controller
         // 1. Get Filters
         $filters = $request->only(['unique_id', 'title', 'creator_email', 'publish_date_range', 'scope']);
 
-        // Set up the base query - Show all published quizzes to everyone
+        // Set up the base query
         $query = Quiz::with(['creator'])
-                     ->where('is_published', true)
                      // Eager load counts for display in the table
                      ->withCount(['questions', 'attempts']);
         
-        // 2. Apply Filtering Logic (Copy from your index.blade.php assumptions)
+        // 2. Filter based on publication status and user role
+        // Show published quizzes to everyone
+        // Show draft quizzes only to their creator
+        $query->where(function ($q) {
+            $q->where('is_published', true)
+              ->orWhere(function ($q2) {
+                  // Show draft quizzes only to authenticated teachers who are the creator
+                  if (Auth::check() && Auth::user()->role === 'teacher') {
+                      $q2->where('is_published', false)
+                          ->where('teacher_id', Auth::id());
+                  }
+              });
+        });
+        
+        // 3. Apply Filtering Logic (Copy from your index.blade.php assumptions)
         
         // Filter by Scope (Mine/All) - Only for teachers viewing their own quizzes
         if (Auth::check() && Auth::user()->role === 'teacher' && ($filters['scope'] ?? 'all') === 'mine') {
@@ -67,12 +80,12 @@ class QuizTeacherController extends Controller
         }
 
 
-        // 3. Get limit from request (default 10, increments by 10)
+        // 4. Get limit from request (default 10, increments by 10)
         $limit = (int) $request->get('limit', 10);
         if ($limit < 10) $limit = 10;
         if ($limit > 1000) $limit = 1000; // Safety limit
         
-        // 4. Get all quizzes with the specified limit
+        // 5. Get all quizzes with the specified limit
         $allQuizzes = $query->latest('created_at')->get();
         $quizzes = $allQuizzes->take($limit);
         $hasMore = count($allQuizzes) > $limit;
@@ -285,6 +298,21 @@ class QuizTeacherController extends Controller
                         'correct_answer' => ($questionType === QuizQuestion::TYPE_SHORT_ANSWER) 
                                             ? ($questionData['correct_answer'] ?? null)
                                             : null,
+                        'coding_template' => ($questionType === 'coding')
+                                            ? ($questionData['coding_template'] ?? null)
+                                            : null,
+                        'coding_full_code' => ($questionType === 'coding')
+                                            ? ($questionData['coding_full_code'] ?? null)
+                                            : null,
+                        'coding_language' => ($questionType === 'coding')
+                                            ? ($questionData['coding_language'] ?? 'java')
+                                            : null,
+                        'coding_expected_output' => ($questionType === 'coding')
+                                                    ? ($questionData['coding_expected_output'] ?? null)
+                                                    : null,
+                        'hidden_line_numbers' => ($questionType === 'coding')
+                                                    ? ($questionData['hidden_line_numbers'] ?? null)
+                                                    : null,
                     ]);
 
                     // 3b. Handle Options for Multiple Choice/Checkbox Questions

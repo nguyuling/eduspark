@@ -10,7 +10,7 @@
         <div class="title">Kemaskini Kuiz: {{ $quiz->title }}</div>
         <div class="sub">Ubah soalan dan tetapan kuiz anda</div>
       </div>
-        <a href="{{ route('teacher.quizzes.index', $quiz->id) }}" class="btn-kembali">
+        <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali">
             <i class="bi bi-arrow-left"></i>Kembali
         </a>
     </div>
@@ -168,7 +168,8 @@
         MC: 'multiple_choice',
         SA: 'short_answer',
         TF: 'true_false',
-        CHECKBOX: 'checkbox'
+        CHECKBOX: 'checkbox',
+        CODING: 'coding'
     };
     
     // Global counter for question indices
@@ -182,7 +183,11 @@
         <section class="panel" style="margin-bottom:20px;" question-card data-index="${index}">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #d4c5f9;">
                 <h3 style="margin:0; font-size:16px; font-weight:700;">Soalan ${index + 1}</h3>
-                <button type="button" style="background:transparent; color:var(--danger); border:2px solid var(--danger); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-question-btn" data-index="${index}"><i class="bi bi-trash"></i></button>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button type="button" title="Pindah ke atas" style="background:transparent; color:var(--accent); border:2px solid var(--accent); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="move-up-btn" data-index="${index}"><i class="bi bi-arrow-up"></i></button>
+                    <button type="button" title="Pindah ke bawah" style="background:transparent; color:var(--accent); border:2px solid var(--accent); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="move-down-btn" data-index="${index}"><i class="bi bi-arrow-down"></i></button>
+                    <button type="button" style="background:transparent; color:var(--danger); border:2px solid var(--danger); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-question-btn" data-index="${index}"><i class="bi bi-trash"></i></button>
+                </div>
             </div>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
                 <!-- Left: Teks Soalan -->
@@ -203,6 +208,7 @@
                             <option value="${QUESTION_TYPES.CHECKBOX}">Kotak Semak</option>
                             <option value="${QUESTION_TYPES.SA}">Jawapan Pendek</option>
                             <option value="${QUESTION_TYPES.TF}">Benar/Salah</option>
+                            <option value="${QUESTION_TYPES.CODING}">Pengaturcaraan</option>
                         </select>
                     </div>
                 </div>
@@ -221,6 +227,190 @@
             <input type="text" name="questions[${index}][correct_answer]" placeholder="Masukkan jawapan yang tepat" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
         </div>
     `;
+
+    // Template for the Coding question input (Java only)
+    const codingTemplate = (index) => {
+        return `<div style="margin-top:12px;">
+<!-- Full Code Input Section with Inline Checkboxes -->
+<div style="margin-bottom:20px;">
+<label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Kod Penuh<span style="color: var(--danger);">*</span></label>
+<div style="display: flex; gap: 0; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; background: #f5f5f5;">
+  <!-- Checkbox Column -->
+  <div id="code-checkboxes-${index}" style="display: flex; flex-direction: column; background: linear-gradient(to bottom, #fafafa, #f5f5f5); border-right: 2px solid #e5e7eb; min-width: 40px; padding: 11px 4px; overflow-y: auto; font-size: 13px; line-height: 1.5; gap: 0px;">
+  </div>
+  
+  <!-- Line Numbers Column -->
+  <div id="code-lines-${index}" style="position: relative; background: #f9fafb; padding: 11px 8px; text-align: right; font-size: 13px; font-family: 'Courier New', monospace; color: #9ca3af; border-right: 2px solid #e5e7eb; line-height: 1.5; user-select: none; min-width: 40px;">1</div>
+  
+  <!-- Code Textarea -->
+  <div style="flex: 1; position: relative; overflow: hidden;">
+    <textarea name="questions[${index}][coding_full_code]" class="code-full-textarea" data-index="${index}" rows="1" placeholder="Masukkan kod Java lengkap di sini..." required style="width: 100%; padding: 11px 12px; border: none; background: transparent; color: inherit; font-size: 13px; font-family: 'Courier New', monospace; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;" oninput="updateCodeLineNumbers(this, ${index})"></textarea>
+  </div>
+</div>
+<div style="font-size:12px; color:#888; margin-top:8px; margin-bottom:12px;">
+<i class="bi bi-info-circle"></i> Klik checkbox untuk untuk baris yang harus dijawab oleh pelajar | ENTER untuk baris seterusnya | TAB untuk indentasi
+</div>
+</div>
+
+<!-- Hidden Lines Input -->
+<input type="hidden" name="questions[${index}][hidden_line_numbers]" class="hidden-lines-input" data-index="${index}" value="">
+
+<!-- Preview Section (Student View) -->
+<div style="margin-top:20px;">
+<label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px;">Pandangan Pelajar</label>
+<div id="code-preview-${index}" style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:0; min-height:100px; display: flex;">
+<div id="preview-lines-${index}" style="flex-shrink: 0; width: 40px; background: #e8e8e8; padding: 8px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none; padding-right: 6px;"></div>
+<div id="preview-code-${index}" style="flex: 1; padding: 8px 8px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit; white-space: pre-wrap; word-wrap: break-word; overflow-x: auto;">Masukkan kod di atas</div>
+</div>
+</div>
+</div>`;
+    };
+
+    // Function to update line numbers and refresh checkboxes
+    function updateCodeLineNumbers(textarea, index) {
+        const lines = textarea.value.split('\n');
+        
+        const lineNumbersDiv = document.getElementById(`code-lines-${index}`);
+        const checkboxesDiv = document.getElementById(`code-checkboxes-${index}`);
+        
+        // Auto-expand textarea based on content, starting from minimum single line
+        textarea.style.height = 'auto';
+        const minHeight = parseInt(window.getComputedStyle(textarea).lineHeight) * 1 + parseInt(window.getComputedStyle(textarea).paddingTop) + parseInt(window.getComputedStyle(textarea).paddingBottom);
+        textarea.style.height = Math.max(textarea.scrollHeight, minHeight) + 'px';
+        
+        // Update line numbers
+        let lineNumbers = '';
+        for (let i = 1; i <= Math.max(lines.length, 1); i++) {
+            lineNumbers += i + '<br>';
+        }
+        lineNumbersDiv.innerHTML = lineNumbers;
+        
+        // Update checkboxes column
+        updateCheckboxesColumn(index, lines);
+        
+        // Update preview
+        updateCodePreview(index, lines);
+    }
+
+    // Function to render checkboxes in the checkbox column
+    function updateCheckboxesColumn(index, lines) {
+        const checkboxesDiv = document.getElementById(`code-checkboxes-${index}`);
+        const hiddenInput = document.querySelector(`.hidden-lines-input[data-index="${index}"]`);
+        const currentHidden = hiddenInput.value ? hiddenInput.value.split(',').map(Number) : [];
+        
+        let html = '';
+        lines.forEach((line, i) => {
+            const lineNum = i + 1;
+            const isHidden = currentHidden.includes(lineNum);
+            
+            html += `<div class="checkbox-wrapper" data-line="${lineNum}" style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 17px;
+                margin: 1px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            " onmouseover="this.style.background='${isHidden ? 'rgba(168, 85, 247, 0.1)' : 'rgba(0, 0, 0, 0.03)'}';" onmouseout="this.style.background='transparent';">
+                <input 
+                    type="checkbox" 
+                    class="code-line-checkbox" 
+                    data-line="${lineNum}" 
+                    ${isHidden ? 'checked' : ''} 
+                    style="
+                        cursor: pointer;
+                        width: 10px;
+                        height: 10px;
+                        margin: 2px;
+                        accent-color: #A855F7;
+                    "
+                >
+            </div>`;
+        });
+        
+        checkboxesDiv.innerHTML = html;
+        
+        // Add event listeners to checkboxes
+        checkboxesDiv.querySelectorAll('.code-line-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', () => updateHiddenLines(index));
+        });
+    }
+
+    // Function to update hidden lines input and preview
+    function updateHiddenLines(index) {
+        const checkboxesDiv = document.getElementById(`code-checkboxes-${index}`);
+        const hiddenInput = document.querySelector(`.hidden-lines-input[data-index="${index}"]`);
+        const checkboxes = checkboxesDiv.querySelectorAll('.code-line-checkbox:checked');
+        
+        const hiddenLines = Array.from(checkboxes).map(cb => {
+            return cb.getAttribute('data-line');
+        });
+        
+        hiddenInput.value = hiddenLines.join(',');
+        
+        // Auto-calculate points: 1 point per hidden line
+        const pointsInput = document.querySelector(`input[name="questions[${index}][points]"]`);
+        if (pointsInput) {
+            pointsInput.value = Math.max(1, hiddenLines.length); // Minimum 1 point
+        }
+        
+        // Update preview
+        const textarea = document.querySelector(`.code-full-textarea[data-index="${index}"]`);
+        const lines = textarea.value.split('\n');
+        updateCodePreview(index, lines);
+    }
+
+    // Function to update code preview (showing what students will see)
+    function updateCodePreview(index, lines) {
+        const hiddenInput = document.querySelector(`.hidden-lines-input[data-index="${index}"]`);
+        const currentHidden = hiddenInput.value ? hiddenInput.value.split(',').map(Number) : [];
+        
+        const previewDiv = document.getElementById(`preview-code-${index}`);
+        const previewLines = document.getElementById(`preview-lines-${index}`);
+        
+        if (lines.length === 0) {
+            previewDiv.textContent = 'Masukkan kod di atas';
+            previewLines.innerHTML = '';
+            return;
+        }
+        
+        let previewHtml = '';
+        let lineNumbersHtml = '';
+        let lineNum = 1;
+        
+        lines.forEach((line, i) => {
+            if (currentHidden.includes(i + 1)) {
+                previewHtml += '<div style="height: 1.5em; display: flex; align-items: center;"><span style="background-color: #ffee8c; color: #000; padding: 2px 4px; border-radius: 2px;">[___BARIS DISEMBUNYIKAN___]</span></div>';
+            } else {
+                previewHtml += '<div style="height: 1.5em; display: flex; align-items: center;">' + line.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
+            }
+            lineNumbersHtml += '<div style="height: 1.5em; display: flex; align-items: center; justify-content: flex-end;">' + lineNum + '</div>';
+            lineNum++;
+        });
+        
+        previewDiv.innerHTML = previewHtml;
+        previewDiv.style.display = 'flex';
+        previewDiv.style.flexDirection = 'column';
+        previewLines.innerHTML = lineNumbersHtml;
+        previewLines.style.display = 'flex';
+        previewLines.style.flexDirection = 'column';
+    }
+
+    // Function to handle tab key for 4 spaces
+    function handleTabKey(event, index) {
+        const textarea = event.target;
+        if (event.code === 'Tab') {
+            event.preventDefault();
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            
+            // Insert 4 spaces at cursor position
+            textarea.value = textarea.value.substring(0, start) + '    ' + textarea.value.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + 4;
+            updateCodeLineNumbers(textarea, index);
+        }
+    }
+
 
     // Template for Options container (used by MC, TF, and CHECKBOX)
     const optionTemplate = (qIndex, type) => {
@@ -303,6 +493,8 @@
 
         if (type === QUESTION_TYPES.SA) {
             container.innerHTML = shortAnswerTemplate(qIndex);
+        } else if (type === QUESTION_TYPES.CODING) {
+            container.innerHTML = codingTemplate(qIndex);
         } else if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF || type === QUESTION_TYPES.CHECKBOX) {
             
             container.innerHTML = optionTemplate(qIndex, type);
@@ -347,6 +539,51 @@
         optionsList.insertAdjacentHTML('beforeend', rowTemplate(qIndex, currentOptions));
     };
 
+    // Function to update question numbers after moving
+    function updateQuestionNumbers() {
+        const container = document.getElementById('questions-container');
+        const questionCards = container.querySelectorAll('[question-card]');
+        
+        questionCards.forEach((card, index) => {
+            const oldIndex = parseInt(card.getAttribute('data-index'));
+            const newIndex = index;
+            
+            // Update question number display
+            const titleElement = card.querySelector('h3');
+            if (titleElement) {
+                titleElement.textContent = `Soalan ${newIndex + 1}`;
+            }
+            
+            // Update all field names from questions[oldIndex] to questions[newIndex]
+            card.setAttribute('data-index', newIndex);
+            card.innerHTML = card.innerHTML
+                .replace(new RegExp(`questions\\[${oldIndex}\\]`, 'g'), `questions[${newIndex}]`)
+                .replace(new RegExp(`code-checkboxes-${oldIndex}`, 'g'), `code-checkboxes-${newIndex}`)
+                .replace(new RegExp(`code-lines-${oldIndex}`, 'g'), `code-lines-${newIndex}`)
+                .replace(new RegExp(`preview-lines-${oldIndex}`, 'g'), `preview-lines-${newIndex}`)
+                .replace(new RegExp(`preview-code-${oldIndex}`, 'g'), `preview-code-${newIndex}`)
+                .replace(new RegExp(`code-preview-${oldIndex}`, 'g'), `code-preview-${newIndex}`)
+                .replace(new RegExp(`answers-container-${oldIndex}`, 'g'), `answers-container-${newIndex}`)
+                .replace(new RegExp(`data-index="${oldIndex}"`, 'g'), `data-index="${newIndex}"`);
+            
+            // Re-attach event listeners for code textarea if it's a coding question
+            const fullCodeTextarea = card.querySelector(`.code-full-textarea[data-index="${newIndex}"]`);
+            if (fullCodeTextarea) {
+                fullCodeTextarea.addEventListener('input', function() {
+                    updateCodeLineNumbers(this, newIndex);
+                });
+            }
+            
+            // Update button data attributes
+            const removeBtn = card.querySelector('.remove-question-btn');
+            const moveUpBtn = card.querySelector('.move-up-btn');
+            const moveDownBtn = card.querySelector('.move-down-btn');
+            if (removeBtn) removeBtn.setAttribute('data-index', newIndex);
+            if (moveUpBtn) moveUpBtn.setAttribute('data-index', newIndex);
+            if (moveDownBtn) moveDownBtn.setAttribute('data-index', newIndex);
+        });
+    }
+
     // --- EVENT LISTENERS & INITIALIZATION ---
     
     document.addEventListener('DOMContentLoaded', function () {
@@ -362,6 +599,11 @@
                 // Populate existing data into the form inputs
                 const card = container.querySelector(`[question-card][data-index="${i}"]`);
                 
+                if (!card) {
+                    console.error(`Could not find card with data-index="${i}"`);
+                    return;
+                }
+                
                 // Set question text
                 const textArea = card.querySelector('textarea[name*="question_text"]');
                 if (textArea) textArea.value = qData.question_text || '';
@@ -374,13 +616,32 @@
                 const typeSelect = card.querySelector('select[name*="type"]');
                 if (typeSelect) typeSelect.value = qData.type || QUESTION_TYPES.MC;
                 
-                // Re-render to show correct fields based on loaded type
-                renderAnswerFields(i, qData.type);
-                
                 // Populate options/answers
                 if (qData.type === QUESTION_TYPES.SA) {
                     const correctInput = card.querySelector('input[name*="correct_answer"]');
                     if (correctInput) correctInput.value = qData.correct_answer || '';
+                } else if (qData.type === QUESTION_TYPES.CODING) {
+                    // Handle Coding question
+                    const codeTextarea = card.querySelector('textarea[name*="coding_full_code"]');
+                    if (codeTextarea) {
+                        // Set hidden line numbers FIRST before updating code display
+                        const hiddenLinesInput = card.querySelector('.hidden-lines-input');
+                        if (hiddenLinesInput && qData.hidden_line_numbers) {
+                            hiddenLinesInput.value = qData.hidden_line_numbers;
+                        }
+                        
+                        // Now set code and update display (which will use the hidden lines)
+                        codeTextarea.value = qData.coding_full_code || '';
+                        updateCodeLineNumbers(codeTextarea, i);
+                        
+                        // Add event listeners for coding textarea
+                        codeTextarea.addEventListener('input', function() {
+                            updateCodeLineNumbers(this, i);
+                        });
+                        codeTextarea.addEventListener('keydown', function(e) {
+                            handleTabKey(e, i);
+                        });
+                    }
                 } else if (qData.type === QUESTION_TYPES.TF) {
                     // Handle True/False specific logic
                     const radios = card.querySelectorAll('input[type="radio"]');
@@ -473,6 +734,26 @@
                      
                 } else {
                     alert("Kuiz mesti mempunyai sekurang-kurangnya satu soalan.");
+                }
+            }
+
+            // Move Question Up
+            if (e.target.closest('.move-up-btn')) {
+                const card = e.target.closest('[question-card]');
+                const previousCard = card.previousElementSibling;
+                if (previousCard && previousCard.hasAttribute('question-card')) {
+                    card.parentNode.insertBefore(card, previousCard);
+                    updateQuestionNumbers();
+                }
+            }
+
+            // Move Question Down
+            if (e.target.closest('.move-down-btn')) {
+                const card = e.target.closest('[question-card]');
+                const nextCard = card.nextElementSibling;
+                if (nextCard && nextCard.hasAttribute('question-card')) {
+                    card.parentNode.insertBefore(nextCard, card);
+                    updateQuestionNumbers();
                 }
             }
             
