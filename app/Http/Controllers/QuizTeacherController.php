@@ -30,16 +30,19 @@ class QuizTeacherController extends Controller
         // 2. Filter based on publication status and user role
         // Show published quizzes to everyone
         // Show draft quizzes only to their creator
-        $query->where(function ($q) {
-            $q->where('is_published', true)
-              ->orWhere(function ($q2) {
-                  // Show draft quizzes only to authenticated teachers who are the creator
-                  if (Auth::check() && Auth::user()->role === 'teacher') {
+        if (Auth::check() && Auth::user()->role === 'teacher') {
+            // Teachers see published quizzes + their own draft quizzes
+            $query->where(function ($q) {
+                $q->where('is_published', true)
+                  ->orWhere(function ($q2) {
                       $q2->where('is_published', false)
-                          ->where('teacher_id', Auth::id());
-                  }
-              });
-        });
+                         ->where('teacher_id', Auth::id());
+                  });
+            });
+        } else {
+            // Non-authenticated or non-teacher users see only published quizzes
+            $query->where('is_published', true);
+        }
         
         // 3. Apply Filtering Logic (Copy from your index.blade.php assumptions)
         
