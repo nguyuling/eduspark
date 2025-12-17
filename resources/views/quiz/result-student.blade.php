@@ -96,16 +96,43 @@
                 $hiddenLineNumbers = !empty($answer->question->hidden_line_numbers) 
                   ? array_map('intval', explode(',', $answer->question->hidden_line_numbers))
                   : [];
+                $codeLines = explode("\n", $answer->question->coding_full_code);
               @endphp
-              @if(count($hiddenLineNumbers) > 0)
-                <div style="font-family:monospace; font-size:13px; background:#f5f5f5; padding:12px; border-radius:6px; line-height:1.6;">
-                  @foreach($hiddenLineNumbers as $lineNum)
+              @if(count($codeLines) > 0)
+                <div style="font-family:monospace; font-size:13px; background:#f5f5f5; padding:12px; border-radius:6px; line-height:1.8;">
+                  @foreach($codeLines as $index => $codeLine)
                     @php
+                      $lineNum = $index + 1;
+                      $isHidden = in_array($lineNum, $hiddenLineNumbers);
                       $lineKey = 'line_' . $lineNum;
+                      $studentAnswer = $submittedAnswers[$lineKey] ?? '';
+                      $expectedCode = trim($codeLine);
+                      $isCorrect = trim($studentAnswer) === $expectedCode;
                     @endphp
-                    <div style="margin-bottom:8px; display:flex; gap:12px;">
-                      <span style="color:#999; min-width:30px;">{{ $lineNum }}:</span>
-                      <span style="color:#0b1220; flex:1; word-break:break-word;">{{ $submittedAnswers[$lineKey] ?? '(Tidak dijawab)' }}</span>
+                    <div style="margin-bottom:4px; display:flex; gap:12px; align-items:flex-start;">
+                      <span style="color:#999; min-width:30px; text-align:right;">{{ $lineNum }}:</span>
+                      <div style="flex:1;">
+                        @if($isHidden)
+                          {{-- Hidden line: show student's answer with status --}}
+                          <div style="display:flex; gap:8px; align-items:center;">
+                            <span style="color:#0b1220; word-break:break-word; flex:1; padding:4px 6px; background:{{ $isCorrect ? 'rgba(42,157,143,0.1)' : 'rgba(230,57,70,0.1)' }}; border-radius:4px;">
+                              {{ $studentAnswer ?: '(Tidak dijawab)' }}
+                            </span>
+                            <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; background:{{ $isCorrect ? 'rgba(42,157,143,0.2)' : 'rgba(230,57,70,0.2)' }}; color:{{ $isCorrect ? '#2A9D8F' : '#E63946' }};white-space:nowrap;">
+                              {{ $isCorrect ? '✓ Betul' : '✗ Salah' }}
+                            </span>
+                          </div>
+                          {{-- Show correct answer if wrong --}}
+                          @if(!$isCorrect && $studentAnswer !== '')
+                            <div style="margin-top:4px; font-size:12px; color:#666; padding-left:6px; border-left:2px solid #ddd;">
+                              Sepatutnya: <span style="color:#2A9D8F; font-weight:600;">{{ $expectedCode }}</span>
+                            </div>
+                          @endif
+                        @else
+                          {{-- Non-hidden line: show as read-only --}}
+                          <span style="color:#666;">{{ trim($codeLine) }}</span>
+                        @endif
+                      </div>
                     </div>
                   @endforeach
                 </div>
@@ -136,16 +163,18 @@
                   $codeLines = explode("\n", $answer->question->coding_full_code);
                 @endphp
                 @if(count($hiddenLineNumbers) > 0)
-                  <div style="font-family:monospace; font-size:13px; background:#f0fef5; padding:12px; border-radius:6px; line-height:1.6;">
-                    @foreach($hiddenLineNumbers as $lineNum)
+                  <div style="font-family:monospace; font-size:13px; background:#f0fef5; padding:12px; border-radius:6px; line-height:1.8;">
+                    @foreach($codeLines as $index => $codeLine)
                       @php
-                        $lineIndex = $lineNum - 1;
-                        $correctCode = isset($codeLines[$lineIndex]) ? trim($codeLines[$lineIndex]) : '';
+                        $lineNum = $index + 1;
+                        $isHidden = in_array($lineNum, $hiddenLineNumbers);
                       @endphp
-                      <div style="margin-bottom:8px; display:flex; gap:12px;">
-                        <span style="color:#999; min-width:30px;">{{ $lineNum }}:</span>
-                        <span style="color:#2A9D8F; flex:1; word-break:break-word; font-weight:600;">{{ $correctCode }}</span>
-                      </div>
+                      @if($isHidden)
+                        <div style="margin-bottom:4px; display:flex; gap:12px; align-items:center;">
+                          <span style="color:#999; min-width:30px; text-align:right;">{{ $lineNum }}:</span>
+                          <span style="color:#2A9D8F; flex:1; word-break:break-word; font-weight:600; padding:4px 6px; background:rgba(42,157,143,0.1); border-radius:4px;">{{ trim($codeLine) }}</span>
+                        </div>
+                      @endif
                     @endforeach
                   </div>
                 @endif
