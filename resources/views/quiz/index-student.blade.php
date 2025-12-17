@@ -163,10 +163,6 @@
           </a>
         </div>
       @endif
-            </tr>
-          @endforelse
-        </tbody>
-      </table>
     </section>
   </main>
 </div>
