@@ -7,7 +7,7 @@ return [
     // QUIZ 1: Java - Asas Sintaks dan Jenis Data (Based on Form 4/Basic Java)
     // ----------------------------------------------------------------------
     [
-        'teacher_id' => 2,
+        'teacher_id' => 10,
         'title' => 'Java: Asas Sintaks dan Jenis Data',
         'description' => 'Kuiz ini menguji pengetahuan asas tentang sintaks Java, pemboleh ubah, dan jenis data primitif.',
         'max_attempts' => 5,
@@ -103,7 +103,7 @@ return [
     // QUIZ 2: Java - Konsep Pengaturcaraan Berorientasi Objek (OOP)
     // ----------------------------------------------------------------------
     [
-        'teacher_id' => 3,
+        'teacher_id' => 11,
         'title' => 'Java: Konsep Pengaturcaraan Berorientasi Objek (OOP)',
         'description' => 'Kuiz ini menguji pemahaman anda tentang Kelas, Objek, Pewarisan, dan Polimorfisme.',
         'max_attempts' => 3,
@@ -240,7 +240,7 @@ return [
     // QUIZ 3: Java - Struktur Kawalan
     // ----------------------------------------------------------------------
     [
-        'teacher_id' => 4,
+        'teacher_id' => 12,
         'title' => 'Java: Struktur Kawalan dan Titasusunan (Array) ',
         'description' => 'Kuiz mengenai pernyataan if-else, loops, dan manipulasi tatasusunan (arrays).',
         'max_attempts' => 5,
@@ -355,7 +355,7 @@ return [
     // QUIZ 4: Tingkatan 5, Bab 1 - Etika Komputer & Undang-undang Siber
     // ----------------------------------------------------------------------
     [
-        'teacher_id' => 5,
+        'teacher_id' => 13,
         'title' => 'Tingkatan 5, Bab 1: Etika Komputer dan Undang-undang Siber',
         'description' => 'Kuiz ini merangkumi konsep etika dalam pengkomputeran, hak cipta, dan undang-undang siber.',
         'max_attempts' => 2,
@@ -492,7 +492,7 @@ return [
     // QUIZ 5: Tingkatan 5, Bab 1 - Pembangunan Aplikasi Laman Web (Basics)
     // ----------------------------------------------------------------------
     [
-        'teacher_id' => 6,
+        'teacher_id' => 14,
         'title' => 'Tingkatan 5, Bab 1: Pembangunan Aplikasi Laman Web (Asas)',
         'description' => 'Kuiz ini menguji asas pembangunan aplikasi web termasuk bahasa skrip.',
         'max_attempts' => 4,
@@ -590,7 +590,7 @@ return [
     // QUIZ 6: Tingkatan 5 Bab 1 - Komputer & Impak
     // ---------------------------------------------------------------
     [
-        'teacher_id' => 2,
+        'teacher_id' => 10,
         'title' => 'Tingkatan 5 Bab 1: Komputer & Impak Sosial',
         'description' => 'Kuiz mengenai impak komputer dan teknologi terhadap masyarakat dan ekonomi.',
         'max_attempts' => 3,
@@ -688,7 +688,7 @@ return [
     // QUIZ 7: Tingkatan 5 Bab 1 - Seni Bina Komputer
     // ---------------------------------------------------------------
     [
-        'teacher_id' => 2,
+        'teacher_id' => 10,
         'title' => 'Tingkatan 5 Bab 1: Seni Bina Komputer',
         'description' => 'Kuiz mengenai struktur dan komponen utama seni bina komputer.',
         'max_attempts' => 3,
@@ -786,7 +786,7 @@ return [
     // QUIZ 8: Tingkatan 5 Bab 1 - Gerbang Logik
     // ---------------------------------------------------------------
     [
-        'teacher_id' => 2,
+        'teacher_id' => 10,
         'title' => 'Tingkatan 5 Bab 1: Gerbang Logik',
         'description' => 'Kuiz mengenai gerbang logik asas dan operasi logik dalam seni bina digital.',
         'max_attempts' => 3,
@@ -884,7 +884,7 @@ return [
     // QUIZ 14: Tingkatan 5 Bab 1 - Pengaturcaraan Java (Coding)
     // ---------------------------------------------------------------
     [
-        'teacher_id' => 2,
+        'teacher_id' => 10,
         'title' => 'Tingkatan 5: Pengaturcaraan Java - Soalan Kod',
         'description' => 'Kuiz pengekodan yang memerlukan pelajar menulis kod Java dari awal atau melengkapkan templat yang disediakan.',
         'max_attempts' => 3,
