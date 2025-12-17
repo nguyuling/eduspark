@@ -80,7 +80,8 @@
         <tbody>
           @forelse ($lessons ?? [] as $index => $lesson)
             <tr>
-              <td style="width:55%">
+              <td style="width:5%; text-align:center; font-weight:600;">{{ $index + 1 }}</td>
+              <td style="width:45%">
                 <div class="table-title">{{ $lesson->title }}</div>
                 <div class="table-subtitle">{{ $lesson->description ?: 'Tiada penerangan' }}</div>
                 <div class="table-meta">
@@ -119,11 +120,23 @@
             </tr>
           @empty
             <tr>
-              <td colspan="3" class="empty-state">Tiada bahan ditemui.</td>
+              <td colspan="4" class="empty-state">Tiada bahan ditemui.</td>
             </tr>
           @endforelse
         </tbody>
       </table>
+
+      <!-- Show More Section -->
+      @if ($hasMore ?? false)
+        <div style="text-align:center; margin-top:20px; padding:20px;">
+          <a href="{{ route('lesson.index', array_merge(request()->query(), ['limit' => $nextLimit])) }}" 
+             style="color:var(--accent); text-decoration:none; font-size:14px; cursor:pointer;" 
+             onmouseover="this.style.textDecoration='underline';" 
+             onmouseout="this.style.textDecoration='none';">
+            Tunjukkan 10 Bahan Lagi
+          </a>
+        </div>
+      @endif
     </section>
   </main>
 </div>
