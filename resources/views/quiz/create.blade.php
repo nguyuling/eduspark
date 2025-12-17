@@ -337,21 +337,26 @@ Pilih Semua
         
         selector.innerHTML = html;
         
-        // Add click handlers to each row
-        selector.querySelectorAll('.line-selector-row').forEach(row => {
-            row.addEventListener('click', function() {
-                const checkbox = this.querySelector('.line-checkbox');
+        // Use event delegation for row clicks (handles all rows including scrolled ones)
+        selector.removeEventListener('click', window[`lineSelector_${index}_handler`]);
+        window[`lineSelector_${index}_handler`] = function(e) {
+            const row = e.target.closest('.line-selector-row');
+            if (row) {
+                const checkbox = row.querySelector('.line-checkbox');
                 checkbox.checked = !checkbox.checked;
                 updateHiddenLines(index);
-            });
-        });
+            }
+        };
+        selector.addEventListener('click', window[`lineSelector_${index}_handler`]);
         
         // Add event listener to select all checkbox
         const selectAllCheckbox = document.querySelector(`.select-all-lines[data-index="${index}"]`);
         if (selectAllCheckbox) {
-            selectAllCheckbox.addEventListener('change', function() {
+            selectAllCheckbox.removeEventListener('change', window[`selectAll_${index}_handler`]);
+            window[`selectAll_${index}_handler`] = function() {
                 selectAllLines(index, this.checked);
-            });
+            };
+            selectAllCheckbox.addEventListener('change', window[`selectAll_${index}_handler`]);
         }
     }
 
