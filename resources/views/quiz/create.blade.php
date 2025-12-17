@@ -232,7 +232,7 @@
 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Kod Penuh<span style="color: var(--danger);">*</span></label>
 <div style="display: flex; gap: 0; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; background: #f5f5f5;">
   <!-- Checkbox Column -->
-  <div id="code-checkboxes-${index}" style="display: flex; flex-direction: column; background: linear-gradient(to bottom, #fafafa, #f5f5f5); border-right: 2px solid #e5e7eb; min-width: 45px; padding: 11px 8px; overflow-y: auto; font-size: 13px; line-height: 1.5; gap: 2px;">
+  <div id="code-checkboxes-${index}" style="display: flex; flex-direction: column; background: linear-gradient(to bottom, #fafafa, #f5f5f5); border-right: 2px solid #e5e7eb; min-width: 40px; padding: 11px 4px; overflow-y: auto; font-size: 13px; line-height: 1.5; gap: 0px;">
   </div>
   
   <!-- Line Numbers Column -->
@@ -240,7 +240,7 @@
   
   <!-- Code Textarea -->
   <div style="flex: 1; position: relative; overflow: hidden;">
-    <textarea name="questions[${index}][coding_full_code]" class="code-full-textarea" data-index="${index}" rows="8" placeholder="Masukkan kod Java lengkap di sini..." required style="width: 100%; padding: 11px 12px; border: none; background: transparent; color: inherit; font-size: 13px; font-family: 'Courier New', monospace; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;"></textarea>
+    <textarea name="questions[${index}][coding_full_code]" class="code-full-textarea" data-index="${index}" rows="1" placeholder="Masukkan kod Java lengkap di sini..." required style="width: 100%; padding: 11px 12px; border: none; background: transparent; color: inherit; font-size: 13px; font-family: 'Courier New', monospace; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;"></textarea>
   </div>
 </div>
 <div style="font-size:12px; color:#888; margin-top:8px; margin-bottom:12px;">
@@ -268,9 +268,10 @@
         const lineNumbersDiv = document.getElementById(`code-lines-${index}`);
         const checkboxesDiv = document.getElementById(`code-checkboxes-${index}`);
         
-        // Auto-expand textarea based on content
+        // Auto-expand textarea based on content, starting from minimum single line
         textarea.style.height = 'auto';
-        textarea.style.height = Math.max(textarea.scrollHeight, 100) + 'px';
+        const minHeight = parseInt(window.getComputedStyle(textarea).lineHeight) * 1 + parseInt(window.getComputedStyle(textarea).paddingTop) + parseInt(window.getComputedStyle(textarea).paddingBottom);
+        textarea.style.height = Math.max(textarea.scrollHeight, minHeight) + 'px';
         
         // Update line numbers
         let lineNumbers = '';
@@ -301,8 +302,9 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                height: 24px;
-                border-radius: 4px;
+                height: 20px;
+                min-height: 20px;
+                border-radius: 3px;
                 cursor: pointer;
                 transition: all 0.2s ease;
                 background: ${isHidden ? 'rgba(168, 85, 247, 0.15)' : 'transparent'};
@@ -315,9 +317,10 @@
                     ${isHidden ? 'checked' : ''} 
                     style="
                         cursor: pointer;
-                        width: 16px;
-                        height: 16px;
+                        width: 14px;
+                        height: 14px;
                         accent-color: #A855F7;
+                        margin: 0;
                     "
                 >
             </div>`;
@@ -379,7 +382,7 @@
             lineNum++;
         });
         
-        previewDiv.textContent = previewHtml.trimEnd();
+        previewDiv.innerHTML = previewHtml.trimEnd();
         previewLines.innerHTML = lineNumbersHtml;
     }
 
