@@ -256,7 +256,7 @@
 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px;">Pandangan Pelajar</label>
 <div id="code-preview-${index}" style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:8px; min-height:100px;">
 <div id="preview-lines-${index}" style="position: absolute; left: 0; top: 8px; width: 40px; background: #e8e8e8; padding: 3px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none;"></div>
-<div id="preview-code-${index}" style="margin-left:50px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit;">Masukkan kod di atas</div>
+<div id="preview-code-${index}" style="margin-left:50px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit; display: flex; flex-direction: column;">Masukkan kod di atas</div>
 </div>
 </div>
 </div>`;
@@ -302,9 +302,9 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                height: 20px;
-                min-height: 20px;
-                border-radius: 3px;
+                height: 18px;
+                min-height: 18px;
+                border-radius: 2px;
                 cursor: pointer;
                 transition: all 0.2s ease;
                 background: ${isHidden ? 'rgba(168, 85, 247, 0.15)' : 'transparent'};
@@ -317,8 +317,8 @@
                     ${isHidden ? 'checked' : ''} 
                     style="
                         cursor: pointer;
-                        width: 14px;
-                        height: 14px;
+                        width: 12px;
+                        height: 12px;
                         accent-color: #A855F7;
                         margin: 0;
                     "
@@ -374,15 +374,15 @@
         
         lines.forEach((line, i) => {
             if (currentHidden.includes(i + 1)) {
-                previewHtml += `<div style="background:#fff3cd; color:#856404; padding:2px 4px; margin:0 -4px;">[___BARIS DISEMBUNYIKAN___]</div>\n`;
+                previewHtml += `<div style="background:#fff3cd; color:#856404; padding:2px 4px; margin:0 -4px;">[___BARIS DISEMBUNYIKAN___]</div>`;
             } else {
-                previewHtml += (line || '') + '\n';
+                previewHtml += `<div>${line || ''}</div>`;
             }
             lineNumbersHtml += lineNum + '<br>';
             lineNum++;
         });
         
-        previewDiv.innerHTML = previewHtml.trimEnd();
+        previewDiv.innerHTML = previewHtml;
         previewLines.innerHTML = lineNumbersHtml;
     }
 
