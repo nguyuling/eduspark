@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { gameService } from "/src/services/api";
+import { gameService } from '../../services/api'; 
 import GameCard from './GameCard';
 
 const GameList = () => {

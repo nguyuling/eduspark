@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\GameProgressController;
+use App\Http\Controllers\LeaderboardController;
 
 // Game Update Routes (Teacher specific)
 Route::prefix('teacher')->middleware('auth:sanctum')->group(function () {
@@ -38,4 +39,18 @@ Route::prefix('games')->group(function () {
     Route::get('/{game}/progress', [GameProgressController::class, 'getProgress']);
     Route::get('/progress/all', [GameProgressController::class, 'getAllProgress']);
     Route::post('/rewards/{reward}/claim', [GameProgressController::class, 'claimReward']);
+});
+
+// ===== LEADERBOARD ROUTES =====
+
+Route::prefix('leaderboard')->group(function () {
+    // Public: view leaderboard
+    Route::get('/', [LeaderboardController::class, 'index']);
+
+    // Public: submit score (no auth — students don’t log in mid-game)
+    Route::post('/', [LeaderboardController::class, 'store']);
+
+    // Teacher-only: reset (add middleware later)
+    Route::delete('/', [LeaderboardController::class, 'reset'])
+        ->middleware('auth:sanctum'); // ← only if teacher is logged in
 });

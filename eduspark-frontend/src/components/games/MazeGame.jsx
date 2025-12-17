@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { progressService } from '../../services/progressService';
 import GameSummary from './GameSummary';
 import RewardsDisplay from './RewardsDisplay';
+import Leaderboard from '../leaderboard/Leaderboard';
 
 const MazeGame = () => {
-  // === All state hooks remain exactly the same ===
+  // === State Variables ===
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [characterPos, setCharacterPos] = useState({ x: 1, y: 1 });
@@ -24,8 +25,10 @@ const MazeGame = () => {
   const [startTime, setStartTime] = useState(null);
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showGameOverModal, setShowGameOverModal] = useState(false); // NEW STATE
 
-  // Database & Progress — unchanged
+  // === Save Score to Database ===
   const saveScoreToDatabase = async (finalScore, status) => {
     try {
       let playerId = localStorage.getItem('mazeGamePlayerId');
@@ -34,7 +37,7 @@ const MazeGame = () => {
         localStorage.setItem('mazeGamePlayerId', playerId);
       }
       const gameId = 4;
-      const response = await fetch('/save-game-score', {
+      const response = await fetch('/api/save-game-score', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -59,11 +62,61 @@ const MazeGame = () => {
       }
       const result = await response.json();
       console.log('📊 Score save result:', result);
+      return result;
     } catch (error) {
       console.error('❌ Failed to save score:', error);
+      return null;
     }
   };
 
+  // === Submit Score to Leaderboard ===
+  const submitToLeaderboard = async (finalScore) => {
+    const userData = localStorage.getItem('user');
+    let user = null;
+    
+    try {
+      if (userData) {
+        user = JSON.parse(userData);
+      }
+    } catch (e) {
+      console.warn('Failed to parse user data from localStorage');
+    }
+    
+    if (!user || !user.id) {
+      console.warn('⚠️ User not authenticated — skipping leaderboard submission');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${user.token || ''}`
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          username: user.name || 'Anonymous',
+          class: user.class || 'Unknown',
+          game_id: 'game4',
+          score: finalScore,
+          time_taken: startTime ? Math.floor((Date.now() - startTime) / 1000) : 120 - timeLeft
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${response.status}`);
+      }
+
+      console.log('✅ Score submitted to leaderboard');
+    } catch (error) {
+      console.error('❌ Leaderboard submission failed:', error.message);
+    }
+  };
+
+  // === Progress Tracking ===
   const startGameTracking = async (gameId) => {
     try {
       const response = await progressService.startGame(gameId);
@@ -81,7 +134,7 @@ const MazeGame = () => {
         level: 1,
         time_spent: timeSpent,
         completed: true,
-        progress_data: {
+        progress: {
           questions_answered: questionsAnswered,
           correct_answers: correctAnswers,
           accuracy_percentage: questionsAnswered > 0 ? (correctAnswers / questionsAnswered) * 100 : 0,
@@ -98,7 +151,7 @@ const MazeGame = () => {
     }
   };
 
-  // Maze & Questions — updated for 16×16
+  // === Maze Layout ===
   const [maze] = useState([
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
@@ -125,144 +178,145 @@ const MazeGame = () => {
     { x: 6, y: 11 }, { x: 13, y: 13 }, { x: 8, y: 13 }
   ];
 
+  // === BEGINNER JAVA QUESTIONS (Bahasa Melayu) ===
   const questionsPool = [
     {
-      question: "Apakah maksud 'pemboleh ubah' dalam pengaturcaraan?",
+      question: "Apakah bahasa pengaturcaraan Java?",
       options: [
-        "Nilai yang sentiasa tetap",
-        "Simpanan data yang boleh berubah nilainya",
-        "Arahan untuk mengira",
-        "Struktur data jenis senarai"
+        "Bahasa mesin",
+        "Bahasa pengaturcaraan berorientasi objek",
+        "Bahasa pangkalan data",
+        "Bahasa markup"
       ],
       correct: 1,
-      explanation: "✅ Pemboleh ubah ialah lokasi ingatan yang menyimpan data yang nilainya boleh diubah semasa perlaksanaan atur cara."
+      explanation: "✅ Java adalah bahasa pengaturcaraan berorientasi objek yang popular untuk membina aplikasi mudah alih, desktop dan web."
     },
     {
-      question: "Struktur kawalan manakah yang digunakan untuk membuat keputusan dalam atur cara?",
+      question: "Apakah fungsi utama 'public static void main(String[] args)' dalam Java?",
       options: [
-        "for",
-        "while",
-        "if...else",
-        "function"
-      ],
-      correct: 2,
-      explanation: "✅ Struktur kawalan 'if...else' digunakan untuk membuat keputusan berdasarkan syarat (boolean)."
-    },
-    {
-      question: "Apakah output bagi kod Python berikut?\n```x = 5\ny = 2\nprint(x // y)```",
-      options: [
-        "2.5",
-        "2",
-        "3",
-        "10"
-      ],
-      correct: 1,
-      explanation: "✅ Operator '//' adalah pembahagian integer (floor division). 5 // 2 = 2."
-    },
-    {
-      question: "Apakah fungsi utama 'function' dalam pengaturcaraan?",
-      options: [
-        "Menyimpan data kekal",
-        "Mengelakkan pengulangan kod",
+        "Menyatakan pemboleh ubah",
+        "Titik permulaan program Java",
         "Mencetak output ke skrin",
-        "Menghubungkan ke pangkalan data"
+        "Mengimport pakej"
       ],
       correct: 1,
-      explanation: "✅ Fungsi membolehkan kod ditulis sekali dan diguna semula — meningkatkan kerekaan modular dan boleh selenggara."
+      explanation: "✅ 'main' method adalah titik masuk utama (entry point) untuk program Java. Semua program Java bermula di sini."
     },
     {
-      question: "Jenis data manakah yang sesuai untuk menyimpan 'True' atau 'False'?",
+      question: "Apakah output bagi kod berikut?\n```java\nint x = 5;\nint y = 2;\nSystem.out.println(x + y);\n```",
       options: [
-        "integer",
-        "string",
-        "float",
-        "boolean"
-      ],
-      correct: 3,
-      explanation: "✅ Jenis data 'boolean' hanya mempunyai dua nilai: True atau False."
-    },
-    {
-      question: "Apakah maksud 'komputasi awan'?",
-      options: [
-        "Penggunaan komputer riba untuk sambungan internet",
-        "Perkhidmatan komputing yang disediakan melalui internet",
-        "Sistem operasi berbasis awan",
-        "Peranti storan fizikal berbentuk awan"
-      ],
-      correct: 1,
-      explanation: "✅ Komputasi awan merujuk kepada perkhidmatan seperti penyimpanan, pemprosesan, dan aplikasi yang disampaikan melalui internet."
-    },
-    {
-      question: "Antara berikut, yang manakah BUKAN model perkhidmatan komputasi awan?",
-      options: [
-        "IaaS",
-        "PaaS",
-        "SaaS",
-        "CaaS"
-      ],
-      correct: 3,
-      explanation: "✅ Model utama ialah IaaS (Infrastructure), PaaS (Platform), dan SaaS (Software)."
-    },
-    {
-      question: "Apakah ciri utama 'komputasi selari'?",
-      options: [
-        "Satu tugas dilaksanakan oleh satu pemproses sahaja",
-        "Beberapa tugas dilaksanakan serentak oleh pelbagai pemproses",
-        "Atur cara dilaksanakan secara turutan",
-        "Tiada keperluan untuk koordinasi"
-      ],
-      correct: 1,
-      explanation: "✅ Komputasi selari melibatkan pelbagai pemproses/tetulang melaksanakan bahagian tugas secara serentak."
-    },
-    {
-      question: "Apakah kelebihan utama komputasi awan kepada pengguna?",
-      options: [
-        "Kos permulaan yang tinggi",
-        "Keperluan peranti keras berkuasa tinggi",
-        "Akses dari mana-mana lokasi dengan internet",
-        "Keselamatan data lebih rendah"
-      ],
-      correct: 2,
-      explanation: "✅ Pengguna boleh mengakses perkhidmatan awan dari mana-mana peranti dengan sambungan internet."
-    },
-    {
-      question: "Apakah maksud 'scalability' dalam komputasi awan?",
-      options: [
-        "Keupayaan sistem untuk mengecilkan sumber",
-        "Keupayaan sistem untuk menyesuaikan sumber mengikut permintaan",
-        "Kepantasan rangkaian sahaja",
-        "Jumlah data yang boleh disimpan"
-      ],
-      correct: 1,
-      explanation: "✅ 'Scalability' bermaksud sistem boleh dikembangkan atau dikecilkan mengikut keperluan."
-    },
-    {
-      question: "Apakah output bagi kod Python ini?\n```for i in range(3):\n    print(i, end=' ')\n```",
-      options: [
-        "0 1 2",
-        "1 2 3",
-        "0 1 2 3",
-        "3"
+        "7",
+        "52",
+        "10",
+        "5+2"
       ],
       correct: 0,
-      explanation: "✅ `range(3)` menghasilkan 0, 1, 2."
+      explanation: "✅ Operator '+' menambah nilai: 5 + 2 = 7."
     },
     {
-      question: "Apakah fungsi 'cloud storage'?",
+      question: "Apakah jenis data untuk menyimpan nombor bulat dalam Java?",
       options: [
-        "Menyimpan data pada cakera keras fizikal di rumah",
-        "Menyimpan data pada pelayan jauh melalui internet",
-        "Memproses data tanpa internet",
-        "Mengedit dokumen secara manual"
+        "String",
+        "boolean",
+        "int",
+        "double"
+      ],
+      correct: 2,
+      explanation: "✅ 'int' digunakan untuk menyimpan nombor bulat seperti 1, 2, 3, -10, 100, dsb."
+    },
+    {
+      question: "Bagaimanakah anda mengisytiharkan pemboleh ubah dalam Java?",
+      options: [
+        "variable x = 5;",
+        "int x = 5;",
+        "x = 5;",
+        "declare x = 5;"
       ],
       correct: 1,
-      explanation: "✅ Cloud storage (contoh: Google Drive) menyimpan data di pelayan jauh."
+      explanation: "✅ Sintaks yang betul: <jenis_data> <nama_pembolehubah> = <nilai>; Contoh: int umur = 20;"
+    },
+    {
+      question: "Apakah fungsi 'System.out.println()' dalam Java?",
+      options: [
+        "Membaca input pengguna",
+        "Menyimpan data ke fail",
+        "Mencetak teks ke konsol",
+        "Mengira matematik"
+      ],
+      correct: 2,
+      explanation: "✅ 'System.out.println()' mencetak output ke konsol (command prompt/terminal) dan menambah baris baru."
+    },
+    {
+      question: "Apakah operator yang digunakan untuk perbandingan 'sama dengan' dalam Java?",
+      options: [
+        "=",
+        "==",
+        "===",
+        "equals"
+      ],
+      correct: 1,
+      explanation: "✅ Operator '==' membandingkan sama ada dua nilai adalah sama. Contoh: if (x == 5) { ... }"
+    },
+    {
+      question: "Apakah kitaran hidup program Java?",
+      options: [
+        "Kompilasi → Interpretasi → Pelaksanaan",
+        "Tulis → Debug → Hantar",
+        "Design → Code → Test",
+        "Plan → Code → Deploy"
+      ],
+      correct: 0,
+      explanation: "✅ Java kod dikompilasi ke bytecode (.class), kemudian diinterpretasi oleh JVM untuk dilaksanakan."
+    },
+    {
+      question: "Apakah maksud 'OOP' dalam Java?",
+      options: [
+        "Object-Oriented Programming",
+        "Online Operation Protocol",
+        "Output Optimization Process",
+        "Object Operation Platform"
+      ],
+      correct: 0,
+      explanation: "✅ OOP = Object-Oriented Programming. Java adalah bahasa berorientasi objek yang menggunakan konsep class dan object."
+    },
+    {
+      question: "Apakah fungsi kata kunci 'class' dalam Java?",
+      options: [
+        "Mengisytiharkan pemboleh ubah",
+        "Membuat gelung (loop)",
+        "Mentakrifkan templat untuk objek",
+        "Mengimport perpustakaan"
+      ],
+      correct: 2,
+      explanation: "✅ 'class' adalah templat atau blueprint untuk mencipta objek. Ia mengandungi data (fields) dan methods."
+    },
+    {
+      question: "Bagaimanakah anda membuat komen satu baris dalam Java?",
+      options: [
+        "/* komen */",
+        "// komen",
+        "# komen",
+        "-- komen"
+      ],
+      correct: 1,
+      explanation: "✅ '//' digunakan untuk komen satu baris. Contoh: // Ini adalah komen"
+    },
+    {
+      question: "Apakah fungsi 'if' statement dalam Java?",
+      options: [
+        "Membuat gelung",
+        "Membuat keputusan bersyarat",
+        "Mengisytiharkan class",
+        "Mencetak output"
+      ],
+      correct: 1,
+      explanation: "✅ 'if' statement membuat keputusan berdasarkan syarat. Jika syarat benar, kod dalam blok if akan dilaksanakan."
     }
   ];
 
   const [availableQuestions, setAvailableQuestions] = useState([]);
 
-  // Game Lifecycle — unchanged logic
+  // === Lifecycle Effects ===
   useEffect(() => {
     if (gameStarted) {
       setCharacterPos({ x: 1, y: 1 });
@@ -270,6 +324,7 @@ const MazeGame = () => {
       setScore(0);
       setTimeLeft(120);
       setGameOver(false);
+      setShowGameOverModal(false);
       setVisitedQuestions(new Set());
       setAvailableQuestions([...questionsPool].sort(() => 0.5 - Math.random()).slice(0, 10));
       setQuestionsAnswered(0);
@@ -283,19 +338,27 @@ const MazeGame = () => {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 && !gameOver) {
-      setGameOver(true);
-      saveScoreToDatabase(score, 'gagal');
+      handleGameOver('gagal');
     }
   }, [timeLeft, gameStarted, gameOver, showQuestion, score]);
 
-  useEffect(() => {
-    if (gameOver) {
-      saveGameProgress();
+  // === Game Over Handler ===
+  const handleGameOver = async (status) => {
+    setGameOver(true);
+    
+    // Save score and progress
+    await saveScoreToDatabase(score, status);
+    await submitToLeaderboard(score);
+    await saveGameProgress();
+    
+    // Show game over modal after a short delay
+    setTimeout(() => {
+      setShowGameOverModal(true);
       setShowSummary(true);
-    }
-  }, [gameOver]);
+    }, 500);
+  };
 
-  // Movement — unchanged
+  // === Movement Handler ===
   const handleKeyDown = useCallback((e) => {
     if (gameOver || showQuestion || !gameStarted || isMoving) return;
     if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
@@ -328,8 +391,7 @@ const MazeGame = () => {
         if (newX === 14 && newY === 14) {
           const finalScore = score + 50;
           setScore(finalScore);
-          setGameOver(true);
-          saveScoreToDatabase(finalScore, 'selesai');
+          handleGameOver('selesai');
         }
       }, 200);
     }
@@ -342,15 +404,16 @@ const MazeGame = () => {
     }
   }, [gameStarted, gameOver, handleKeyDown]);
 
-  // Questions — updated: no auto-close
+  // === Question Handler ===
   const triggerQuestion = (questionIndex) => {
     if (availableQuestions.length === 0) return;
-    const q = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+    const q = availableQuestions[randomIndex];
     setCurrentQuestion(q);
     setShowQuestion(true);
     setSelectedAnswer(null);
     setIsCorrect(null);
-    setExplanation(currentQuestion?.explanation || '');
+    setExplanation('');
     setVisitedQuestions(prev => new Set([...prev, questionIndex]));
   };
 
@@ -375,10 +438,11 @@ const MazeGame = () => {
   const resetGame = () => {
     setGameStarted(false);
     setGameOver(false);
+    setShowGameOverModal(false);
     setShowQuestion(false);
     setShowSummary(false);
+    setShowLeaderboard(false);
     setUnlockedRewards([]);
-    // Reset all game state variables
     setScore(0);
     setCharacterPos({ x: 1, y: 1 });
     setCharacterDirection('down');
@@ -389,7 +453,13 @@ const MazeGame = () => {
     setStartTime(null);
   };
 
-  // ✅ NEW: Bright & Fun Maze Renderer
+  // === Show Leaderboard Function ===
+  const handleShowLeaderboard = () => {
+    setShowGameOverModal(false);
+    setShowLeaderboard(true);
+  };
+
+  // === Render Maze ===
   const renderMaze = () => {
     return maze.map((row, rowIndex) => (
       <div key={rowIndex} style={{ display: 'flex' }}>
@@ -402,29 +472,24 @@ const MazeGame = () => {
           const isQuestionTile = qIndex !== -1 && cell === 0;
           const isVisitedQuestion = isQuestionTile && visitedQuestions.has(qIndex);
 
-          // 🎨 Bright, fun colors!
-          let backgroundColor = isWall 
-            ? '#86C8BC' // Soft teal wall
-            : '#F1F5F9'; // Light path
-
+          let backgroundColor = isWall ? '#86C8BC' : '#F1F5F9';
           let content = '';
-          let color = '#1E293B'; // Dark text for contrast
-          let fontWeight = 'bold';
+          let color = '#1E293B';
           let fontSize = '14px';
 
           if (isPlayer) {
-            content = '🧑'; // Friendly character
-            color = '#FF6B6B'; // Coral
+            content = '🧑';
+            color = '#FF6B6B';
             fontSize = '18px';
           } else if (isExit) {
-            content = '🏁'; // Finish flag (more universal)
-            color = '#66BB6A'; // Success green
+            content = '🏁';
+            color = '#66BB6A';
           } else if (isQuestionTile && !isVisitedQuestion) {
             content = '?';
-            color = '#FFA726'; // Amber — warm & fun
+            color = '#FFA726';
           } else if (isQuestionTile && isVisitedQuestion) {
             content = '✓';
-            color = '#66BB6A'; // Green check
+            color = '#66BB6A';
           }
 
           return (
@@ -439,7 +504,7 @@ const MazeGame = () => {
                 backgroundColor,
                 color,
                 fontSize,
-                fontWeight,
+                fontWeight: 'bold',
                 border: isWall ? 'none' : '1px solid #E2E8F0',
                 borderRadius: '4px',
                 position: 'relative',
@@ -468,7 +533,7 @@ const MazeGame = () => {
     ));
   };
 
-  // ——— UI: START SCREEN (Bright & Inviting) ———
+  // === START SCREEN ===
   if (!gameStarted) {
     return (
       <div style={{
@@ -497,7 +562,7 @@ const MazeGame = () => {
             fontWeight: '800',
             letterSpacing: '-0.5px'
           }}>
-            🌟 Laluan Soalan
+            🌟 Labyrinth Java
           </h1>
           <div style={{ 
             color: '#64748B', 
@@ -505,7 +570,7 @@ const MazeGame = () => {
             marginBottom: '24px',
             fontWeight: '500'
           }}>
-            Sains Komputer Tingkatan 4 & 5
+            Pembelajaran Pengaturcaraan Java Asas
           </div>
 
           <div style={{
@@ -527,11 +592,11 @@ const MazeGame = () => {
               📚 Cara Bermain
             </h3>
             {[
-              "gunakan kekunci anak panah (↑ ↓ ← →) untuk bergerak",
-              "elakkan dinding (kotak hijau muda)",
-              "jawab soalan (?) untuk dapatkan markah",
-              "setiap jawapan betul: +15 markah",
-              "capai bendera (🏁) sebelum masa tamat!"
+              "Gunakan kekunci anak panah (↑ ↓ ← →) untuk bergerak",
+              "Elakkan dinding (kotak hijau muda)",
+              "Jawab soalan Java (?) untuk dapatkan markah",
+              "Setiap jawapan betul: +15 markah",
+              "Capai bendera (🏁) sebelum masa tamat!"
             ].map((item, i) => (
               <div key={i} style={{ 
                 display: 'flex', 
@@ -589,7 +654,7 @@ const MazeGame = () => {
     );
   }
 
-  // ——— UI: GAME SCREEN (Clean & Fun) ———
+  // === GAME SCREEN ===
   return (
     <div style={{
       minHeight: '100vh',
@@ -616,7 +681,7 @@ const MazeGame = () => {
           fontSize: '1.8rem',
           fontWeight: 700
         }}>
-          🌟 Laluan Soalan
+          🌟 Labyrinth Java
         </h1>
         <div style={{ 
           display: 'flex', 
@@ -655,7 +720,7 @@ const MazeGame = () => {
         </div>
       </div>
 
-      {/* Maze Container */}
+      {/* Maze */}
       <div style={{
         background: '#FFFFFF',
         borderRadius: '20px',
@@ -676,7 +741,6 @@ const MazeGame = () => {
         
         {renderMaze()}
 
-        {/* Legend — colorful & clear */}
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(3, 1fr)',
@@ -742,7 +806,7 @@ const MazeGame = () => {
               fontSize: '1.5rem',
               fontWeight: 700
             }}>
-              💡 Cabaran Sains Komputer
+              💡 Soalan Java Asas
             </h3>
             
             <p style={{
@@ -832,15 +896,15 @@ const MazeGame = () => {
         </div>
       )}
 
-      {/* Game Over Modal */}
-      {gameOver && (
+      {/* Game Over Modal - SEPARATE from Leaderboard Modal */}
+      {showGameOverModal && (
         <div style={{
           position: 'fixed',
           top: 0,
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'rgba(248, 250, 252, 0.9)',
+          background: 'rgba(248, 250, 252, 0.95)',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -896,7 +960,7 @@ const MazeGame = () => {
               <div style={{ marginTop: '20px', marginBottom: '24px' }}>
                 <GameSummary 
                   progress={gameProgress} 
-                  game={{ name: 'Laluan Soalan' }} 
+                  game={{ name: 'Labyrinth Java' }} 
                 />
                 
                 {unlockedRewards.length > 0 && (
@@ -910,18 +974,18 @@ const MazeGame = () => {
               </div>
             )}
 
-            {/* ✅ Three clear options — all stay on MazeGame */}
             <div style={{ 
               display: 'flex',
               flexDirection: 'column',
               gap: '12px',
               marginTop: '20px'
             }}>
-              {/* 1. Main Semula — restart game immediately */}
               <button
                 onClick={() => {
-                  // Reset game state
+                  // Play Again - reset everything
+                  setGameStarted(true);
                   setGameOver(false);
+                  setShowGameOverModal(false);
                   setShowQuestion(false);
                   setShowSummary(false);
                   setUnlockedRewards([]);
@@ -950,7 +1014,23 @@ const MazeGame = () => {
                 ▶ Main Semula
               </button>
 
-              {/* 2. Kembali ke Menu Permainan — goes back to START SCREEN */}
+              <button
+                onClick={handleShowLeaderboard}
+                style={{
+                  background: 'linear-gradient(90deg, #F59E0B, #F97316)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '14px',
+                  borderRadius: '14px',
+                  cursor: 'pointer',
+                  fontWeight: '700',
+                  fontSize: '1.1rem',
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+                }}
+              >
+                📊 Lihat Kedudukan
+              </button>
+
               <button
                 onClick={resetGame}
                 style={{
@@ -967,9 +1047,62 @@ const MazeGame = () => {
                 onMouseEnter={e => e.target.style.background = '#F0FDFA'}
                 onMouseLeave={e => e.target.style.background = 'white'}
               >
-                ◀ Kembali ke Menu Permainan
+                ◀ Kembali ke Menu
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* LEADERBOARD MODAL - SEPARATE from Game Over Modal */}
+      {showLeaderboard && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 2000
+        }}>
+          <div style={{ 
+            width: '95%', 
+            maxWidth: '900px',
+            maxHeight: '85vh',
+            overflowY: 'auto',
+            borderRadius: '16px',
+            background: '#FFFFFF',
+            padding: '20px'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px'
+            }}>
+              <h2 style={{ margin: 0, color: '#1E293B' }}>🏆 Kedudukan Pemain</h2>
+              <button
+                onClick={() => setShowLeaderboard(false)}
+                style={{
+                  background: '#EF4444',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '600'
+                }}
+              >
+                Tutup
+              </button>
+            </div>
+            <Leaderboard 
+              gameId="game4" 
+              onClose={() => setShowLeaderboard(false)} 
+            />
           </div>
         </div>
       )}
