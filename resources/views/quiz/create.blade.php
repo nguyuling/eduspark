@@ -232,7 +232,7 @@
 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Kod Penuh<span style="color: var(--danger);">*</span></label>
 <div style="display: flex; gap: 0; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; background: #f5f5f5;">
   <!-- Checkbox Column -->
-  <div id="code-checkboxes-${index}" style="display: flex; flex-direction: column; background: linear-gradient(to bottom, #fafafa, #f5f5f5); border-right: 2px solid #e5e7eb; min-width: 40px; padding: 11px 4px; overflow-y: auto; font-size: 13px; line-height: 1.5; gap: 0px;">
+  <div id="code-checkboxes-${index}" style="display: flex; flex-direction: column; background: linear-gradient(to bottom, #fafafa, #f5f5f5); border-right: 2px solid #e5e7eb; min-width: 40px; padding: 11px 4px; overflow-y: auto; font-size: 13px; line-height: 1.5; gap: 3px;">
   </div>
   
   <!-- Line Numbers Column -->
@@ -302,8 +302,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                height: 18px;
-                min-height: 18px;
+                height: 19px;
+                min-height: 19px;
                 border-radius: 2px;
                 cursor: pointer;
                 transition: all 0.2s ease;
@@ -317,8 +317,8 @@
                     ${isHidden ? 'checked' : ''} 
                     style="
                         cursor: pointer;
-                        width: 12px;
-                        height: 12px;
+                        width: 10px;
+                        height: 10px;
                         accent-color: #A855F7;
                         margin: 0;
                     "
