@@ -146,7 +146,7 @@
 
       <!-- Action Buttons - Outside all containers but inside form -->
       <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0;">
-        <button type="submit" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
+        <button type="submit" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'" onclick="return validateBeforeSubmit()">
           <i class="bi bi-check-lg"></i>Simpan Kuiz
         </button>
       </div>
@@ -798,6 +798,37 @@
         });
         
     });
+
+    // Validation function to check that all coding questions have hidden lines
+    function validateBeforeSubmit() {
+        const container = document.getElementById('questions-container');
+        const codingQuestions = container.querySelectorAll('[question-card]');
+        
+        let hasInvalidCodingQuestion = false;
+        
+        codingQuestions.forEach(card => {
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            if (type === 'coding') {
+                const hiddenLinesInput = card.querySelector('.hidden-lines-input');
+                const hiddenLines = hiddenLinesInput ? hiddenLinesInput.value.trim() : '';
+                
+                if (!hiddenLines) {
+                    hasInvalidCodingQuestion = true;
+                    const questionNum = card.getAttribute('data-index') + 1;
+                    console.warn(`Soalan ${questionNum} (Pengaturaan/Coding) tidak mempunyai baris tersembunyi yang dipilih`);
+                }
+            }
+        });
+        
+        if (hasInvalidCodingQuestion) {
+            alert('Semua soalan Pengaturaan (Coding) mesti mempunyai sekurang-kurangnya satu baris yang dipilih sebagai baris yang perlu dijawab oleh pelajar. Sila klik checkbox untuk menandakan baris.');
+            return false;
+        }
+        
+        return true;
+    }
 </script>
 
 @endsection
