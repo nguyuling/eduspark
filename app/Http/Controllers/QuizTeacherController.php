@@ -146,11 +146,17 @@ class QuizTeacherController extends Controller
                         'coding_template' => ($questionType === 'coding')
                                             ? ($questionData['coding_template'] ?? null)
                                             : null,
+                        'coding_full_code' => ($questionType === 'coding')
+                                            ? ($questionData['coding_full_code'] ?? null)
+                                            : null,
                         'coding_language' => ($questionType === 'coding')
                                             ? ($questionData['coding_language'] ?? 'java')
                                             : null,
                         'coding_expected_output' => ($questionType === 'coding')
                                                     ? ($questionData['coding_expected_output'] ?? null)
+                                                    : null,
+                        'hidden_line_numbers' => ($questionType === 'coding')
+                                                    ? ($questionData['hidden_line_numbers'] ?? null)
                                                     : null,
                     ]);
 
