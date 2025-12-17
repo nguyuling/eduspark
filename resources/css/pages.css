@@ -184,6 +184,13 @@ body.dark .panel {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 20px;
+  flex-wrap: nowrap;
+  gap: 20px;
+}
+
+.header > div:first-child {
+  flex: 1;
+  min-width: 0;
 }
 
 .header-content {
@@ -840,14 +847,19 @@ label {
   margin-top: 15px !important;
   transition: all 0.2s ease !important;
   cursor: pointer !important;
-  line-height: 1 !important;
+  line-height: 1.4 !important;
   height: auto !important;
   opacity: 1 !important;
+  min-width: 140px !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  flex-shrink: 0 !important;
 }
 
 .btn-kembali:hover {
   background: rgba(106, 77, 247, 0.1) !important;
   color: #6A4DF7 !important;
+  border-color: #6A4DF7 !important;
   text-decoration: none !important;
   opacity: 1 !important;
   transform: none !important;
@@ -858,11 +870,14 @@ label {
   color: #6A4DF7 !important;
   text-decoration: none !important;
   opacity: 1 !important;
+  outline: 2px solid #6A4DF7 !important;
+  outline-offset: 2px !important;
 }
 
 .btn-kembali:active {
-  background: transparent !important;
+  background: rgba(106, 77, 247, 0.15) !important;
   color: #6A4DF7 !important;
+  border-color: #6A4DF7 !important;
 }
 
 .btn-kembali i {

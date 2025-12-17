@@ -10,8 +10,8 @@
         <div class="title">Cipta Kuiz Baru</div>
         <div class="sub">Sediakan kuiz anda dengan soalan dan pilihan</div>
       </div>
-      <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali" style="display:inline-block !important; margin-top:15px; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
-        <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+      <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali">
+        <i class="bi bi-arrow-left"></i>Kembali
       </a>
     </div>
 
@@ -232,7 +232,7 @@
 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Kod Penuh<span style="color: var(--danger);">*</span></label>
 <div style="display: flex; gap: 0; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; background: #f5f5f5;">
   <!-- Checkbox Column -->
-  <div id="code-checkboxes-${index}" style="display: flex; flex-direction: column; background: linear-gradient(to bottom, #fafafa, #f5f5f5); border-right: 2px solid #e5e7eb; min-width: 40px; padding: 11px 4px; overflow-y: auto; font-size: 13px; line-height: 1.5; gap: 3px;">
+  <div id="code-checkboxes-${index}" style="display: flex; flex-direction: column; background: linear-gradient(to bottom, #fafafa, #f5f5f5); border-right: 2px solid #e5e7eb; min-width: 40px; padding: 11px 4px; overflow-y: auto; font-size: 13px; line-height: 1.5; gap: 0px;">
   </div>
   
   <!-- Line Numbers Column -->
@@ -302,7 +302,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                height: 19px;
+                height: 17px;
+                margin: 1px;
                 cursor: pointer;
                 transition: all 0.2s ease;
             " onmouseover="this.style.background='${isHidden ? 'rgba(168, 85, 247, 0.1)' : 'rgba(0, 0, 0, 0.03)'}';" onmouseout="this.style.background='transparent';">
@@ -315,8 +316,8 @@
                         cursor: pointer;
                         width: 10px;
                         height: 10px;
+                        margin: 2px;
                         accent-color: #A855F7;
-                        margin: 0;
                     "
                 >
             </div>`;
