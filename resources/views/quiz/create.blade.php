@@ -258,9 +258,9 @@
 <!-- Preview Section (Student View) -->
 <div style="margin-top:20px;">
 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px;">Pandangan Pelajar</label>
-<div id="code-preview-${index}" style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:8px; min-height:100px;">
-<div id="preview-lines-${index}" style="position: absolute; left: 0; top: 8px; width: 40px; background: #e8e8e8; padding: 3px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none;"></div>
-<div id="preview-code-${index}" style="margin-left:50px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit; display: flex; flex-direction: column; white-space: pre-wrap; word-wrap: break-word;">Masukkan kod di atas</div>
+<div id="code-preview-${index}" style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:0; min-height:100px; display: flex;">
+<div id="preview-lines-${index}" style="flex-shrink: 0; width: 40px; background: #e8e8e8; padding: 8px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none; padding-right: 6px;"></div>
+<div id="preview-code-${index}" style="flex: 1; padding: 8px 8px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit; white-space: pre-wrap; word-wrap: break-word; overflow-x: auto;">Masukkan kod di atas</div>
 </div>
 </div>
 </div>`;
@@ -382,21 +382,20 @@
         
         lines.forEach((line, i) => {
             if (currentHidden.includes(i + 1)) {
-                previewHtml += '<span style="background-color: #ffee8c; color: #000; padding: 2px 4px; border-radius: 2px;">[___BARIS DISEMBUNYIKAN___]</span>\n';
+                previewHtml += '<div style="height: 1.5em; display: flex; align-items: center;"><span style="background-color: #ffee8c; color: #000; padding: 2px 4px; border-radius: 2px;">[___BARIS DISEMBUNYIKAN___]</span></div>';
             } else {
-                previewHtml += line + '\n';
+                previewHtml += '<div style="height: 1.5em; display: flex; align-items: center;">' + line.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
             }
-            lineNumbersHtml += lineNum + '<br>';
+            lineNumbersHtml += '<div style="height: 1.5em; display: flex; align-items: center; justify-content: flex-end;">' + lineNum + '</div>';
             lineNum++;
         });
         
-        // Remove the last newline to avoid extra blank line
-        previewHtml = previewHtml.slice(0, -1);
-        
         previewDiv.innerHTML = previewHtml;
-        previewDiv.style.whiteSpace = 'pre-wrap';
-        previewDiv.style.wordWrap = 'break-word';
+        previewDiv.style.display = 'flex';
+        previewDiv.style.flexDirection = 'column';
         previewLines.innerHTML = lineNumbersHtml;
+        previewLines.style.display = 'flex';
+        previewLines.style.flexDirection = 'column';
     }
 
     // Function to update line numbers in output textarea
