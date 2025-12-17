@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use App\Models\QuizOption;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -17,17 +18,26 @@ class QuizSeeder extends Seeder
     public function run(): void
     {
         $quizzes_data = include database_path('seeders/QuizQuestionSeeder.php');
+        
+        // Get a teacher user (role = 'teacher')
+        $teacher = User::where('role', 'teacher')->first();
+        $teacher_id = $teacher ? $teacher->id : null;
+        
+        if (!$teacher_id) {
+            echo "No teacher found. Skipping quiz seeding.\n";
+            return;
+        }
 
         foreach ($quizzes_data as $quiz_data) {
             $questions = $quiz_data['questions'] ?? [];
             unset($quiz_data['questions']);
 
-            // Create quiz with unique code
+            // Create quiz with unique code, using the actual teacher ID
             $quiz = Quiz::create([
-                'user_id' => $quiz_data['teacher_id'],
+                'user_id' => $teacher_id,
                 'title' => $quiz_data['title'],
                 'description' => $quiz_data['description'],
-                'teacher_id' => $quiz_data['teacher_id'],
+                'teacher_id' => $teacher_id,
                 'max_attempts' => $quiz_data['max_attempts'],
                 'due_at' => $quiz_data['due_at'],
                 'is_published' => $quiz_data['is_published'],
