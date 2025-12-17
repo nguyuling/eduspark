@@ -24,6 +24,7 @@ class QuizSeeder extends Seeder
 
             // Create quiz with unique code
             $quiz = Quiz::create([
+                'user_id' => $quiz_data['teacher_id'],
                 'title' => $quiz_data['title'],
                 'description' => $quiz_data['description'],
                 'teacher_id' => $quiz_data['teacher_id'],
