@@ -879,5 +879,109 @@ return [
             ],
         ], // Total 10 Questions
     ],
+
+    // ---------------------------------------------------------------
+    // QUIZ 14: Tingkatan 5 Bab 1 - Pengaturcaraan Java (Coding)
+    // ---------------------------------------------------------------
+    [
+        'teacher_id' => 2,
+        'title' => 'Tingkatan 5: Pengaturcaraan Java - Soalan Kod',
+        'description' => 'Kuiz pengekodan yang memerlukan pelajar menulis kod Java dari awal atau melengkapkan templat yang disediakan.',
+        'max_attempts' => 3,
+        'due_at' => Carbon::now()->addDays(45),
+        'is_published' => true,
+        'questions' => [
+            [
+                'text' => 'Tulis kaedah Java yang menerima dua integer sebagai parameter dan mengembalikan hasil tambah mereka. Nama kaedah: `tambah`',
+                'type' => 'coding', 'points' => 10,
+                'coding_language' => 'java',
+                'coding_template' => null,
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Lengkapkan kaedah Java untuk menghitung faktorial bagi nombor yang diberikan.',
+                'type' => 'coding', 'points' => 15,
+                'coding_language' => 'java',
+                'coding_template' => 'public static int faktorial(int n) {
+    // Lengkapkan kod di sini
+    
+}',
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Tulis program Java untuk mencetak segi tiga bintang dengan n baris. Contoh (n=3):
+*
+**
+***',
+                'type' => 'coding', 'points' => 12,
+                'coding_language' => 'java',
+                'coding_template' => null,
+                'coding_expected_output' => '*
+**
+***',
+            ],
+            [
+                'text' => 'Lengkapkan kaedah yang menyemak sama ada satu integer adalah nombor perdana.',
+                'type' => 'coding', 'points' => 15,
+                'coding_language' => 'java',
+                'coding_template' => 'public static boolean isPerdana(int num) {
+    // Lengkapkan kod di sini
+    
+}',
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Tulis kaedah Java yang mengembalikan rentetan terbalik (reverse) bagi rentetan input.',
+                'type' => 'coding', 'points' => 10,
+                'coding_language' => 'java',
+                'coding_template' => null,
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Lengkapkan kaedah untuk mengira jumlah digit dalam integer positif.',
+                'type' => 'coding', 'points' => 10,
+                'coding_language' => 'java',
+                'coding_template' => 'public static int jumlahDigit(int num) {
+    // Lengkapkan kod di sini
+    
+}',
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Tulis program Java untuk mencetak jadual pendaraban 5x5.',
+                'type' => 'coding', 'points' => 15,
+                'coding_language' => 'java',
+                'coding_template' => null,
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Lengkapkan kaedah yang mencari nilai maksimum dalam array integer.',
+                'type' => 'coding', 'points' => 12,
+                'coding_language' => 'java',
+                'coding_template' => 'public static int cariMaksimum(int[] arr) {
+    // Lengkapkan kod di sini
+    
+}',
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Tulis kaedah yang menyemak sama ada satu rentetan adalah palindrom.',
+                'type' => 'coding', 'points' => 15,
+                'coding_language' => 'java',
+                'coding_template' => null,
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Lengkapkan kaedah yang mengira purata nilai dalam array dan mengembalikan hasilnya.',
+                'type' => 'coding', 'points' => 10,
+                'coding_language' => 'java',
+                'coding_template' => 'public static double purata(int[] arr) {
+    // Lengkapkan kod di sini
+    
+}',
+                'coding_expected_output' => null,
+            ],
+        ], // Total 10 Questions
+    ],
 ];
 

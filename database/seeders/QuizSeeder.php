@@ -24,7 +24,6 @@ class QuizSeeder extends Seeder
 
             // Create quiz with unique code
             $quiz = Quiz::create([
-                'user_id' => $quiz_data['teacher_id'],
                 'title' => $quiz_data['title'],
                 'description' => $quiz_data['description'],
                 'teacher_id' => $quiz_data['teacher_id'],
@@ -40,12 +39,23 @@ class QuizSeeder extends Seeder
                 unset($question_data['options']);
                 $correct_text = $question_data['correct_text'] ?? null;
                 unset($question_data['correct_text']);
+                
+                // Extract coding-specific fields
+                $coding_template = $question_data['coding_template'] ?? null;
+                unset($question_data['coding_template']);
+                $coding_language = $question_data['coding_language'] ?? 'java';
+                unset($question_data['coding_language']);
+                $coding_expected_output = $question_data['coding_expected_output'] ?? null;
+                unset($question_data['coding_expected_output']);
 
                 $question = QuizQuestion::create([
                     'quiz_id' => $quiz->id,
                     'question_text' => $question_data['text'],
                     'type' => $question_data['type'],
                     'points' => $question_data['points'],
+                    'coding_template' => $coding_template,
+                    'coding_language' => $coding_language,
+                    'coding_expected_output' => $coding_expected_output,
                 ]);
 
                 // Create options
