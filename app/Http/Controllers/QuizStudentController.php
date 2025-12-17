@@ -217,22 +217,20 @@ class QuizStudentController extends Controller
                 $submittedOptions = []; 
 
             } elseif ($question->type === 'coding') {
-                // Coding question grading: Check if all hidden lines match correctly
+                // Coding question grading: Award 1 point per correctly answered hidden line
                 $hiddenLineNumbers = !empty($question->hidden_line_numbers) 
                     ? array_map('intval', explode(',', $question->hidden_line_numbers))
                     : [];
                 
                 $codeLines = explode("\n", $question->coding_full_code);
+                $correctLineCount = 0;
                 
-                // Check if all hidden lines were answered correctly
-                $allCorrect = true;
-                
+                // Check each hidden line
                 foreach ($hiddenLineNumbers as $lineNum) {
                     $lineIndex = $lineNum - 1; // Convert to 0-indexed
                     
                     if (!isset($codeLines[$lineIndex])) {
-                        $allCorrect = false;
-                        break;
+                        continue;
                     }
                     
                     $expectedCode = trim($codeLines[$lineIndex]);
@@ -240,13 +238,16 @@ class QuizStudentController extends Controller
                     $submittedCode = trim($studentAnswer[$lineKey] ?? '');
                     
                     // Exact match comparison (case-sensitive for code)
-                    if ($expectedCode !== $submittedCode) {
-                        $allCorrect = false;
-                        break;
+                    if ($expectedCode === $submittedCode) {
+                        $correctLineCount++;
                     }
                 }
                 
-                if ($allCorrect && count($hiddenLineNumbers) > 0) {
+                // Award 1 point per correctly answered line (capped at question points)
+                $scoreGained = min($correctLineCount, $question->points);
+                
+                // Consider correct only if all lines answered correctly
+                if ($correctLineCount === count($hiddenLineNumbers) && count($hiddenLineNumbers) > 0) {
                     $isCorrect = true;
                 }
                 
@@ -256,8 +257,14 @@ class QuizStudentController extends Controller
             }
             
             // --- SCORING & STORAGE ---
-            if ($isCorrect) {
-                $scoreGained = $question->points;
+            if ($question->type === 'coding') {
+                // Coding questions already have scoreGained calculated above
+                // No need to recalculate
+            } else {
+                // Other question types: all or nothing
+                if ($isCorrect) {
+                    $scoreGained = $question->points;
+                }
             }
             $totalScore += $scoreGained;
 
