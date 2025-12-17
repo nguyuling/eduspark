@@ -35,15 +35,25 @@ Route::middleware('auth')->group(function () {
 
 // Lesson routes (authenticated only)
 Route::middleware('auth')->group(function () {
+    // List and Create
     Route::get('/lesson', [LessonController::class, 'index'])->name('lesson.index');
     Route::get('/lesson/create', [LessonController::class, 'create'])->name('lesson.create');
-    Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
     Route::post('/lesson', [LessonController::class, 'store'])->name('lesson.store');
-    Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
-    Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');
+    
+    // Preview and Download (MUST come before {id} routes)
+    Route::get('/lesson/{id}/preview', [LessonController::class, 'previewFile'])->name('lesson.preview-file');
     Route::get('/lesson/{id}/preview', [LessonController::class, 'preview'])->name('lesson.preview');
     Route::get('/lesson/{id}/download', [LessonController::class, 'downloadLesson'])->name('lesson.download');
     Route::get('/lesson/{id}/preview-file', [LessonController::class, 'previewFile'])->name('lesson.preview-file');
+    Route::get('/lesson/{id}/edit', [LessonController::class, 'edit'])->name('lesson.edit');
+    
+    // View, Update, Delete
+    Route::get('/lesson/{id}', [LessonController::class, 'show'])->name('lesson.show');
+    Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
+    Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');
+    
+    // Legacy routes for compatibility
+    Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
 });
 
 // Quiz Teacher routes
