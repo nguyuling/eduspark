@@ -215,6 +215,44 @@ class QuizStudentController extends Controller
                     $isCorrect = true;
                 }
                 $submittedOptions = []; 
+
+            } elseif ($question->type === 'coding') {
+                // Coding question grading: Check if all hidden lines match correctly
+                $hiddenLineNumbers = !empty($question->hidden_line_numbers) 
+                    ? array_map('intval', explode(',', $question->hidden_line_numbers))
+                    : [];
+                
+                $codeLines = explode("\n", $question->coding_full_code);
+                
+                // Check if all hidden lines were answered correctly
+                $allCorrect = true;
+                
+                foreach ($hiddenLineNumbers as $lineNum) {
+                    $lineIndex = $lineNum - 1; // Convert to 0-indexed
+                    
+                    if (!isset($codeLines[$lineIndex])) {
+                        $allCorrect = false;
+                        break;
+                    }
+                    
+                    $expectedCode = trim($codeLines[$lineIndex]);
+                    $lineKey = 'line_' . $lineNum;
+                    $submittedCode = trim($studentAnswer[$lineKey] ?? '');
+                    
+                    // Exact match comparison (case-sensitive for code)
+                    if ($expectedCode !== $submittedCode) {
+                        $allCorrect = false;
+                        break;
+                    }
+                }
+                
+                if ($allCorrect && count($hiddenLineNumbers) > 0) {
+                    $isCorrect = true;
+                }
+                
+                // Store submitted code as JSON for reference
+                $submittedText = json_encode($studentAnswer);
+                $submittedOptions = [];
             }
             
             // --- SCORING & STORAGE ---

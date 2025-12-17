@@ -90,6 +90,28 @@
               @else
                 <div style="font-size:14px; color:#0b1220;">(Tidak dijawab)</div>
               @endif
+            @elseif($answer->question->type === 'coding')
+              @php
+                $submittedAnswers = json_decode($answer->submitted_text, true) ?? [];
+                $hiddenLineNumbers = !empty($answer->question->hidden_line_numbers) 
+                  ? array_map('intval', explode(',', $answer->question->hidden_line_numbers))
+                  : [];
+              @endphp
+              @if(count($hiddenLineNumbers) > 0)
+                <div style="font-family:monospace; font-size:13px; background:#f5f5f5; padding:12px; border-radius:6px; line-height:1.6;">
+                  @foreach($hiddenLineNumbers as $lineNum)
+                    @php
+                      $lineKey = 'line_' . $lineNum;
+                    @endphp
+                    <div style="margin-bottom:8px; display:flex; gap:12px;">
+                      <span style="color:#999; min-width:30px;">{{ $lineNum }}:</span>
+                      <span style="color:#0b1220; flex:1; word-break:break-word;">{{ $submittedAnswers[$lineKey] ?? '(Tidak dijawab)' }}</span>
+                    </div>
+                  @endforeach
+                </div>
+              @else
+                <div style="font-size:14px; color:#0b1220;">(Tidak dijawab)</div>
+              @endif
             @endif
           </div>
 
@@ -106,6 +128,27 @@
                 <div style="font-size:14px; color:#2A9D8F; font-weight:600;">
                   {{ $correctOptions->first()?->option_text ?? 'N/A' }}
                 </div>
+              @elseif($answer->question->type === 'coding')
+                @php
+                  $hiddenLineNumbers = !empty($answer->question->hidden_line_numbers) 
+                    ? array_map('intval', explode(',', $answer->question->hidden_line_numbers))
+                    : [];
+                  $codeLines = explode("\n", $answer->question->coding_full_code);
+                @endphp
+                @if(count($hiddenLineNumbers) > 0)
+                  <div style="font-family:monospace; font-size:13px; background:#f0fef5; padding:12px; border-radius:6px; line-height:1.6;">
+                    @foreach($hiddenLineNumbers as $lineNum)
+                      @php
+                        $lineIndex = $lineNum - 1;
+                        $correctCode = isset($codeLines[$lineIndex]) ? trim($codeLines[$lineIndex]) : '';
+                      @endphp
+                      <div style="margin-bottom:8px; display:flex; gap:12px;">
+                        <span style="color:#999; min-width:30px;">{{ $lineNum }}:</span>
+                        <span style="color:#2A9D8F; flex:1; word-break:break-word; font-weight:600;">{{ $correctCode }}</span>
+                      </div>
+                    @endforeach
+                  </div>
+                @endif
               @else
                 @if($correctOptions->count() > 0)
                   <ul style="margin:0; padding-left:20px;">

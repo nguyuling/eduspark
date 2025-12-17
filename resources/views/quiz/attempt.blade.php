@@ -90,6 +90,59 @@
                          data-question-id="{{ $question->id }}"
                          style="width:100%; padding:8px 12px; border-radius:6px; border:2px solid #d1d5db; box-sizing:border-box; font-size:13px;">
                 </div>
+
+              @elseif ($question->type === 'coding')
+                <div style="margin-bottom:12px;">
+                  <!-- Code Template Display -->
+                  @if ($question->coding_template)
+                    <div style="margin-bottom:20px;">
+                      <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:6px;">Template Kod:</div>
+                      <div style="background:#f5f5f5; padding:12px; border-radius:8px; border:2px solid #d1d5db; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; white-space:pre; overflow-x:auto;">{{ $question->coding_template }}</div>
+                    </div>
+                  @endif
+
+                  <!-- Pandangan Pelajar (Student View) - Matching edit form preview exactly -->
+                  @if ($question->coding_full_code)
+                    <div style="margin-top:20px;">
+                      <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px;">Pandangan Pelajar</label>
+                      <div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:0; min-height:100px; display: flex;">
+                        @php
+                          $hiddenLines = !empty($question->hidden_line_numbers) ? array_map('intval', explode(',', $question->hidden_line_numbers)) : [];
+                          $lines = explode("\n", $question->coding_full_code);
+                        @endphp
+                        
+                        <!-- Line Numbers Column -->
+                        <div style="flex-shrink: 0; width: 40px; background: #e8e8e8; padding: 8px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none; padding-right: 6px; display: flex; flex-direction: column;">
+                          @foreach ($lines as $index => $line)
+                            <div style="height: 1.5em; display: flex; align-items: center; justify-content: flex-end;">{{ $index + 1 }}</div>
+                          @endforeach
+                        </div>
+                        
+                        <!-- Code Content Column -->
+                        <div style="flex: 1; padding: 8px 8px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit; white-space: pre; overflow-x: auto; display: flex; flex-direction: column;">
+                          @foreach ($lines as $index => $line)
+                            @php $lineNum = $index + 1; $isHidden = in_array($lineNum, $hiddenLines); @endphp
+                            @if ($isHidden)
+                              <!-- Hidden line: input field with yellow background -->
+                              <div style="height: 1.5em; display: flex; align-items: center; background: rgba(255, 193, 7, 0.2); flex-shrink: 0;">
+                                <input type="text" 
+                                       class="quiz-answer-input coding-line-input" 
+                                       data-question-id="{{ $question->id }}" 
+                                       data-line-number="{{ $lineNum }}"
+                                       name="answers[{{ $question->id }}][line_{{ $lineNum }}]"
+                                       value=""
+                                       style="flex:1; border:none; background:transparent; font-family:'Courier New', monospace; font-size:12px; padding:0 4px; outline:none; color:#000; line-height:1.5; margin:0; display:block; white-space:pre;">
+                              </div>
+                            @else
+                              <!-- Non-hidden line: display as text (read-only) -->
+                              <div style="height: 1.5em; display: flex; align-items: center; flex-shrink: 0;">{{ $line }}</div>
+                            @endif
+                          @endforeach
+                        </div>
+                      </div>
+                    </div>
+                  @endif
+                </div>
               @endif
             </div>
           </section>
@@ -113,6 +166,22 @@
 
 {{-- JavaScript --}}
 <script>
+// Tab key handler for coding line inputs
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab' && e.target.classList.contains('coding-line-input')) {
+        e.preventDefault();
+        const input = e.target;
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        
+        // Insert 4 spaces
+        input.value = input.value.substring(0, start) + '    ' + input.value.substring(end);
+        
+        // Move cursor after inserted spaces
+        input.selectionStart = input.selectionEnd = start + 4;
+    }
+});
+
 function checkAllQuestionsAnswered() {
     const questions = document.querySelectorAll('[data-question-id]');
     let unansweredCount = 0;
@@ -121,7 +190,8 @@ function checkAllQuestionsAnswered() {
         const questionId = questionCard.getAttribute('data-question-id');
         const radios = questionCard.querySelectorAll('input[type="radio"][data-question-id]');
         const checkboxes = questionCard.querySelectorAll('input[type="checkbox"][data-question-id]');
-        const textInputs = questionCard.querySelectorAll('input[type="text"][data-question-id]');
+        const textInputs = questionCard.querySelectorAll('input[type="text"]:not(.coding-line-input)[data-question-id]');
+        const codingLineInputs = questionCard.querySelectorAll('input.coding-line-input[data-question-id]');
 
         let isAnswered = false;
 
@@ -149,8 +219,16 @@ function checkAllQuestionsAnswered() {
             }
         }
 
+        // Check if any coding line input has value
+        if (codingLineInputs.length > 0 && !isAnswered) {
+            const filledCodeLine = Array.from(codingLineInputs).find(c => c.value.trim() !== '');
+            if (filledCodeLine) {
+                isAnswered = true;
+            }
+        }
+
         // If no answers found for this question type, mark as unanswered
-        if (!isAnswered && (radios.length > 0 || checkboxes.length > 0 || textInputs.length > 0)) {
+        if (!isAnswered && (radios.length > 0 || checkboxes.length > 0 || textInputs.length > 0 || codingLineInputs.length > 0)) {
             unansweredCount++;
         }
     });
@@ -185,11 +263,25 @@ function submitQuizData() {
         else if (input.type === 'radio' && input.checked) {
             answers[qId] = input.value;
         }
-        // Handle Short Answer Text
-        else if (input.type === 'text' && input.value) {
+        // Handle Short Answer Text (but not coding line inputs)
+        else if (input.type === 'text' && input.value && !input.classList.contains('coding-line-input')) {
             // Short answers are sent as { 'questionId': { 'text': 'user answer' } }
             answers[qId] = { text: input.value };
         }
+    });
+
+    // Handle coding line inputs separately
+    const codingLineInputs = document.querySelectorAll('.coding-line-input');
+    codingLineInputs.forEach(input => {
+        const qId = input.dataset.questionId;
+        const lineNum = input.dataset.lineNumber;
+        
+        if (!answers[qId]) {
+            answers[qId] = {};
+        }
+        
+        // Store each line answer with its line number
+        answers[qId][`line_${lineNum}`] = input.value;
     });
 
     // Prepare the final request payload
@@ -200,12 +292,16 @@ function submitQuizData() {
     payload.append('_token', token);
     
     // Add answers to the payload
-    // Note: URLSearchParams correctly handles nested arrays/objects for PHP
     for (const [qId, answer] of Object.entries(answers)) {
         if (Array.isArray(answer)) {
             answer.forEach(val => payload.append(`answers[${qId}][]`, val));
         } else if (typeof answer === 'object' && answer !== null && 'text' in answer) {
             payload.append(`answers[${qId}][text]`, answer.text);
+        } else if (typeof answer === 'object' && answer !== null) {
+            // Handle coding line answers { line_1: value, line_2: value, ... }
+            for (const [lineKey, lineValue] of Object.entries(answer)) {
+                payload.append(`answers[${qId}][${lineKey}]`, lineValue);
+            }
         } else {
             payload.append(`answers[${qId}]`, answer);
         }
