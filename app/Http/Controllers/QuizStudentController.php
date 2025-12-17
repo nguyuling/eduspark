@@ -87,10 +87,19 @@ class QuizStudentController extends Controller
         }
 
         // Execute the filtered query
-        $quizzes = $query->orderBy('due_at', 'asc')->get();        
+        $allQuizzes = $query->orderBy('due_at', 'asc')->get();
+        
+        // Get limit from request (default 10, increments by 10)
+        $limit = (int) $request->get('limit', 10);
+        if ($limit < 10) $limit = 10;
+        if ($limit > 1000) $limit = 1000; // Safety limit
+        
+        $quizzes = $allQuizzes->take($limit);
+        $hasMore = count($allQuizzes) > $limit;
+        $nextLimit = $limit + 10;
     
         // Pass the quizzes and the filters back to the view
-        return view('quiz.index-student', compact('quizzes', 'filters'));
+        return view('quiz.index-student', compact('quizzes', 'filters', 'limit', 'hasMore', 'nextLimit'));
     }
 
     /**

@@ -71,13 +71,14 @@
       <table style="table-layout:fixed; width:100%; border-collapse:collapse;">
         <thead>
           <tr>
-            <th style="width:65%; text-align:left;">Kuiz</th>
+            <th style="width:5%;">No.</th>
+            <th style="width:60%; text-align:left;">Kuiz</th>
             <th style="width:20%; text-align:center;">Status</th>
             <th style="width:15%; text-align:center;">Tindakan</th>
           </tr>
         </thead>
         <tbody>
-          @forelse ($quizzes as $quiz)
+          @forelse ($quizzes as $index => $quiz)
             @php
               $completedAttempts = $quiz->attempts;
               $attemptsUsed = $completedAttempts->count();
@@ -95,7 +96,8 @@
               }
             @endphp
             <tr>
-              <td style="width:75%; padding:12px;">
+              <td style="width:5%; padding:12px; text-align:center; font-weight:600;">{{ $index + 1 }}</td>
+              <td style="width:70%; padding:12px;">
                 <div style="font-weight:700; margin-bottom:4px;">{{ $quiz->title }}</div>
                 <div style="font-size:13px; color:var(--muted); margin-bottom:8px; line-height:1.4;">{{ $quiz->description }}</div>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:11px; align-items:center;">
@@ -141,13 +143,26 @@
             </tr>
           @empty
             <tr>
-              <td colspan="3" style="text-align:center; padding:24px; color:var(--muted);">
+              <td colspan="4" style="text-align:center; padding:24px; color:var(--muted);">
                 @if (!empty(array_filter(['unique_id' => request('unique_id'), 'title' => request('title'), 'creator_email' => request('creator_email'), 'publish_date' => request('publish_date'), 'attempted' => request('attempted')])))
                   Tiada kuiz sepadan dengan kriteria anda.
                 @else
                   Tiada kuiz yang diterbitkan tersedia untuk anda pada masa ini.
                 @endif
               </td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
+
+      <!-- Show More Section -->
+      @if ($hasMore)
+        <div style="text-align:center; margin-top:20px; padding:20px;">
+          <a href="{{ route('student.quizzes.index', array_merge(request()->query(), ['limit' => $nextLimit])) }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+            <i class="bi bi-download"></i> Tunjukkan 10 Kuiz Lagi ({{ $limit }} dari {{ count($quizzes) + ($hasMore ? 10 : 0) }})
+          </a>
+        </div>
+      @endif
             </tr>
           @endforelse
         </tbody>

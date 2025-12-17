@@ -22,15 +22,16 @@ class QuizTeacherController extends Controller
         // 1. Get Filters
         $filters = $request->only(['unique_id', 'title', 'creator_email', 'publish_date_range', 'scope']);
 
-        // Set up the base query
+        // Set up the base query - Show all published quizzes to everyone
         $query = Quiz::with(['creator'])
+                     ->where('is_published', true)
                      // Eager load counts for display in the table
                      ->withCount(['questions', 'attempts']);
         
         // 2. Apply Filtering Logic (Copy from your index.blade.php assumptions)
         
-        // Filter by Scope (Mine/All)
-        if (Auth::check() && ($filters['scope'] ?? 'all') === 'mine') {
+        // Filter by Scope (Mine/All) - Only for teachers viewing their own quizzes
+        if (Auth::check() && Auth::user()->role === 'teacher' && ($filters['scope'] ?? 'all') === 'mine') {
             $query->where('teacher_id', Auth::id());
         }
 
@@ -66,11 +67,19 @@ class QuizTeacherController extends Controller
         }
 
 
-        // 3. Paginate and return the view
-        $quizzes = $query->latest('created_at')->paginate(10); // Or use latest('updated_at')
+        // 3. Get limit from request (default 10, increments by 10)
+        $limit = (int) $request->get('limit', 10);
+        if ($limit < 10) $limit = 10;
+        if ($limit > 1000) $limit = 1000; // Safety limit
+        
+        // 4. Get all quizzes with the specified limit
+        $allQuizzes = $query->latest('created_at')->get();
+        $quizzes = $allQuizzes->take($limit);
+        $hasMore = count($allQuizzes) > $limit;
+        $nextLimit = $limit + 10;
         
         // Ensure you return the view that corresponds to the 'teacher.quizzes.index' route
-        return view('quiz.index-teacher', compact('quizzes', 'filters'));
+        return view('quiz.index-teacher', compact('quizzes', 'filters', 'limit', 'hasMore', 'nextLimit'));
     }
 
 
