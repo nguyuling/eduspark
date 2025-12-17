@@ -227,28 +227,33 @@
     // Template for the Coding question input (Java only)
     const codingTemplate = (index) => {
         return `<div style="margin-top:12px;">
-<!-- Full Code Input Section -->
+<!-- Full Code Input Section with Inline Checkboxes -->
 <div style="margin-bottom:20px;">
 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Kod Penuh<span style="color: var(--danger);">*</span></label>
-<div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; margin-bottom:8px;">
-<textarea name="questions[${index}][coding_full_code]" class="code-full-textarea" data-index="${index}" rows="8" placeholder="Masukkan kod Java lengkap di sini..." required style="width: 100%; padding: 11px 8px 11px 50px; border: none; background: transparent; color: inherit; font-size: 13px; font-family: 'Courier New', monospace; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;"></textarea>
+<div style="display: flex; gap: 0; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; background: #f5f5f5;">
+  <!-- Checkbox Column -->
+  <div id="code-checkboxes-${index}" style="display: flex; flex-direction: column; background: #f0f0f0; border-right: 1px solid #d1d5db; min-width: 35px; padding: 11px 4px; overflow-y: auto; font-size: 13px; line-height: 1.5;">
+    <div style="color: #888; text-align: center; width: 27px;">☐</div>
+  </div>
+  
+  <!-- Line Numbers Column -->
+  <div id="code-lines-${index}" style="position: relative; background: #f0f0f0; padding: 11px 0; text-align: right; font-size: 13px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none; min-width: 35px;">1</div>
+  
+  <!-- Code Textarea -->
+  <div style="flex: 1; position: relative; overflow: hidden;">
+    <textarea name="questions[${index}][coding_full_code]" class="code-full-textarea" data-index="${index}" rows="8" placeholder="Masukkan kod Java lengkap di sini..." required style="width: 100%; padding: 11px 8px; border: none; background: transparent; color: inherit; font-size: 13px; font-family: 'Courier New', monospace; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;"></textarea>
+  </div>
 </div>
-<div style="font-size:12px; color:#888; margin-bottom:12px;">
-<i class="bi bi-info-circle"></i> Tekan ENTER untuk baris seterusnya | Tekan TAB untuk 4 spasi
+<div style="font-size:12px; color:#888; margin-top:8px; margin-bottom:12px;">
+<i class="bi bi-info-circle"></i> Tekan ENTER untuk baris seterusnya | Tekan TAB untuk 4 spasi | Klik checkbox untuk tandakan baris
 </div>
 </div>
 
-<!-- Code Lines with Checkboxes (for line hiding selection) -->
-<div style="margin-bottom:20px; background:#f9f9f9; padding:12px; border-radius:8px; border:2px solid #d1d5db;">
-<label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 12px;">☑ Tanda baris untuk disembunyikan</label>
-<div id="code-lines-with-checkboxes-${index}" style="background:#fff; border:1px solid #d1d5db; border-radius:6px; padding:8px; max-height:400px; overflow-y:auto; font-family:'Courier New', monospace; font-size:12px;">
-<div style="color:#888; padding:8px; text-align:center;">Masukkan kod di atas terlebih dahulu</div>
-</div>
+<!-- Hidden Lines Input -->
 <input type="hidden" name="questions[${index}][hidden_line_numbers]" class="hidden-lines-input" data-index="${index}" value="">
-</div>
 
 <!-- Preview Section (Student View) -->
-<div style="margin-bottom:20px;">
+<div style="margin-top:20px;">
 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px;">Pandangan Pelajar</label>
 <div id="code-preview-${index}" style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:8px; min-height:100px;">
 <div id="preview-lines-${index}" style="position: absolute; left: 0; top: 8px; width: 40px; background: #e8e8e8; padding: 3px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none;"></div>
@@ -258,96 +263,63 @@
 </div>`;
     };
 
-    // Function to update line numbers and refresh line selector
+    // Function to update line numbers and refresh checkboxes
     function updateCodeLineNumbers(textarea, index) {
         const lines = textarea.value.split('\n');
+        const lineNumbersDiv = document.getElementById(`code-lines-${index}`);
+        const checkboxesDiv = document.getElementById(`code-checkboxes-${index}`);
         
         // Auto-expand textarea based on content
         textarea.style.height = 'auto';
         textarea.style.height = Math.max(textarea.scrollHeight, 100) + 'px';
         
-        // Update code lines with checkboxes display
-        updateCodeLinesWithCheckboxes(index, lines);
+        // Update line numbers
+        let lineNumbers = '';
+        for (let i = 1; i <= Math.max(lines.length, 1); i++) {
+            lineNumbers += i + '<br>';
+        }
+        lineNumbersDiv.innerHTML = lineNumbers;
+        
+        // Update checkboxes column
+        updateCheckboxesColumn(index, lines);
         
         // Update preview
         updateCodePreview(index, lines);
     }
 
-    // Function to render checkboxes with code lines
-    function updateCodeLinesWithCheckboxes(index, lines) {
-        const container = document.getElementById(`code-lines-with-checkboxes-${index}`);
+    // Function to render checkboxes in the checkbox column
+    function updateCheckboxesColumn(index, lines) {
+        const checkboxesDiv = document.getElementById(`code-checkboxes-${index}`);
         const hiddenInput = document.querySelector(`.hidden-lines-input[data-index="${index}"]`);
         const currentHidden = hiddenInput.value ? hiddenInput.value.split(',').map(Number) : [];
-        
-        if (lines.length === 0) {
-            container.innerHTML = '<div style="color:#888; padding:8px; text-align:center;">Masukkan kod di atas terlebih dahulu</div>';
-            return;
-        }
         
         let html = '';
         lines.forEach((line, i) => {
             const lineNum = i + 1;
             const isHidden = currentHidden.includes(lineNum);
-            const displayLine = line || '(kosong)';
             
-            html += `<div class="code-line-row" data-line="${lineNum}" style="
-                padding: 6px 8px;
-                margin: 2px 0;
-                border-radius: 4px;
-                cursor: pointer;
-                background: ${isHidden ? '#e8d5f7' : '#fff'};
-                border: 1px solid ${isHidden ? '#d4c5f9' : '#d1d5db'};
-                user-select: none;
-                transition: all 0.2s ease;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            " onmouseover="this.style.background='${isHidden ? '#d4c5f9' : '#f9f9f9'}'" onmouseout="this.style.background='${isHidden ? '#e8d5f7' : '#fff'}'">
-                <input type="checkbox" class="code-line-checkbox" ${isHidden ? 'checked' : ''} style="cursor:pointer; flex-shrink:0;">
-                <span style="color:#888; min-width:20px; text-align:right; font-size:11px; font-weight:600; flex-shrink:0;">${lineNum}:</span>
-                <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:${line.trim() === '' ? '#bbb' : 'inherit'}; font-family:'Courier New', monospace;">${displayLine.substring(0, 60)}</span>
-            </div>`;
+            html += `<input type="checkbox" class="code-line-checkbox" data-line="${lineNum}" ${isHidden ? 'checked' : ''} style="cursor:pointer; width:20px; height:20px;" title="Line ${lineNum}">`;
         });
         
-        container.innerHTML = html;
+        checkboxesDiv.innerHTML = html;
         
-        // Use event delegation for row clicks
-        container.removeEventListener('click', window[`codeLineHandler_${index}`]);
-        window[`codeLineHandler_${index}`] = function(e) {
-            const row = e.target.closest('.code-line-row');
-            if (row) {
-                const checkbox = row.querySelector('.code-line-checkbox');
-                checkbox.checked = !checkbox.checked;
-                updateHiddenLines(index);
-            }
-        };
-        container.addEventListener('click', window[`codeLineHandler_${index}`]);
-    }
-
-    // Function to update line selector (deprecated but keeping for reference)
-    function updateLineSelector(index, lines) {
-        // This function is now replaced by updateCodeLinesWithCheckboxes
-        updateCodeLinesWithCheckboxes(index, lines);
+        // Add event listeners to checkboxes
+        checkboxesDiv.querySelectorAll('.code-line-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', () => updateHiddenLines(index));
+        });
     }
 
     // Function to update hidden lines input and preview
     function updateHiddenLines(index) {
-        const container = document.getElementById(`code-lines-with-checkboxes-${index}`);
+        const checkboxesDiv = document.getElementById(`code-checkboxes-${index}`);
         const hiddenInput = document.querySelector(`.hidden-lines-input[data-index="${index}"]`);
-        const checkboxes = container.querySelectorAll('.code-line-checkbox:checked');
+        const checkboxes = checkboxesDiv.querySelectorAll('.code-line-checkbox:checked');
         
         const hiddenLines = Array.from(checkboxes).map(cb => {
-            return cb.closest('.code-line-row').getAttribute('data-line');
+            return cb.getAttribute('data-line');
         });
         
         hiddenInput.value = hiddenLines.join(',');
-        
-        // Update the row styling
-        container.querySelectorAll('.code-line-row').forEach(row => {
-            const isChecked = row.querySelector('.code-line-checkbox').checked;
-            row.style.background = isChecked ? '#e8d5f7' : '#fff';
-            row.style.borderColor = isChecked ? '#d4c5f9' : '#d1d5db';
-        });
         
         // Update preview
         const textarea = document.querySelector(`.code-full-textarea[data-index="${index}"]`);
