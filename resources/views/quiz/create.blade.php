@@ -231,7 +231,6 @@
 <div style="margin-bottom:20px;">
 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Kod Penuh<span style="color: var(--danger);">*</span></label>
 <div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; margin-bottom:8px;">
-<div id="code-lines-${index}" style="position: absolute; left: 0; top: 0; width: 40px; background: #e8e8e8; padding: 11px 0; text-align: right; font-size: 13px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none;">1</div>
 <textarea name="questions[${index}][coding_full_code]" class="code-full-textarea" data-index="${index}" rows="8" placeholder="Masukkan kod Java lengkap di sini..." required style="width: 100%; padding: 11px 8px 11px 50px; border: none; background: transparent; color: inherit; font-size: 13px; font-family: 'Courier New', monospace; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;"></textarea>
 </div>
 <div style="font-size:12px; color:#888; margin-bottom:12px;">
@@ -239,27 +238,18 @@
 </div>
 </div>
 
-<!-- Hidden Lines Selection Section -->
-<div style="margin-bottom:20px; background:rgba(106,77,247,0.05); padding:12px; border-radius:8px; border:2px solid #d4c5f9;">
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-<label style="display: block; font-weight: 600; font-size: 13px;">Pilih Baris yang Akan Disembunyikan <span style="color: var(--danger);">*</span></label>
-<label style="display:flex; align-items:center; gap:6px; font-weight:500; font-size:12px; cursor:pointer;">
-<input type="checkbox" class="select-all-lines" data-index="${index}" style="cursor:pointer;">
-Pilih Semua
-</label>
-</div>
-<div id="line-selector-${index}" style="background:#fff; border:1px solid #d1d5db; border-radius:6px; padding:8px; max-height:400px; overflow-y:auto; font-family:'Courier New', monospace; font-size:12px;">
+<!-- Code Lines with Checkboxes (for line hiding selection) -->
+<div style="margin-bottom:20px; background:#f9f9f9; padding:12px; border-radius:8px; border:2px solid #d1d5db;">
+<label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 12px;">☑ Tanda baris untuk disembunyikan</label>
+<div id="code-lines-with-checkboxes-${index}" style="background:#fff; border:1px solid #d1d5db; border-radius:6px; padding:8px; max-height:400px; overflow-y:auto; font-family:'Courier New', monospace; font-size:12px;">
 <div style="color:#888; padding:8px; text-align:center;">Masukkan kod di atas terlebih dahulu</div>
 </div>
 <input type="hidden" name="questions[${index}][hidden_line_numbers]" class="hidden-lines-input" data-index="${index}" value="">
-<div style="font-size:12px; color:#666; margin-top:8px;">
-💡 Klik pada baris untuk menandai sebagai disembunyikan. Baris yang dipilih akan menjadi jawapan pelajar.
-</div>
 </div>
 
-<!-- Preview Section -->
+<!-- Preview Section (Student View) -->
 <div style="margin-bottom:20px;">
-<label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px;">Pratonton (Pandangan Pelajar)</label>
+<label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px;">Pandangan Pelajar</label>
 <div id="code-preview-${index}" style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:8px; min-height:100px;">
 <div id="preview-lines-${index}" style="position: absolute; left: 0; top: 8px; width: 40px; background: #e8e8e8; padding: 3px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none;"></div>
 <div id="preview-code-${index}" style="margin-left:50px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit;">Masukkan kod di atas</div>
@@ -271,33 +261,26 @@ Pilih Semua
     // Function to update line numbers and refresh line selector
     function updateCodeLineNumbers(textarea, index) {
         const lines = textarea.value.split('\n');
-        const lineNumbersDiv = document.getElementById(`code-lines-${index}`);
         
         // Auto-expand textarea based on content
         textarea.style.height = 'auto';
         textarea.style.height = Math.max(textarea.scrollHeight, 100) + 'px';
         
-        let lineNumbers = '';
-        for (let i = 1; i <= Math.max(lines.length, 1); i++) {
-            lineNumbers += i + '<br>';
-        }
-        lineNumbersDiv.innerHTML = lineNumbers;
-        
-        // Update line selector
-        updateLineSelector(index, lines);
+        // Update code lines with checkboxes display
+        updateCodeLinesWithCheckboxes(index, lines);
         
         // Update preview
         updateCodePreview(index, lines);
     }
 
-    // Function to render clickable line selector
-    function updateLineSelector(index, lines) {
-        const selector = document.getElementById(`line-selector-${index}`);
+    // Function to render checkboxes with code lines
+    function updateCodeLinesWithCheckboxes(index, lines) {
+        const container = document.getElementById(`code-lines-with-checkboxes-${index}`);
         const hiddenInput = document.querySelector(`.hidden-lines-input[data-index="${index}"]`);
         const currentHidden = hiddenInput.value ? hiddenInput.value.split(',').map(Number) : [];
         
         if (lines.length === 0) {
-            selector.innerHTML = '<div style="color:#888; padding:8px; text-align:center;">Masukkan kod di atas terlebih dahulu</div>';
+            container.innerHTML = '<div style="color:#888; padding:8px; text-align:center;">Masukkan kod di atas terlebih dahulu</div>';
             return;
         }
         
@@ -307,7 +290,7 @@ Pilih Semua
             const isHidden = currentHidden.includes(lineNum);
             const displayLine = line || '(kosong)';
             
-            html += `<div class="line-selector-row" data-line="${lineNum}" style="
+            html += `<div class="code-line-row" data-line="${lineNum}" style="
                 padding: 6px 8px;
                 margin: 2px 0;
                 border-radius: 4px;
@@ -320,65 +303,51 @@ Pilih Semua
                 align-items: center;
                 gap: 8px;
             " onmouseover="this.style.background='${isHidden ? '#d4c5f9' : '#f9f9f9'}'" onmouseout="this.style.background='${isHidden ? '#e8d5f7' : '#fff'}'">
-                <input type="checkbox" class="line-checkbox" ${isHidden ? 'checked' : ''} style="cursor:pointer;">
-                <span style="color:#888; min-width:20px; text-align:right; font-size:11px; font-weight:600;">${lineNum}:</span>
-                <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:${line.trim() === '' ? '#bbb' : 'inherit'}">${displayLine.substring(0, 60)}</span>
+                <input type="checkbox" class="code-line-checkbox" ${isHidden ? 'checked' : ''} style="cursor:pointer; flex-shrink:0;">
+                <span style="color:#888; min-width:20px; text-align:right; font-size:11px; font-weight:600; flex-shrink:0;">${lineNum}:</span>
+                <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:${line.trim() === '' ? '#bbb' : 'inherit'}; font-family:'Courier New', monospace;">${displayLine.substring(0, 60)}</span>
             </div>`;
         });
         
-        selector.innerHTML = html;
+        container.innerHTML = html;
         
-        // Use event delegation for row clicks (handles all rows including scrolled ones)
-        selector.removeEventListener('click', window[`lineSelector_${index}_handler`]);
-        window[`lineSelector_${index}_handler`] = function(e) {
-            const row = e.target.closest('.line-selector-row');
+        // Use event delegation for row clicks
+        container.removeEventListener('click', window[`codeLineHandler_${index}`]);
+        window[`codeLineHandler_${index}`] = function(e) {
+            const row = e.target.closest('.code-line-row');
             if (row) {
-                const checkbox = row.querySelector('.line-checkbox');
+                const checkbox = row.querySelector('.code-line-checkbox');
                 checkbox.checked = !checkbox.checked;
                 updateHiddenLines(index);
             }
         };
-        selector.addEventListener('click', window[`lineSelector_${index}_handler`]);
-        
-        // Add event listener to select all checkbox
-        const selectAllCheckbox = document.querySelector(`.select-all-lines[data-index="${index}"]`);
-        if (selectAllCheckbox) {
-            selectAllCheckbox.removeEventListener('change', window[`selectAll_${index}_handler`]);
-            window[`selectAll_${index}_handler`] = function() {
-                selectAllLines(index, this.checked);
-            };
-            selectAllCheckbox.addEventListener('change', window[`selectAll_${index}_handler`]);
-        }
+        container.addEventListener('click', window[`codeLineHandler_${index}`]);
+    }
+
+    // Function to update line selector (deprecated but keeping for reference)
+    function updateLineSelector(index, lines) {
+        // This function is now replaced by updateCodeLinesWithCheckboxes
+        updateCodeLinesWithCheckboxes(index, lines);
     }
 
     // Function to update hidden lines input and preview
     function updateHiddenLines(index) {
-        const selector = document.getElementById(`line-selector-${index}`);
+        const container = document.getElementById(`code-lines-with-checkboxes-${index}`);
         const hiddenInput = document.querySelector(`.hidden-lines-input[data-index="${index}"]`);
-        const checkboxes = selector.querySelectorAll('.line-checkbox:checked');
+        const checkboxes = container.querySelectorAll('.code-line-checkbox:checked');
         
         const hiddenLines = Array.from(checkboxes).map(cb => {
-            return cb.closest('.line-selector-row').getAttribute('data-line');
+            return cb.closest('.code-line-row').getAttribute('data-line');
         });
         
         hiddenInput.value = hiddenLines.join(',');
         
         // Update the row styling
-        selector.querySelectorAll('.line-selector-row').forEach(row => {
-            const isChecked = row.querySelector('.line-checkbox').checked;
+        container.querySelectorAll('.code-line-row').forEach(row => {
+            const isChecked = row.querySelector('.code-line-checkbox').checked;
             row.style.background = isChecked ? '#e8d5f7' : '#fff';
             row.style.borderColor = isChecked ? '#d4c5f9' : '#d1d5db';
         });
-        
-        // Update select all checkbox state
-        const totalLines = selector.querySelectorAll('.line-checkbox').length;
-        const checkedLines = selector.querySelectorAll('.line-checkbox:checked').length;
-        const selectAllCheckbox = document.querySelector(`.select-all-lines[data-index="${index}"]`);
-        
-        if (selectAllCheckbox) {
-            selectAllCheckbox.checked = totalLines > 0 && totalLines === checkedLines;
-            selectAllCheckbox.indeterminate = checkedLines > 0 && checkedLines < totalLines;
-        }
         
         // Update preview
         const textarea = document.querySelector(`.code-full-textarea[data-index="${index}"]`);
@@ -386,14 +355,7 @@ Pilih Semua
         updateCodePreview(index, lines);
     }
 
-    // Function to handle select all lines
-    function selectAllLines(index, isChecked) {
-        const selector = document.getElementById(`line-selector-${index}`);
-        selector.querySelectorAll('.line-checkbox').forEach(checkbox => {
-            checkbox.checked = isChecked;
-        });
-        updateHiddenLines(index);
-    }
+
 
     // Function to update code preview (showing what students will see)
     function updateCodePreview(index, lines) {
