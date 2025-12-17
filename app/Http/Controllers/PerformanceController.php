@@ -220,8 +220,14 @@ class PerformanceController extends Controller
             ->take(6);
 
         // Prepare chart arrays
-        $labels = $recentData->pluck('title')->all();
-        $scores = $recentData->pluck('score')->all();
+        // keep chart stable even when no data is available
+        if ($recentData->isEmpty()) {
+            $labels = ['Tiada data'];
+            $scores = [0];
+        } else {
+            $labels = $recentData->pluck('title')->all();
+            $scores = $recentData->pluck('score')->all();
+        }
 
         return view('performance.index', [
             'avgQuizScore' => round($avgQuizScore ?? 0, 1),
