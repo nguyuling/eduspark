@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="app">
-    <main class="main" style="overflow: hidden; margin: 0; padding: 0;">
-        <div id="gameContainer" style="padding: 0; width: 100%; min-height: calc(100vh - 70px); display: flex; flex-direction: column; background: #000;">
+    <main class="main" style="overflow: hidden; margin: 0; padding: 0; height: 100vh;">
+        <div id="gameContainer" style="padding: 0; width: 100%; height: 100%; display: flex; flex-direction: column; background: #000;">
             <!-- Game Header -->
             <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10; height: auto;">
                 <div style="color: white;">
@@ -22,7 +22,7 @@
             </div>
 
             <!-- Game Canvas -->
-            <canvas id="gameCanvas" style="flex: 1; display: none !important; width: 100%; background: linear-gradient(to bottom, #000428, #004e92); cursor: none;"></canvas>
+            <canvas id="gameCanvas" style="flex: 1; display: block !important; width: 100%; height: 100%; background: linear-gradient(to bottom, #000428, #004e92); cursor: none;"></canvas>
 
             <!-- Start Screen -->
             <div id="startScreen" style="display: flex; align-items: center; justify-content: center; flex: 1; text-align: center; color: white;">
@@ -93,11 +93,10 @@
 
     function resizeCanvas() {
         const gameContainer = document.getElementById('gameContainer');
-        const header = document.getElementById('gameHeader');
-        const headerHeight = header.offsetHeight;
+        const canvas = document.getElementById('gameCanvas');
         
         canvas.width = gameContainer.offsetWidth;
-        canvas.height = gameContainer.offsetHeight - headerHeight;
+        canvas.height = gameContainer.offsetHeight;
         
         player.x = canvas.width / 2 - player.width / 2;
         player.y = canvas.height - 60;
