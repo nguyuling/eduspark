@@ -15,7 +15,11 @@ require __DIR__ . '/auth.php';
 Route::get('/', function() {
     if (auth()->check()) {
         $user = auth()->user();
-        return redirect('/performance');
+        // Teachers land on reports, others on performance
+        if (($user->role ?? null) === 'teacher') {
+            return redirect()->route('reports.index');
+        }
+        return redirect()->route('performance');
     }
     return redirect('/login');
 })->name('home');
