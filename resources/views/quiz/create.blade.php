@@ -208,7 +208,7 @@
                             <option value="${QUESTION_TYPES.CHECKBOX}">Kotak Semak</option>
                             <option value="${QUESTION_TYPES.SA}">Jawapan Pendek</option>
                             <option value="${QUESTION_TYPES.TF}">Benar/Salah</option>
-                            <option value="${QUESTION_TYPES.CODING}">Pengaturcaraan</option>
+                            <option value="${QUESTION_TYPES.CODING}">Koding</option>
                         </select>
                     </div>
                 </div>
