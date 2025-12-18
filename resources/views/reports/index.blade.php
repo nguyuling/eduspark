@@ -33,7 +33,7 @@
         </select>
 
         <button id="open-student" class="btn"
-            style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;">
+            style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:8px;">
             Buka
         </button>
     </div>
