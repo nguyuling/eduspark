@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="app">
-    <main class="main" style="overflow: hidden; margin: 0; padding: 0; height: 100vh;">
-        <div id="gameContainer" style="padding: 0; width: 100%; height: 100%; display: flex; flex-direction: column; background: #000;">
+    <main class="main" style="overflow: hidden; margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column;">
+        <div id="gameContainer" style="padding: 0; width: 100%; flex: 1; display: flex; flex-direction: column; background: #000;">
             <!-- Game Header -->
             <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10; height: auto;">
                 <div style="color: white;">
