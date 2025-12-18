@@ -101,50 +101,108 @@
 </style>
 
 <script>
+    // Placeholder games data - in production this should come from the API
+    const sampleGames = [
+        {
+            id: 1,
+            name: 'Cosmic Defender',
+            title: 'Cosmic Defender',
+            description: 'Pertahanan luar angkasa yang menarik dengan soalan matematik',
+            difficulty: 'medium'
+        },
+        {
+            id: 2,
+            name: 'Memory Match',
+            title: 'Memory Match',
+            description: 'Permainan ingatan yang membantu meningkatkan fokus dan ingatan',
+            difficulty: 'easy'
+        },
+        {
+            id: 3,
+            name: 'Maze Quest',
+            title: 'Maze Quest',
+            description: 'Navigasi labirin sambil menjawab soalan pembelajaran',
+            difficulty: 'medium'
+        },
+        {
+            id: 4,
+            name: 'Quiz Challenge',
+            title: 'Quiz Challenge',
+            description: 'Cabaran kuiz cepat dengan pelbagai topik',
+            difficulty: 'hard'
+        },
+        {
+            id: 5,
+            name: 'Whack-a-Mole',
+            title: 'Whack-a-Mole',
+            description: 'Permainan pantas dengan soalan pendidikan',
+            difficulty: 'easy'
+        }
+    ];
+
     document.addEventListener('DOMContentLoaded', async function() {
+        const container = document.getElementById('gamesContainer');
+        
         try {
+            // Try to fetch from API first
             const response = await fetch('/api/games');
             const games = await response.json();
             
-            const container = document.getElementById('gamesContainer');
-            container.innerHTML = '';
-            
-            if (games.length === 0) {
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);"><p>Belum ada permainan tersedia</p></div>';
+            if (games && games.length > 0) {
+                renderGames(games);
                 return;
             }
-            
-            games.forEach(game => {
-                const difficultyClass = `difficulty-${(game.difficulty || 'easy').toLowerCase()}`;
-                const card = document.createElement('div');
-                card.className = 'game-card';
-                card.innerHTML = `
-                    <div class="game-card-image">
-                        ${getGameEmoji(game.name)}
-                    </div>
-                    <div class="game-card-content">
-                        <div class="game-card-title">${escapeHtml(game.name)}</div>
-                        <div class="game-card-description">${escapeHtml(game.description || 'Permainan edukatif yang menyenangkan')}</div>
-                        <div class="game-card-footer">
-                            <span class="game-difficulty ${difficultyClass}">
-                                ${capitalizeFirst(game.difficulty || 'Easy')}
-                            </span>
-                        </div>
-                    </div>
-                `;
-                
-                card.addEventListener('click', function() {
-                    window.location.href = `/api/games/${game.id}`;
-                });
-                
-                container.appendChild(card);
-            });
         } catch (error) {
-            console.error('Error loading games:', error);
-            const container = document.getElementById('gamesContainer');
-            container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);"><p>Ralat semasa memuatkan permainan</p></div>';
+            console.log('API not available, using sample games');
         }
+        
+        // Fall back to sample games
+        renderGames(sampleGames);
     });
+
+    function renderGames(games) {
+        const container = document.getElementById('gamesContainer');
+        container.innerHTML = '';
+        
+        if (!games || games.length === 0) {
+            container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);"><p>Belum ada permainan tersedia</p></div>';
+            return;
+        }
+        
+        games.forEach(game => {
+            const gameName = game.name || game.title || 'Unknown Game';
+            const difficultyClass = `difficulty-${(game.difficulty || 'easy').toLowerCase()}`;
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            card.innerHTML = `
+                <div class="game-card-image">
+                    ${getGameEmoji(gameName)}
+                </div>
+                <div class="game-card-content">
+                    <div class="game-card-title">${escapeHtml(gameName)}</div>
+                    <div class="game-card-description">${escapeHtml(game.description || 'Permainan edukatif yang menyenangkan')}</div>
+                    <div class="game-card-footer">
+                        <span class="game-difficulty ${difficultyClass}">
+                            ${capitalizeFirst(game.difficulty || 'Easy')}
+                        </span>
+                    </div>
+                </div>
+            `;
+            
+            card.addEventListener('click', function() {
+                // Link to game details or launch
+                if (game.url) {
+                    window.location.href = game.url;
+                } else if (game.game_file) {
+                    window.location.href = `/game/${game.id}`;
+                } else {
+                    alert('Permainan ini belum siap untuk dimainkan');
+                }
+            });
+            
+            container.appendChild(card);
+        });
+    }
     
     function getGameEmoji(gameName) {
         const emojiMap = {
