@@ -17,7 +17,7 @@
     </div>
 
     @if (session('success'))
-      <div style="background:var(--accent);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('success') }}</div>
+      <div class="alert-success">{{ session('success') }}</div>
     @endif
 
     @if (session('error'))
