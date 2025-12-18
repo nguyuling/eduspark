@@ -26,6 +26,7 @@ class PerformanceController extends Controller
         $labels = [];
         $labelsFull = [];
         $scores = [];
+        $rawScores = [];
 
         $recentCollection = collect();
 
@@ -140,6 +141,8 @@ class PerformanceController extends Controller
                     'title' => $shortTitle,
                     'title_full' => $fullTitle,
                     'score' => (float) $scorePercent,
+                    'raw_score' => $r->score,
+                    'max_score' => $maxScore,
                     'completed_at' => $completedAt,
                 ]);
             }
@@ -239,6 +242,12 @@ class PerformanceController extends Controller
         $labels = $recentData->pluck('title')->all();
         $labelsFull = $recentData->pluck('title_full')->all();
         $scores = $recentData->pluck('score')->all();
+        $rawScores = $recentData->map(function($item) {
+            return [
+                'raw' => $item->raw_score ?? null,
+                'max' => $item->max_score ?? null
+            ];
+        })->all();
 
         return view('performance.index', [
             'avgQuizScore' => round($avgQuizScore ?? 0, 2),
@@ -250,6 +259,7 @@ class PerformanceController extends Controller
             'labels' => $labels,
             'labelsFull' => $labelsFull,
             'scores' => $scores,
+            'rawScores' => $rawScores,
         ]);
     }
 }

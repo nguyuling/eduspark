@@ -81,6 +81,7 @@ gr.addColorStop(1,'rgba(156,123,255,0.06)');
 const labels = {!! json_encode($labels) !!};
 const labelsFull = {!! json_encode($labelsFull ?? $labels) !!};
 const scores = {!! json_encode($scores) !!};
+const rawScores = {!! json_encode($rawScores ?? []) !!};
 
 new Chart(ctx,{
   type:'line',
@@ -107,7 +108,15 @@ new Chart(ctx,{
             const idx = items[0]?.dataIndex ?? 0;
             return labelsFull[idx] ?? labels[idx] ?? '';
           },
-          label:(ctx)=> `Skor: ${ctx.parsed.y}`
+          label:(ctx)=> {
+            const idx = ctx.dataIndex;
+            const percent = ctx.parsed.y;
+            const raw = rawScores[idx];
+            if (raw && raw.raw !== null && raw.max !== null) {
+              return [`Skor: ${percent}%`, `(${raw.raw}/${raw.max})`];
+            }
+            return `Skor: ${percent}%`;
+          }
         }
       }
     },
