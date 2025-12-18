@@ -125,9 +125,9 @@
             slug: 'cosmic-defender',
             name: 'Cosmic Defender',
             title: 'Cosmic Defender',
-            description: 'Pertahanan luar angkasa yang menarik dengan soalan matematik',
+            description: 'Pertahanan luar angkasa yang menarik dengan aksi penembakan',
             difficulty: 'medium',
-            route: '/games/SpaceAdventure'
+            route: '{{ route("games.cosmic") }}'
         },
         {
             id: 2,
@@ -136,23 +136,23 @@
             title: 'Memory Match',
             description: 'Permainan ingatan yang membantu meningkatkan fokus dan ingatan',
             difficulty: 'easy',
-            route: '/games/MemoryGame'
+            route: '{{ route("games.memory") }}'
         },
         {
             id: 3,
             slug: 'maze-game',
             name: 'Maze Quest',
             title: 'Maze Quest',
-            description: 'Navigasi labirin sambil menjawab soalan pembelajaran',
+            description: 'Navigasi labirin dan capai pintu keluar dengan cepat',
             difficulty: 'medium',
-            route: '/games/MazeGame'
+            route: '{{ route("games.maze") }}'
         },
         {
             id: 4,
             slug: 'quiz-challenge',
             name: 'Quiz Challenge',
             title: 'Quiz Challenge',
-            description: 'Cabaran kuiz cepat dengan pelbagai topik',
+            description: 'Cabaran kuiz cepat dengan soalan pengaturcaraan Python',
             difficulty: 'hard',
             route: '{{ route("games.quiz") }}'
         },
@@ -161,9 +161,9 @@
             slug: 'whack-mole',
             name: 'Whack-a-Mole',
             title: 'Whack-a-Mole',
-            description: 'Permainan pantas dengan soalan pendidikan',
+            description: 'Permainan pantas - tumbuk tikus yang muncul',
             difficulty: 'easy',
-            route: '/games/WhackAMole'
+            route: '{{ route("games.whack") }}'
         }
     ];
 

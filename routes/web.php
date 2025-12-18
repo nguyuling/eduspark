@@ -125,3 +125,19 @@ Route::middleware('auth')->group(function () {
         return view('games.quiz-challenge');
     })->name('games.quiz');
     
+    Route::get('/games/whack-a-mole', function() {
+        return view('games.whack-a-mole');
+    })->name('games.whack');
+    
+    Route::get('/games/memory-match', function() {
+        return view('games.memory-match');
+    })->name('games.memory');
+    
+    Route::get('/games/cosmic-defender', function() {
+        return view('games.cosmic-defender');
+    })->name('games.cosmic');
+    
+    Route::get('/games/maze-game', function() {
+        return view('games.maze-game');
+    })->name('games.maze');
+});
