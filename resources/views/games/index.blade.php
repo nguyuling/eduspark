@@ -98,110 +98,104 @@
         background: rgba(239, 68, 68, 0.2);
         color: #ef4444;
     }
+
+    .play-btn {
+        padding: 6px 14px;
+        background: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .play-btn:hover {
+        opacity: 0.9;
+        transform: scale(1.05);
+    }
 </style>
 
 <script>
-    // Placeholder games data - in production this should come from the API
-    const sampleGames = [
+    // Game database with actual game implementations
+    const gameDatabase = [
         {
             id: 1,
+            slug: 'cosmic-defender',
             name: 'Cosmic Defender',
             title: 'Cosmic Defender',
             description: 'Pertahanan luar angkasa yang menarik dengan soalan matematik',
-            difficulty: 'medium'
+            difficulty: 'medium',
+            reactRoute: '/games/SpaceAdventure'
         },
         {
             id: 2,
+            slug: 'memory-game',
             name: 'Memory Match',
             title: 'Memory Match',
             description: 'Permainan ingatan yang membantu meningkatkan fokus dan ingatan',
-            difficulty: 'easy'
+            difficulty: 'easy',
+            reactRoute: '/games/MemoryGame'
         },
         {
             id: 3,
+            slug: 'maze-game',
             name: 'Maze Quest',
             title: 'Maze Quest',
             description: 'Navigasi labirin sambil menjawab soalan pembelajaran',
-            difficulty: 'medium'
+            difficulty: 'medium',
+            reactRoute: '/games/MazeGame'
         },
         {
             id: 4,
-            name: 'Quiz Challenge',
-            title: 'Quiz Challenge',
-            description: 'Cabaran kuiz cepat dengan pelbagai topik',
-            difficulty: 'hard'
-        },
-        {
-            id: 5,
+            slug: 'whack-mole',
             name: 'Whack-a-Mole',
             title: 'Whack-a-Mole',
             description: 'Permainan pantas dengan soalan pendidikan',
-            difficulty: 'easy'
+            difficulty: 'easy',
+            reactRoute: '/games/WhackAMole'
         }
     ];
 
-    document.addEventListener('DOMContentLoaded', async function() {
-        const container = document.getElementById('gamesContainer');
-        
-        try {
-            // Try to fetch from API first
-            const response = await fetch('/api/games');
-            const games = await response.json();
-            
-            if (games && games.length > 0) {
-                renderGames(games);
-                return;
-            }
-        } catch (error) {
-            console.log('API not available, using sample games');
-        }
-        
-        // Fall back to sample games
-        renderGames(sampleGames);
-    });
-
-    function renderGames(games) {
+    document.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById('gamesContainer');
         container.innerHTML = '';
         
-        if (!games || games.length === 0) {
+        if (!gameDatabase || gameDatabase.length === 0) {
             container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);"><p>Belum ada permainan tersedia</p></div>';
             return;
         }
         
-        games.forEach(game => {
-            const gameName = game.name || game.title || 'Unknown Game';
+        gameDatabase.forEach(game => {
             const difficultyClass = `difficulty-${(game.difficulty || 'easy').toLowerCase()}`;
             const card = document.createElement('div');
             card.className = 'game-card';
             card.innerHTML = `
                 <div class="game-card-image">
-                    ${getGameEmoji(gameName)}
+                    ${getGameEmoji(game.name)}
                 </div>
                 <div class="game-card-content">
-                    <div class="game-card-title">${escapeHtml(gameName)}</div>
-                    <div class="game-card-description">${escapeHtml(game.description || 'Permainan edukatif yang menyenangkan')}</div>
+                    <div class="game-card-title">${escapeHtml(game.name)}</div>
+                    <div class="game-card-description">${escapeHtml(game.description || 'Permainan edukatif yang menyenungkan')}</div>
                     <div class="game-card-footer">
                         <span class="game-difficulty ${difficultyClass}">
                             ${capitalizeFirst(game.difficulty || 'Easy')}
                         </span>
+                        <button class="play-btn" onclick="playGame('${game.reactRoute}')">
+                            Main ▶
+                        </button>
                     </div>
                 </div>
             `;
             
-            card.addEventListener('click', function() {
-                // Link to game details or launch
-                if (game.url) {
-                    window.location.href = game.url;
-                } else if (game.game_file) {
-                    window.location.href = `/game/${game.id}`;
-                } else {
-                    alert('Permainan ini belum siap untuk dimainkan');
-                }
-            });
-            
             container.appendChild(card);
         });
+    });
+
+    function playGame(route) {
+        // Redirect to React app with the game route
+        window.location.href = route;
     }
     
     function getGameEmoji(gameName) {
