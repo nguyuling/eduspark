@@ -21,8 +21,13 @@
                 </div>
             </div>
 
+            <!-- Instructions -->
+            <div style="background: rgba(74, 222, 128, 0.1); border-bottom: 1px solid rgba(74, 222, 128, 0.3); padding: 12px 20px; text-align: center; color: #4ade80; font-size: 13px;">
+                <strong>📖 How to Play:</strong> Use <strong>← →</strong> or <strong>A/D</strong> to move • Press <strong>SPACE</strong> to shoot • Destroy 👾 enemies • Don't let them hit you!
+            </div>
+
             <!-- Game Canvas -->
-            <canvas id="gameCanvas" style="flex: 1; display: none; width: 100%; background: linear-gradient(to bottom, #000428, #004e92); cursor: none;"></canvas>
+            <canvas id="gameCanvas" style="flex: 1; display: none !important; width: 100%; background: linear-gradient(to bottom, #000428, #004e92); cursor: none;"></canvas>
 
             <!-- Start Screen -->
             <div id="startScreen" style="display: flex; align-items: center; justify-content: center; flex: 1; text-align: center; color: white;">
