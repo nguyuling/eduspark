@@ -237,6 +237,14 @@ class ReportController extends Controller
     }
 
     /**
+     * Alias to keep route compatibility with existing blades/JS.
+     */
+    public function student(Request $request, $id)
+    {
+        return $this->studentReport($request, $id);
+    }
+
+    /**
      * Stream CSV export for student (formatted header + table).
      */
     public function exportStudentCsv($id)
