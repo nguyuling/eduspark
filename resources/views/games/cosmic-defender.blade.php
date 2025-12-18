@@ -99,10 +99,15 @@
     function resizeCanvas() {
         const gameContainer = document.getElementById('gameContainer');
         const header = document.getElementById('gameHeader');
-        const headerHeight = header.offsetHeight;
+        const instructions = document.querySelector('[style*="rgba(74, 222, 128"]');
+        
+        let totalHeaderHeight = header.offsetHeight;
+        if (instructions) {
+            totalHeaderHeight += instructions.offsetHeight;
+        }
         
         canvas.width = gameContainer.offsetWidth;
-        canvas.height = gameContainer.offsetHeight - headerHeight;
+        canvas.height = gameContainer.offsetHeight - totalHeaderHeight;
         
         player.x = canvas.width / 2 - player.width / 2;
         player.y = canvas.height - 60;
