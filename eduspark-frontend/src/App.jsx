@@ -21,15 +21,15 @@ function App() {
         <Header />
         <main style={{
           flex: 1,
-          marginLeft: '280px', // Sidebar width
+          marginLeft: '280px', // Lebar sidebar
           padding: '20px',
           minHeight: '100vh',
-          backgroundColor: 'transparent', // Changed from var(--background)
+          backgroundColor: 'transparent',
           color: 'var(--text-secondary)',
           width: 'calc(100% - 280px)'
         }}>
           <Routes>
-            {/* Home/Dashboard - Shows GameList */}
+            {/* Laman Utama/Papan Pemuka - Papar Senarai Permainan */}
             <Route path="/" element={
               <div>
                 <div style={{
@@ -45,53 +45,88 @@ function App() {
                     fontSize: '2.5rem',
                     textShadow: '0 0 8px var(--accent-glow)'
                   }}>
-                    Welcome to <span style={{ color: '#1D5DCD' }}>Edu</span>
+                    Selamat Datang ke <span style={{ color: '#1D5DCD' }}>Edu</span>
                     <span style={{ color: '#E63946' }}>Spark</span>! 🚀
                   </h1>
                   <p style={{ fontSize: '1.1rem', opacity: 0.9, color: 'var(--text-secondary)' }}>
-                    Start your learning journey with interactive educational games
+                    Mulakan perjalanan pembelajaran anda dengan permainan pendidikan interaktif
                   </p>
                 </div>
-                <h2 style={{ color: 'var(--text-primary)', marginBottom: '20px', textShadow: '0 0 6px var(--accent-glow)' }}>Featured Games</h2>
+                <h2 style={{ color: 'var(--text-primary)', marginBottom: '20px', textShadow: '0 0 6px var(--accent-glow)' }}>
+                  🎮 Permainan Pilihan
+                </h2>
                 <GameList />
               </div>
             } />
             
-            {/* Games Page - Also shows GameList */}
+            {/* Laman Permainan - Juga paparkan Senarai Permainan */}
             <Route path="/games" element={
               <div>
                 <h1 style={{ color: 'var(--text-primary)', marginBottom: '30px', fontSize: '2.5rem', textShadow: '0 0 8px var(--accent-glow)' }}>
-                  🎮 All Games
+                  🎮 Semua Permainan
                 </h1>
                 <GameList />
               </div>
             } />
             
-            {/* Individual Game Routes */}
+            {/* KOREKSI: Kembalikan laluan asal untuk permainan */}
             <Route path="/games/SpaceAdventure" element={<SpaceAdventure />} />
             <Route path="/games/WhackAMole" element={<WhackAMole />} />
             <Route path="/games/MemoryGame" element={<MemoryGame />} />
             <Route path="/games/MazeGame" element={<MazeGame />} />
             
-            {/* Placeholder Pages */}
+            {/* Laman Sementara */}
             <Route path="/materials" element={
-              <div>
-                <h1 style={{ color: 'var(--text-primary)', textShadow: '0 0 6px var(--accent-glow)' }}>📚 Learning Materials</h1>
-                <p style={{ color: 'var(--text-secondary)' }}>Study materials coming soon...</p>
+              <div style={{ padding: '40px', textAlign: 'center' }}>
+                <h1 style={{ color: 'var(--text-primary)', textShadow: '0 0 6px var(--accent-glow)', marginBottom: '20px' }}>
+                  📚 Bahan Pembelajaran
+                </h1>
+                <div style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  padding: '40px',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem' }}>
+                    Bahan pembelajaran akan tiba tidak lama lagi...
+                  </p>
+                </div>
               </div>
             } />
             
             <Route path="/forum" element={
-              <div>
-                <h1 style={{ color: 'var(--text-primary)', textShadow: '0 0 6px var(--accent-glow)' }}>💬 Community Forum</h1>
-                <p style={{ color: 'var(--text-secondary)' }}>Forum coming soon...</p>
+              <div style={{ padding: '40px', textAlign: 'center' }}>
+                <h1 style={{ color: 'var(--text-primary)', textShadow: '0 0 6px var(--accent-glow)', marginBottom: '20px' }}>
+                  💬 Forum Komuniti
+                </h1>
+                <div style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  padding: '40px',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem' }}>
+                    Forum akan tiba tidak lama lagi...
+                  </p>
+                </div>
               </div>
             } />
             
             <Route path="/assessments" element={
-              <div>
-                <h1 style={{ color: 'var(--text-primary)', textShadow: '0 0 6px var(--accent-glow)' }}>📝 Assessments</h1>
-                <p style={{ color: 'var(--text-secondary)' }}>Assessments coming soon...</p>
+              <div style={{ padding: '40px', textAlign: 'center' }}>
+                <h1 style={{ color: 'var(--text-primary)', textShadow: '0 0 6px var(--accent-glow)', marginBottom: '20px' }}>
+                  📝 Penilaian
+                </h1>
+                <div style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  padding: '40px',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem' }}>
+                    Penilaian akan tiba tidak lama lagi...
+                  </p>
+                </div>
               </div>
             } />
           </Routes>

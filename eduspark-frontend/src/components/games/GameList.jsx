@@ -13,7 +13,7 @@ const GameList = () => {
 
   useEffect(() => {
     loadGames();
-    // You can load actual stats from your API later
+    // Anda boleh muat stat sebenar dari API kemudian
     setStats({
       totalGames: 4,
       completedGames: 0,
@@ -23,56 +23,56 @@ const GameList = () => {
 
   const loadGames = async () => {
     try {
-      // If you have backend API
+      // Jika anda mempunyai API backend
       // const response = await gameService.getAllGames();
       // setGames(response.data);
       
-      // For now, use hardcoded games matching your teammate's style
+      // Untuk sekarang, gunakan permainan contoh yang sepadan dengan gaya rakan sepasukan anda
       const sampleGames = [
         {
           id: 1,
-          name: '🚀 Cosmic Defender',
+          name: '🚀 Pertahanan Kosmik',
           slug: 'space-adventure',
-          description: 'Epic space battle with power-ups!',
-          topic: 'action',
+          description: 'Pertempuran angkasa epik dengan kuasa tambahan!',
+          topic: 'aksi',
           game_type: 'arcade',
-          difficulty: 'medium',
+          difficulty: 'sederhana',
           score: 0
         },
         {
           id: 2,
-          name: '🎯 Whack-a-Mole',
+          name: '🎯 Tumbuk Tikus',
           slug: 'whack-mole',
-          description: 'Whack the moles for high score!',
-          topic: 'casual',
+          description: 'Tumbuk tikus untuk markah tinggi!',
+          topic: 'santai',
           game_type: 'arcade',
-          difficulty: 'easy',
+          difficulty: 'mudah',
           score: 0
         },
         {
           id: 3,
-          name: '🎴 Memory Match',
+          name: '🎴 Padanan Ingatan',
           slug: 'memory-game',
-          description: 'Test your memory skills!',
-          topic: 'puzzle',
+          description: 'Uji kemahiran ingatan anda!',
+          topic: 'teka-teki',
           game_type: 'memory',
-          difficulty: 'easy',
+          difficulty: 'mudah',
           score: 0
         },
         {
           id: 4,
-          name: '🌿 Garden Maze',
+          name: '🌿 Labyrinth Java',
           slug: 'maze-game',
-          description: 'Navigate maze & answer CS questions!',
-          topic: 'education',
-          game_type: 'adventure',
-          difficulty: 'medium',
+          description: 'Navigasi labirin & jawab soalan pengaturcaraan Java!',
+          topic: 'pendidikan',
+          game_type: 'pengembaraan',
+          difficulty: 'sederhana',
           score: 0
         }
       ];
       setGames(sampleGames);
     } catch (error) {
-      console.error('Error loading games:', error);
+      console.error('Ralat memuatkan permainan:', error);
     } finally {
       setLoading(false);
     }
@@ -87,7 +87,7 @@ const GameList = () => {
         marginRight: '20px',
         marginTop: '20px'
       }}>
-        <div className="label" style={{ color: 'var(--muted)' }}>Loading games...</div>
+        <div className="label" style={{ color: 'var(--muted)' }}>Memuatkan permainan...</div>
       </div>
     );
   }
@@ -111,18 +111,18 @@ const GameList = () => {
             fontSize: '24px',
             marginBottom: '4px'
           }}>
-            Games
+            Permainan
           </div>
           <div className="sub" style={{ 
             color: 'var(--muted)', 
             fontSize: '14px' 
           }}>
-            Interactive learning games for SPM Computer Science
+            Permainan pembelajaran interaktif untuk Sains Komputer SPM
           </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Kad Statistik */}
       <div className="cards" style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -135,7 +135,7 @@ const GameList = () => {
             color: 'var(--muted)', 
             fontWeight: '600' 
           }}>
-            Total Games
+            Jumlah Permainan
           </div>
           <div className="value" style={{ 
             fontWeight: '700', 
@@ -156,7 +156,7 @@ const GameList = () => {
             color: 'var(--muted)', 
             fontWeight: '600' 
           }}>
-            Completed
+            Selesai
           </div>
           <div className="value" style={{ 
             fontWeight: '700', 
@@ -177,7 +177,7 @@ const GameList = () => {
             color: 'var(--muted)', 
             fontWeight: '600' 
           }}>
-            Avg Score
+            Purata Markah
           </div>
           <div className="value" style={{ 
             fontWeight: '700', 
@@ -193,7 +193,7 @@ const GameList = () => {
         </div>
       </div>
 
-      {/* Games Grid */}
+      {/* Grid Permainan */}
       <div style={{ 
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',

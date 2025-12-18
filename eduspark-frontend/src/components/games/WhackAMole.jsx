@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { progressService } from '../../services/progressService';
 import GameSummary from './GameSummary';
 import RewardsDisplay from './RewardsDisplay';
+import Leaderboard from '../leaderboard/Leaderboard';
 import './WhackAMole.css';
 
 const WhackAMole = () => {
@@ -28,8 +29,11 @@ const WhackAMole = () => {
   const [kemajuanPermainan, setKemajuanPermainan] = useState(null);
   const [ganjaranDibuka, setGanjaranDibuka] = useState([]);
   const [tunjukRingkasan, setTunjukRingkasan] = useState(false);
+  const [tunjukLeaderboard, setTunjukLeaderboard] = useState(false);
+  const [tikusDitumpaskan, setTikusDitumpaskan] = useState(0);
   
   const papanRef = useRef(null);
+  const permulaanMasaRef = useRef(null);
 
   const munculkanTikusRawak = useCallback(() => {
     if (permainanTamcat) return;
@@ -134,8 +138,107 @@ const WhackAMole = () => {
   useEffect(() => {
     if (permainanDimulakan) {
       mulakanPenjejakanPermainan(2);
+      permulaanMasaRef.current = Date.now();
     }
   }, [permainanDimulakan]);
+
+  // Save score to database
+  const simpanMarkahKeDatabase = async (markahAkhir, status) => {
+    try {
+      let idPemain = localStorage.getItem('tukulGamePlayerId');
+      if (!idPemain) {
+        idPemain = 'player_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('tukulGamePlayerId', idPemain);
+      }
+      
+      const gameId = 2; // Whack-a-Mole Game ID
+      const masaDiambil = permulaanMasaRef.current ? Math.floor((Date.now() - permulaanMasaRef.current) / 1000) : 0;
+      
+      const response = await fetch('/api/save-game-score', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: idPemain,
+          game_id: gameId,
+          score: markahAkhir,
+          time_taken: masaDiambil,
+          game_stats: {
+            status: status,
+            tikus_ditumpaskan: tikusDitumpaskan,
+            kombo_tertinggi: komboTertinggi,
+            kelajuan_minimum: kelajuan,
+            powerups_dikumpul: (kuasa ? 1 : 0)
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Gagal menyimpan markah:', errorText);
+        return null;
+      }
+      const result = await response.json();
+      console.log('Markah disimpan:', result);
+      return result;
+    } catch (error) {
+      console.error('Ralat menyimpan markah:', error);
+      return null;
+    }
+  };
+
+  // Submit to leaderboard
+  const hantarKeLeaderboard = async (markahAkhir) => {
+    const dataPengguna = localStorage.getItem('user');
+    let pengguna = null;
+    
+    try {
+      if (dataPengguna) {
+        pengguna = JSON.parse(dataPengguna);
+      }
+    } catch (e) {
+      console.warn('Gagal memproses data pengguna');
+    }
+    
+    if (!pengguna || !pengguna.id) {
+      console.warn('Pengguna tidak disahkan — melangkau leaderboard');
+      return;
+    }
+
+    try {
+      const masaDiambil = permulaanMasaRef.current ? Math.floor((Date.now() - permulaanMasaRef.current) / 1000) : 0;
+      
+      const response = await fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${pengguna.token || ''}`
+        },
+        body: JSON.stringify({
+          user_id: pengguna.id,
+          username: pengguna.name || 'Tanpa Nama',
+          class: pengguna.class || 'Tidak Diketahui',
+          game_id: 'game2',
+          score: markahAkhir,
+          time_taken: masaDiambil,
+          kombo_tertinggi: komboTertinggi,
+          tikus_ditumpaskan: tikusDitumpaskan
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${response.status}`);
+      }
+
+      console.log('Markah dihantar ke leaderboard');
+    } catch (error) {
+      console.error('Penghantaran ke leaderboard gagal:', error.message);
+    }
+  };
 
   const mulakanPenjejakanPermainan = async (idPermainan) => {
     try {
@@ -155,6 +258,7 @@ const WhackAMole = () => {
     }
     
     setMarkah(prev => prev + mata);
+    setTikusDitumpaskan(prev => prev + 1);
     
     const komboBaru = kombo + 1;
     setKombo(komboBaru);
@@ -180,10 +284,19 @@ const WhackAMole = () => {
 
   useEffect(() => {
     if (permainanTamcat) {
+      // Save score and submit to leaderboard
+      simpanMarkahKeDatabase(markah, 'selesai');
+      hantarKeLeaderboard(markah);
+      
+      // Save progress
       simpanKemajuanPermainan();
-      setTunjukRingkasan(true);
+      
+      // Show summary after a short delay
+      setTimeout(() => {
+        setTunjukRingkasan(true);
+      }, 500);
     }
-  }, [permainanTamcat]);
+  }, [permainanTamcat, markah]);
 
   const simpanKemajuanPermainan = async () => {
     try {
@@ -261,6 +374,11 @@ const WhackAMole = () => {
     setPengiraMasaKuasa(0);
     setPendarab(1);
     setMasaTambahan(0);
+    setTikusDitumpaskan(0);
+    setTunjukRingkasan(false);
+    setGanjaranDibuka([]);
+    setTunjukLeaderboard(false);
+    permulaanMasaRef.current = Date.now();
   };
 
   const mulakanPermainan = () => {
@@ -301,7 +419,7 @@ const WhackAMole = () => {
             color: '#4ecca3',
             textShadow: '0 0 10px rgba(78, 204, 163, 0.7)',
             marginBottom: '20px'
-          }}>🐹 Ketuk Tikus!</h2>
+          }}>🎯 Tumbuk Tikus!</h2>
           
           <div style={{ 
             fontSize: '1.2rem', 
@@ -309,7 +427,7 @@ const WhackAMole = () => {
             lineHeight: '1.6',
             color: '#f1f1f1'
           }}>
-            <p>Ketuk tikus yang muncul secepat mungkin!</p>
+            <p>Tumbuk tikus yang muncul secepat mungkin!</p>
             <p>Cuba dapatkan markah tertinggi dalam masa 30 saat.</p>
           </div>
           
@@ -321,8 +439,8 @@ const WhackAMole = () => {
           }}>
             <h4 style={{ color: '#4ecca3', marginBottom: '10px' }}>Cara Bermain:</h4>
             <div style={{ textAlign: 'left', display: 'inline-block', width: '100%' }}>
-              <p>• Klik pada tikus yang muncul untuk mengetuknya</p>
-              <p>• Cuba ketuk sebanyak mungkin dalam masa 30 saat</p>
+              <p>• Klik pada tikus yang muncul untuk menumbuknya</p>
+              <p>• Cuba tumbuk sebanyak mungkin dalam masa 30 saat</p>
               <p>• Kuasa bonus akan muncul secara rawak - klik untuk manfaat</p>
               <p>• Permainan semakin sukar apabila markah meningkat</p>
             </div>
@@ -353,7 +471,7 @@ const WhackAMole = () => {
             color: '#4ecca3',
             textShadow: '0 0 10px rgba(78, 204, 163, 0.7)',
             marginBottom: '20px'
-          }}>🐹 Ketuk Tikus!</h2>
+          }}>🎯 Tumbuk Tikus!</h2>
           
           <div style={{
             display: 'flex',
@@ -390,6 +508,11 @@ const WhackAMole = () => {
                 ></div>
               </div>
               <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{masaTinggal}s</div>
+            </div>
+            
+            <div style={{ margin: '5px' }}>
+              <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>Tikus:</span>
+              <span style={{ marginLeft: '10px', fontSize: '1.2rem' }}>{tikusDitumpaskan}</span>
             </div>
             
             {masaTambahan > 0 && (
@@ -489,7 +612,7 @@ const WhackAMole = () => {
               marginBottom: '15px',
               fontSize: '1.1rem'
             }}>
-              Ketuk tikus secepat mungkin!
+              Tumbuk tikus secepat mungkin!
             </div>
             
             <div style={{
@@ -647,7 +770,7 @@ const WhackAMole = () => {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -656,54 +779,89 @@ const WhackAMole = () => {
                 <div style={{
                   backgroundColor: '#0f3460',
                   padding: '30px',
-                  borderRadius: '10px',
+                  borderRadius: '12px',
                   textAlign: 'center',
                   border: '2px solid #4ecca3',
-                  maxWidth: '400px',
-                  width: '80%'
+                  maxWidth: '500px',
+                  width: '90%',
+                  boxShadow: '0 0 25px rgba(78, 204, 163, 0.7)'
                 }}>
-                  <h3 style={{ color: '#ff5252', fontSize: '2rem', marginBottom: '20px' }}>Permainan Tamat!</h3>
-                  <p style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Markah Akhir: <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>{markah}</span></p>
-                  <p style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Kombo Tertinggi: <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>x{komboTertinggi}</span></p>
-                  <p style={{ fontSize: '1.2rem', marginBottom: '20px' }}>Markah Tertinggi: <span style={{ color: '#4ecca3', fontWeight: 'bold' }}>{markahTertinggi}</span></p>
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
-                    <button 
-                      style={{
-                        padding: '12px 25px',
-                        backgroundColor: '#4CAF50',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                        fontSize: '1.1rem',
-                        transition: 'all 0.2s'
-                      }}
-                      onClick={() => {
-                        setSemulaPermainan();
-                        setTunjukRingkasan(false);
-                        setGanjaranDibuka([]);
-                      }}
-                    >
-                      Main Semula
-                    </button>
-                    <button 
-                      style={{
-                        padding: '12px 25px',
-                        backgroundColor: '#9C27B0',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                        fontSize: '1.1rem',
-                        transition: 'all 0.2s'
-                      }}
-                      onClick={kembaliKeLamanUtama}
-                    >
-                      Laman Utama
-                    </button>
-                  </div>
+                  <h3 style={{ color: '#ff5252', fontSize: '2.2rem', marginBottom: '20px', textShadow: '0 0 6px rgba(255, 82, 82, 0.8)' }}>🛑 Permainan Tamat!</h3>
+                  <p style={{ fontSize: '1.3rem', marginBottom: '12px', color: '#FFD700' }}>Markah Akhir: <strong style={{ color: '#4ecca3', fontSize: '1.4rem' }}>{markah}</strong></p>
+                  <p style={{ fontSize: '1.2rem', marginBottom: '12px' }}>Kombo Tertinggi: <strong>x{komboTertinggi}</strong></p>
+                  <p style={{ fontSize: '1.2rem', marginBottom: '12px' }}>Tikus Ditumpaskan: <strong>{tikusDitumpaskan}</strong></p>
+                  <p style={{ fontSize: '1.2rem', marginBottom: '20px' }}>Markah Tertinggi: <strong>{markahTertinggi}</strong></p>
+                  
+                  {tunjukRingkasan && (
+                    <>
+                      <GameSummary progress={kemajuanPermainan} game={{ name: 'Tumbuk Tikus' }} />
+                      
+                      {ganjaranDibuka.length > 0 && (
+                        <RewardsDisplay 
+                          rewards={ganjaranDibuka}
+                          onClaim={(ganjaran) => console.log('Ganjaran dituntut:', ganjaran)}
+                        />
+                      )}
+                      
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '25px', flexWrap: 'wrap' }}>
+                        <button 
+                          style={{
+                            padding: '12px 25px',
+                            backgroundColor: '#4CAF50',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '1.1rem',
+                            transition: 'all 0.2s',
+                            boxShadow: '0 2px 6px rgba(76, 175, 80, 0.4)'
+                          }}
+                          onClick={() => {
+                            setSemulaPermainan();
+                            setTunjukRingkasan(false);
+                            setGanjaranDibuka([]);
+                          }}
+                        >
+                          🔄 Main Semula
+                        </button>
+                        <button 
+                          style={{
+                            padding: '12px 25px',
+                            backgroundColor: '#FF9800',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '1.1rem',
+                            transition: 'all 0.2s',
+                            boxShadow: '0 2px 6px rgba(255, 152, 0, 0.4)'
+                          }}
+                          onClick={() => setTunjukLeaderboard(true)}
+                        >
+                          📊 Lihat Kedudukan
+                        </button>
+                        <button 
+                          style={{
+                            padding: '12px 25px',
+                            backgroundColor: '#9C27B0',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '1.1rem',
+                            transition: 'all 0.2s',
+                            boxShadow: '0 2px 6px rgba(156, 39, 176, 0.4)'
+                          }}
+                          onClick={kembaliKeLamanUtama}
+                        >
+                          🏠 Laman Utama
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -724,48 +882,42 @@ const WhackAMole = () => {
                   }}
                   onClick={kembaliKeLamanUtama}
                 >
-                  Laman Utama
+                  🏠 Laman Utama
                 </button>
-              </div>
-            )}
-
-            {tunjukRingkasan && (
-              <div style={{ marginTop: '30px' }}>
-                <GameSummary progress={kemajuanPermainan} game={{ name: 'Ketuk Tikus' }} />
-                
-                {ganjaranDibuka.length > 0 && (
-                  <RewardsDisplay 
-                    rewards={ganjaranDibuka}
-                    onClaim={(ganjaran) => {
-                      console.log('Ganjaran dituntut:', ganjaran);
-                    }}
-                  />
-                )}
-                
-                <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px' }}>
-                  <button
-                    onClick={() => {
-                      setSemulaPermainan();
-                      setTunjukRingkasan(false);
-                      setGanjaranDibuka([]);
-                    }}
-                    style={{
-                      padding: '12px 25px',
-                      background: 'linear-gradient(90deg, #4ecca3, #4CAF50)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '12px',
-                      cursor: 'pointer',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    Main Semula
-                  </button>
-                </div>
               </div>
             )}
           </div>
         </>
+      )}
+
+      {/* Leaderboard Modal */}
+      {tunjukLeaderboard && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.95)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 2000,
+          padding: '20px'
+        }}>
+          <div style={{ 
+            width: '95%', 
+            maxWidth: '900px',
+            maxHeight: '85vh',
+            overflowY: 'auto',
+            borderRadius: '16px'
+          }}>
+            <Leaderboard 
+              gameId="game2" 
+              onClose={() => setTunjukLeaderboard(false)} 
+            />
+          </div>
+        </div>
       )}
 
       <style>{`

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'EduSpark') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -246,14 +246,14 @@
 
     {{-- Sidebar --}}
     <aside class="sidebar">
-        <!-- Replace with your actual logo -->
+        <!-- Gantikan dengan logo sebenar anda -->
         <img src="{{ asset('logo.png') }}" alt="Logo" class="logo">
         <div class="brand">
             <span style="color:#1D5DCD;">Pen</span><span style="color:#E63946;">gajar</span>
         </div>
 
         <nav class="nav">
-            {{-- Navigation links --}}
+            {{-- Pautan Navigasi --}}
             <a href="{{ Route::has('reports.index') ? route('reports.index') : url('/reports') }}"
                class="{{ request()->is('reports*') ? 'active' : '' }}">Laporan</a>
 
@@ -271,19 +271,19 @@
         </nav>
     </aside>
 
-    {{-- Main content area --}}
+    {{-- Kawasan kandungan utama --}}
     <main style="flex:1; display:flex; justify-content:center;">
         <div class="content-wrapper">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                 <div>
-                    <h1 class="title">{{ $title ?? 'Dashboard' }}</h1>
+                    <h1 class="title">{{ $title ?? 'Papan Pemuka' }}</h1>
                     <div class="sub">{{ $subtitle ?? '' }}</div>
                 </div>
 
                 <button id="themeToggle" style="background:none;border:0;color:inherit;font-size:18px;cursor:pointer;">🌙</button>
             </div>
 
-            {{-- Main content goes here --}}
+            {{-- Kandungan utama di sini --}}
             <div class="panel">
                 @yield('content')
             </div>

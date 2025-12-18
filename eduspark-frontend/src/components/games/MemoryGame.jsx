@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { progressService } from '../../services/progressService';
 import GameSummary from './GameSummary';
 import RewardsDisplay from './RewardsDisplay';
+import Leaderboard from '../leaderboard/Leaderboard';
 
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
@@ -20,6 +21,8 @@ const MemoryGame = () => {
   const [showSummary, setShowSummary] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [emojis, setEmojis] = useState([]);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [finalScore, setFinalScore] = useState(0);
 
   // Different emoji sets for different themes
   const emojiThemes = {
@@ -36,6 +39,97 @@ const MemoryGame = () => {
     expert: { pairs: 20, columns: 4, rows: 10, theme: 'objects' }
   };
 
+  // Save score to database
+  const saveScoreToDatabase = async (score, status) => {
+    try {
+      let playerId = localStorage.getItem('memoryGamePlayerId');
+      if (!playerId) {
+        playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('memoryGamePlayerId', playerId);
+      }
+      const gameId = 3; // Memory Game ID
+      const response = await fetch('/api/save-game-score', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: playerId,
+          game_id: gameId,
+          score: score,
+          time_taken: time,
+          game_stats: {
+            status: status,
+            moves: moves,
+            pairs_matched: matches,
+            difficulty: difficulty,
+            efficiency: (difficultySettings[difficulty].pairs / Math.max(moves, 1)) * 100
+          }
+        })
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Failed to save score:', errorText);
+        return null;
+      }
+      const result = await response.json();
+      console.log('Score saved:', result);
+      return result;
+    } catch (error) {
+      console.error('Error saving score:', error);
+      return null;
+    }
+  };
+
+  // Submit to leaderboard
+  const submitToLeaderboard = async (score) => {
+    const userData = localStorage.getItem('user');
+    let user = null;
+    
+    try {
+      if (userData) {
+        user = JSON.parse(userData);
+      }
+    } catch (e) {
+      console.warn('Failed to parse user data');
+    }
+    
+    if (!user || !user.id) {
+      console.warn('User not authenticated — skipping leaderboard');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${user.token || ''}`
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          username: user.name || 'Anonymous',
+          class: user.class || 'Unknown',
+          game_id: 'game3',
+          score: score,
+          time_taken: time,
+          difficulty: difficulty
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${response.status}`);
+      }
+
+      console.log('Score submitted to leaderboard');
+    } catch (error) {
+      console.error('Leaderboard submission failed:', error.message);
+    }
+  };
+
   // Game tracking function
   const startGameTracking = async (gameId) => {
     try {
@@ -49,13 +143,15 @@ const MemoryGame = () => {
   const saveGameProgress = async () => {
     try {
       const timeSpent = startTime ? Math.floor((Date.now() - startTime) / 1000) : time;
+      const score = getScore();
+      setFinalScore(score);
       
       const progressData = {
-        score: getScore(),
+        score: score,
         level: 1,
         time_spent: timeSpent,
         completed: true,
-        progress_data: {  // FIXED: Changed from progress_ to progress_data
+        progress_data: {
           total_moves: moves,
           pairs_count: difficultySettings[difficulty].pairs,
           time_taken_seconds: timeSpent,
@@ -65,6 +161,10 @@ const MemoryGame = () => {
 
       const response = await progressService.saveProgress(3, progressData);
       setGameProgress(response.data.progress);
+      
+      // Save score and submit to leaderboard
+      await saveScoreToDatabase(score, 'selesai');
+      await submitToLeaderboard(score);
       
       if (response.data.rewards_unlocked && response.data.rewards_unlocked.length > 0) {
         setUnlockedRewards(response.data.rewards_unlocked);
@@ -97,7 +197,11 @@ const MemoryGame = () => {
       setGameWon(true);
       setTimerActive(false);
       saveGameProgress();
-      setShowSummary(true);
+      
+      // Show summary after a delay
+      setTimeout(() => {
+        setShowSummary(true);
+      }, 500);
     }
   }, [solved, cards.length]);
 
@@ -124,8 +228,10 @@ const MemoryGame = () => {
     setGameWon(false);
     setTimerActive(true);
     setShowSummary(false);
+    setShowLeaderboard(false);
     setUnlockedRewards([]);
     setStartTime(Date.now());
+    setFinalScore(0);
     
     // Start game tracking — Game ID 3
     startGameTracking(3);
@@ -412,10 +518,10 @@ const MemoryGame = () => {
                 <h3 style={{ color: '#4CAF50', fontSize: '1.9rem', marginBottom: '12px', fontWeight: 600 }}>🎉 Tahniah! Anda Berjaya!</h3>
                 <p style={{ fontSize: '1.2rem', margin: '8px 0' }}>Diselesaikan dalam <strong>{moves} langkah</strong></p>
                 <p style={{ fontSize: '1.2rem', margin: '8px 0' }}>Masa: <strong>{formatTime(time)}</strong></p>
-                <p style={{ fontSize: '1.3rem', margin: '12px 0', color: '#FFD700', fontWeight: 'bold' }}>Markah: <strong>{getScore()}</strong></p>
+                <p style={{ fontSize: '1.3rem', margin: '12px 0', color: '#FFD700', fontWeight: 'bold' }}>Markah: <strong>{finalScore}</strong></p>
                 
                 {showSummary && (
-                  <>
+                  <div style={{ marginTop: '20px' }}>
                     <GameSummary progress={gameProgress} game={{ name: 'Padanan Ingatan' }} />
                     
                     {unlockedRewards.length > 0 && (
@@ -426,96 +532,116 @@ const MemoryGame = () => {
                         />
                       </div>
                     )}
-                  </>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '25px' }}>
+                      <button 
+                        style={{
+                          padding: '12px 28px',
+                          backgroundColor: '#4CAF50',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontWeight: 'bold',
+                          fontSize: '1.1rem',
+                          transition: 'all 0.2s',
+                          boxShadow: '0 2px 6px rgba(76, 175, 80, 0.4)'
+                        }}
+                        onClick={resetGame}
+                      >
+                        Main Semula
+                      </button>
+                      <button 
+                        style={{
+                          padding: '12px 28px',
+                          backgroundColor: '#FF9800',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontWeight: 'bold',
+                          fontSize: '1.1rem',
+                          transition: 'all 0.2s',
+                          boxShadow: '0 2px 6px rgba(255, 152, 0, 0.4)'
+                        }}
+                        onClick={() => setShowLeaderboard(true)}
+                      >
+                        📊 Lihat Kedudukan
+                      </button>
+                      <button 
+                        style={{
+                          padding: '12px 28px',
+                          backgroundColor: '#9C27B0',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontWeight: 'bold',
+                          fontSize: '1.1rem',
+                          transition: 'all 0.2s',
+                          boxShadow: '0 2px 6px rgba(156, 39, 176, 0.4)'
+                        }}
+                        onClick={() => {
+                          setGameStarted(false);
+                          setGameWon(false);
+                          setShowSummary(false);
+                          setUnlockedRewards([]);
+                        }}
+                      >
+                        Permainan Baharu
+                      </button>
+                    </div>
+                  </div>
                 )}
-                
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '20px' }}>
-                  <button 
-                    style={{
-                      padding: '12px 28px',
-                      backgroundColor: '#4CAF50',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      fontWeight: 'bold',
-                      fontSize: '1.1rem',
-                      transition: 'all 0.2s',
-                      boxShadow: '0 2px 6px rgba(76, 175, 80, 0.4)'
-                    }}
-                    onClick={resetGame}
-                  >
-                    Main Semula
-                  </button>
-                  <button 
-                    style={{
-                      padding: '12px 28px',
-                      backgroundColor: '#9C27B0',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      fontWeight: 'bold',
-                      fontSize: '1.1rem',
-                      transition: 'all 0.2s',
-                      boxShadow: '0 2px 6px rgba(156, 39, 176, 0.4)'
-                    }}
-                    onClick={() => {
-                      setGameStarted(false);
-                      setGameWon(false);
-                      setShowSummary(false);
-                      setUnlockedRewards([]);
-                    }}
-                  >
-                    Permainan Baharu
-                  </button>
-                </div>
               </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '20px' }}>
-              <button 
-                style={{
-                  padding: '10px 22px',
-                  backgroundColor: '#2196F3',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  fontSize: '1.05rem',
-                  transition: 'all 0.2s'
-                }}
-                onClick={() => setShowInstructions(true)}
-              >
-                📖 Panduan
-              </button>
-              <button 
-                style={{
-                  padding: '10px 22px',
-                  backgroundColor: '#9C27B0',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  fontSize: '1.05rem',
-                  transition: 'all 0.2s'
-                }}
-                onClick={() => {
-                  setGameStarted(false);
-                  setGameWon(false);
-                  setShowSummary(false);
-                  setUnlockedRewards([]);
-                }}
-              >
-                🔄 Permainan Baharu
-              </button>
-            </div>
+            {!gameWon && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '20px' }}>
+                <button 
+                  style={{
+                    padding: '10px 22px',
+                    backgroundColor: '#2196F3',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '1.05rem',
+                    transition: 'all 0.2s'
+                  }}
+                  onClick={() => setShowInstructions(true)}
+                >
+                  📖 Panduan
+                </button>
+                <button 
+                  style={{
+                    padding: '10px 22px',
+                    backgroundColor: '#9C27B0',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '1.05rem',
+                    transition: 'all 0.2s'
+                  }}
+                  onClick={() => {
+                    setGameStarted(false);
+                    setGameWon(false);
+                    setShowSummary(false);
+                    setUnlockedRewards([]);
+                  }}
+                >
+                  🔄 Permainan Baharu
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}
       
+      {/* Instructions Modal */}
       {showInstructions && (
         <div style={{
           position: 'fixed',
@@ -571,6 +697,36 @@ const MemoryGame = () => {
             >
               Tutup
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Leaderboard Modal */}
+      {showLeaderboard && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 2000,
+          padding: '20px'
+        }}>
+          <div style={{ 
+            width: '95%', 
+            maxWidth: '900px',
+            maxHeight: '85vh',
+            overflowY: 'auto',
+            borderRadius: '16px'
+          }}>
+            <Leaderboard 
+              gameId="game3" 
+              onClose={() => setShowLeaderboard(false)} 
+            />
           </div>
         </div>
       )}
