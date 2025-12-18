@@ -96,10 +96,11 @@
         const header = document.getElementById('gameHeader');
         const canvas = document.getElementById('gameCanvas');
         
-        const headerHeight = header.offsetHeight;
+        // Get actual available height by calculating from gameContainer minus header
+        const availableHeight = gameContainer.clientHeight - header.clientHeight;
         
-        canvas.width = gameContainer.offsetWidth;
-        canvas.height = gameContainer.offsetHeight - headerHeight;
+        canvas.width = gameContainer.clientWidth;
+        canvas.height = availableHeight;
         
         player.x = canvas.width / 2 - player.width / 2;
         player.y = canvas.height - 60;
