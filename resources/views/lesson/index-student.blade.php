@@ -2,7 +2,8 @@
 
 @section('content')
 
-<!-- Main -->
+<div class="app">
+  <!-- Main -->
   <main class="main">
     <div class="header">
       <div>
@@ -64,14 +65,16 @@
       <table>
         <thead>
           <tr>
-            <th style="width:60%">Bahan</th>
+            <th style="width:5%">No.</th>
+            <th style="width:55%">Bahan</th>
             <th style="width:20%">Fail</th>
             <th style="width:20%">Tindakan</th>
           </tr>
         </thead>
         <tbody>
-          @forelse ($lessons ?? [] as $lesson)
+          @forelse ($lessons ?? [] as $index => $lesson)
             <tr>
+              <td style="width:5%; text-align:center; font-weight:600;">{{ $index + 1 }}</td>
               <td style="width:60%">
                 <div class="table-title">{{ $lesson->title }}</div>
                 <div class="table-subtitle">{{ $lesson->description ?: 'Tiada penerangan' }}</div>
@@ -105,7 +108,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="3" style="text-align:center; padding:24px; color:var(--muted);">
+              <td colspan="4" style="text-align:center; padding:24px; color:var(--muted);">
                 @if (!empty(array_filter(['q' => request('q'), 'file_type' => request('file_type'), 'date_from' => request('date_from'), 'date_to' => request('date_to')])))
                   Tiada bahan sepadan dengan kriteria anda.
                 @else
@@ -116,6 +119,15 @@
           @endforelse
         </tbody>
       </table>
+
+      <!-- Show More Section -->
+      @if ($hasMore ?? false)
+        <div style="text-align:center; margin-top:20px; padding:20px;">
+          <a href="{{ route('lesson.index', array_merge(request()->query(), ['limit' => $nextLimit])) }}" style="color:var(--accent); text-decoration:none; font-size:14px; cursor:pointer;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">
+            Tunjukkan 10 Bahan Lagi
+          </a>
+        </div>
+      @endif
     </section>
   </main>
 </div>
@@ -148,5 +160,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-</main>
 @endsection

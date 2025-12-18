@@ -87,10 +87,19 @@ class QuizStudentController extends Controller
         }
 
         // Execute the filtered query
-        $quizzes = $query->orderBy('due_at', 'asc')->get();        
+        $allQuizzes = $query->orderBy('due_at', 'asc')->get();
+        
+        // Get limit from request (default 10, increments by 10)
+        $limit = (int) $request->get('limit', 10);
+        if ($limit < 10) $limit = 10;
+        if ($limit > 1000) $limit = 1000; // Safety limit
+        
+        $quizzes = $allQuizzes->take($limit);
+        $hasMore = count($allQuizzes) > $limit;
+        $nextLimit = $limit + 10;
     
         // Pass the quizzes and the filters back to the view
-        return view('quiz.index-student', compact('quizzes', 'filters'));
+        return view('quiz.index-student', compact('quizzes', 'filters', 'limit', 'hasMore', 'nextLimit'));
     }
 
     /**
@@ -206,11 +215,56 @@ class QuizStudentController extends Controller
                     $isCorrect = true;
                 }
                 $submittedOptions = []; 
+
+            } elseif ($question->type === 'coding') {
+                // Coding question grading: Award 1 point per correctly answered hidden line
+                $hiddenLineNumbers = !empty($question->hidden_line_numbers) 
+                    ? array_map('intval', explode(',', $question->hidden_line_numbers))
+                    : [];
+                
+                $codeLines = explode("\n", $question->coding_full_code);
+                $correctLineCount = 0;
+                
+                // Check each hidden line
+                foreach ($hiddenLineNumbers as $lineNum) {
+                    $lineIndex = $lineNum - 1; // Convert to 0-indexed
+                    
+                    if (!isset($codeLines[$lineIndex])) {
+                        continue;
+                    }
+                    
+                    $expectedCode = trim($codeLines[$lineIndex]);
+                    $lineKey = 'line_' . $lineNum;
+                    $submittedCode = trim($studentAnswer[$lineKey] ?? '');
+                    
+                    // Exact match comparison (case-sensitive for code)
+                    if ($expectedCode === $submittedCode) {
+                        $correctLineCount++;
+                    }
+                }
+                
+                // Award 1 point per correctly answered line (capped at question points)
+                $scoreGained = min($correctLineCount, $question->points);
+                
+                // Consider correct only if all lines answered correctly
+                if ($correctLineCount === count($hiddenLineNumbers) && count($hiddenLineNumbers) > 0) {
+                    $isCorrect = true;
+                }
+                
+                // Store submitted code as JSON for reference
+                $submittedText = json_encode($studentAnswer);
+                $submittedOptions = [];
             }
             
             // --- SCORING & STORAGE ---
-            if ($isCorrect) {
-                $scoreGained = $question->points;
+            if ($question->type === 'coding') {
+                // Coding questions already have scoreGained calculated above
+                // No need to recalculate
+            } else {
+                // Other question types: all or nothing
+                if ($isCorrect) {
+                    $scoreGained = $question->points;
+                }
             }
             $totalScore += $scoreGained;
 

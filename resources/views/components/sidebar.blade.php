@@ -1,8 +1,8 @@
 <style>
 .sidebar{
-  width:320px; border-radius:14px; padding:28px;
+  width:240px; border-radius:14px; padding:18px;
   padding-top:40px;
-  display:flex; flex-direction:column; align-items:flex-start; gap:20px;
+  display:flex; flex-direction:column; align-items:flex-start; gap:12px;
   backdrop-filter: blur(8px) saturate(120%);
   box-shadow: none;
   position: fixed;
@@ -21,13 +21,13 @@ body.dark .sidebar{
 }
 .logo { width:200px; height:auto; margin:0 auto -4px; }
 
-.nav { width:100%; margin-top:14px; padding-top:6px; padding-left:0; position:relative; }
+.nav { width:100%; margin-top:14px; padding-top:6px; padding-left:6px; position:relative; }
 .nav a {
-  display:block; padding:16px 20px; padding-left:16px; border-radius:12px;
+  display:block; padding:12px 16px; padding-left:28px; border-radius:12px;
   color:var(--muted); text-decoration:none; font-weight:600;
-  margin:14px 0; position:relative; font-size:18px;
+  margin:8px 0; position:relative; font-size:16px;
   transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
-  width:100%;
+  width:calc(100% - 32px);
   overflow: hidden;
 }
 .nav a:hover { color:var(--accent) !important; background:rgba(106,77,247,0.15) !important; }
@@ -165,7 +165,7 @@ body.dark #themeToggle::before {
       <a href="{{ route('profile.show') }}" class="{{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}">Profil</a>
 
     @else
-      <a href="{{ Route::has('performance.student_view') ? route('performance.student_view') : url('/performance/student') }}" class="{{ request()->is('performance*') ? 'active' : '' }}">Prestasi</a>
+      <a href="{{ Route::has('performance') ? route('performance') : url('/performance') }}" class="{{ request()->is('performance*') ? 'active' : '' }}">Prestasi</a>
       <a href="{{ Route::has('lessons.index') ? route('lessons.index') : url('/lessons') }}" class="{{ request()->is('lessons*') ? 'active' : '' }}">Bahan</a>
       <a href="{{ Route::has('student.quizzes.index') ? route('student.quizzes.index') : url('/quizzes') }}" class="{{ request()->is('quizzes*') ? 'active' : '' }}">Kuiz</a>
       <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}" class="{{ request()->is('forum*') ? 'active' : '' }}">Forum</a>

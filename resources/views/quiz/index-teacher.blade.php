@@ -2,7 +2,8 @@
 
 @section('content')
 
-<!-- Main -->
+<div class="app">
+  <!-- Main -->
   <main class="main">
     <div class="header">
       <div>
@@ -77,20 +78,22 @@
       <table>
         <thead>
           <tr>
-            <th style="width:65%">Kuiz</th>
+            <th style="width:5%">No.</th>
+            <th style="width:60%">Kuiz</th>
             <th style="width:15%">Bil. Soalan</th>
             <th style="width:20%">Tindakan</th>
           </tr>
         </thead>
         <tbody>
-          @forelse ($quizzes as $quiz)
+          @forelse ($quizzes as $index => $quiz)
             @php
               $statusBadge = $quiz->is_published ? 'Diterbitkan' : 'Draf';
               $isMyQuiz = auth()->id() === $quiz->teacher_id;
               $attemptsCount = $quiz->attempts_count ?? 0;
             @endphp
             <tr>
-              <td style="width:58%">
+              <td style="width:5%; text-align:center; font-weight:600;">{{ $index + 1 }}</td>
+              <td style="width:53%">
                 <div style="font-weight:700; margin-bottom:4px;">{{ $quiz->title }}</div>
                 <div style="font-size:13px; color:var(--muted); margin-bottom:8px; line-height:1.4;">{{ Str::limit($quiz->description, 100) }}</div>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:11px; align-items:center;">
@@ -144,7 +147,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="3" style="text-align:center; padding:24px; color:var(--muted);">
+              <td colspan="4" style="text-align:center; padding:24px; color:var(--muted);">
                 @if (!empty(array_filter(['unique_id' => request('unique_id'), 'title' => request('title'), 'creator_email' => request('creator_email'), 'publish_date_range' => request('publish_date_range'), 'scope' => request('scope')])))
                   Tiada kuiz sepadan dengan kriteria anda.
                 @else
@@ -156,10 +159,12 @@
         </tbody>
       </table>
 
-      <!-- Pagination -->
-      @if (method_exists($quizzes, 'links'))
-        <div style="margin-top:20px;">
-          {{ $quizzes->links() }}
+      <!-- Show More Section -->
+      @if ($hasMore)
+        <div style="text-align:center; margin-top:20px; padding:20px;">
+          <a href="{{ route('teacher.quizzes.index', array_merge(request()->query(), ['limit' => $nextLimit])) }}" style="color:var(--accent); text-decoration:none; font-size:14px; cursor:pointer;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">
+            Tunjukkan 10 Kuiz Lagi
+          </a>
         </div>
       @endif
     </section>
@@ -213,7 +218,5 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
-
-</main>
 
 @endsection

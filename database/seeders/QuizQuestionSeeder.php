@@ -7,7 +7,7 @@ return [
     // QUIZ 1: Java - Asas Sintaks dan Jenis Data (Based on Form 4/Basic Java)
     // ----------------------------------------------------------------------
     [
-        'teacher_id' => 2,
+        'teacher_id' => 10,
         'title' => 'Java: Asas Sintaks dan Jenis Data',
         'description' => 'Kuiz ini menguji pengetahuan asas tentang sintaks Java, pemboleh ubah, dan jenis data primitif.',
         'max_attempts' => 5,
@@ -103,7 +103,7 @@ return [
     // QUIZ 2: Java - Konsep Pengaturcaraan Berorientasi Objek (OOP)
     // ----------------------------------------------------------------------
     [
-        'teacher_id' => 3,
+        'teacher_id' => 11,
         'title' => 'Java: Konsep Pengaturcaraan Berorientasi Objek (OOP)',
         'description' => 'Kuiz ini menguji pemahaman anda tentang Kelas, Objek, Pewarisan, dan Polimorfisme.',
         'max_attempts' => 3,
@@ -240,7 +240,7 @@ return [
     // QUIZ 3: Java - Struktur Kawalan
     // ----------------------------------------------------------------------
     [
-        'teacher_id' => 4,
+        'teacher_id' => 12,
         'title' => 'Java: Struktur Kawalan dan Titasusunan (Array) ',
         'description' => 'Kuiz mengenai pernyataan if-else, loops, dan manipulasi tatasusunan (arrays).',
         'max_attempts' => 5,
@@ -353,10 +353,9 @@ return [
 
     // ----------------------------------------------------------------------
     // QUIZ 4: Tingkatan 5, Bab 1 - Etika Komputer & Undang-undang Siber
-    // (Assumed Chapter 1 based on snippets: Ethics, Phishing)
     // ----------------------------------------------------------------------
     [
-        'teacher_id' => 5,
+        'teacher_id' => 13,
         'title' => 'Tingkatan 5, Bab 1: Etika Komputer dan Undang-undang Siber',
         'description' => 'Kuiz ini merangkumi konsep etika dalam pengkomputeran, hak cipta, dan undang-undang siber.',
         'max_attempts' => 2,
@@ -491,10 +490,9 @@ return [
 
     // ----------------------------------------------------------------------
     // QUIZ 5: Tingkatan 5, Bab 1 - Pembangunan Aplikasi Laman Web (Basics)
-    // (Assumed Chapter 1 based on snippets: Scripting Language, Website Design)
     // ----------------------------------------------------------------------
     [
-        'teacher_id' => 6,
+        'teacher_id' => 14,
         'title' => 'Tingkatan 5, Bab 1: Pembangunan Aplikasi Laman Web (Asas)',
         'description' => 'Kuiz ini menguji asas pembangunan aplikasi web termasuk bahasa skrip.',
         'max_attempts' => 4,
@@ -588,253 +586,521 @@ return [
         ], // Total 10 Questions
     ],
 
-    // ----------------------------------------------------------------------
-    // QUIZ 6: Tingkatan 4 - Sistem Nombor dan Perwakilan Data
-    // ----------------------------------------------------------------------
+    // ---------------------------------------------------------------
+    // QUIZ 6: Tingkatan 5 Bab 1 - Komputer & Impak
+    // ---------------------------------------------------------------
     [
-        'teacher_id' => 2,
-        'title' => 'Tingkatan 4: Sistem Nombor dan Perwakilan Data',
-        'description' => 'Kuiz ini merangkumi sistem nombor binari, perlapanan, heksadesimal, dan perwakilan data.',
-        'max_attempts' => 4,
-        'due_at' => Carbon::now()->addDays(35),
-        'is_published' => true,
-        'questions' => [
-            [
-                'text' => 'Apakah asas (base) untuk sistem nombor binari?',
-                'type' => 'multiple_choice', 'points' => 3,
-                'options' => [
-                    ['text' => '8', 'is_correct' => false],
-                    ['text' => '10', 'is_correct' => false],
-                    ['text' => '2', 'is_correct' => true],
-                    ['text' => '16', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Tukarkan nombor perpuluhan 15 kepada binari. Jawapan: ______',
-                'type' => 'short_answer', 'points' => 5,
-                'correct_text' => '1111',
-            ],
-            [
-                'text' => 'Sistem nombor heksadesimal menggunakan digit 0-9 dan huruf A-F.',
-                'type' => 'true_false', 'points' => 2,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => true],
-                    ['text' => 'False', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Asas untuk sistem nombor perlapanan adalah ______.',
-                'type' => 'short_answer', 'points' => 3,
-                'correct_text' => '8',
-            ],
-            [
-                'text' => 'Apakah nilai perpuluhan bagi binari 10101?',
-                'type' => 'multiple_choice', 'points' => 4,
-                'options' => [
-                    ['text' => '20', 'is_correct' => false],
-                    ['text' => '21', 'is_correct' => true],
-                    ['text' => '19', 'is_correct' => false],
-                    ['text' => '22', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Pilih jenis-jenis perwakilan data dalam komputer.',
-                'type' => 'checkbox', 'points' => 6,
-                'options' => [
-                    ['text' => 'Audio', 'is_correct' => true],
-                    ['text' => 'Video', 'is_correct' => true],
-                    ['text' => 'Teks', 'is_correct' => true],
-                    ['text' => 'Masa', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Konversi 255 dalam perpuluhan kepada heksadesimal: ______',
-                'type' => 'short_answer', 'points' => 6,
-                'correct_text' => 'FF',
-            ],
-            [
-                'text' => 'Bit adalah unit asas (fundamental unit) untuk mewakili data dalam komputer.',
-                'type' => 'true_false', 'points' => 2,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => true],
-                    ['text' => 'False', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Satu bait (byte) setara dengan berapa bit?',
-                'type' => 'multiple_choice', 'points' => 3,
-                'options' => [
-                    ['text' => '4', 'is_correct' => false],
-                    ['text' => '8', 'is_correct' => true],
-                    ['text' => '16', 'is_correct' => false],
-                    ['text' => '32', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'ASCII adalah standard untuk perwakilan aksara dalam komputer.',
-                'type' => 'true_false', 'points' => 3,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => true],
-                    ['text' => 'False', 'is_correct' => false],
-                ]
-            ],
-        ], // Total 10 Questions
-    ],
-
-    // ----------------------------------------------------------------------
-    // QUIZ 7: Tingkatan 4 - Pengurusan Sistem Fail dan Keselamatan Data
-    // ----------------------------------------------------------------------
-    [
-        'teacher_id' => 3,
-        'title' => 'Tingkatan 4: Pengurusan Sistem Fail dan Keselamatan Data',
-        'description' => 'Kuiz mengenai pengurusan fail, organisasi data, backup, dan keselamatan maklumat.',
+        'teacher_id' => 10,
+        'title' => 'Tingkatan 5 Bab 1: Komputer & Impak Sosial',
+        'description' => 'Kuiz mengenai impak komputer dan teknologi terhadap masyarakat dan ekonomi.',
         'max_attempts' => 3,
-        'due_at' => Carbon::now()->addDays(40),
+        'due_at' => Carbon::now()->addDays(30),
         'is_published' => true,
         'questions' => [
             [
-                'text' => 'Apakah fungsi utama sistem fail dalam komputer?',
+                'text' => 'Apakah definisi teknologi maklumat (IT)?',
+                'type' => 'multiple_choice', 'points' => 3,
+                'options' => [
+                    ['text' => 'Penggunaan komputer untuk memproses dan menyimpan data', 'is_correct' => true],
+                    ['text' => 'Hanya merujuk kepada rangkaian internet', 'is_correct' => false],
+                    ['text' => 'Sistem komunikasi tradisional', 'is_correct' => false],
+                    ['text' => 'Teknologi untuk pembuatan kereta', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Antara berikut, yang manakah merupakan impak POSITIF penggunaan komputer?',
                 'type' => 'multiple_choice', 'points' => 4,
                 'options' => [
-                    ['text' => 'Menyimpan dan mengatur maklumat dalam disk.', 'is_correct' => true],
-                    ['text' => 'Menjalankan perisian aplikasi sahaja.', 'is_correct' => false],
-                    ['text' => 'Mengawal input/output perangkat keras.', 'is_correct' => false],
-                    ['text' => 'Menyambung ke internet sahaja.', 'is_correct' => false],
+                    ['text' => 'Meningkatkan produktiviti kerja', 'is_correct' => true],
+                    ['text' => 'Kehilangan pekerjaan tradisional', 'is_correct' => false],
+                    ['text' => 'Peningkatan jenayah siber', 'is_correct' => false],
+                    ['text' => 'Gangguan kesihatan mata', 'is_correct' => false],
                 ]
             ],
             [
-                'text' => 'Folder dalam komputer juga dikenali sebagai ______.',
-                'type' => 'short_answer', 'points' => 3,
-                'correct_text' => 'Directory',
-            ],
-            [
-                'text' => 'Backup data adalah satu amalan penting untuk melindungi maklumat daripada kehilangan.',
-                'type' => 'true_false', 'points' => 3,
+                'text' => 'Kemajuan teknologi komputer telah mengubah cara orang bekerja dan berinteraksi.',
+                'type' => 'true_false', 'points' => 2,
                 'options' => [
                     ['text' => 'True', 'is_correct' => true],
                     ['text' => 'False', 'is_correct' => false],
                 ]
             ],
             [
-                'text' => 'Apakah kaedah enkripsi data yang paling biasa digunakan?',
-                'type' => 'multiple_choice', 'points' => 5,
+                'text' => 'Antara berikut, yang manakah adalah impak NEGATIF penggunaan komputer yang berlebihan?',
+                'type' => 'checkbox', 'points' => 5,
                 'options' => [
-                    ['text' => 'Penyejajaran teks', 'is_correct' => false],
-                    ['text' => 'Algoritma AES (Advanced Encryption Standard)', 'is_correct' => true],
-                    ['text' => 'Pemampatan fail', 'is_correct' => false],
-                    ['text' => 'Sinkronisasi folder', 'is_correct' => false],
+                    ['text' => 'Masalah kesihatan mental', 'is_correct' => true],
+                    ['text' => 'Keadilan dalam pendidikan', 'is_correct' => false],
+                    ['text' => 'Ketagihan media sosial', 'is_correct' => true],
+                    ['text' => 'Efisiensi perniagaan', 'is_correct' => false],
                 ]
             ],
             [
-                'text' => 'Pilih langkah-langkah untuk melindungi data dari ancaman siber.',
-                'type' => 'checkbox', 'points' => 7,
-                'options' => [
-                    ['text' => 'Menggunakan kata laluan yang kuat', 'is_correct' => true],
-                    ['text' => 'Melakukan backup berkala', 'is_correct' => true],
-                    ['text' => 'Menutup antivirus', 'is_correct' => false],
-                    ['text' => 'Memperbarui perisian secara berkala', 'is_correct' => true],
-                ]
-            ],
-            [
-                'text' => 'Pemampatan fail (file compression) mengurangkan saiz fail sambil mengekalkan kualiti data.',
-                'type' => 'true_false', 'points' => 4,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => true],
-                    ['text' => 'False', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Apakah format fail yang biasa digunakan untuk fail termampat?',
-                'type' => 'multiple_choice', 'points' => 4,
-                'options' => [
-                    ['text' => '.doc', 'is_correct' => false],
-                    ['text' => '.zip', 'is_correct' => true],
-                    ['text' => '.mp3', 'is_correct' => false],
-                    ['text' => '.html', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Kerosakan sektor dalam hard disk dapat menyebabkan kehilangan data yang tidak dapat dipulihkan.',
-                'type' => 'true_false', 'points' => 3,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => true],
-                    ['text' => 'False', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Apakah yang dimaksudkan dengan "data integrity"?',
-                'type' => 'multiple_choice', 'points' => 5,
-                'options' => [
-                    ['text' => 'Data tidak hilang atau rosak semasa disimpan atau dihantar.', 'is_correct' => true],
-                    ['text' => 'Data yang dienkripsi sahaja.', 'is_correct' => false],
-                    ['text' => 'Data yang disimpan di cloud.', 'is_correct' => false],
-                    ['text' => 'Data yang tidak diperlukan.', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Ancam kepada privasi data termasuk ______.',
+                'text' => 'Sebutkan tiga industri yang diubah oleh komputer dan internet.',
                 'type' => 'short_answer', 'points' => 5,
-                'correct_text' => 'Phishing,Malware,Unauthorized Access',
+                'correct_text' => 'Perbankan,Pendidikan,Runcit,Kesihatan,Komunikasi',
+            ],
+            [
+                'text' => 'Apakah yang dimaksudkan dengan "digital divide"?',
+                'type' => 'multiple_choice', 'points' => 4,
+                'options' => [
+                    ['text' => 'Jurang antara mereka yang mempunyai akses teknologi dan yang tidak', 'is_correct' => true],
+                    ['text' => 'Perbezaan dalam jenis komputer yang digunakan', 'is_correct' => false],
+                    ['text' => 'Pembahagian pasar komputer', 'is_correct' => false],
+                    ['text' => 'Terbahagi layar komputer', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Privasi data adalah salah satu cabaran utama dalam era digital.',
+                'type' => 'true_false', 'points' => 3,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => true],
+                    ['text' => 'False', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Apa itu e-commerce?',
+                'type' => 'short_answer', 'points' => 4,
+                'correct_text' => 'Perdagangan elektronik,Jualan dalam talian,Transaksi perniagaan dalam talian',
+            ],
+            [
+                'text' => 'Komputer telah membantu dalam pemajuan ekonomi negara.',
+                'type' => 'true_false', 'points' => 2,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => true],
+                    ['text' => 'False', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Antara berikut, yang manakah adalah kebaikan globalisasi digital?',
+                'type' => 'multiple_choice', 'points' => 4,
+                'options' => [
+                    ['text' => 'Kemudahan berbagi maklumat dan pengetahuan', 'is_correct' => true],
+                    ['text' => 'Penghapusan semua masalah sosial', 'is_correct' => false],
+                    ['text' => 'Pengurangan penggunaan komputer', 'is_correct' => false],
+                    ['text' => 'Pemusatan kuasa politik', 'is_correct' => false],
+                ]
+            ],
+        ], // Total 10 Questions
+    ],
+
+    // ---------------------------------------------------------------
+    // QUIZ 7: Tingkatan 5 Bab 1 - Seni Bina Komputer
+    // ---------------------------------------------------------------
+    [
+        'teacher_id' => 10,
+        'title' => 'Tingkatan 5 Bab 1: Seni Bina Komputer',
+        'description' => 'Kuiz mengenai struktur dan komponen utama seni bina komputer.',
+        'max_attempts' => 3,
+        'due_at' => Carbon::now()->addDays(30),
+        'is_published' => true,
+        'questions' => [
+            [
+                'text' => 'Apakah Unit Pemprosesan Pusat (CPU)?',
+                'type' => 'multiple_choice', 'points' => 3,
+                'options' => [
+                    ['text' => 'Otak komputer yang melakukan pemprosesan', 'is_correct' => true],
+                    ['text' => 'Peranti penyimpanan data', 'is_correct' => false],
+                    ['text' => 'Papan litar utama', 'is_correct' => false],
+                    ['text' => 'Sistem pendingin komputer', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Apa fungsi utama RAM?',
+                'type' => 'multiple_choice', 'points' => 4,
+                'options' => [
+                    ['text' => 'Penyimpanan sementara data semasa pemprosesan', 'is_correct' => true],
+                    ['text' => 'Penyimpanan permanen data', 'is_correct' => false],
+                    ['text' => 'Penghantaran data melalui internet', 'is_correct' => false],
+                    ['text' => 'Penampilan grafik', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'ROM adalah jenis memori yang boleh diubah oleh pengguna.',
+                'type' => 'true_false', 'points' => 2,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => false],
+                    ['text' => 'False', 'is_correct' => true],
+                ]
+            ],
+            [
+                'text' => 'Pilih semua komponen perkakasan utama komputer.',
+                'type' => 'checkbox', 'points' => 5,
+                'options' => [
+                    ['text' => 'Papan ibu (Motherboard)', 'is_correct' => true],
+                    ['text' => 'Sistem operasi', 'is_correct' => false],
+                    ['text' => 'Peranti grafis (GPU)', 'is_correct' => true],
+                    ['text' => 'Peranti penyimpanan (HDD/SSD)', 'is_correct' => true],
+                ]
+            ],
+            [
+                'text' => 'Apakah unit asas bagi laju pemprosesan CPU?',
+                'type' => 'short_answer', 'points' => 4,
+                'correct_text' => 'GHz,Gigahertz',
+            ],
+            [
+                'text' => 'Antara berikut, yang manakah menyimpan data secara permanen?',
+                'type' => 'multiple_choice', 'points' => 4,
+                'options' => [
+                    ['text' => 'Hard Disk Drive (HDD)', 'is_correct' => true],
+                    ['text' => 'RAM', 'is_correct' => false],
+                    ['text' => 'Cache', 'is_correct' => false],
+                    ['text' => 'Daftar (Register)', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'GPU (Graphics Processing Unit) hanya digunakan untuk permainan video.',
+                'type' => 'true_false', 'points' => 3,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => false],
+                    ['text' => 'False', 'is_correct' => true],
+                ]
+            ],
+            [
+                'text' => 'Sebutkan tiga jenis ingatan komputer mengikut susunan kecepatan dari paling cepat.',
+                'type' => 'short_answer', 'points' => 5,
+                'correct_text' => 'Register,Cache,RAM',
+            ],
+            [
+                'text' => 'Papan ibu (Motherboard) menghubungkan semua komponen perkakasan komputer.',
+                'type' => 'true_false', 'points' => 2,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => true],
+                    ['text' => 'False', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Apakah nisbah perbandingan kecepatan Cache berbanding RAM?',
+                'type' => 'multiple_choice', 'points' => 4,
+                'options' => [
+                    ['text' => 'Cache lebih cepat 10-100 kali dari RAM', 'is_correct' => true],
+                    ['text' => 'RAM lebih cepat dari Cache', 'is_correct' => false],
+                    ['text' => 'Kecepatan sama', 'is_correct' => false],
+                    ['text' => 'Cache lebih lambat 10 kali', 'is_correct' => false],
+                ]
+            ],
+        ], // Total 10 Questions
+    ],
+
+    // ---------------------------------------------------------------
+    // QUIZ 8: Tingkatan 5 Bab 1 - Gerbang Logik
+    // ---------------------------------------------------------------
+    [
+        'teacher_id' => 10,
+        'title' => 'Tingkatan 5 Bab 1: Gerbang Logik',
+        'description' => 'Kuiz mengenai gerbang logik asas dan operasi logik dalam seni bina digital.',
+        'max_attempts' => 3,
+        'due_at' => Carbon::now()->addDays(30),
+        'is_published' => true,
+        'questions' => [
+            [
+                'text' => 'Apakah gerbang logik AND?',
+                'type' => 'multiple_choice', 'points' => 3,
+                'options' => [
+                    ['text' => 'Keluaran 1 apabila SEMUA input adalah 1', 'is_correct' => true],
+                    ['text' => 'Keluaran 1 apabila SALAH SATU input adalah 1', 'is_correct' => false],
+                    ['text' => 'Keluaran 1 apabila input adalah 0', 'is_correct' => false],
+                    ['text' => 'Tidak berkaitan dengan input', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Apakah keluaran gerbang OR jika input adalah 0 dan 0?',
+                'type' => 'multiple_choice', 'points' => 4,
+                'options' => [
+                    ['text' => '0', 'is_correct' => true],
+                    ['text' => '1', 'is_correct' => false],
+                    ['text' => '2', 'is_correct' => false],
+                    ['text' => 'Tidak tentu', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Gerbang NOT mengubah 1 menjadi 0 dan 0 menjadi 1.',
+                'type' => 'true_false', 'points' => 2,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => true],
+                    ['text' => 'False', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Pilih semua gerbang logik asas.',
+                'type' => 'checkbox', 'points' => 5,
+                'options' => [
+                    ['text' => 'AND', 'is_correct' => true],
+                    ['text' => 'OR', 'is_correct' => true],
+                    ['text' => 'NOT', 'is_correct' => true],
+                    ['text' => 'MAYBE', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Apakah keluaran gerbang XOR jika input adalah 1 dan 0?',
+                'type' => 'short_answer', 'points' => 4,
+                'correct_text' => '1',
+            ],
+            [
+                'text' => 'Gerbang NAND adalah gabungan daripada gerbang apa?',
+                'type' => 'multiple_choice', 'points' => 4,
+                'options' => [
+                    ['text' => 'AND dan NOT', 'is_correct' => true],
+                    ['text' => 'OR dan NOT', 'is_correct' => false],
+                    ['text' => 'AND dan OR', 'is_correct' => false],
+                    ['text' => 'Gerbang asas sahaja', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Jadual kebenaran gerbang AND dengan 2 input mempunyai 4 kombinasi kemungkinan.',
+                'type' => 'true_false', 'points' => 3,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => true],
+                    ['text' => 'False', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Senaraikan keluaran gerbang AND untuk semua kombinasi input 2 bit.',
+                'type' => 'short_answer', 'points' => 5,
+                'correct_text' => '0,0,0,1',
+            ],
+            [
+                'text' => 'Gerbang universal adalah gerbang yang dapat membina semua gerbang logik yang lain.',
+                'type' => 'true_false', 'points' => 2,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => true],
+                    ['text' => 'False', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Apakah keluaran gerbang NOR jika semua input adalah 0?',
+                'type' => 'multiple_choice', 'points' => 4,
+                'options' => [
+                    ['text' => '1', 'is_correct' => true],
+                    ['text' => '0', 'is_correct' => false],
+                    ['text' => '2', 'is_correct' => false],
+                    ['text' => 'Tidak tentu', 'is_correct' => false],
+                ]
+            ],
+        ], // Total 10 Questions
+    ],
+
+    // ---------------------------------------------------------------
+    // QUIZ 14: Tingkatan 5 Bab 1 - Pengaturcaraan Java (Coding)
+    // ---------------------------------------------------------------
+    [
+        'teacher_id' => 10,
+        'title' => 'Tingkatan 5: Pengaturcaraan Java - Soalan Kod',
+        'description' => 'Kuiz pengekodan yang memerlukan pelajar menulis kod Java dari awal atau melengkapkan templat yang disediakan.',
+        'max_attempts' => 3,
+        'due_at' => Carbon::now()->addDays(45),
+        'is_published' => true,
+        'questions' => [
+            [
+                'text' => 'Tulis kaedah Java yang menerima dua integer sebagai parameter dan mengembalikan hasil tambah mereka. Nama kaedah: `tambah`',
+                'type' => 'coding', 'points' => 10,
+                'coding_language' => 'java',
+                'coding_template' => null,
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Lengkapkan kaedah Java untuk menghitung faktorial bagi nombor yang diberikan.',
+                'type' => 'coding', 'points' => 15,
+                'coding_language' => 'java',
+                'coding_template' => 'public static int faktorial(int n) {
+    // Lengkapkan kod di sini
+    
+}',
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Tulis program Java untuk mencetak segi tiga bintang dengan n baris. Contoh (n=3):
+*
+**
+***',
+                'type' => 'coding', 'points' => 12,
+                'coding_language' => 'java',
+                'coding_template' => null,
+                'coding_expected_output' => '*
+**
+***',
+            ],
+            [
+                'text' => 'Lengkapkan kaedah yang menyemak sama ada satu integer adalah nombor perdana.',
+                'type' => 'coding', 'points' => 15,
+                'coding_language' => 'java',
+                'coding_template' => 'public static boolean isPerdana(int num) {
+    // Lengkapkan kod di sini
+    
+}',
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Tulis kaedah Java yang mengembalikan rentetan terbalik (reverse) bagi rentetan input.',
+                'type' => 'coding', 'points' => 10,
+                'coding_language' => 'java',
+                'coding_template' => null,
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Lengkapkan kaedah untuk mengira jumlah digit dalam integer positif.',
+                'type' => 'coding', 'points' => 10,
+                'coding_language' => 'java',
+                'coding_template' => 'public static int jumlahDigit(int num) {
+    // Lengkapkan kod di sini
+    
+}',
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Tulis program Java untuk mencetak jadual pendaraban 5x5.',
+                'type' => 'coding', 'points' => 15,
+                'coding_language' => 'java',
+                'coding_template' => null,
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Lengkapkan kaedah yang mencari nilai maksimum dalam array integer.',
+                'type' => 'coding', 'points' => 12,
+                'coding_language' => 'java',
+                'coding_template' => 'public static int cariMaksimum(int[] arr) {
+    // Lengkapkan kod di sini
+    
+}',
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Tulis kaedah yang menyemak sama ada satu rentetan adalah palindrom.',
+                'type' => 'coding', 'points' => 15,
+                'coding_language' => 'java',
+                'coding_template' => null,
+                'coding_expected_output' => null,
+            ],
+            [
+                'text' => 'Lengkapkan kaedah yang mengira purata nilai dalam array dan mengembalikan hasilnya.',
+                'type' => 'coding', 'points' => 10,
+                'coding_language' => 'java',
+                'coding_template' => 'public static double purata(int[] arr) {
+    // Lengkapkan kod di sini
+    
+}',
+                'coding_expected_output' => null,
             ],
         ], // Total 10 Questions
     ],
 
     // ----------------------------------------------------------------------
-    // QUIZ 8: Tingkatan 5 - Pangkalan Data dan SQL
+    // QUIZ 3: Java - Soalan Kod OOP Mudah (5 Coding Questions)
     // ----------------------------------------------------------------------
     [
-        'teacher_id' => 4,
-        'title' => 'Tingkatan 5: Pangkalan Data dan SQL',
-        'description' => 'Kuiz tentang konsep pangkalan data relasional, normalisasi, dan bahasa SQL.',
-        'max_attempts' => 4,
+        'teacher_id' => 10,
+        'title' => 'Java: Soalan Kod OOP Mudah',
+        'description' => 'Kuiz ini mengandungi 5 soalan pengaturcaraan tentang konsep OOP yang mudah dalam Java.',
+        'max_attempts' => 3,
+        'due_at' => Carbon::now()->addDays(45),
+        'is_published' => true,
+        'questions' => [
+            [
+                'text' => 'Tulis kod untuk mencipta kelas simple bernama "Kereta" dengan pemboleh ubah instance: brand (String), color (String), dan speed (int). Tambahkan kaedah constructor untuk menginisialisasi ketiga-tiga pemboleh ubah tersebut.',
+                'type' => 'coding', 'points' => 10,
+                'coding_template' => 'public class Kereta {
+    // Tambahkan pemboleh ubah instance di sini
+    
+    // Tambahkan constructor di sini
+}',
+                'coding_expected_output' => 'Kereta k = new Kereta("Toyota", "Merah", 120);
+System.out.println(k.brand); // Output: Toyota',
+            ],
+            [
+                'text' => 'Tulis kaedah bernama `displayInfo()` dalam kelas Person yang mencetak maklumat peribadi (nama, umur, email). Kelas Person mempunyai tiga pemboleh ubah: name, age, dan email.',
+                'type' => 'coding', 'points' => 10,
+                'coding_template' => 'public class Person {
+    private String name;
+    private int age;
+    private String email;
+    
+    public Person(String name, int age, String email) {
+        this.name = name;
+        this.age = age;
+        this.email = email;
+    }
+    
+    // Tulis kaedah displayInfo di sini
+}',
+                'coding_expected_output' => 'Nama: Ali
+Umur: 25
+Email: ali@example.com',
+            ],
+            [
+                'text' => 'Buat kelas Student yang mewarisi daripada kelas Person. Tambahkan pemboleh ubah studentID dan kaedah untuk mendapatkan (getter) studentID.',
+                'type' => 'coding', 'points' => 10,
+                'coding_template' => 'public class Person {
+    protected String name;
+    protected int age;
+    
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+
+public class Student extends Person {
+    // Tambahkan pemboleh ubah dan kaedah di sini
+}',
+                'coding_expected_output' => 'Student s = new Student("Siti", 17, "S12345");
+System.out.println(s.getStudentID()); // Output: S12345',
+            ],
+            [
+                'text' => 'Tulis kaedah bernama `calculateArea()` dalam kelas Rectangle yang menerima panjang (length) dan lebar (width), kemudian mengembalikan nilai luas segi empat tepat.',
+                'type' => 'coding', 'points' => 10,
+                'coding_template' => 'public class Rectangle {
+    // Tulis kaedah calculateArea di sini
+    
+    public static void main(String[] args) {
+        Rectangle rect = new Rectangle();
+        double area = rect.calculateArea(5, 10);
+        System.out.println("Luas: " + area);
+    }
+}',
+                'coding_expected_output' => 'Luas: 50.0',
+            ],
+            [
+                'text' => 'Tulis kaedah bernama `increaseAge()` dalam kelas Person yang menambah umur sebanyak 1 tahun setiap kali dipanggil. Paparkan umur selepas peningkatan.',
+                'type' => 'coding', 'points' => 10,
+                'coding_template' => 'public class Person {
+    private String name;
+    private int age;
+    
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    
+    // Tulis kaedah increaseAge di sini
+}',
+                'coding_expected_output' => 'Umur: 26',
+            ],
+        ], // Total 5 Coding Questions
+    ],
+
+    // ----------------------------------------------------------------------
+    // QUIZ 4: Java - OOP Characteristics (Encapsulation, Abstract, Inheritance)
+    // ----------------------------------------------------------------------
+    [
+        'teacher_id' => 11,
+        'title' => 'Java: Ciri-ciri OOP (Pengkapsulan, Abstrak, Pewarisan)',
+        'description' => 'Kuiz ini menguji pemahaman mendalam tentang pengkapsulan, kelas abstrak, dan pewarisan dalam OOP.',
+        'max_attempts' => 3,
         'due_at' => Carbon::now()->addDays(50),
         'is_published' => true,
         'questions' => [
             [
-                'text' => 'Apakah maksud RDBMS dalam pangkalan data?',
-                'type' => 'multiple_choice', 'points' => 4,
+                'text' => 'Apakah tujuan utama Pengkapsulan (Encapsulation) dalam OOP?',
+                'type' => 'multiple_choice', 'points' => 6,
                 'options' => [
-                    ['text' => 'Relational Database Management System', 'is_correct' => true],
-                    ['text' => 'Real Database Module System', 'is_correct' => false],
-                    ['text' => 'Remote Database Management Service', 'is_correct' => false],
-                    ['text' => 'Rapid Database Mobile System', 'is_correct' => false],
+                    ['text' => 'Untuk menyembunyikan data dalam dan hanya mengekspos interface yang diperlukan', 'is_correct' => true],
+                    ['text' => 'Untuk mempertingkat kecepatan program', 'is_correct' => false],
+                    ['text' => 'Untuk mengurangkan saiz fail program', 'is_correct' => false],
+                    ['text' => 'Untuk memudahkan sintaks bahasa Java', 'is_correct' => false],
                 ]
             ],
             [
-                'text' => 'Jadual dalam pangkalan data terdiri daripada baris dan lajur. Baris juga dipanggil ______.',
-                'type' => 'short_answer', 'points' => 4,
-                'correct_text' => 'Record',
-            ],
-            [
-                'text' => 'Kunci primer (Primary Key) digunakan untuk mengenal pasti rekod secara unik dalam jadual.',
-                'type' => 'true_false', 'points' => 3,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => true],
-                    ['text' => 'False', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Apakah perintah SQL yang digunakan untuk menambah data baru ke dalam jadual?',
-                'type' => 'multiple_choice', 'points' => 4,
-                'options' => [
-                    ['text' => 'INSERT', 'is_correct' => true],
-                    ['text' => 'UPDATE', 'is_correct' => false],
-                    ['text' => 'SELECT', 'is_correct' => false],
-                    ['text' => 'DELETE', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Pilih perintah SQL yang benar untuk mencari data.',
-                'type' => 'checkbox', 'points' => 6,
-                'options' => [
-                    ['text' => 'SELECT', 'is_correct' => true],
-                    ['text' => 'WHERE', 'is_correct' => true],
-                    ['text' => 'FROM', 'is_correct' => true],
-                    ['text' => 'REMOVE', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Normalisasi pangkalan data bertujuan untuk mengurangkan redundansi data.',
+                'text' => 'Kata kunci `private` dalam Java digunakan untuk membatasi akses ke ahli kelas kepada kelas itu sahaja.',
                 'type' => 'true_false', 'points' => 4,
                 'options' => [
                     ['text' => 'True', 'is_correct' => true],
@@ -842,100 +1108,12 @@ return [
                 ]
             ],
             [
-                'text' => 'Kunci asing (Foreign Key) digunakan untuk ______.',
-                'type' => 'short_answer', 'points' => 5,
-                'correct_text' => 'menghubungkan jadual,membuat hubungan antara jadual',
+                'text' => 'Apakah perbezaan antara kelas abstrak dan interface dalam Java?',
+                'type' => 'short_answer', 'points' => 8,
+                'correct_text' => 'Kelas abstrak boleh mempunyai pemboleh ubah dan kaedah konkrit, manakala interface hanya mempunyai kaedah abstrak dan pemalar (sebelum Java 8)',
             ],
             [
-                'text' => 'Perintah SQL yang digunakan untuk mengubah data yang sedia ada adalah ______.',
-                'type' => 'short_answer', 'points' => 4,
-                'correct_text' => 'UPDATE',
-            ],
-            [
-                'text' => 'Berapa bentuk normal (Normal Form) dalam normalisasi pangkalan data?',
-                'type' => 'multiple_choice', 'points' => 4,
-                'options' => [
-                    ['text' => '2', 'is_correct' => false],
-                    ['text' => '3', 'is_correct' => true],
-                    ['text' => '4', 'is_correct' => false],
-                    ['text' => '5', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Kueri (query) adalah perintah untuk meminta maklumat daripada pangkalan data.',
-                'type' => 'true_false', 'points' => 2,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => true],
-                    ['text' => 'False', 'is_correct' => false],
-                ]
-            ],
-        ], // Total 10 Questions
-    ],
-
-    // ----------------------------------------------------------------------
-    // QUIZ 9: Tingkatan 4 - Algoritma dan Pseudokod
-    // ----------------------------------------------------------------------
-    [
-        'teacher_id' => 5,
-        'title' => 'Tingkatan 4: Algoritma dan Pseudokod',
-        'description' => 'Kuiz mengenai konsep algoritma, analisis algoritma, dan penulisan pseudokod.',
-        'max_attempts' => 5,
-        'due_at' => Carbon::now()->addDays(42),
-        'is_published' => true,
-        'questions' => [
-            [
-                'text' => 'Apakah definisi algoritma yang paling tepat?',
-                'type' => 'multiple_choice', 'points' => 4,
-                'options' => [
-                    ['text' => 'Satu set langkah-langkah yang jelas untuk menyelesaikan masalah.', 'is_correct' => true],
-                    ['text' => 'Nama seorang pengaturcara terkenal.', 'is_correct' => false],
-                    ['text' => 'Bahasa pengaturcaraan.', 'is_correct' => false],
-                    ['text' => 'Sejenis perisian anti-virus.', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Pseudokod adalah tulisan yang menyerupai bahasa pengaturcaraan tetapi tidak dapat dilaksanakan oleh komputer.',
-                'type' => 'true_false', 'points' => 3,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => true],
-                    ['text' => 'False', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Apakah tiga komponen utama yang digunakan dalam analisis algoritma?',
-                'type' => 'multiple_choice', 'points' => 5,
-                'options' => [
-                    ['text' => 'Masa, Ruang, dan Ketepatan', 'is_correct' => true],
-                    ['text' => 'Panjang, Lebar, dan Tinggi', 'is_correct' => false],
-                    ['text' => 'Input, Output, dan Proses', 'is_correct' => false],
-                    ['text' => 'Permulaaan, Pertengahan, dan Akhir', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Carta alir (flowchart) digunakan untuk mewakili algoritma secara visual.',
-                'type' => 'true_false', 'points' => 2,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => true],
-                    ['text' => 'False', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Pilih langkah-langkah dalam membangunkan algoritma.',
-                'type' => 'checkbox', 'points' => 7,
-                'options' => [
-                    ['text' => 'Memahami masalah', 'is_correct' => true],
-                    ['text' => 'Merangka penyelesaian', 'is_correct' => true],
-                    ['text' => 'Melupakan keputusan', 'is_correct' => false],
-                    ['text' => 'Menguji algoritma', 'is_correct' => true],
-                ]
-            ],
-            [
-                'text' => 'Kerumitan waktu O(1) bermaksud algoritma berjalan dalam ______.',
-                'type' => 'short_answer', 'points' => 5,
-                'correct_text' => 'Masa tetap,Malar',
-            ],
-            [
-                'text' => 'Algoritma pencarian sekuensial (linear search) adalah lebih cepat daripada pencarian binari (binary search).',
+                'text' => 'Kelas abstrak boleh diinstan (instantiated) secara langsung.',
                 'type' => 'true_false', 'points' => 4,
                 'options' => [
                     ['text' => 'True', 'is_correct' => false],
@@ -943,121 +1121,155 @@ return [
                 ]
             ],
             [
-                'text' => 'Simbol berlian (diamond) dalam carta alir mewakili ______.',
-                'type' => 'short_answer', 'points' => 4,
-                'correct_text' => 'Keputusan,Syarat',
-            ],
-            [
-                'text' => 'Apakah jenis-jenis struktur data asas yang sering digunakan dalam algoritma?',
-                'type' => 'multiple_choice', 'points' => 5,
+                'text' => 'Pilih semua kenyataan yang benar tentang Pewarisan (Inheritance).',
+                'type' => 'checkbox', 'points' => 8,
                 'options' => [
-                    ['text' => 'Array, Stack, Queue, Linked List', 'is_correct' => true],
-                    ['text' => 'Tikus, Papan Kekunci, Monitor', 'is_correct' => false],
-                    ['text' => 'Merah, Hijau, Biru', 'is_correct' => false],
-                    ['text' => 'Keras, Lembut, Tengah', 'is_correct' => false],
+                    ['text' => 'Kelas anak mewarisi semua kaedah dari kelas induk', 'is_correct' => true],
+                    ['text' => 'Kelas anak boleh mengubah suai kaedah kelas induk melalui overriding', 'is_correct' => true],
+                    ['text' => 'Java menyokong pewarisan berganda', 'is_correct' => false],
+                    ['text' => 'Kelas anak boleh menambah pemboleh ubah baru', 'is_correct' => true],
                 ]
             ],
             [
-                'text' => 'Keadaan penamat (terminating condition) adalah penting dalam gelung untuk mengelakkan ______.',
-                'type' => 'short_answer', 'points' => 4,
-                'correct_text' => 'Gelung tak terhingga,Infinite loop',
+                'text' => 'Apakah istilah untuk mengubah suai kaedah kelas induk dalam kelas anak?',
+                'type' => 'short_answer', 'points' => 6,
+                'correct_text' => 'Method Overriding',
             ],
-        ], // Total 10 Questions
+            [
+                'text' => 'Kata kunci `abstract` digunakan untuk mengisytiharkan kaedah atau kelas yang tidak mempunyai pelaksanaan.',
+                'type' => 'true_false', 'points' => 4,
+                'options' => [
+                    ['text' => 'True', 'is_correct' => true],
+                    ['text' => 'False', 'is_correct' => false],
+                ]
+            ],
+            [
+                'text' => 'Apakah kegunaan kaedah getter dan setter dalam pengkapsulan?',
+                'type' => 'multiple_choice', 'points' => 6,
+                'options' => [
+                    ['text' => 'Untuk mengawal akses kepada pemboleh ubah private', 'is_correct' => true],
+                    ['text' => 'Untuk mempercepatkan program', 'is_correct' => false],
+                    ['text' => 'Untuk membuat kod lebih pendek', 'is_correct' => false],
+                    ['text' => 'Untuk menghapus pemboleh ubah', 'is_correct' => false],
+                ]
+            ],
+        ], // Total 8 Questions
     ],
 
     // ----------------------------------------------------------------------
-    // QUIZ 10: Tingkatan 5 - Rangkaian Komputer dan Internet
+    // QUIZ 5: Java - Program Komprehensif (2 Long Coding Questions - 30+ Lines Each)
     // ----------------------------------------------------------------------
     [
-        'teacher_id' => 6,
-        'title' => 'Tingkatan 5: Rangkaian Komputer dan Internet',
-        'description' => 'Kuiz mengenai topologi rangkaian, protokol komunikasi, dan keselamatan rangkaian.',
-        'max_attempts' => 3,
-        'due_at' => Carbon::now()->addDays(55),
+        'teacher_id' => 12,
+        'title' => 'Java: Program Pengaturcaraan Komprehensif',
+        'description' => 'Kuiz ini mengandungi 2 soalan pengaturcaraan jarak panjang yang menguji kefahaman mendalam tentang konsep Java.',
+        'max_attempts' => 2,
+        'due_at' => Carbon::now()->addDays(60),
         'is_published' => true,
         'questions' => [
             [
-                'text' => 'Apakah topologi rangkaian yang menghubungkan semua komputer ke satu peranti pusat?',
-                'type' => 'multiple_choice', 'points' => 4,
-                'options' => [
-                    ['text' => 'Topologi Bus', 'is_correct' => false],
-                    ['text' => 'Topologi Bintang', 'is_correct' => true],
-                    ['text' => 'Topologi Cincin', 'is_correct' => false],
-                    ['text' => 'Topologi Mesh', 'is_correct' => false],
-                ]
+                'text' => 'Tulis program lengkap untuk sistem pengurusan perpustakaan mudah dengan kelas Book, Library, dan Librarian. Program mestilah dapat menambah buku, membuang buku, mencari buku mengikut tajuk, dan memaparkan senarai semua buku.',
+                'type' => 'coding', 'points' => 25,
+                'coding_template' => 'import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Book {
+    private String title;
+    private String author;
+    private String isbn;
+    
+    public Book(String title, String author, String isbn) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+    }
+    
+    public String getTitle() { return title; }
+    public String getAuthor() { return author; }
+    public String getIsbn() { return isbn; }
+    
+    public void displayInfo() {
+        System.out.println("Tajuk: " + title + ", Pengarang: " + author + ", ISBN: " + isbn);
+    }
+}
+
+public class Library {
+    private ArrayList<Book> books = new ArrayList<>();
+    
+    // Tambahkan kaedah addBook di sini
+    // Tambahkan kaedah removeBook di sini
+    // Tambahkan kaedah searchBook di sini
+    // Tambahkan kaedah displayAllBooks di sini
+}
+
+public class Librarian {
+    public static void main(String[] args) {
+        Library library = new Library();
+        // Tulis program aplikasi di sini
+    }
+}',
+                'coding_expected_output' => 'Buku "Algoritma" ditambah
+Buku "Algoritma" dicari ditemui
+Senarai Buku:
+Tajuk: Algoritma, Pengarang: Aziz Deraman, ISBN: 123-456
+Tajuk: OOP Java, Pengarang: Tan Lee, ISBN: 789-012',
             ],
             [
-                'text' => 'TCP/IP adalah protokol yang digunakan dalam Internet.',
-                'type' => 'true_false', 'points' => 3,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => true],
-                    ['text' => 'False', 'is_correct' => false],
-                ]
+                'text' => 'Tulis program lengkap untuk sistem pengurusan pelajar dengan kelas Student, Course, dan Enrollment. Program mestilah dapat mendaftarkan pelajar dalam kursus, mencatat gred, mengira purata gred pelajar, dan memaparkan transkrip akademik lengkap setiap pelajar.',
+                'type' => 'coding', 'points' => 25,
+                'coding_template' => 'import java.util.ArrayList;
+import java.util.HashMap;
+
+public class Student {
+    private String studentId;
+    private String name;
+    private ArrayList<String> courses;
+    private HashMap<String, Double> grades;
+    
+    public Student(String studentId, String name) {
+        this.studentId = studentId;
+        this.name = name;
+        this.courses = new ArrayList<>();
+        this.grades = new HashMap<>();
+    }
+    
+    public String getStudentId() { return studentId; }
+    public String getName() { return name; }
+    
+    // Tambahkan kaedah enrollCourse di sini
+    // Tambahkan kaedah setGrade di sini
+    // Tambahkan kaedah getAverageGrade di sini
+    // Tambahkan kaedah displayTranscript di sini
+}
+
+public class Course {
+    private String courseCode;
+    private String courseName;
+    private int credits;
+    
+    public Course(String courseCode, String courseName, int credits) {
+        this.courseCode = courseCode;
+        this.courseName = courseName;
+        this.credits = credits;
+    }
+    
+    public String getCourseCode() { return courseCode; }
+    public String getCourseName() { return courseName; }
+}
+
+public class Enrollment {
+    public static void main(String[] args) {
+        // Tulis kod sistem pengurusan pelajar di sini
+    }
+}',
+                'coding_expected_output' => 'Transkrip Akademik:
+Nombor Pelajar: S001
+Nama: Ali bin Mohamed
+Kursus: JAVA101 - Pengaturcaraan Java (3 kredit) - Gred: A (4.0)
+Kursus: WEB101 - Pembangunan Web (3 kredit) - Gred: B+ (3.5)
+Purata Gred Keseluruhan (GPA): 3.75',
             ],
-            [
-                'text' => 'Apakah kepanjangan bagi IP dalam rangkaian komputer?',
-                'type' => 'multiple_choice', 'points' => 3,
-                'options' => [
-                    ['text' => 'Internet Protocol', 'is_correct' => true],
-                    ['text' => 'Internal Program', 'is_correct' => false],
-                    ['text' => 'Internet Provider', 'is_correct' => false],
-                    ['text' => 'Integrated Processor', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Firewall adalah alat untuk melindungi rangkaian dari ancaman luar.',
-                'type' => 'true_false', 'points' => 4,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => true],
-                    ['text' => 'False', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Pilih topologi rangkaian yang ada.',
-                'type' => 'checkbox', 'points' => 6,
-                'options' => [
-                    ['text' => 'Topologi Bintang', 'is_correct' => true],
-                    ['text' => 'Topologi Merah', 'is_correct' => false],
-                    ['text' => 'Topologi Mesh', 'is_correct' => true],
-                    ['text' => 'Topologi Cincin', 'is_correct' => true],
-                ]
-            ],
-            [
-                'text' => 'Alamat IP versi 4 terdiri daripada berapa oktet?',
-                'type' => 'multiple_choice', 'points' => 3,
-                'options' => [
-                    ['text' => '2', 'is_correct' => false],
-                    ['text' => '4', 'is_correct' => true],
-                    ['text' => '6', 'is_correct' => false],
-                    ['text' => '8', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Protokol HTTP digunakan untuk komunikasi data yang selamat di Internet.',
-                'type' => 'true_false', 'points' => 4,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => false],
-                    ['text' => 'False', 'is_correct' => true], // HTTPS is secure, not HTTP
-                ]
-            ],
-            [
-                'text' => 'Bandwidth dalam rangkaian merujuk kepada ______.',
-                'type' => 'short_answer', 'points' => 5,
-                'correct_text' => 'kapasiti pemindahan data,kecepatan transfer',
-            ],
-            [
-                'text' => 'Teknologi VPN membenarkan pengguna untuk mengakses rangkaian secara selamat melalui rangkaian awam.',
-                'type' => 'true_false', 'points' => 4,
-                'options' => [
-                    ['text' => 'True', 'is_correct' => true],
-                    ['text' => 'False', 'is_correct' => false],
-                ]
-            ],
-            [
-                'text' => 'Istilah "latency" dalam rangkaian merujuk kepada ______.',
-                'type' => 'short_answer', 'points' => 4,
-                'correct_text' => 'Kelewatan,Masa tunda',
-            ],
-        ], // Total 10 Questions
+        ], // Total 2 Long Coding Questions
     ],
 ];
+

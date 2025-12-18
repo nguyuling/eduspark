@@ -27,10 +27,27 @@ class QuizTeacherController extends Controller
                      // Eager load counts for display in the table
                      ->withCount(['questions', 'attempts']);
         
-        // 2. Apply Filtering Logic (Copy from your index.blade.php assumptions)
+        // 2. Filter based on publication status and user role
+        // Show published quizzes to everyone
+        // Show draft quizzes only to their creator
+        if (Auth::check() && Auth::user()->role === 'teacher') {
+            // Teachers see published quizzes + their own draft quizzes
+            $query->where(function ($q) {
+                $q->where('is_published', true)
+                  ->orWhere(function ($q2) {
+                      $q2->where('is_published', false)
+                         ->where('teacher_id', Auth::id());
+                  });
+            });
+        } else {
+            // Non-authenticated or non-teacher users see only published quizzes
+            $query->where('is_published', true);
+        }
         
-        // Filter by Scope (Mine/All)
-        if (Auth::check() && ($filters['scope'] ?? 'all') === 'mine') {
+        // 3. Apply Filtering Logic (Copy from your index.blade.php assumptions)
+        
+        // Filter by Scope (Mine/All) - Only for teachers viewing their own quizzes
+        if (Auth::check() && Auth::user()->role === 'teacher' && ($filters['scope'] ?? 'all') === 'mine') {
             $query->where('teacher_id', Auth::id());
         }
 
@@ -66,11 +83,19 @@ class QuizTeacherController extends Controller
         }
 
 
-        // 3. Paginate and return the view
-        $quizzes = $query->latest('created_at')->paginate(10); // Or use latest('updated_at')
+        // 4. Get limit from request (default 10, increments by 10)
+        $limit = (int) $request->get('limit', 10);
+        if ($limit < 10) $limit = 10;
+        if ($limit > 1000) $limit = 1000; // Safety limit
+        
+        // 5. Get all quizzes with the specified limit
+        $allQuizzes = $query->latest('created_at')->get();
+        $quizzes = $allQuizzes->take($limit);
+        $hasMore = count($allQuizzes) > $limit;
+        $nextLimit = $limit + 10;
         
         // Ensure you return the view that corresponds to the 'teacher.quizzes.index' route
-        return view('quiz.index-teacher', compact('quizzes', 'filters'));
+        return view('quiz.index-teacher', compact('quizzes', 'filters', 'limit', 'hasMore', 'nextLimit'));
     }
 
 
@@ -134,6 +159,21 @@ class QuizTeacherController extends Controller
                         'correct_answer' => ($questionType === QuizQuestion::TYPE_SHORT_ANSWER) 
                                             ? ($questionData['correct_answer'] ?? null)
                                             : null,
+                        'coding_template' => ($questionType === 'coding')
+                                            ? ($questionData['coding_template'] ?? null)
+                                            : null,
+                        'coding_full_code' => ($questionType === 'coding')
+                                            ? ($questionData['coding_full_code'] ?? null)
+                                            : null,
+                        'coding_language' => ($questionType === 'coding')
+                                            ? ($questionData['coding_language'] ?? 'java')
+                                            : null,
+                        'coding_expected_output' => ($questionType === 'coding')
+                                                    ? ($questionData['coding_expected_output'] ?? null)
+                                                    : null,
+                        'hidden_line_numbers' => ($questionType === 'coding')
+                                                    ? ($questionData['hidden_line_numbers'] ?? null)
+                                                    : null,
                     ]);
 
                     // 2b. Handle Options for Multiple Choice/Checkbox Questions
@@ -261,6 +301,21 @@ class QuizTeacherController extends Controller
                         'correct_answer' => ($questionType === QuizQuestion::TYPE_SHORT_ANSWER) 
                                             ? ($questionData['correct_answer'] ?? null)
                                             : null,
+                        'coding_template' => ($questionType === 'coding')
+                                            ? ($questionData['coding_template'] ?? null)
+                                            : null,
+                        'coding_full_code' => ($questionType === 'coding')
+                                            ? ($questionData['coding_full_code'] ?? null)
+                                            : null,
+                        'coding_language' => ($questionType === 'coding')
+                                            ? ($questionData['coding_language'] ?? 'java')
+                                            : null,
+                        'coding_expected_output' => ($questionType === 'coding')
+                                                    ? ($questionData['coding_expected_output'] ?? null)
+                                                    : null,
+                        'hidden_line_numbers' => ($questionType === 'coding')
+                                                    ? ($questionData['hidden_line_numbers'] ?? null)
+                                                    : null,
                     ]);
 
                     // 3b. Handle Options for Multiple Choice/Checkbox Questions
@@ -393,22 +448,65 @@ class QuizTeacherController extends Controller
      */
     public function showResults(Quiz $quiz)
     {
-        $this->authorize('update', $quiz);
+        $this->authorize('viewResults', $quiz);
         
         // Load attempts with student and answer data
         $attempts = $quiz->attempts()
             ->with(['student', 'answers'])
             ->get();
         
-        return view('quiz.results', compact('quiz', 'attempts'));
-    }
-
-    // QuizPolicy.php (The Security Guard)
-    public function view(User $user, Quiz $quiz): bool
-    {
-        // The logic that determines TRUE or FALSE
-        // If this returns FALSE for a non-owner quiz, you get the 403 error.
-        return $user->id === $quiz->teacher_id || $user->role === 'teacher';
+        // Calculate statistics
+        $totalAttempts = $attempts->count();
+        $totalPoints = $quiz->questions->sum('points');
+        
+        // Get best score for each student
+        $studentBestScores = [];
+        $allScores = [];
+        
+        foreach ($attempts as $attempt) {
+            $studentId = $attempt->student_id;
+            
+            if (!isset($studentBestScores[$studentId])) {
+                $studentBestScores[$studentId] = [
+                    'student' => $attempt->student,
+                    'best_score' => $attempt->score,
+                    'percentage' => $totalPoints > 0 ? round(($attempt->score / $totalPoints) * 100) : 0,
+                    'latest_submitted_at' => $attempt->submitted_at,
+                    'attempt_count' => 1,
+                ];
+            } else {
+                // Update if this attempt has a better score
+                if ($attempt->score > $studentBestScores[$studentId]['best_score']) {
+                    $studentBestScores[$studentId]['best_score'] = $attempt->score;
+                    $studentBestScores[$studentId]['percentage'] = $totalPoints > 0 ? round(($attempt->score / $totalPoints) * 100) : 0;
+                }
+                // Update to the latest submission date
+                if ($attempt->submitted_at && (!$studentBestScores[$studentId]['latest_submitted_at'] || $attempt->submitted_at > $studentBestScores[$studentId]['latest_submitted_at'])) {
+                    $studentBestScores[$studentId]['latest_submitted_at'] = $attempt->submitted_at;
+                }
+                // Increment attempt count
+                $studentBestScores[$studentId]['attempt_count']++;
+            }
+            
+            if ($attempt->score) {
+                $allScores[] = $attempt->score;
+            }
+        }
+        
+        // Calculate average, highest, and lowest scores
+        $average = count($allScores) > 0 ? round(array_sum($allScores) / count($allScores)) : 0;
+        $highest = count($allScores) > 0 ? max($allScores) : 0;
+        $lowest = count($allScores) > 0 ? min($allScores) : 0;
+        
+        $statistics = [
+            'total_attempts' => $totalAttempts,
+            'total_students' => count($studentBestScores),
+            'average' => $totalPoints > 0 ? round(($average / $totalPoints) * 100) : 0,
+            'highest' => $totalPoints > 0 ? round(($highest / $totalPoints) * 100) : 0,
+            'lowest' => $totalPoints > 0 ? round(($lowest / $totalPoints) * 100) : 0,
+        ];
+        
+        return view('quiz.result-teacher', compact('quiz', 'attempts', 'studentBestScores', 'statistics', 'totalPoints'));
     }
 
 }

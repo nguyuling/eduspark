@@ -16,7 +16,11 @@ class QuizAnswer extends Model
     'question_id', 
     'is_correct', 
     'score_gained', 
-    'submitted_text'
+    'submitted_text',
+    'submitted_code',
+    'code_output',
+    'code_compiled',
+    'compilation_error'
 ];
 
     public function attempt(): BelongsTo

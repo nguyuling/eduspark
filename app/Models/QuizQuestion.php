@@ -14,7 +14,8 @@ class QuizQuestion extends Model
     public const TYPE_SHORT_ANSWER = 'short_answer';
     public const TYPE_TRUE_FALSE = 'true_false';
     public const TYPE_CHECKBOX = 'checkbox';
-    protected $fillable = ['quiz_id', 'question_text', 'points', 'type'];
+    public const TYPE_CODING = 'coding';
+    protected $fillable = ['quiz_id', 'question_text', 'points', 'type', 'coding_template', 'coding_full_code', 'coding_language', 'coding_expected_output', 'hidden_line_numbers'];
     // A Question belongs to one Quiz
     public function quiz(): BelongsTo
     {

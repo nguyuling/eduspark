@@ -2,9 +2,6 @@
 
 ## [Unreleased](https://github.com/laravel/laravel/compare/v12.9.1...12.x)
 
-* Fixed database user/student records so student accounts stay linked to their user profiles.
-* Performance: fixed graph rendering, teacher redirection to reports, report UI polish, report export, and user table linkage for reports.
-
 ## [v12.9.1](https://github.com/laravel/laravel/compare/v12.9.0...v12.9.1) - 2025-10-23
 
 * [12.x] Replace Bootcamp with Laravel Learn by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/laravel/pull/6692

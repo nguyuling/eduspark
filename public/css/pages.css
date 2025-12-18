@@ -372,6 +372,10 @@ input[type="checkbox"] {
 input[type="checkbox"]:checked {
   background: var(--accent) !important;
   border-color: var(--accent) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='white'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 14px 14px !important;
 }
 
 /* ===== BUTTONS ===== */
@@ -1172,4 +1176,54 @@ body.dark .auth-form-group select {
   color: var(--muted);
   position: relative;
   z-index: 10;
+}
+
+.btn-kembali {
+  display: inline-block !important;
+  padding: 12px 24px !important;
+  background: transparent !important;
+  color: #6A4DF7 !important;
+  border: 2px solid #6A4DF7 !important;
+  text-decoration: none !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  margin-top: 15px !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  line-height: 1.4 !important;
+  height: auto !important;
+  opacity: 1 !important;
+  min-width: 140px !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  flex-shrink: 0 !important;
+}
+
+.btn-kembali:hover {
+  background: rgba(106, 77, 247, 0.1) !important;
+  color: #6A4DF7 !important;
+  border-color: #6A4DF7 !important;
+  text-decoration: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.btn-kembali:focus {
+  background: rgba(106, 77, 247, 0.1) !important;
+  color: #6A4DF7 !important;
+  text-decoration: none !important;
+  opacity: 1 !important;
+  outline: 2px solid #6A4DF7 !important;
+  outline-offset: 2px !important;
+}
+
+.btn-kembali:active {
+  background: rgba(106, 77, 247, 0.15) !important;
+  color: #6A4DF7 !important;
+  border-color: #6A4DF7 !important;
+}
+
+.btn-kembali i {
+  margin-right: 6px !important;
 }

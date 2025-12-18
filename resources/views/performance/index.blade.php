@@ -2,16 +2,17 @@
 
 @section('content')
 
-<main class="main">
-  <div class="header">
-    <div>
-      <div class="title">Prestasi</div>
-      <div class="sub">Gambaran pembelajaran peribadi & aktiviti terkini</div>
+<div class="app">
+  <main class="main">
+    <div class="header">
+      <div>
+        <div class="title">Prestasi</div>
+        <div class="sub">Gambaran pembelajaran peribadi & aktiviti terkini</div>
+      </div>
     </div>
-  </div>
 
-  <!-- Performance Cards (2x2 Grid) -->
-  <section class="cards performance-cards" style="margin-bottom:20px; margin-top:10px;">
+    <!-- Performance Cards (2x2 Grid) -->
+    <section class="cards performance-cards" style="margin-bottom:20px; margin-top:10px;">
       <div class="card" style="text-align:center;">
         <div class="panel-header" style="justify-content:center;">
             <h3>Purata Skor Kuiz</h3>
@@ -67,7 +68,8 @@
       </div>
       <canvas id="trendChart"></canvas>
     </section>
-</main>
+  </main>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -76,16 +78,10 @@ const gr = ctx.getContext('2d').createLinearGradient(0,0,0,200);
 gr.addColorStop(0,'rgba(106,77,247,0.22)');
 gr.addColorStop(1,'rgba(156,123,255,0.06)');
 
-const fullLabels = {!! json_encode($labels) !!};
-const shortLabels = fullLabels.map(l => {
-  if(!l) return '';
-  return l.length > 32 ? l.slice(0, 32) + '...' : l;
-});
-
 new Chart(ctx,{
   type:'line',
   data:{
-    labels: shortLabels,
+    labels:{!! json_encode($labels) !!},
     datasets:[{
       label:'Skor',
       data:{!! json_encode($scores) !!},
@@ -99,17 +95,7 @@ new Chart(ctx,{
     }]
   },
   options:{
-    plugins:{
-      legend:{display:false},
-      tooltip:{
-        callbacks:{
-          title:(items)=>{
-            const i = items[0]?.dataIndex ?? 0;
-            return fullLabels[i] ?? '';
-          }
-        }
-      }
-    },
+    plugins:{legend:{display:false}},
     scales:{y:{beginAtZero:true,max:100}}
   }
 });
