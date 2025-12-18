@@ -191,7 +191,7 @@
                         <span class="game-difficulty ${difficultyClass}">
                             ${capitalizeFirst(game.difficulty || 'Easy')}
                         </span>
-                        <button class="play-btn" onclick="playGame('${game.reactRoute}')">
+                        <button class="play-btn" onclick="playGame('${game.route}')">
                             Main ▶
                         </button>
                     </div>
