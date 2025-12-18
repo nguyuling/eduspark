@@ -131,5 +131,7 @@
     <footer class="page-footer">
         © 2025 EduSpark • Belajar • Bermain • Berkembang
     </footer>
+
+    @yield('scripts')
 </body>
 </html>
