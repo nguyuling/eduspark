@@ -9732,3 +9732,4 @@ FATAL:  password authentication failed for user \"postgres\" at C:\\xampp\\php\\
 #13 /Users/nguyuling/eduspark/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
 #14 {main}
 "} 
+[2025-12-18 14:38:56] local.INFO: studentsByClass: Found 11 rows for class: 4 Arif  
