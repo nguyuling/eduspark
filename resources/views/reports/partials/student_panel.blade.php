@@ -44,6 +44,15 @@
         {{ $stats['weakest_subject'] ?? '' }}
       </div>
     </div>
+
+    <div class="card" style="min-width:150px;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Most Played</div>
+      <div class="value">
+        <span class="badge-pill" style="display:inline-block;background:linear-gradient(90deg,#FF9800,#FFB74D); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
+          {{ $stats['most_frequent'] ?? 'N/A' }}
+        </span>
+      </div>
+    </div>
   </div>
 
   <hr style="margin:16px 0;border:none;border-top:1px solid rgba(0,0,0,0.08)">

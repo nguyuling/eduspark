@@ -188,12 +188,42 @@ class ReportController extends Controller
 
         // Compute stats
         $scores = [];
+        $topicScores = [];
+        $topicCount = [];
+        
         foreach ($attempts as $a) {
             if (isset($a->score) && is_numeric($a->score)) $scores[] = (float)$a->score;
+            
+            // Track scores by topic for strongest/weakest topic
+            $topic = $a->quiz_id ?? ($a->title ?? 'Unknown');
+            if (!isset($topicScores[$topic])) {
+                $topicScores[$topic] = [];
+                $topicCount[$topic] = 0;
+            }
+            if (isset($a->score) && is_numeric($a->score)) {
+                $topicScores[$topic][] = (float)$a->score;
+            }
+            $topicCount[$topic]++;
         }
+        
         $avg = count($scores) ? round(array_sum($scores) / count($scores), 0) : 'N/A';
         $highest = count($scores) ? max($scores) : 'N/A';
         $weakest = count($scores) ? min($scores) : 'N/A';
+        
+        // Calculate strongest and weakest topics (by average score)
+        $strongestTopic = null;
+        $weakestTopic = null;
+        $mostFrequentTopic = null;
+        
+        if (count($topicScores) > 0) {
+            $topicAverages = [];
+            foreach ($topicScores as $topic => $scores_list) {
+                $topicAverages[$topic] = round(array_sum($scores_list) / count($scores_list), 0);
+            }
+            $strongestTopic = array_keys($topicAverages, max($topicAverages))[0];
+            $weakestTopic = array_keys($topicAverages, min($topicAverages))[0];
+            $mostFrequentTopic = array_keys($topicCount, max($topicCount))[0];
+        }
 
         // Map attempts for view partial
         $attemptsForView = [];
@@ -209,9 +239,10 @@ class ReportController extends Controller
         $stats = [
             'average_score' => $avg,
             'highest_score' => $highest,
-            'highest_subject' => null,
+            'highest_subject' => $strongestTopic,
             'weakest_score' => $weakest,
-            'weakest_subject' => null,
+            'weakest_subject' => $weakestTopic,
+            'most_frequent' => $mostFrequentTopic,
             'attempts' => $attemptsForView
         ];
 
