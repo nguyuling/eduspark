@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class PerformanceController extends Controller
 {
@@ -23,6 +24,7 @@ class PerformanceController extends Controller
         $totalGames = 0;
         $bestGame = 'N/A';
         $labels = [];
+        $labelsFull = [];
         $scores = [];
 
         $recentCollection = collect();
@@ -68,22 +70,31 @@ class PerformanceController extends Controller
             }
 
             // Fetch recent quiz rows (only requested columns that exist)
-            $quizSelect = ['score', 'quiz_id'];
+            $quizSelect = ['a.score', 'a.quiz_id'];
             if ($quizTimestampCol) {
-                $quizSelect[] = $quizTimestampCol . ' as completed_at';
+                $quizSelect[] = 'a.' . $quizTimestampCol . ' as completed_at';
+            }
+            if ($quizMetaTable) {
+                $quizSelect[] = 'q.title as quiz_title';
             }
 
-            $recentQuizRows = DB::table($quizTable)
-                ->where($quizUserCol, $studentId)
-                ->orderBy($quizTimestampCol ?? 'id', 'desc') // fallback to id if no timestamp
+            $recentQuizRows = DB::table($quizTable . ' as a')
+                ->when($quizMetaTable, function ($q) use ($quizMetaTable) {
+                    return $q->leftJoin($quizMetaTable . ' as q', 'a.quiz_id', '=', 'q.id');
+                })
+                ->where("a.$quizUserCol", $studentId)
+                ->orderBy('a.' . ($quizTimestampCol ?? 'id'), 'desc') // fallback to id if no timestamp
                 ->limit(6)
                 ->get($quizSelect);
 
             // normalize and push into recentCollection with a standard completed_at
             foreach ($recentQuizRows as $r) {
                 $completedAt = property_exists($r, 'completed_at') ? $r->completed_at : null;
+                $fullTitle = $r->quiz_title ?? ($r->quiz_id ? 'Kuiz #' . $r->quiz_id : 'Kuiz');
+                $shortTitle = Str::limit($fullTitle, 18, '…');
                 $recentCollection->push((object)[
-                    'title' => $r->quiz_id ? 'Kuiz #' . $r->quiz_id : 'Kuiz',
+                    'title' => $shortTitle,
+                    'title_full' => $fullTitle,
                     'score' => (float) $r->score,
                     'completed_at' => $completedAt,
                 ]);
@@ -144,7 +155,8 @@ class PerformanceController extends Controller
 
                 foreach ($recentGameRows as $r) {
                     $recentCollection->push((object)[
-                        'title' => $r->title ?? ('Game #' . $r->game_id),
+                        'title' => Str::limit($r->title ?? ('Game #' . $r->game_id), 18, '…'),
+                        'title_full' => $r->title ?? ('Game #' . $r->game_id),
                         'score' => (float) $r->score,
                         'completed_at' => property_exists($r, 'completed_at') ? $r->completed_at : null,
                     ]);
@@ -159,7 +171,8 @@ class PerformanceController extends Controller
 
                 foreach ($recentGameRows as $r) {
                     $recentCollection->push((object)[
-                        'title' => isset($r->game_id) ? 'Game #' . $r->game_id : 'Game',
+                        'title' => Str::limit(isset($r->game_id) ? 'Game #' . $r->game_id : 'Game', 18, '…'),
+                        'title_full' => isset($r->game_id) ? 'Game #' . $r->game_id : 'Game',
                         'score' => (float) $r->score,
                         'completed_at' => property_exists($r, 'completed_at') ? $r->completed_at : null,
                     ]);
@@ -180,6 +193,7 @@ class PerformanceController extends Controller
 
         // Prepare chart arrays
         $labels = $recentData->pluck('title')->all();
+        $labelsFull = $recentData->pluck('title_full')->all();
         $scores = $recentData->pluck('score')->all();
 
         return view('performance.index', [
@@ -190,6 +204,7 @@ class PerformanceController extends Controller
             'weakTopic' => $weakTopic ?? 'N/A',
             'bestGame' => $bestGame ?? 'N/A',
             'labels' => $labels,
+            'labelsFull' => $labelsFull,
             'scores' => $scores,
         ]);
     }

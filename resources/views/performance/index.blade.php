@@ -78,13 +78,17 @@ const gr = ctx.getContext('2d').createLinearGradient(0,0,0,200);
 gr.addColorStop(0,'rgba(106,77,247,0.22)');
 gr.addColorStop(1,'rgba(156,123,255,0.06)');
 
+const labels = {!! json_encode($labels) !!};
+const labelsFull = {!! json_encode($labelsFull ?? $labels) !!};
+const scores = {!! json_encode($scores) !!};
+
 new Chart(ctx,{
   type:'line',
   data:{
-    labels:{!! json_encode($labels) !!},
+    labels: labels,
     datasets:[{
       label:'Skor',
-      data:{!! json_encode($scores) !!},
+      data: scores,
       borderColor:'#6A4DF7',
       backgroundColor:gr,
       tension:.38,
@@ -95,8 +99,25 @@ new Chart(ctx,{
     }]
   },
   options:{
-    plugins:{legend:{display:false}},
-    scales:{y:{beginAtZero:true,max:100}}
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        callbacks:{
+          title:(items)=>{
+            const idx = items[0]?.dataIndex ?? 0;
+            return labelsFull[idx] ?? labels[idx] ?? '';
+          },
+          label:(ctx)=> `Skor: ${ctx.parsed.y}`
+        }
+      }
+    },
+    scales:{
+      y:{beginAtZero:true,max:100,suggestedMax:100},
+      x:{ticks:{callback:(value)=>{
+        const label = labels[value] ?? '';
+        return label;
+      }}}
+    }
   }
 });
 </script>
