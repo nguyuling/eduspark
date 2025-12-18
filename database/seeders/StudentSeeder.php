@@ -34,17 +34,20 @@ class StudentSeeder extends Seeder
             }
         }
 
-        // Map each student to their exact class (user IDs 9-53)
+        // Balanced distribution: 4 Arif (11), 4 Bestari (11), 5 Arif (12), 5 Bestari (11)
+        // Covers user IDs 9-53 (45 students)
         $studentClassMap = [
-            9 => '5 Arif', 10 => '5 Arif', 11 => '4 Arif', 12 => '5 Arif', 13 => '5 Arif',
-            14 => '5 Arif', 15 => '5 Arif', 16 => '4 Arif', 17 => '5 Bestari', 18 => '5 Arif',
-            19 => '4 Bestari', 20 => '5 Arif', 21 => '4 Bestari', 22 => '4 Arif', 23 => '5 Bestari',
-            24 => '5 Arif', 25 => '4 Arif', 26 => '5 Bestari', 27 => '4 Arif', 28 => '4 Bestari',
-            29 => '5 Arif', 30 => '5 Bestari', 31 => '4 Arif', 32 => '4 Bestari', 33 => '4 Arif',
-            34 => '5 Arif', 35 => '5 Arif', 36 => '4 Bestari', 37 => '5 Arif', 38 => '5 Arif',
-            39 => '5 Arif', 40 => '5 Arif', 41 => '4 Arif', 42 => '5 Bestari', 43 => '5 Bestari',
-            44 => '5 Bestari', 45 => '5 Arif', 46 => '5 Bestari', 47 => '5 Arif', 48 => '4 Arif',
-            49 => '4 Arif', 50 => '5 Bestari', 51 => '4 Arif', 52 => '4 Arif', 53 => '5 Bestari',
+            9 => '4 Arif', 10 => '4 Arif', 11 => '4 Arif', 12 => '4 Arif', 13 => '4 Arif',
+            14 => '4 Arif', 15 => '4 Arif', 16 => '4 Arif', 17 => '4 Arif', 18 => '4 Arif', 19 => '4 Arif',
+
+            20 => '4 Bestari', 21 => '4 Bestari', 22 => '4 Bestari', 23 => '4 Bestari', 24 => '4 Bestari',
+            25 => '4 Bestari', 26 => '4 Bestari', 27 => '4 Bestari', 28 => '4 Bestari', 29 => '4 Bestari', 30 => '4 Bestari',
+
+            31 => '5 Arif', 32 => '5 Arif', 33 => '5 Arif', 34 => '5 Arif', 35 => '5 Arif',
+            36 => '5 Arif', 37 => '5 Arif', 38 => '5 Arif', 39 => '5 Arif', 40 => '5 Arif', 41 => '5 Arif', 42 => '5 Arif',
+
+            43 => '5 Bestari', 44 => '5 Bestari', 45 => '5 Bestari', 46 => '5 Bestari', 47 => '5 Bestari',
+            48 => '5 Bestari', 49 => '5 Bestari', 50 => '5 Bestari', 51 => '5 Bestari', 52 => '5 Bestari', 53 => '5 Bestari',
         ];
 
         // Get all students and create records with their assigned classes
