@@ -70,4 +70,6 @@ class StudentSeeder extends Seeder
             DB::table('students')->insert($payload);
         }
 
-        echo "All students a
+        echo "All students assigned to classes successfully.\n";
+    }
+}
