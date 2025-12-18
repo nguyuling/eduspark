@@ -36,9 +36,31 @@ class PerformanceController extends Controller
             $quizTable = Schema::hasTable('quiz_attempts') ? 'quiz_attempts' : 'quiz_attempt';
             $quizUserCol = Schema::hasColumn($quizTable, 'student_id') ? 'student_id' : (Schema::hasColumn($quizTable, 'user_id') ? 'user_id' : 'user_id');
 
-            $avgQuizScore = (float) DB::table($quizTable)
+            // Pull all attempts for this user to compute percentage based on per-quiz max scores
+            $allQuizAttempts = DB::table($quizTable)
                 ->where($quizUserCol, $studentId)
-                ->avg('score') ?? 0;
+                ->select('quiz_id', 'score')
+                ->get();
+
+            // Max score per quiz across all users (best available proxy for full marks)
+            $maxScoreByQuiz = DB::table($quizTable)
+                ->select('quiz_id', DB::raw('MAX(score) as max_score'))
+                ->groupBy('quiz_id')
+                ->pluck('max_score', 'quiz_id');
+
+            $normalizedQuizScores = [];
+            foreach ($allQuizAttempts as $a) {
+                $maxScore = $maxScoreByQuiz[$a->quiz_id] ?? null;
+                if ($maxScore && $maxScore > 0) {
+                    $normalizedQuizScores[] = ($a->score / $maxScore) * 100;
+                } else {
+                    $normalizedQuizScores[] = (float) $a->score; // fallback to raw
+                }
+            }
+
+            $avgQuizScore = count($normalizedQuizScores)
+                ? array_sum($normalizedQuizScores) / count($normalizedQuizScores)
+                : 0;
 
             $totalQuizzes = DB::table($quizTable)
                 ->where($quizUserCol, $studentId)
@@ -92,10 +114,14 @@ class PerformanceController extends Controller
                 $completedAt = property_exists($r, 'completed_at') ? $r->completed_at : null;
                 $fullTitle = $r->quiz_title ?? ($r->quiz_id ? 'Kuiz #' . $r->quiz_id : 'Kuiz');
                 $shortTitle = Str::limit($fullTitle, 18, '…');
+                $maxScore = $maxScoreByQuiz[$r->quiz_id] ?? null;
+                $scorePercent = ($maxScore && $maxScore > 0)
+                    ? ($r->score / $maxScore) * 100
+                    : (float) $r->score;
                 $recentCollection->push((object)[
                     'title' => $shortTitle,
                     'title_full' => $fullTitle,
-                    'score' => (float) $r->score,
+                    'score' => (float) $scorePercent,
                     'completed_at' => $completedAt,
                 ]);
             }
