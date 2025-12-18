@@ -114,3 +114,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/forum/{id}', [ForumController::class, 'destroy'])->name('forum.destroy');
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
 });
+
+// Games routes (Permainan in sidebar)
+Route::middleware('auth')->group(function () {
+    Route::get('/games', function() {
+        return view('games.index');
+    })->name('games.index');
+});
