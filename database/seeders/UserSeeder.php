@@ -111,7 +111,7 @@ class UserSeeder extends Seeder
 
         echo "7 Teachers created successfully.\n";
 
-        // Create All Students
+
         $students = [
             [
                 'id' => 5,
