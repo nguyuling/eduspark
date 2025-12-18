@@ -48,14 +48,18 @@ class PerformanceController extends Controller
                 ->groupBy('quiz_id')
                 ->pluck('max_score', 'quiz_id');
 
-            // Map quiz titles if available
+            // Map quiz titles and max_points if available
             $quizMetaTable = Schema::hasTable('quizzes') ? 'quizzes' : (Schema::hasTable('quiz') ? 'quiz' : null);
-            $quizTitles = $quizMetaTable ? DB::table($quizMetaTable)->pluck('title', 'id') : collect();
+            $quizData = $quizMetaTable 
+                ? DB::table($quizMetaTable)->select('id', 'title', 'max_points')->get()->keyBy('id')
+                : collect();
+            $quizTitles = $quizData->pluck('title');
 
             $normalizedQuizScores = [];
             $quizAggregates = [];
             foreach ($allQuizAttempts as $a) {
-                $maxScore = $maxScoreByQuiz[$a->quiz_id] ?? null;
+                // Use max_points from quizzes table, fallback to global max
+                $maxScore = $quizData[$a->quiz_id]->max_points ?? $maxScoreByQuiz[$a->quiz_id] ?? null;
                 if ($maxScore && $maxScore > 0) {
                     $normalizedQuizScores[] = ($a->score / $maxScore) * 100;
                 } else {
@@ -64,7 +68,7 @@ class PerformanceController extends Controller
 
                 // aggregate per quiz for weakest topic logic
                 if (!isset($quizAggregates[$a->quiz_id])) {
-                    $quizAggregates[$a->quiz_id] = ['sum' => 0, 'count' => 0];
+                    $quizAggregates[$a->quiz_id] = ['sum' => 0, 'count' => 0, 'max_points' => $maxScore];
                 }
                 $quizAggregates[$a->quiz_id]['sum'] += (float) $a->score;
                 $quizAggregates[$a->quiz_id]['count'] += 1;
@@ -82,7 +86,7 @@ class PerformanceController extends Controller
             $weakTopic = 'Tiada';
             $weakTopicScore = null;
             foreach ($quizAggregates as $quizId => $agg) {
-                $maxScore = $maxScoreByQuiz[$quizId] ?? null;
+                $maxScore = $agg['max_points'] ?? null;
                 if (!$maxScore || $maxScore <= 0 || $agg['count'] === 0) {
                     continue;
                 }
@@ -128,7 +132,7 @@ class PerformanceController extends Controller
                 $completedAt = property_exists($r, 'completed_at') ? $r->completed_at : null;
                 $fullTitle = $r->quiz_title ?? ($r->quiz_id ? 'Kuiz #' . $r->quiz_id : 'Kuiz');
                 $shortTitle = Str::limit($fullTitle, 18, '…');
-                $maxScore = $maxScoreByQuiz[$r->quiz_id] ?? null;
+                $maxScore = $quizData[$r->quiz_id]->max_points ?? $maxScoreByQuiz[$r->quiz_id] ?? null;
                 $scorePercent = ($maxScore && $maxScore > 0)
                     ? ($r->score / $maxScore) * 100
                     : (float) $r->score;
