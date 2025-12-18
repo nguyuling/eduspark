@@ -48,12 +48,13 @@ class StudentSeeder extends Seeder
         ];
 
         // Get all students and create records with their assigned classes
-        $users = DB::table('users')->where('role', 'student')->get();
+        $users = DB::table('users')->where('role', 'student')->orderBy('id')->get();
 
         foreach ($users as $u) {
             $cls = $studentClassMap[$u->id] ?? '4 Arif'; // Default to 4 Arif if not mapped
 
             $payload = [
+                'id' => $u->id,
                 'name' => $u->name,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -69,6 +70,4 @@ class StudentSeeder extends Seeder
             DB::table('students')->insert($payload);
         }
 
-        echo "All students assigned to classes successfully.\n";
-    }
-}
+        echo "All students a
