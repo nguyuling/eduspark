@@ -16,7 +16,7 @@
 
 {{-- ===================== STUDENT REPORT ===================== --}}
 <div class="panel" style="padding:18px;border-radius:12px;">
-    <h3 style="margin-top:0;">Laporan Pelajar</h3>
+    <h3 style="margin-top:0;font-weight:700;">Laporan Pelajar</h3>
 
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
         <label style="font-weight:700;color:var(--muted);">Kelas</label>
@@ -62,7 +62,7 @@
 
 {{-- ===================== CLASS REPORT ===================== --}}
 <div class="panel" style="padding:18px;border-radius:12px;margin-top:16px;">
-    <h3 style="margin-top:0;">Laporan Kelas</h3>
+    <h3 style="margin-top:0;font-weight:700;">Laporan Kelas</h3>
 
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
         <label style="font-weight:700;color:var(--muted);">Pilih kelas</label>
