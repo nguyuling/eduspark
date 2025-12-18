@@ -94,8 +94,8 @@
               <td style="width:20%; text-align:center;">
                 <div style="display:flex; gap:20px; justify-content:center;">
                   @if ($lesson->file_path)
-                    <a href="{{ route('lesson.preview-file', $lesson->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Lihat">
-                      <i class="bi bi-eye-fill"></i>
+                    <a href="{{ route('lesson.show', $lesson->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Lihat Butiran">
+                        <i class="bi bi-eye-fill"></i>
                     </a>
                     <a href="{{ route('lesson.download', $lesson->id) }}" download style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Muat Turun">
                       <i class="bi bi-download"></i>
