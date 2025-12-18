@@ -71,7 +71,12 @@ class ReportController extends Controller
             }
         }
 
-        if (!$rows || $rows->isEmpty()) return response()->json([]);
+        if (!$rows || $rows->isEmpty()) {
+            \Log::info("studentsByClass: No rows found for class: {$class}");
+            return response()->json([]);
+        }
+
+        \Log::info("studentsByClass: Found {$rows->count()} rows for class: {$class}");
 
         // detect available student name columns to avoid N/A
         $studentNameCol = null;
