@@ -190,6 +190,7 @@ class ReportController extends Controller
         $scores = [];
         $topicScores = [];
         $topicMaxScores = [];
+        $topicFullMarks = [];
         $topicCount = [];
         
         foreach ($attempts as $a) {
@@ -200,6 +201,7 @@ class ReportController extends Controller
             if (!isset($topicScores[$topic])) {
                 $topicScores[$topic] = [];
                 $topicMaxScores[$topic] = 0;
+                $topicFullMarks[$topic] = null;
                 $topicCount[$topic] = 0;
             }
             if (isset($a->score) && is_numeric($a->score)) {
@@ -207,6 +209,22 @@ class ReportController extends Controller
                 // Track max score for this topic
                 if ($a->score > $topicMaxScores[$topic]) {
                     $topicMaxScores[$topic] = $a->score;
+                }
+            }
+            // Get full mark for this quiz if not already set
+            if ($topicFullMarks[$topic] === null && isset($a->quiz_id)) {
+                if (Schema::hasTable('quizzes')) {
+                    $quiz = DB::table('quizzes')->where('id', $a->quiz_id)->first();
+                    if ($quiz && isset($quiz->full_mark)) {
+                        $topicFullMarks[$topic] = $quiz->full_mark;
+                    }
+                }
+                // If no full_mark field, try to sum quiz_options points
+                if ($topicFullMarks[$topic] === null && Schema::hasTable('quiz_options')) {
+                    $totalPoints = DB::table('quiz_options')->where('quiz_id', $a->quiz_id)->sum('points');
+                    if ($totalPoints > 0) {
+                        $topicFullMarks[$topic] = $totalPoints;
+                    }
                 }
             }
             $topicCount[$topic]++;
@@ -228,9 +246,11 @@ class ReportController extends Controller
                 $topicAverages[$topic] = round(array_sum($scores_list) / count($scores_list), 0);
             }
             $strongestTopic = array_keys($topicAverages, max($topicAverages))[0];
-            $strongestTopicScore = $topicAverages[$strongestTopic] . '/' . $topicMaxScores[$strongestTopic];
+            $fullMark = $topicFullMarks[$strongestTopic] ?? $topicMaxScores[$strongestTopic];
+            $strongestTopicScore = $topicAverages[$strongestTopic] . '/' . $fullMark;
             $weakestTopic = array_keys($topicAverages, min($topicAverages))[0];
-            $weakestTopicScore = $topicAverages[$weakestTopic] . '/' . $topicMaxScores[$weakestTopic];
+            $fullMark = $topicFullMarks[$weakestTopic] ?? $topicMaxScores[$weakestTopic];
+            $weakestTopicScore = $topicAverages[$weakestTopic] . '/' . $fullMark;
         }
 
         // Map attempts for view partial
