@@ -28,17 +28,6 @@ class UserSeeder extends Seeder
         $teachers = [
             [
                 'id' => 2,
-                'name' => 'Cikgu Ahmad',
-                'email' => 'cikgu.ahmad@smkpu.com',
-                'password' => Hash::make('password'),
-                'role' => 'teacher',
-                'district' => 'Putrajaya',
-                'school_code' => 'PU001',
-                'phone' => '+60123000001',
-                'user_id' => 'G-PU001-001',
-            ],
-            [
-                'id' => 3,
                 'name' => 'Ms. Julia',
                 'email' => 'ms-julia@gmail.com',
                 'password' => Hash::make('password'),
@@ -49,7 +38,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'G-PU001-003',
             ],
             [
-                'id' => 4,
+                'id' => 3,
                 'name' => 'Cikgu Ahmad',
                 'email' => 'ahmad@example.com',
                 'password' => Hash::make('password'),
@@ -60,7 +49,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'G-JB001-a1b',
             ],
             [
-                'id' => 5,
+                'id' => 4,
                 'name' => 'Cikgu Farah',
                 'email' => 'farah@example.com',
                 'password' => Hash::make('password'),
@@ -71,7 +60,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'G-KL001-c2d',
             ],
             [
-                'id' => 6,
+                'id' => 5,
                 'name' => 'Cikgu Ravi',
                 'email' => 'ravi@example.com',
                 'password' => Hash::make('password'),
@@ -82,7 +71,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'G-SG001-e3f',
             ],
             [
-                'id' => 7,
+                'id' => 6,
                 'name' => 'Cikgu Siti',
                 'email' => 'siti@example.com',
                 'password' => Hash::make('password'),
@@ -93,7 +82,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'G-PN001-g4h',
             ],
             [
-                'id' => 8,
+                'id' => 7,
                 'name' => 'Cikgu Budi',
                 'email' => 'budi@example.com',
                 'password' => Hash::make('password'),
@@ -109,7 +98,7 @@ class UserSeeder extends Seeder
             User::create($teacher);
         }
 
-        echo "7 Teachers created successfully.\n";
+        echo "6 Teachers created successfully.\n";
 
 
         $students = [
@@ -615,6 +604,6 @@ class UserSeeder extends Seeder
         }
 
         echo "45 Students created successfully.\n";
-        echo "Total: 53 users (1 test user, 7 teachers, 45 students).\n";
+        echo "Total: 52 users (1 test user, 6 teachers, 45 students).\n";
     }
 }
