@@ -189,6 +189,7 @@ class ReportController extends Controller
         // Compute stats
         $scores = [];
         $topicScores = [];
+        $topicMaxScores = [];
         $topicCount = [];
         
         foreach ($attempts as $a) {
@@ -198,10 +199,15 @@ class ReportController extends Controller
             $topic = $a->quiz_id ?? ($a->title ?? 'Unknown');
             if (!isset($topicScores[$topic])) {
                 $topicScores[$topic] = [];
+                $topicMaxScores[$topic] = 0;
                 $topicCount[$topic] = 0;
             }
             if (isset($a->score) && is_numeric($a->score)) {
                 $topicScores[$topic][] = (float)$a->score;
+                // Track max score for this topic
+                if ($a->score > $topicMaxScores[$topic]) {
+                    $topicMaxScores[$topic] = $a->score;
+                }
             }
             $topicCount[$topic]++;
         }
@@ -222,9 +228,9 @@ class ReportController extends Controller
                 $topicAverages[$topic] = round(array_sum($scores_list) / count($scores_list), 0);
             }
             $strongestTopic = array_keys($topicAverages, max($topicAverages))[0];
-            $strongestTopicScore = $topicAverages[$strongestTopic];
+            $strongestTopicScore = $topicAverages[$strongestTopic] . '/' . $topicMaxScores[$strongestTopic];
             $weakestTopic = array_keys($topicAverages, min($topicAverages))[0];
-            $weakestTopicScore = $topicAverages[$weakestTopic];
+            $weakestTopicScore = $topicAverages[$weakestTopic] . '/' . $topicMaxScores[$weakestTopic];
         }
 
         // Map attempts for view partial
