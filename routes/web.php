@@ -120,4 +120,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/games', function() {
         return view('games.index');
     })->name('games.index');
+    
+    Route::get('/games/quiz-challenge', function() {
+        return view('games.quiz-challenge');
+    })->name('games.quiz');
 });

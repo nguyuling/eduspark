@@ -127,7 +127,7 @@
             title: 'Cosmic Defender',
             description: 'Pertahanan luar angkasa yang menarik dengan soalan matematik',
             difficulty: 'medium',
-            reactRoute: '/games/SpaceAdventure'
+            route: '/games/SpaceAdventure'
         },
         {
             id: 2,
@@ -136,7 +136,7 @@
             title: 'Memory Match',
             description: 'Permainan ingatan yang membantu meningkatkan fokus dan ingatan',
             difficulty: 'easy',
-            reactRoute: '/games/MemoryGame'
+            route: '/games/MemoryGame'
         },
         {
             id: 3,
@@ -145,16 +145,25 @@
             title: 'Maze Quest',
             description: 'Navigasi labirin sambil menjawab soalan pembelajaran',
             difficulty: 'medium',
-            reactRoute: '/games/MazeGame'
+            route: '/games/MazeGame'
         },
         {
             id: 4,
+            slug: 'quiz-challenge',
+            name: 'Quiz Challenge',
+            title: 'Quiz Challenge',
+            description: 'Cabaran kuiz cepat dengan pelbagai topik',
+            difficulty: 'hard',
+            route: '{{ route("games.quiz") }}'
+        },
+        {
+            id: 5,
             slug: 'whack-mole',
             name: 'Whack-a-Mole',
             title: 'Whack-a-Mole',
             description: 'Permainan pantas dengan soalan pendidikan',
             difficulty: 'easy',
-            reactRoute: '/games/WhackAMole'
+            route: '/games/WhackAMole'
         }
     ];
 
@@ -194,7 +203,7 @@
     });
 
     function playGame(route) {
-        // Redirect to React app with the game route
+        // Redirect to game page
         window.location.href = route;
     }
     
