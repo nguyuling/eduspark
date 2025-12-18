@@ -799,4 +799,13 @@ class ReportController extends Controller
             fclose($out);
         }, 200, ['Content-Type'=>'text/csv','Content-Disposition'=>"attachment; filename={$filename}"]);
         return $response;
-    }
+    }
+
+    public function studentsChartData()
+    {
+        return response()->json([
+            'labels' => [],
+            'data' => []
+        ]);
+    }
+}
