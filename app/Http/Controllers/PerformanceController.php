@@ -48,7 +48,12 @@ class PerformanceController extends Controller
                 ->groupBy('quiz_id')
                 ->pluck('max_score', 'quiz_id');
 
+            // Map quiz titles if available
+            $quizMetaTable = Schema::hasTable('quizzes') ? 'quizzes' : (Schema::hasTable('quiz') ? 'quiz' : null);
+            $quizTitles = $quizMetaTable ? DB::table($quizMetaTable)->pluck('title', 'id') : collect();
+
             $normalizedQuizScores = [];
+            $quizAggregates = [];
             foreach ($allQuizAttempts as $a) {
                 $maxScore = $maxScoreByQuiz[$a->quiz_id] ?? null;
                 if ($maxScore && $maxScore > 0) {
@@ -56,6 +61,13 @@ class PerformanceController extends Controller
                 } else {
                     $normalizedQuizScores[] = (float) $a->score; // fallback to raw
                 }
+
+                // aggregate per quiz for weakest topic logic
+                if (!isset($quizAggregates[$a->quiz_id])) {
+                    $quizAggregates[$a->quiz_id] = ['sum' => 0, 'count' => 0];
+                }
+                $quizAggregates[$a->quiz_id]['sum'] += (float) $a->score;
+                $quizAggregates[$a->quiz_id]['count'] += 1;
             }
 
             $avgQuizScore = count($normalizedQuizScores)
@@ -66,20 +78,22 @@ class PerformanceController extends Controller
                 ->where($quizUserCol, $studentId)
                 ->count();
 
-            // weakest topic: join to quizzes/quizz table (try plural 'quizzes' first)
-            $quizMetaTable = Schema::hasTable('quizzes') ? 'quizzes' : (Schema::hasTable('quiz') ? 'quiz' : null);
-
-            if ($quizMetaTable) {
-                $weakTopicRow = DB::table($quizTable . ' as a')
-                    ->join($quizMetaTable . ' as q', 'a.quiz_id', '=', 'q.id')
-                    ->where("a.$quizUserCol", $studentId)
-                    ->select('q.title', DB::raw('AVG(a.score) as avg_score'))
-                    ->groupBy('q.title')
-                    ->orderBy('avg_score', 'asc')
-                    ->limit(1)
-                    ->first();
-
-                $weakTopic = $weakTopicRow->title ?? 'N/A';
+            // weakest topic: pick the lowest average percent but only if below 100%
+            $weakTopic = 'Tiada';
+            $weakTopicScore = null;
+            foreach ($quizAggregates as $quizId => $agg) {
+                $maxScore = $maxScoreByQuiz[$quizId] ?? null;
+                if (!$maxScore || $maxScore <= 0 || $agg['count'] === 0) {
+                    continue;
+                }
+                $avgPercent = (($agg['sum'] / $agg['count']) / $maxScore) * 100;
+                if ($avgPercent >= 100) {
+                    continue; // ignore perfect scores
+                }
+                if (is_null($weakTopicScore) || $avgPercent < $weakTopicScore) {
+                    $weakTopicScore = $avgPercent;
+                    $weakTopic = ($quizTitles[$quizId] ?? ('Kuiz #' . $quizId));
+                }
             }
 
             // Determine a timestamp column to use for ordering/display (safe fallback)
