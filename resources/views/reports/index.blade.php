@@ -5,6 +5,15 @@
 
 @section('content')
 
+<div class="app">
+  <main class="main">
+    <div class="header">
+      <div>
+        <div class="title">Laporan</div>
+        <div class="sub">Prestasi pelajar dan kelas</div>
+      </div>
+    </div>
+
 {{-- ===================== STUDENT REPORT ===================== --}}
 <div class="panel" style="padding:18px;border-radius:12px;">
     <h3 style="margin-top:0;">Laporan Pelajar</h3>
