@@ -143,9 +143,6 @@
         <button type="submit" style="background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:12px 24px; border:none; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
           <i class="bi bi-check-lg" style="margin-right:6px;"></i>Simpan Perubahan
         </button>
-        <a href="{{ route('lesson.index') }}" style="display:inline-block; padding:12px 24px; background:transparent; color:#6A4DF7; border:2px solid #6A4DF7; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
-          Batal
-        </a>
       </section>
     </form>
   </main>

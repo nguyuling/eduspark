@@ -14,26 +14,17 @@
       </a>
     </div>
 
-    @if($lesson->file_ext === 'pdf')
-  <div style="margin-top:20px;">
-    <iframe src="{{ route('lesson.preview-file', $lesson->id) }}" style="width:100%; height:600px;" frameborder="0"></iframe>
-  </div>
-@else
-  <p>Pratonton hanya tersedia untuk PDF.</p>
-@endif
-
-
-    @if (session('success'))
-      <div style="background:var(--accent);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('success') }}</div>
-    @endif
-
-    @if (session('error'))
-      <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
-    @endif
-
     <!-- Lesson Details -->
     <section class="panel" style="margin-bottom:20px; margin-top:10px;">
       <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Maklumat Bahan</h2>
+
+      @if (session('success'))
+        <div class="alert-success">{{ session('success') }}</div>
+      @endif
+
+      @if (session('error'))
+        <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;font-size:14px;">{{ session('error') }}</div>
+      @endif
 
       <div style="margin-bottom: 20px;">
         <div style="font-weight: 600; font-size: 14px; color: var(--muted); margin-bottom: 6px;">Tajuk</div>
@@ -85,10 +76,7 @@
       @endif
 
       @if($lesson->file_path)
-      <a href="{{ asset('storage/' . $lesson->file_path) }}" target="_blank" style="...">
-    <i class="bi bi-eye" style="margin-right:8px; font-size:16px;"></i>Pratonton
-  </a>
-      <div style="margin-bottom: 20px; padding-top: 20px; border-top: 2px solid #d4c5f9;">
+      <div style="margin-bottom: 20px; padding-top: 0;">
         <div style="font-weight: 600; font-size: 14px; color: var(--muted); margin-bottom: 12px;">Fail Dilampirkan</div>
         <div style="display: flex; gap: 12px; align-items: center; background: rgba(106,77,247,0.05); padding: 16px; border-radius: 8px; border: 1px solid rgba(106,77,247,0.2);">
           <span style="background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding: 10px 16px; border-radius: 6px; font-weight: 700; font-size: 14px; min-width: 60px; text-align: center;">
@@ -101,12 +89,9 @@
         </div>
       </div>
 
-      <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
+      <div style="display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; justify-content: center;">
         <a href="{{ route('lesson.download', $lesson->id) }}" download style="display:inline-flex; align-items:center; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
           <i class="bi bi-download" style="margin-right:8px; font-size:16px;"></i>Muat Turun
-        </a>
-        <a href="{{ route('lesson.preview-file', $lesson->id) }}" target="_blank" style="display:inline-flex; align-items:center; padding:12px 24px; background:transparent; color:#6A4DF7; border:2px solid #6A4DF7; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
-          <i class="bi bi-eye" style="margin-right:8px; font-size:16px;"></i>Pratonton
         </a>
       </div>
       @else
@@ -117,22 +102,13 @@
       @endif
     </section>
 
-    <!-- Action Buttons (Only for Owner) -->
-    @if(Auth::user()->role === 'teacher' && $lesson->uploaded_by === Auth::id())
-    <section style="margin-left:40px; margin-right:40px; margin-bottom:20px; display:flex; gap:12px; justify-content:center; flex-wrap: wrap;">
-      <a href="{{ route('lesson.edit', $lesson->id) }}" style="display:inline-flex; align-items:center; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-        <i class="bi bi-pencil-square" style="margin-right:8px;"></i>Edit Bahan
-      </a>
-      <form action="{{ route('lesson.destroy', $lesson->id) }}" method="POST" onsubmit="return confirm('⚠️ AMARAN!\n\nAdakah anda pasti ingin memadamkan bahan ini?\n\nTajuk: {{ addslashes($lesson->title) }}\n\nTindakan ini tidak boleh dibatalkan!');" style="display:inline;">
-        @csrf
-        @method('DELETE')
-        <button type="submit" style="display:inline-flex; align-items:center; padding:12px 24px; background:var(--danger); color:#fff; border:none; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(230,57,70,0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(230,57,70,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(230,57,70,0.3)';">
-          <i class="bi bi-trash" style="margin-right:8px;"></i>Padam
-        </button>
-      </form>
-    </section>
+    <!-- PDF Preview -->
+    @if($lesson->file_path && $lesson->file_ext === 'pdf')
+      <section class="panel" style="margin-bottom:20px;">
+        <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Pratonton Fail</h2>
+        <div style="margin-top:20px;">
+          <iframe src="{{ route('lesson.preview-file', $lesson->id) }}" style="width:100%; height:600px;" frameborder="0"></iframe>
+        </div>
+      </section>
     @endif
-  </main>
-</div>
-
 @endsection
