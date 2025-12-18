@@ -212,8 +212,9 @@ class ReportController extends Controller
         
         // Calculate strongest and weakest topics (by average score)
         $strongestTopic = null;
+        $strongestTopicScore = 'N/A';
         $weakestTopic = null;
-        $mostFrequentTopic = null;
+        $weakestTopicScore = 'N/A';
         
         if (count($topicScores) > 0) {
             $topicAverages = [];
@@ -221,8 +222,9 @@ class ReportController extends Controller
                 $topicAverages[$topic] = round(array_sum($scores_list) / count($scores_list), 0);
             }
             $strongestTopic = array_keys($topicAverages, max($topicAverages))[0];
+            $strongestTopicScore = $topicAverages[$strongestTopic];
             $weakestTopic = array_keys($topicAverages, min($topicAverages))[0];
-            $mostFrequentTopic = array_keys($topicCount, max($topicCount))[0];
+            $weakestTopicScore = $topicAverages[$weakestTopic];
         }
 
         // Map attempts for view partial
@@ -240,9 +242,10 @@ class ReportController extends Controller
             'average_score' => $avg,
             'highest_score' => $highest,
             'highest_subject' => $strongestTopic,
+            'highest_subject_score' => $strongestTopicScore,
             'weakest_score' => $weakest,
             'weakest_subject' => $weakestTopic,
-            'most_frequent' => $mostFrequentTopic,
+            'weakest_subject_score' => $weakestTopicScore,
             'attempts' => $attemptsForView
         ];
 
@@ -796,13 +799,4 @@ class ReportController extends Controller
             fclose($out);
         }, 200, ['Content-Type'=>'text/csv','Content-Disposition'=>"attachment; filename={$filename}"]);
         return $response;
-    }
-
-    public function studentsChartData()
-    {
-        return response()->json([
-            'labels' => [],
-            'data' => []
-        ]);
-    }
-}
+    }

@@ -22,35 +22,26 @@
     </div>
 
     <div class="card" style="min-width:150px;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
-      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Highest</div>
+      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Strongest Topic</div>
       <div class="value">
         <span class="badge-pill" style="display:inline-block;background:var(--success); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
-          {{ $stats['highest_score'] ?? 'N/A' }}
+          {{ $stats['highest_subject'] ?? 'N/A' }}
         </span>
       </div>
       <div style="color:var(--muted);font-size:12px;">
-        {{ $stats['highest_subject'] ?? '' }}
+        Score: {{ $stats['highest_subject_score'] ?? 'N/A' }}
       </div>
     </div>
 
     <div class="card" style="min-width:150px;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
-      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Weakest</div>
+      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Weakest Topic</div>
       <div class="value">
         <span class="badge-pill" style="display:inline-block;background:var(--danger); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
-          {{ $stats['weakest_score'] ?? 'N/A' }}
+          {{ $stats['weakest_subject'] ?? 'N/A' }}
         </span>
       </div>
       <div style="color:var(--muted);font-size:12px;">
-        {{ $stats['weakest_subject'] ?? '' }}
-      </div>
-    </div>
-
-    <div class="card" style="min-width:150px;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
-      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Most Played</div>
-      <div class="value">
-        <span class="badge-pill" style="display:inline-block;background:linear-gradient(90deg,#FF9800,#FFB74D); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
-          {{ $stats['most_frequent'] ?? 'N/A' }}
-        </span>
+        Score: {{ $stats['weakest_subject_score'] ?? 'N/A' }}
       </div>
     </div>
   </div>
