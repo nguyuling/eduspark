@@ -53,7 +53,7 @@
                         <button id="playAgainBtn" style="padding: 12px 30px; background: #1D5DCD; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
                             Main Semula
                         </button>
-                        <a href="{{ route('games.index') }}" style="padding: 12px 30px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;">
+                        <a href="/games" style="padding: 12px 30px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;">
                             Kembali
                         </a>
                     </div>
