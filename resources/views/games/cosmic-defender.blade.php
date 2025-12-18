@@ -2,10 +2,10 @@
 
 @section('content')
 <div class="app">
-    <main class="main" style="overflow: hidden; padding: 0; margin: 0;">
-        <div id="gameContainer" style="padding: 0; width: 100vw; height: 100vh; display: flex; flex-direction: column; background: #000; position: fixed; top: 0; left: 0; right: 0; bottom: 0;">
+    <main class="main" style="overflow: hidden; margin: 0; padding: 0;">
+        <div id="gameContainer" style="padding: 0; width: 100%; min-height: calc(100vh - 70px); display: flex; flex-direction: column; background: #000;">
             <!-- Game Header -->
-            <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10; height: 70px; box-sizing: border-box;">
+            <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10; height: auto;">
                 <div style="color: white;">
                     <h1 style="margin: 0; font-size: 24px; font-weight: 700;">🚀 Cosmic Defender</h1>
                 </div>
@@ -22,7 +22,7 @@
             </div>
 
             <!-- Game Canvas -->
-            <canvas id="gameCanvas" style="flex: 1; display: none; width: 100%; height: 100%; background: linear-gradient(to bottom, #000428, #004e92); cursor: none; image-rendering: pixelated;"></canvas>
+            <canvas id="gameCanvas" style="flex: 1; display: none; width: 100%; background: linear-gradient(to bottom, #000428, #004e92); cursor: none;"></canvas>
 
             <!-- Start Screen -->
             <div id="startScreen" style="display: flex; align-items: center; justify-content: center; flex: 1; text-align: center; color: white;">
@@ -92,10 +92,13 @@
     window.addEventListener('keyup', (e) => { keys[e.key] = false; });
 
     function resizeCanvas() {
+        const gameContainer = document.getElementById('gameContainer');
         const header = document.getElementById('gameHeader');
-        const headerHeight = header ? header.offsetHeight : 70;
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight - headerHeight;
+        const headerHeight = header.offsetHeight;
+        
+        canvas.width = gameContainer.offsetWidth;
+        canvas.height = gameContainer.offsetHeight - headerHeight;
+        
         player.x = canvas.width / 2 - player.width / 2;
         player.y = canvas.height - 60;
     }
