@@ -1,8 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .main { max-width: 100% !important; }
+</style>
 <div class="app" style="height: 100vh; display: flex; flex-direction: column;">
-    <main class="main" style="overflow: hidden; margin: 0; padding: 0; flex: 1; display: flex; flex-direction: column;">
+    <main class="main" style="overflow: hidden; margin: 0; padding: 0; flex: 1; display: flex; flex-direction: column; width: 100%; max-width: 100%;">
         <div id="gameContainer" style="padding: 0; width: 100%; flex: 1; display: flex; flex-direction: column; background: #000;">
             <!-- Game Header -->
             <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10; height: auto;">
