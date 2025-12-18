@@ -28,12 +28,11 @@
         </select>
 
         <label style="font-weight:700;color:var(--muted);margin-right:8px;">Pelajar</label>
-        <select id="student-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:280px;border:2px solid #ddd;background:#f9f9f9;">
+        <select id="student-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:280px;border:2px solid #ddd;background:#f9f9f9;margin-right:20px;">
             <option value="">{{ $studentPlaceholder ?? '-- pilih pelajar --' }}</option>
         </select>
 
         <button id="open-student" class="btn"
-            style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-left:16px;"
             style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;">
             Buka
         </button>
