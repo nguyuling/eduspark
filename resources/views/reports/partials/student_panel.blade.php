@@ -25,11 +25,11 @@
       <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Strongest Topic</div>
       <div class="value">
         <span class="badge-pill" style="display:inline-block;background:var(--success); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
-          {{ $stats['highest_subject'] ?? 'N/A' }}
+          {{ $stats['highest_subject_score'] ?? 'N/A' }}
         </span>
       </div>
       <div style="color:var(--muted);font-size:12px;">
-        Score: {{ $stats['highest_subject_score'] ?? 'N/A' }}
+        {{ $stats['highest_subject'] ?? '' }}
       </div>
     </div>
 
@@ -37,11 +37,11 @@
       <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Weakest Topic</div>
       <div class="value">
         <span class="badge-pill" style="display:inline-block;background:var(--danger); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
-          {{ $stats['weakest_subject'] ?? 'N/A' }}
+          {{ $stats['weakest_subject_score'] ?? 'N/A' }}
         </span>
       </div>
       <div style="color:var(--muted);font-size:12px;">
-        Score: {{ $stats['weakest_subject_score'] ?? 'N/A' }}
+        {{ $stats['weakest_subject'] ?? '' }}
       </div>
     </div>
   </div>
