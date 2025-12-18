@@ -20,7 +20,7 @@
 
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
         <label style="font-weight:700;color:var(--muted);">Kelas</label>
-        <select id="class-select" class="select" style="padding:8px;border-radius:8px;min-width:160px;">
+        <select id="class-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:160px;border:2px solid var(--border);background:var(--surface);">
             <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
             @foreach($classes as $c)
                 <option value="{{ $c }}">{{ $c }}</option>
@@ -28,7 +28,7 @@
         </select>
 
         <label style="font-weight:700;color:var(--muted);">Pelajar</label>
-        <select id="student-select" class="select" style="padding:8px;border-radius:8px;min-width:280px;">
+        <select id="student-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:280px;border:2px solid var(--border);background:var(--surface);">
             <option value="">{{ $studentPlaceholder ?? '-- pilih pelajar --' }}</option>
         </select>
 
@@ -67,7 +67,7 @@
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
         <label style="font-weight:700;color:var(--muted);">Pilih kelas</label>
 
-        <select id="class-report-select" class="select" style="padding:8px;border-radius:8px;min-width:160px;">
+        <select id="class-report-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:160px;border:2px solid var(--border);background:var(--surface);">
             <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
             @foreach($classes as $c)
                 <option value="{{ $c }}">{{ $c }}</option>
