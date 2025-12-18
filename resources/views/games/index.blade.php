@@ -127,7 +127,7 @@
             title: 'Cosmic Defender',
             description: 'Pertahanan luar angkasa yang menarik dengan aksi penembakan',
             difficulty: 'medium',
-            route: '{{ route("games.cosmic") }}'
+            route: '/games/cosmic-defender'
         },
         {
             id: 2,
@@ -136,7 +136,7 @@
             title: 'Memory Match',
             description: 'Permainan ingatan yang membantu meningkatkan fokus dan ingatan',
             difficulty: 'easy',
-            route: '{{ route("games.memory") }}'
+            route: '/games/memory-match'
         },
         {
             id: 3,
@@ -145,7 +145,7 @@
             title: 'Maze Quest',
             description: 'Navigasi labirin dan capai pintu keluar dengan cepat',
             difficulty: 'medium',
-            route: '{{ route("games.maze") }}'
+            route: '/games/maze-game'
         },
         {
             id: 4,
@@ -154,7 +154,7 @@
             title: 'Quiz Challenge',
             description: 'Cabaran kuiz cepat dengan soalan pengaturcaraan Python',
             difficulty: 'hard',
-            route: '{{ route("games.quiz") }}'
+            route: '/games/quiz-challenge'
         },
         {
             id: 5,
@@ -163,7 +163,7 @@
             title: 'Whack-a-Mole',
             description: 'Permainan pantas - tumbuk tikus yang muncul',
             difficulty: 'easy',
-            route: '{{ route("games.whack") }}'
+            route: '/games/whack-a-mole'
         }
     ];
 
