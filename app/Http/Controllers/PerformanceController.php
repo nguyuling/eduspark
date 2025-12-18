@@ -53,7 +53,7 @@ class PerformanceController extends Controller
             $quizData = $quizMetaTable 
                 ? DB::table($quizMetaTable)->select('id', 'title', 'max_points')->get()->keyBy('id')
                 : collect();
-            $quizTitles = $quizData->pluck('title');
+            $quizTitles = $quizData->pluck('title', 'id');
 
             $normalizedQuizScores = [];
             $quizAggregates = [];
@@ -123,7 +123,7 @@ class PerformanceController extends Controller
                     return $q->leftJoin($quizMetaTable . ' as q', 'a.quiz_id', '=', 'q.id');
                 })
                 ->where("a.$quizUserCol", $studentId)
-                ->orderBy('a.' . ($quizTimestampCol ?? 'id'), 'desc') // fallback to id if no timestamp
+                ->orderBy('a.' . ($quizTimestampCol ?? 'id'), 'asc') // chronological order (oldest first)
                 ->limit(6)
                 ->get($quizSelect);
 
@@ -192,7 +192,7 @@ class PerformanceController extends Controller
                 $recentGameRows = DB::table($gameTable . ' as s')
                     ->join($gameMetaTable . ' as g', 's.game_id', '=', 'g.id')
                     ->where("s.$gameUserCol", $studentId)
-                    ->orderBy('s.' . ($gameTimestampCol ?? 'id'), 'desc')
+                    ->orderBy('s.' . ($gameTimestampCol ?? 'id'), 'asc')
                     ->limit(6)
                     ->select(array_merge(['g.name as title', 's.score'], ($gameTimestampCol ? ['s.' . $gameTimestampCol . ' as completed_at'] : [])))
                     ->get();
@@ -209,7 +209,7 @@ class PerformanceController extends Controller
                 // no game meta table, just pull rows
                 $recentGameRows = DB::table($gameTable . ' as s')
                     ->where("s.$gameUserCol", $studentId)
-                    ->orderBy($gameTimestampCol ?? 'id', 'desc')
+                    ->orderBy($gameTimestampCol ?? 'id', 'asc')
                     ->limit(6)
                     ->get(array_filter($gameSelect));
 
@@ -225,10 +225,10 @@ class PerformanceController extends Controller
         }
 
         //
-        // --- Combine & sort recent data: keep most recent 6 by completed_at (nulls go last)
+        // --- Combine & sort recent data: keep oldest 6 chronologically (nulls go last)
         //
         $recentData = $recentCollection
-            ->sortByDesc(function ($row) {
+            ->sortBy(function ($row) {
                 // normalized key: if completed_at null, return very old timestamp so nulls go last
                 return $row->completed_at ? strtotime($row->completed_at) : 0;
             })
