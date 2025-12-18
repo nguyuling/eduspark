@@ -32,7 +32,7 @@ body.dark{background:var(--bg-dark);color:#e6eef8;}
 .app{display:flex;min-height:100vh;gap:28px;padding:28px;}
 
 .sidebar{
-  width:240px;border-radius:16px;padding:18px;display:flex;
+  width:268px;border-radius:16px;padding:18px;display:flex;
   flex-direction:column;gap:12px;align-items:center;
   backdrop-filter:blur(8px) saturate(120%);
   -webkit-backdrop-filter:blur(8px);
