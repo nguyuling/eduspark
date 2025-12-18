@@ -75,7 +75,7 @@ class PerformanceController extends Controller
             }
 
             $avgQuizScore = count($normalizedQuizScores)
-                ? array_sum($normalizedQuizScores) / count($normalizedQuizScores)
+                ? round(array_sum($normalizedQuizScores) / count($normalizedQuizScores), 2)
                 : 0;
 
             $totalQuizzes = DB::table($quizTable)
@@ -90,7 +90,7 @@ class PerformanceController extends Controller
                 if (!$maxScore || $maxScore <= 0 || $agg['count'] === 0) {
                     continue;
                 }
-                $avgPercent = (($agg['sum'] / $agg['count']) / $maxScore) * 100;
+                $avgPercent = round((($agg['sum'] / $agg['count']) / $maxScore) * 100, 2);
                 if ($avgPercent >= 100) {
                     continue; // ignore perfect scores
                 }
@@ -134,7 +134,7 @@ class PerformanceController extends Controller
                 $shortTitle = Str::limit($fullTitle, 18, '…');
                 $maxScore = $quizData[$r->quiz_id]->max_points ?? $maxScoreByQuiz[$r->quiz_id] ?? null;
                 $scorePercent = ($maxScore && $maxScore > 0)
-                    ? ($r->score / $maxScore) * 100
+                    ? round(($r->score / $maxScore) * 100, 2)
                     : (float) $r->score;
                 $recentCollection->push((object)[
                     'title' => $shortTitle,
@@ -241,8 +241,8 @@ class PerformanceController extends Controller
         $scores = $recentData->pluck('score')->all();
 
         return view('performance.index', [
-            'avgQuizScore' => round($avgQuizScore ?? 0, 1),
-            'avgGameScore' => round($avgGameScore ?? 0, 1),
+            'avgQuizScore' => round($avgQuizScore ?? 0, 2),
+            'avgGameScore' => round($avgGameScore ?? 0, 2),
             'totalQuizzes' => $totalQuizzes,
             'totalGames' => $totalGames,
             'weakTopic' => $weakTopic ?? 'N/A',
