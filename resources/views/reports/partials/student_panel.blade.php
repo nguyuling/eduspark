@@ -25,11 +25,11 @@
       <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Strongest Topic</div>
       <div class="value">
         <span class="badge-pill" style="display:inline-block;background:var(--success); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
-          {{ explode('/', $stats['highest_subject_score'] ?? 'N/A')[0] ?? 'N/A' }}
+          {{ $stats['highest_subject'] ?? 'N/A' }}
         </span>
       </div>
       <div style="color:var(--muted);font-size:12px;">
-        {{ $stats['highest_subject'] ?? '' }}
+        {{ $stats['highest_subject_score'] ?? '' }}
       </div>
     </div>
 
@@ -37,11 +37,11 @@
       <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Weakest Topic</div>
       <div class="value">
         <span class="badge-pill" style="display:inline-block;background:var(--danger); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
-          {{ explode('/', $stats['weakest_subject_score'] ?? 'N/A')[0] ?? 'N/A' }}
+          {{ $stats['weakest_subject'] ?? 'N/A' }}
         </span>
       </div>
       <div style="color:var(--muted);font-size:12px;">
-        {{ $stats['weakest_subject'] ?? '' }}
+        {{ $stats['weakest_subject_score'] ?? '' }}
       </div>
     </div>
   </div>
