@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
 
         // Test User
         User::create([
-            'id' => 52,
+            'id' => 1,
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
         // Create All Teachers
         $teachers = [
             [
-                'id' => 1,
+                'id' => 2,
                 'name' => 'Cikgu Ahmad',
                 'email' => 'cikgu.ahmad@smkpu.com',
                 'password' => Hash::make('password'),
@@ -49,7 +49,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'G-PU001-003',
             ],
             [
-                'id' => 53,
+                'id' => 4,
                 'name' => 'Cikgu Ahmad',
                 'email' => 'ahmad@example.com',
                 'password' => Hash::make('password'),
@@ -60,7 +60,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'G-JB001-a1b',
             ],
             [
-                'id' => 54,
+                'id' => 5,
                 'name' => 'Cikgu Farah',
                 'email' => 'farah@example.com',
                 'password' => Hash::make('password'),
@@ -71,7 +71,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'G-KL001-c2d',
             ],
             [
-                'id' => 55,
+                'id' => 6,
                 'name' => 'Cikgu Ravi',
                 'email' => 'ravi@example.com',
                 'password' => Hash::make('password'),
@@ -82,7 +82,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'G-SG001-e3f',
             ],
             [
-                'id' => 56,
+                'id' => 7,
                 'name' => 'Cikgu Siti',
                 'email' => 'siti@example.com',
                 'password' => Hash::make('password'),
@@ -93,7 +93,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'G-PN001-g4h',
             ],
             [
-                'id' => 57,
+                'id' => 8,
                 'name' => 'Cikgu Budi',
                 'email' => 'budi@example.com',
                 'password' => Hash::make('password'),
@@ -114,7 +114,7 @@ class UserSeeder extends Seeder
 
         $students = [
             [
-                'id' => 5,
+                'id' => 9,
                 'name' => 'Muhammad Amirul bin Hakim',
                 'email' => 'muhammad.hakim@smkpu.com',
                 'password' => Hash::make('password'),
@@ -125,7 +125,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-005',
             ],
             [
-                'id' => 6,
+                'id' => 10,
                 'name' => 'Nur Aleesya binti Fadzil',
                 'email' => 'nur.fadzil@smkpu.com',
                 'password' => Hash::make('password'),
@@ -136,7 +136,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-006',
             ],
             [
-                'id' => 7,
+                'id' => 11,
                 'name' => 'Tan Wei Jian',
                 'email' => 'tan.jian@smkpu.com',
                 'password' => Hash::make('password'),
@@ -147,7 +147,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-007',
             ],
             [
-                'id' => 8,
+                'id' => 12,
                 'name' => 'Asha a/p Manogaran',
                 'email' => 'asha.manogaran@smkpu.com',
                 'password' => Hash::make('password'),
@@ -158,7 +158,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-008',
             ],
             [
-                'id' => 9,
+                'id' => 13,
                 'name' => 'Muhammad Danish Rayyan bin Zulkifli',
                 'email' => 'muhammad.zulkifli@smkpu.com',
                 'password' => Hash::make('password'),
@@ -169,7 +169,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-009',
             ],
             [
-                'id' => 10,
+                'id' => 14,
                 'name' => 'Siti Nur Amirah binti Razlan',
                 'email' => 'siti.razlan@smkpu.com',
                 'password' => Hash::make('password'),
@@ -180,7 +180,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-010',
             ],
             [
-                'id' => 11,
+                'id' => 15,
                 'name' => 'Lim Jia Hui',
                 'email' => 'lim.hui@smkpu.com',
                 'password' => Hash::make('password'),
@@ -191,7 +191,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-011',
             ],
             [
-                'id' => 12,
+                'id' => 16,
                 'name' => 'Harith Haziq bin Rahim',
                 'email' => 'harith.rahim@smkpu.com',
                 'password' => Hash::make('password'),
@@ -202,7 +202,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-012',
             ],
             [
-                'id' => 13,
+                'id' => 17,
                 'name' => 'Kavinesh a/l Kumar',
                 'email' => 'kavinesh.kumar@smkpu.com',
                 'password' => Hash::make('password'),
@@ -213,7 +213,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-013',
             ],
             [
-                'id' => 14,
+                'id' => 18,
                 'name' => 'Chia Wen Ning',
                 'email' => 'chia.ning@smkpu.com',
                 'password' => Hash::make('password'),
@@ -224,7 +224,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-014',
             ],
             [
-                'id' => 15,
+                'id' => 19,
                 'name' => 'Nurul Nadhira binti Shamsul',
                 'email' => 'nurul.shamsul@smkpu.com',
                 'password' => Hash::make('password'),
@@ -235,7 +235,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-015',
             ],
             [
-                'id' => 16,
+                'id' => 20,
                 'name' => 'Muhammad Aiman Hakimi bin Azlan',
                 'email' => 'aiman.azlan@smkpu.com',
                 'password' => Hash::make('password'),
@@ -246,7 +246,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-016',
             ],
             [
-                'id' => 17,
+                'id' => 21,
                 'name' => 'Lee Zi Xuan',
                 'email' => 'lee.xuan@smkpu.com',
                 'password' => Hash::make('password'),
@@ -257,7 +257,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-017',
             ],
             [
-                'id' => 18,
+                'id' => 22,
                 'name' => 'Thivakar a/l Shanmugan',
                 'email' => 'thivakar.shanmugan@smkpu.com',
                 'password' => Hash::make('password'),
@@ -268,7 +268,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-018',
             ],
             [
-                'id' => 19,
+                'id' => 23,
                 'name' => 'Nur Syafiqah Irdina binti Fauzan',
                 'email' => 'nur.fauzan@smkpu.com',
                 'password' => Hash::make('password'),
@@ -279,7 +279,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-019',
             ],
             [
-                'id' => 20,
+                'id' => 24,
                 'name' => 'Muhammad Arif Danish bin Razman',
                 'email' => 'arif.razman@smkpu.com',
                 'password' => Hash::make('password'),
@@ -290,7 +290,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-020',
             ],
             [
-                'id' => 21,
+                'id' => 25,
                 'name' => 'Wong Yu Heng',
                 'email' => 'wong.heng@smkpu.com',
                 'password' => Hash::make('password'),
@@ -301,7 +301,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-021',
             ],
             [
-                'id' => 22,
+                'id' => 26,
                 'name' => 'Siti Maryam binti Khairul',
                 'email' => 'siti.khairul@smkpu.com',
                 'password' => Hash::make('password'),
@@ -312,7 +312,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-022',
             ],
             [
-                'id' => 23,
+                'id' => 27,
                 'name' => 'Tan Li Ying',
                 'email' => 'tan.ying@smkpu.com',
                 'password' => Hash::make('password'),
@@ -323,7 +323,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-023',
             ],
             [
-                'id' => 24,
+                'id' => 28,
                 'name' => 'Naufal Ikhwan bin Shafie',
                 'email' => 'naufal.shafie@smkpu.com',
                 'password' => Hash::make('password'),
@@ -334,7 +334,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-024',
             ],
             [
-                'id' => 25,
+                'id' => 29,
                 'name' => 'Aina Marissa binti Rahmat',
                 'email' => 'aina.rahmat@smkpu.com',
                 'password' => Hash::make('password'),
@@ -345,7 +345,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-025',
             ],
             [
-                'id' => 26,
+                'id' => 30,
                 'name' => 'Muhammad Hazim Firdaus bin Yusri',
                 'email' => 'hazim.yusri@smkpu.com',
                 'password' => Hash::make('password'),
@@ -356,7 +356,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-026',
             ],
             [
-                'id' => 27,
+                'id' => 31,
                 'name' => 'Lim Wei Xuan',
                 'email' => 'lim.xuan@smkpu.com',
                 'password' => Hash::make('password'),
@@ -367,7 +367,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-027',
             ],
             [
-                'id' => 28,
+                'id' => 32,
                 'name' => 'Sharveen a/l Prakash',
                 'email' => 'sharveen.prakash@smkpu.com',
                 'password' => Hash::make('password'),
@@ -378,7 +378,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-028',
             ],
             [
-                'id' => 29,
+                'id' => 33,
                 'name' => 'Nur Syazwina binti Salleh',
                 'email' => 'syazwina.salleh@smkpu.com',
                 'password' => Hash::make('password'),
@@ -389,7 +389,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-029',
             ],
             [
-                'id' => 30,
+                'id' => 34,
                 'name' => 'Muhammad Irfan Danish bin Azmi',
                 'email' => 'irfan.azmi@smkpu.com',
                 'password' => Hash::make('password'),
@@ -400,7 +400,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-030',
             ],
             [
-                'id' => 31,
+                'id' => 35,
                 'name' => 'Chan Jing Wen',
                 'email' => 'chan.wen@smkpu.com',
                 'password' => Hash::make('password'),
@@ -411,7 +411,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-031',
             ],
             [
-                'id' => 32,
+                'id' => 36,
                 'name' => 'Siti Balqis binti Azhar',
                 'email' => 'siti.azhar@smkpu.com',
                 'password' => Hash::make('password'),
@@ -422,7 +422,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-032',
             ],
             [
-                'id' => 33,
+                'id' => 37,
                 'name' => 'Ganes a/l Devan',
                 'email' => 'ganes.devan@smkpu.com',
                 'password' => Hash::make('password'),
@@ -433,7 +433,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-033',
             ],
             [
-                'id' => 34,
+                'id' => 38,
                 'name' => 'Ho Zi Jie',
                 'email' => 'ho.jie@smkpu.com',
                 'password' => Hash::make('password'),
@@ -444,7 +444,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-034',
             ],
             [
-                'id' => 35,
+                'id' => 39,
                 'name' => 'Nur Fatin Amani binti Kamarul',
                 'email' => 'fatin.kamarul@smkpu.com',
                 'password' => Hash::make('password'),
@@ -455,7 +455,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-035',
             ],
             [
-                'id' => 36,
+                'id' => 40,
                 'name' => 'Muhammad Aqil Zafran bin Razak',
                 'email' => 'aqil.razak@smkpu.com',
                 'password' => Hash::make('password'),
@@ -466,7 +466,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-036',
             ],
             [
-                'id' => 37,
+                'id' => 41,
                 'name' => 'Wong Jia Le',
                 'email' => 'wong.jiale@smkpu.com',
                 'password' => Hash::make('password'),
@@ -477,7 +477,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-037',
             ],
             [
-                'id' => 38,
+                'id' => 42,
                 'name' => 'Navinya a/p Murugan',
                 'email' => 'navinya.murugan@smkpu.com',
                 'password' => Hash::make('password'),
@@ -488,7 +488,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-038',
             ],
             [
-                'id' => 39,
+                'id' => 43,
                 'name' => 'Nur Adlina Sofea binti Halim',
                 'email' => 'adlina.halim@smkpu.com',
                 'password' => Hash::make('password'),
@@ -499,7 +499,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-039',
             ],
             [
-                'id' => 40,
+                'id' => 44,
                 'name' => 'Muhammad Harraz Haziq bin Naim',
                 'email' => 'harraz.naim@smkpu.com',
                 'password' => Hash::make('password'),
@@ -510,7 +510,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-040',
             ],
             [
-                'id' => 41,
+                'id' => 45,
                 'name' => 'Tan Kai Ren',
                 'email' => 'tan.kairen@smkpu.com',
                 'password' => Hash::make('password'),
@@ -521,7 +521,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-041',
             ],
             [
-                'id' => 42,
+                'id' => 46,
                 'name' => 'Siti Husna binti Yasin',
                 'email' => 'siti.yasin@smkpu.com',
                 'password' => Hash::make('password'),
@@ -532,7 +532,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-042',
             ],
             [
-                'id' => 43,
+                'id' => 47,
                 'name' => 'Teo Jun Hao',
                 'email' => 'teo.hao@smkpu.com',
                 'password' => Hash::make('password'),
@@ -543,7 +543,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-043',
             ],
             [
-                'id' => 44,
+                'id' => 48,
                 'name' => 'Aisyah Irdina binti Fauzi',
                 'email' => 'aisyah.fauzi@smkpu.com',
                 'password' => Hash::make('password'),
@@ -554,7 +554,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PU001-044',
             ],
             [
-                'id' => 58,
+                'id' => 49,
                 'name' => 'Muhammad Ali',
                 'email' => 'ali@example.com',
                 'password' => Hash::make('password'),
@@ -565,7 +565,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-JB001-k6l',
             ],
             [
-                'id' => 59,
+                'id' => 50,
                 'name' => 'Nur Aisha',
                 'email' => 'aisha@example.com',
                 'password' => Hash::make('password'),
@@ -576,7 +576,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-KL001-m7n',
             ],
             [
-                'id' => 60,
+                'id' => 51,
                 'name' => 'Rajesh Kumar',
                 'email' => 'rajesh@example.com',
                 'password' => Hash::make('password'),
@@ -587,7 +587,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-SG001-o8p',
             ],
             [
-                'id' => 61,
+                'id' => 52,
                 'name' => 'Ying Ying Chen',
                 'email' => 'yingying@example.com',
                 'password' => Hash::make('password'),
@@ -598,7 +598,7 @@ class UserSeeder extends Seeder
                 'user_id' => 'P-PN001-q9r',
             ],
             [
-                'id' => 62,
+                'id' => 53,
                 'name' => 'Zain Zahari',
                 'email' => 'zain@example.com',
                 'password' => Hash::make('password'),
