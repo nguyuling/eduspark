@@ -55,7 +55,7 @@ class LessonController extends Controller
         // Prepare filters for view
         $filters = $request->only(['q', 'file_type', 'date_from', 'date_to']);
 
-        // Return JSON if API request, otherwise render view
+        // Return JSON if API request
         if ($request->expectsJson()) {
             return response()->json($lessons->map(function ($lesson) {
                 return [
@@ -88,29 +88,155 @@ class LessonController extends Controller
     public function create()
     {
         $user = Auth::user();
-        if ($user && $user->role === 'teacher') {
-            return view('lesson.create');
+        if (!$user || $user->role !== 'teacher') {
+            abort(403, 'Hanya guru dibenarkan mencipta bahan.');
         }
         
-        abort(403, 'Unauthorized');
+        return view('lesson.create');
     }
 
     /**
      * Store a new lesson
-     * POST /api/lessons
      */
     public function store(Request $request)
+{
+    try {
+        // Check if user is teacher
+        $user = Auth::user();
+        if (!$user || $user->role !== 'teacher') {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 403);
+            }
+            abort(403, 'Hanya guru dibenarkan mencipta bahan.');
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'class_group' => 'required|string',
+            'visibility' => 'required|in:class,public',
+            'file' => 'nullable|file|mimes:pdf,docx,pptx,txt,jpg,jpeg,png|max:10240', // Added mimes validation
+        ]);
+
+        $lesson = new Lesson();
+        $lesson->title = $validated['title'];
+        $lesson->description = $validated['description'] ?? null;
+        $lesson->class_group = $validated['class_group'];
+        $lesson->visibility = $validated['visibility'];
+        $lesson->uploaded_by = Auth::id();
+
+        // Handle file upload
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileName = time() . '_' . preg_replace('/[^A-Za-z0-9_\-\.]/', '_', $file->getClientOriginalName());
+            $fileExt = strtolower($file->getClientOriginalExtension());
+            
+            // Store in public disk
+            $path = $file->storeAs('lesson', $fileName, 'public');
+            
+            $lesson->file_name = $file->getClientOriginalName();
+            $lesson->file_path = $path;
+            $lesson->file_ext = $fileExt;
+        }
+
+        $lesson->save();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Lesson created successfully',
+                'lesson' => $lesson
+            ], 201);
+        }
+
+        return redirect()->route('lesson.index')->with('success', 'Bahan berjaya dicipta!');
+
+    } catch (\Exception $e) {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
+        }
+
+        return back()->withErrors(['error' => $e->getMessage()])->withInput();
+    }
+}
+
+    /**
+     * Show single lesson details (VIEW PAGE)
+     */
+    public function show($id)
+    {
+        $lesson = Lesson::findOrFail($id);
+        
+        // Load uploader relationship
+        $lesson->load('uploader');
+        
+        return view('lesson.show', compact('lesson'));
+    }
+
+    /**
+     * Show edit form (teacher only, owner restriction)
+     */
+    public function edit($id)
+    {
+        $lesson = Lesson::findOrFail($id);
+        
+        // Check if user is teacher and owner
+        $user = Auth::user();
+        if (!$user || $user->role !== 'teacher') {
+            abort(403, 'Hanya guru dibenarkan mengedit bahan.');
+        }
+        
+        if ($lesson->uploaded_by !== $user->id) {
+            abort(403, 'Anda tidak dibenarkan mengedit bahan ini. Hanya pemilik boleh mengedit.');
+        }
+
+        return view('lesson.edit', compact('lesson'));
+    }
+
+    /**
+     * Update a lesson (owner restriction)
+     */
+    public function update(Request $request, $id)
     {
         try {
+            $lesson = Lesson::findOrFail($id);
+
+            // Check ownership
+            $user = Auth::user();
+            if (!$user || $user->role !== 'teacher') {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Unauthorized'
+                    ], 403);
+                }
+                abort(403, 'Hanya guru dibenarkan mengedit bahan.');
+            }
+            
+            if ($lesson->uploaded_by !== $user->id) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Unauthorized - Not the owner'
+                    ], 403);
+                }
+                abort(403, 'Anda tidak dibenarkan mengedit bahan ini. Hanya pemilik boleh mengedit.');
+            }
+
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'class_group' => 'required|string',
                 'visibility' => 'required|in:class,public',
-                'file' => 'nullable|file|max:10240', // 10MB max
+                'file' => 'nullable|file|max:10240',
             ]);
 
-            $lesson = new Lesson();
             $lesson->title = $validated['title'];
             $lesson->description = $validated['description'] ?? null;
             $lesson->class_group = $validated['class_group'];
@@ -118,68 +244,16 @@ class LessonController extends Controller
 
             // Handle file upload
             if ($request->hasFile('file')) {
-                $file = $request->file('file');
-                $fileName = time() . '_' . $file->getClientOriginalName();
-                $fileExt = strtolower($file->getClientOriginalExtension());
-                
-                // Store file in storage/app/lessons
-                $path = $file->storeAs('lessons', $fileName);
-                
-                $lesson->file_name = $file->getClientOriginalName();
-                $lesson->file_path = $path;
-                $lesson->file_ext = $fileExt;
-            }
-
-            $lesson->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Lesson created successfully',
-                'lesson' => $lesson
-            ], 201);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 422);
-        }
-    }
-
-    /**
-     * Update a lesson
-     * PUT /api/lessons/{id}
-     */
-    public function update(Request $request, $id)
-    {
-        try {
-            $lesson = Lesson::findOrFail($id);
-
-            $validated = $request->validate([
-                'title' => 'sometimes|required|string|max:255',
-                'description' => 'nullable|string',
-                'file' => 'nullable|file|max:10240',
-            ]);
-
-            if (isset($validated['title'])) {
-                $lesson->title = $validated['title'];
-            }
-            if (isset($validated['description'])) {
-                $lesson->description = $validated['description'];
-            }
-
-            // Handle file upload
-            if ($request->hasFile('file')) {
                 // Delete old file if exists
-                if ($lesson->file_path && Storage::exists($lesson->file_path)) {
-                    Storage::delete($lesson->file_path);
+                if ($lesson->file_path && Storage::disk('public')->exists($lesson->file_path)) {
+                    Storage::disk('public')->delete($lesson->file_path);
                 }
 
                 $file = $request->file('file');
                 $fileName = time() . '_' . $file->getClientOriginalName();
                 $fileExt = strtolower($file->getClientOriginalExtension());
                 
-                $path = $file->storeAs('lessons', $fileName);
+                $path = $file->storeAs('lesson', $fileName, 'public');
                 
                 $lesson->file_name = $file->getClientOriginalName();
                 $lesson->file_path = $path;
@@ -188,129 +262,178 @@ class LessonController extends Controller
 
             $lesson->save();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Lesson updated successfully',
-                'lesson' => $lesson
-            ]);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Lesson updated successfully',
+                    'lesson' => $lesson
+                ]);
+            }
+
+            return redirect()->route('lesson.index')->with('success', 'Bahan berjaya dikemaskini!');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 422);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 422);
+            }
+
+            return back()->withErrors(['error' => $e->getMessage()])->withInput();
         }
     }
 
     /**
-     * Delete a lesson
-     * POST /api/lessons/{id}/delete
+     * Delete a lesson (owner restriction)
      */
     public function destroy(Request $request, $id)
     {
         try {
             $lesson = Lesson::findOrFail($id);
 
+            // Check ownership
+            $user = Auth::user();
+            if (!$user || $user->role !== 'teacher') {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Unauthorized'
+                    ], 403);
+                }
+                abort(403, 'Hanya guru dibenarkan memadam bahan.');
+            }
+            
+            if ($lesson->uploaded_by !== $user->id) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Unauthorized - Not the owner'
+                    ], 403);
+                }
+                abort(403, 'Anda tidak dibenarkan memadam bahan ini. Hanya pemilik boleh memadam.');
+            }
+
             // Delete file if exists
-            if ($lesson->file_path && Storage::exists($lesson->file_path)) {
-                Storage::delete($lesson->file_path);
+            if ($lesson->file_path && Storage::disk('public')->exists($lesson->file_path)) {
+                Storage::disk('public')->delete($lesson->file_path);
             }
 
             $lesson->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Lesson deleted successfully'
-            ]);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Lesson deleted successfully'
+                ]);
+            }
+
+            return redirect()->route('lesson.index')->with('success', 'Bahan berjaya dipadam!');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 422);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 422);
+            }
+
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
 
     /**
      * Get preview data for a lesson
-     * GET /api/lessons/{id}/preview
+     */
+    /**
+ * Serve file for preview in iframe
+ */
+public function previewFile($id)
+{
+    try {
+        $lesson = Lesson::findOrFail($id);
+
+        if (!$lesson->file_path) {
+            abort(404, 'File not found');
+        }
+
+        // Try public disk first
+        if (Storage::disk('public')->exists($lesson->file_path)) {
+            $filePath = Storage::disk('public')->path($lesson->file_path);
+            $mimeType = Storage::disk('public')->mimeType($lesson->file_path);
+        } 
+        // Fallback to default disk
+        elseif (Storage::exists($lesson->file_path)) {
+            $filePath = Storage::path($lesson->file_path);
+            $mimeType = Storage::mimeType($lesson->file_path);
+        } 
+        else {
+            abort(404, 'File not found in storage');
+        }
+
+        // Check if file actually exists on filesystem
+        if (!file_exists($filePath)) {
+            abort(404, 'Physical file not found');
+        }
+
+        return response()->file($filePath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . $lesson->file_name . '"'
+        ]);
+
+    } catch (\Exception $e) {
+        return response('Error: ' . $e->getMessage(), 500);
+    }
+}
+
+    /**
+     * Serve the file for preview/download
+     */
+    public function downloadLesson($id)
+{
+    try {
+        $lesson = Lesson::findOrFail($id);
+
+        if (!$lesson->file_path) {
+            abort(404, 'File not found');
+        }
+
+        // Try public disk first
+        if (Storage::disk('public')->exists($lesson->file_path)) {
+            return Storage::disk('public')->download($lesson->file_path, $lesson->file_name);
+        } 
+        // Fallback to default disk
+        elseif (Storage::exists($lesson->file_path)) {
+            return Storage::download($lesson->file_path, $lesson->file_name);
+        } 
+        else {
+            abort(404, 'File not found in storage');
+        }
+
+    } catch (\Exception $e) {
+        return back()->withErrors(['error' => 'Gagal memuat turun fail: ' . $e->getMessage()]);
+    }
+}
+
+    /**
+     * Serve file for preview in iframe
      */
     public function preview($id)
     {
         try {
             $lesson = Lesson::findOrFail($id);
 
-            if (!$lesson->file_path || !Storage::exists($lesson->file_path)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'File not found'
-                ], 404);
-            }
-
-            // Generate a temporary URL for the file
-            $url = route('lesson.preview.file', ['id' => $id]);
-
-            return response()->json([
-                'success' => true,
-                'url' => $url,
-                'file_name' => $lesson->file_name,
-                'file_ext' => $lesson->file_ext,
-                'mime' => Storage::mimeType($lesson->file_path),
-                'lesson' => $lesson
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 422);
-        }
-    }
-
-    /**
-     * Serve the file for preview/download
-     * GET /lessons/download/{id}
-     */
-    public function downloadLesson($id)
-    {
-        try {
-            $lesson = Lesson::findOrFail($id);
-
-            if (!$lesson->file_path || !Storage::exists($lesson->file_path)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'File not found'
-                ], 404);
-            }
-
-            return Storage::download($lesson->file_path, $lesson->file_name);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 422);
-        }
-    }
-
-    /**
-     * Serve file for preview in iframe
-     */
-    public function previewFile($id)
-    {
-        try {
-            $lesson = Lesson::findOrFail($id);
-
-            if (!$lesson->file_path || !Storage::exists($lesson->file_path)) {
+            if (!$lesson->file_path || !Storage::disk('public')->exists($lesson->file_path)) {
                 return response('File not found', 404);
             }
 
-            $mimeType = Storage::mimeType($lesson->file_path);
+            $mimeType = Storage::disk('public')->mimeType($lesson->file_path);
+            $filePath = Storage::disk('public')->path($lesson->file_path);
             
-            return response()->file(
-                Storage::path($lesson->file_path),
-                ['Content-Type' => $mimeType]
-            );
+            return response()->file($filePath, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'inline; filename="' . $lesson->file_name . '"'
+            ]);
 
         } catch (\Exception $e) {
             return response('Error: ' . $e->getMessage(), 422);
