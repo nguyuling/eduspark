@@ -9,7 +9,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-/* ✅ Your original CSS pasted cleanly */
 :root{
   --bg-light:#f5f7ff;
   --bg-dark:#071026;
@@ -29,14 +28,15 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 body.light{background:var(--bg-light);color:#0b1220;}
 body.dark{background:var(--bg-dark);color:#e6eef8;}
 
-.app{display:flex;min-height:100vh;gap:28px;padding:28px;}
+.app{display:flex;min-height:100vh;padding:28px 0;}
 
 .sidebar{
-  width:268px;border-radius:16px;padding:18px;display:flex;
+  width:268px;border-radius:16px;display:flex;
   flex-direction:column;gap:12px;align-items:center;
   backdrop-filter:blur(8px) saturate(120%);
   -webkit-backdrop-filter:blur(8px);
 }
+
 body.light .sidebar{
   background:linear-gradient(180deg,rgba(255,255,255,0.70),rgba(255,255,255,0.65));
   border:1px solid rgba(13,18,25,0.05);
