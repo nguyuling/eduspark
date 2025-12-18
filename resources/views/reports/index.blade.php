@@ -18,17 +18,17 @@
 <div class="panel" style="padding:18px;border-radius:12px;">
     <h3 style="margin-top:0;font-weight:700;">Laporan Pelajar</h3>
 
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
-        <label style="font-weight:700;color:var(--muted);">Kelas</label>
-        <select id="class-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:160px;border:2px solid #ddd;background:#f9f9f9;">
+    <div style="display:flex;gap:0;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+        <label style="font-weight:700;color:var(--muted);margin-right:8px;">Kelas</label>
+        <select id="class-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:160px;border:2px solid #ddd;background:#f9f9f9;margin-right:20px;">
             <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
             @foreach($classes as $c)
                 <option value="{{ $c }}">{{ $c }}</option>
             @endforeach
         </select>
 
-        <label style="font-weight:700;color:var(--muted);">Pelajar</label>
-        <select id="student-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:280px;border:2px solid #ddd;background:#f9f9f9;">
+        <label style="font-weight:700;color:var(--muted);margin-right:8px;">Pelajar</label>
+        <select id="student-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:280px;border:2px solid #ddd;background:#f9f9f9;margin-right:20px;">
             <option value="">{{ $studentPlaceholder ?? '-- pilih pelajar --' }}</option>
         </select>
 
