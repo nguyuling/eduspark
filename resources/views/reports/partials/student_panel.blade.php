@@ -80,7 +80,7 @@
   <div style="display:flex;justify-content:center;gap:12px;margin-top:14px;flex-wrap:wrap;">
     @if(isset($student->id) && $student->id)
       <a href="{{ route('reports.student.csv', $student->id) }}" data-report="csv" class="btn" style="text-decoration:none;padding:9px 16px;border-radius:10px;background:#f5f5f7;color:#111;font-weight:700;">CSV</a>
-      <a href="{{ route('reports.student.pdf', $student->id) }}" data-report="pdf" class="btn" style="text-decoration:none;padding:9px 16px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;">PDF</a>
+      <a href="{{ route('reports.student.print', $student->id) }}" data-report="pdf" class="btn" style="text-decoration:none;padding:9px 16px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;">PDF</a>
     @else
       <button class="btn" disabled style="padding:9px 16px;border-radius:10px;background:#eee;color:#999;font-weight:700;">CSV</button>
       <button class="btn" disabled style="padding:9px 16px;border-radius:10px;background:#eee;color:#999;font-weight:700;">PDF</button>
