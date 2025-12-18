@@ -14,6 +14,11 @@ class StudentSeeder extends Seeder
             return;
         }
 
+        // Clear existing students
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('students')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
         $classes = ['4 Arif', '4 Bestari', '5 Arif', '5 Bestari'];
 
         // Ensure classrooms table has these classes if it exists
@@ -34,39 +39,7 @@ class StudentSeeder extends Seeder
         $users = DB::table('users')->where('role', 'student')->get();
 
         foreach ($users as $u) {
-            $exists = DB::table('students')->where(function ($q) use ($u) {
-                // Prefer matching by user_id when column exists
-                if (\Schema::hasColumn('students', 'user_id')) {
-                    $q->where('user_id', $u->id);
-                } else {
-                    $q->where('name', $u->name);
-                }
-            })->first();
-
             $cls = $classes[array_rand($classes)];
-
-            if ($exists) {
-                // Update class or classroom_id
-                $update = ['updated_at' => now()];
-                if (\Schema::hasColumn('students', 'class')) {
-                    $update['class'] = $exists->class ?? $cls;
-                }
-                if (\Schema::hasColumn('students', 'classroom_id') && \Schema::hasTable('classrooms')) {
-                    $cid = DB::table('classrooms')->where('name', $cls)->value('id') ?? DB::table('classrooms')->value('id');
-                    if ($cid) $update['classroom_id'] = $cid;
-                }
-                DB::table('students')->where('id', $exists->id)->update($update);
-                continue;
-            }
-
-            // Build payload; if 'id' column is not autoincrement (SQLite edge-case), set explicit next id
-            $nextId = null;
-            try {
-                $maxId = DB::table('students')->max('id');
-                $nextId = ($maxId ?? 0) + 1;
-            } catch (\Throwable $e) {
-                $nextId = null;
-            }
 
             $payload = [
                 'name' => $u->name,

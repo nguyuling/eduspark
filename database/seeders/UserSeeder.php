@@ -10,6 +10,19 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        // Clear existing users (keep only the 11 required)
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('users')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        // Test User
+        User::create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => Hash::make('password'),
+            'role' => null,
+        ]);
+
         // Create 5 Teachers
         $teachers = [
             [
@@ -65,13 +78,10 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($teachers as $teacher) {
-            User::firstOrCreate(
-                ['email' => $teacher['email']],
-                $teacher
-            );
+            User::create($teacher);
         }
 
-        echo "5 Teachers created/verified successfully.\n";
+        echo "5 Teachers created successfully.\n";
 
         // Create 5 Students
         $students = [
@@ -128,12 +138,9 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($students as $student) {
-            User::firstOrCreate(
-                ['email' => $student['email']],
-                $student
-            );
+            User::create($student);
         }
 
-        echo "5 Students created/verified successfully.\n";
+        echo "5 Students created successfully.\n";
     }
 }
