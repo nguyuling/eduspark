@@ -12,7 +12,8 @@
   </div>
 
   <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
-    <div class="card" style="min-width:200px;padding:20px 18px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+    <div class="card" style="min-width:250px;padding:20px 18px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Average Score</div>
       <div class="value">
         <span class="badge-pill" style="display:inline-block;background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
           {{ $stats['average_score'] ?? 'N/A' }}
@@ -20,10 +21,10 @@
       </div>
     </div>
 
-    <div class="card" style="min-width:200px;padding:20px 18px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+    <div class="card" style="min-width:250px;padding:20px 18px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
       <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Strongest Topic</div>
       <div class="value">
-        <span class="badge-pill" style="display:inline-block;background:var(--success); padding:6px 12px; font-size:12px;border-radius:999px;color:#fff;max-width:140px;word-wrap:break-word;line-height:1.3;">
+        <span class="badge-pill" style="display:inline-block;background:var(--success); padding:6px 12px; font-size:12px;border-radius:999px;color:#fff;max-width:200px;word-wrap:break-word;line-height:1.3;">
           {{ $stats['highest_subject'] ?? 'N/A' }}
         </span>
       </div>
@@ -32,10 +33,10 @@
       </div>
     </div>
 
-    <div class="card" style="min-width:200px;padding:20px 18px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+    <div class="card" style="min-width:250px;padding:20px 18px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
       <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Weakest Topic</div>
       <div class="value">
-        <span class="badge-pill" style="display:inline-block;background:var(--danger); padding:6px 12px; font-size:12px;border-radius:999px;color:#fff;max-width:140px;word-wrap:break-word;line-height:1.3;">
+        <span class="badge-pill" style="display:inline-block;background:var(--danger); padding:6px 12px; font-size:12px;border-radius:999px;color:#fff;max-width:200px;word-wrap:break-word;line-height:1.3;">
           {{ $stats['weakest_subject'] ?? 'N/A' }}
         </span>
       </div>
