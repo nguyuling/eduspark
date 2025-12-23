@@ -21,59 +21,7 @@
 
 <style>
     .game-card {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        overflow: hidden;
-        transition: all 0.3s ease;
         cursor: pointer;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .game-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(106, 77, 247, 0.2);
-        border-color: var(--accent);
-    }
-
-    .game-card-image {
-        width: 100%;
-        height: 160px;
-        background: linear-gradient(135deg, rgba(106,77,247,0.1), rgba(230,57,70,0.1));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 48px;
-    }
-
-    .game-card-content {
-        padding: 20px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .game-card-title {
-        font-size: 16px;
-        font-weight: 700;
-        margin-bottom: 8px;
-        color: var(--text);
-    }
-
-    .game-card-description {
-        font-size: 13px;
-        color: var(--muted);
-        margin-bottom: 12px;
-        flex: 1;
-    }
-
-    .game-card-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-top: 12px;
-        border-top: 1px solid var(--border);
     }
 
     .game-difficulty {
@@ -97,23 +45,6 @@
     .difficulty-hard {
         background: rgba(239, 68, 68, 0.2);
         color: #ef4444;
-    }
-
-    .play-btn {
-        padding: 6px 14px;
-        background: var(--accent);
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .play-btn:hover {
-        opacity: 0.9;
-        transform: scale(1.05);
     }
 </style>
 
@@ -179,24 +110,30 @@
         gameDatabase.forEach(game => {
             const difficultyClass = `difficulty-${(game.difficulty || 'easy').toLowerCase()}`;
             const card = document.createElement('div');
-            card.className = 'game-card';
+            card.className = 'panel game-card';
+            card.setAttribute('data-route', game.route);
+            card.style.cursor = 'pointer';
             card.innerHTML = `
-                <div class="game-card-image">
-                    ${getGameEmoji(game.name)}
-                </div>
-                <div class="game-card-content">
-                    <div class="game-card-title">${escapeHtml(game.name)}</div>
-                    <div class="game-card-description">${escapeHtml(game.description || 'Permainan edukatif yang menyenungkan')}</div>
-                    <div class="game-card-footer">
+                <div style="display:flex; flex-direction:column; height:100%; gap:16px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div style="font-size:48px;">
+                            ${getGameEmoji(game.name)}
+                        </div>
                         <span class="game-difficulty ${difficultyClass}">
-                            ${capitalizeFirst(game.difficulty || 'Easy')}
+                            ${getDifficultyInMalay(game.difficulty || 'easy')}
                         </span>
-                        <button class="play-btn" onclick="playGame('${game.route}')">
-                            Main ▶
-                        </button>
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:inherit;">${escapeHtml(game.name)}</div>
+                        <div style="font-size:13px; color:var(--muted); line-height:1.5;">${escapeHtml(game.description || 'Permainan edukatif yang menyenungkan')}</div>
                     </div>
                 </div>
             `;
+            
+            // Add click handler after innerHTML is set
+            card.addEventListener('click', function() {
+                playGame(game.route);
+            });
             
             container.appendChild(card);
         });
@@ -235,6 +172,15 @@
     
     function capitalizeFirst(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+    
+    function getDifficultyInMalay(difficulty) {
+        const difficultyMap = {
+            'easy': 'Mudah',
+            'medium': 'Sederhana',
+            'hard': 'Sukar'
+        };
+        return difficultyMap[difficulty.toLowerCase()] || 'Mudah';
     }
 </script>
 @endsection
