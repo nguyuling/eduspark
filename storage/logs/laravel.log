@@ -11024,3 +11024,34 @@ FATAL:  password authentication failed for user \"postgres\" at C:\\xampp\\php\\
 #10 {main}
 "} 
 >>>>>>> eab76151 (fix merge conflict)
+[2025-12-23 05:04:20] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:04:40] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:06:03] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:09:05] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:09:54] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:14:40] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:24:38] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:25:12] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:25:21] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:29:12] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:29:52] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:29:59] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:33:40] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:33:43] local.INFO: studentsByClass: Found 11 rows for class: 5 Bestari  
+[2025-12-23 05:34:09] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:34:17] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:34:29] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:35:56] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:36:27] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:37:40] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:37:55] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:39:08] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:40:38] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:42:26] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:42:53] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:43:55] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:45:40] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:46:09] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:46:41] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:47:13] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:48:36] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
