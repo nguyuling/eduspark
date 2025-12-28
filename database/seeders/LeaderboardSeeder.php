@@ -22,7 +22,7 @@ class LeaderboardSeeder extends Seeder
             return;
         }
 
-        $classes = ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B'];
+        $classes = ['Form 4', 'Form 5']; // Changed to Form 4 and Form 5
 
         // Create multiple scores per student per game to show real participation
         foreach ($games as $game) {
@@ -34,9 +34,10 @@ class LeaderboardSeeder extends Seeder
                     Leaderboard::create([
                         'user_id' => $student->id,
                         'username' => $student->name,
-                        'class' => $classes[array_rand($classes)], // Random class assignment
+                        'class' => $classes[array_rand($classes)], // Random Form 4 or Form 5
                         'game_id' => $game->slug,
                         'score' => rand(150, 1500),
+                        'time_taken' => rand(60, 600), // Time in seconds (1 min to 10 min)
                         'timestamp' => now()->subDays(rand(0, 60))->subHours(rand(0, 24)),
                     ]);
                 }

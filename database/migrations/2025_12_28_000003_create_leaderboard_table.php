@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('class');
             $table->string('game_id');
             $table->integer('score')->default(0);
+            $table->integer('time_taken')->nullable(); // Time in seconds
             $table->timestamp('timestamp')->useCurrent();
             $table->timestamps();
             

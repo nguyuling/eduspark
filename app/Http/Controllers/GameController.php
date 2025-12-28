@@ -95,7 +95,7 @@ class GameController extends Controller
                     $scores->push((object)[
                         'user_id' => $entry->user_id,
                         'score' => $entry->score,
-                        'time_taken' => null,
+                        'time_taken' => $entry->time_taken, // Use actual time_taken from leaderboard
                         'completed_at' => $entry->timestamp,
                         'user' => (object)[
                             'name' => $entry->username,
