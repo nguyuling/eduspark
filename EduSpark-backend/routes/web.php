@@ -2,6 +2,29 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\GameTeacherController;
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\AuthController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+
+// ========== PUBLIC ROUTES ==========
+
+// Home/Index
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// ========== DEBUG/UTILITY ROUTES ==========
 
 // DEBUG ROUTE - Test database connection
 Route::get('/debug-db', function() {
@@ -40,7 +63,6 @@ Route::get('/debug-db', function() {
 });
 
 // ========== GAME SCORE SAVING ROUTE ==========
-// ========== SIMPLE GAME SCORE SAVING ==========
 Route::post('/save-game-score', function () {
     // Get raw input
     $input = file_get_contents('php://input');
@@ -107,4 +129,123 @@ Route::post('/save-game-score', function () {
             'debug_error' => $e->getMessage() // Remove in production
         ], 500);
     }
+});
+
+// ========== AUTHENTICATION ROUTES ==========
+
+// Login routes
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Registration routes
+Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+
+// ========== PROTECTED ROUTES (Require Authentication) ==========
+
+Route::middleware(['auth'])->group(function () {
+    
+    // ========== STUDENT ROUTES ==========
+    Route::middleware(['role:student'])->group(function () {
+        // Student dashboard
+        Route::get('/dashboard', function () {
+            return view('student.dashboard');
+        })->name('dashboard');
+        
+        // Student game pages
+        Route::get('/games', [GameController::class, 'index'])->name('games.index');
+        Route::get('/games/{id}', [GameController::class, 'show'])->name('games.show');
+        Route::post('/games/{id}/save-score', [GameController::class, 'saveScore'])->name('games.saveScore');
+        
+        // Student profile
+        Route::get('/profile', [UserController::class, 'showProfile'])->name('profile');
+    });
+    
+    // ========== TEACHER ROUTES ==========
+    Route::middleware(['role:teacher'])->group(function () {
+        // Teacher dashboard
+        Route::get('/teacher/dashboard', function () {
+            return view('teacher.dashboard');
+        })->name('teacher.dashboard');
+        
+        // ========== TEACHER GAME MANAGEMENT ==========
+        Route::prefix('teacher')->group(function () {
+            // List all games created by teacher
+            Route::get('/games', [GameTeacherController::class, 'index'])->name('teacher.games.index');
+            
+            // Create new game
+            Route::get('/games/create', [GameTeacherController::class, 'create'])->name('teacher.games.create');
+            Route::post('/games', [GameTeacherController::class, 'store'])->name('teacher.games.store');
+            
+            // Edit/Update game
+            Route::get('/games/{game}/edit', [GameTeacherController::class, 'edit'])->name('teacher.games.edit');
+            Route::put('/games/{game}', [GameTeacherController::class, 'update'])->name('teacher.games.update');
+            
+            // Delete game
+            Route::delete('/games/{game}', [GameTeacherController::class, 'destroy'])->name('teacher.games.destroy');
+            
+            // View game details
+            Route::get('/games/{game}', [GameTeacherController::class, 'show'])->name('teacher.games.show');
+        });
+        
+        // Teacher lesson management (from TEACHER_ROUTES.md)
+        Route::get('/lesson', function () {
+            return view('lesson.index-teacher');
+        })->name('lesson.index');
+        
+        Route::get('/lesson/create', function () {
+            return view('lesson.create');
+        })->name('lesson.create');
+        
+        // Teacher quiz management (if exists)
+        Route::prefix('teacher')->group(function () {
+            Route::get('/quizzes', function () {
+                return view('teacher.quizzes.index');
+            })->name('teacher.quizzes.index');
+            
+            Route::get('/quizzes/create', function () {
+                return view('teacher.quizzes.create');
+            })->name('teacher.quizzes.create');
+        });
+        
+        // Teacher profile
+        Route::get('/profile', function () {
+            return view('profile.show');
+        })->name('profile.show');
+        
+        Route::get('/profile/edit', function () {
+            return view('profile.edit');
+        })->name('profile.edit');
+    });
+    
+    // ========== ADMIN ROUTES ==========
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/admin', function () {
+            return view('admin.dashboard');
+        })->name('admin.dashboard');
+    });
+});
+
+// ========== API ROUTES (for AJAX calls) ==========
+Route::prefix('api')->group(function () {
+    // Game API routes
+    Route::get('/games', [GameController::class, 'apiIndex']);
+    Route::get('/games/{id}', [GameController::class, 'apiShow']);
+    Route::post('/games/{id}/score', [GameController::class, 'saveScore']);
+    
+    // Game editing API (teacher only)
+    Route::middleware(['auth', 'role:teacher'])->group(function () {
+        Route::get('/teacher/games', [GameTeacherController::class, 'apiIndex']);
+        Route::post('/games', [GameController::class, 'store']);
+        Route::put('/games/{id}', [GameController::class, 'update']);
+        Route::delete('/games/{id}', [GameController::class, 'destroy']);
+        Route::post('/games/{id}/validate', [GameController::class, 'validateGameData']);
+        Route::get('/games/{id}/history', [GameController::class, 'getUpdateHistory']);
+    });
+});
+
+// ========== FALLBACK ROUTES ==========
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
 });
