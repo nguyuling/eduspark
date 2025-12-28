@@ -131,12 +131,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
 });
 
-// Games routes (Permainan in sidebar)
+// Individual game routes (old legacy routes - these still work)
 Route::middleware('auth')->group(function () {
-    Route::get('/games', function() {
-        return view('games.index');
-    })->name('games.index');
-    
     Route::get('/games/quiz-challenge', function() {
         return view('games.quiz-challenge');
     })->name('games.quiz');
