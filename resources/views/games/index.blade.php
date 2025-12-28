@@ -1,23 +1,147 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="app">
-    <main class="main">
-        <div class="header">
+<div class="container mx-auto px-6 py-8">
+    @if(session('success'))
+        <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-4 rounded-lg">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(auth()->user()->role === 'teacher')
+        {{-- TEACHER VIEW --}}
+        <div class="flex justify-between items-center mb-8">
             <div>
-                <div class="title">Permainan</div>
-                <div class="sub">Mainkan permainan edukatif untuk meningkatkan prestasi anda</div>
+                <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">🎮 Manage Games</h1>
+                <p class="text-gray-600 dark:text-gray-400">Edit or delete games, and view student performance</p>
+            </div>
+            <a href="{{ route('teacher.games.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg flex items-center gap-2">
+                <span>+</span> Add New Game
+            </a>
+        </div>
+
+        <!-- Teacher Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                <div class="text-gray-600 dark:text-gray-400 font-semibold text-sm">Total Games</div>
+                <div class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">{{ $games->count() }}</div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                <div class="text-gray-600 dark:text-gray-400 font-semibold text-sm">Published</div>
+                <div class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">{{ $games->where('is_published', true)->count() }}</div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                <div class="text-gray-600 dark:text-gray-400 font-semibold text-sm">Drafts</div>
+                <div class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">{{ $games->where('is_published', false)->count() }}</div>
             </div>
         </div>
 
-        <div class="games-container" id="gamesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 20px;">
-            <!-- Games will be loaded here via JavaScript -->
-            <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">
-                <p>Sedang memuatkan permainan...</p>
+        <!-- Teacher Game Management Table -->
+        @if($games->count() > 0)
+            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Title</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Category</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Difficulty</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Status</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach($games as $game)
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col">
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ $game->title }}</span>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ Str::limit($game->description, 50) }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{{ $game->category }}</td>
+                            <td class="px-6 py-4 text-sm">
+                                <span class="px-2 py-1 rounded text-xs font-semibold 
+                                    {{ $game->difficulty === 'easy' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
+                                       ($game->difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 
+                                       'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200') }}">
+                                    {{ ucfirst($game->difficulty) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm">
+                                @if($game->is_published)
+                                    <span class="px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">Published</span>
+                                @else
+                                    <span class="px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200">Draft</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-sm space-x-2">
+                                <a href="{{ route('games.leaderboard', $game->id) }}" class="text-purple-600 hover:text-purple-800 dark:text-purple-400 font-medium">📊 Leaderboard</a>
+                                <a href="{{ route('teacher.games.edit', $game->id) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 font-medium">✏️ Edit</a>
+                                <form action="{{ route('games.destroy', $game->id) }}" method="POST" class="inline" onsubmit="return confirm('Delete this game?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 font-medium">🗑️ Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
-        </div>
-    </main>
+        @else
+            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
+                <p class="text-gray-600 dark:text-gray-400 mb-4">No games created yet</p>
+                <a href="{{ route('teacher.games.create') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
+                    Create Your First Game
+                </a>
+            </div>
+        @endif
+
+    @else
+        {{-- STUDENT VIEW --}}
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-8">🎮 Games</h1>
+
+        @if($games->count() > 0)
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($games as $game)
+                <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition">
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-40 flex items-center justify-center">
+                        <span style="font-size: 3rem;">🎮</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-2">{{ $game->title }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ $game->description }}</p>
+                        
+                        <div class="flex gap-2 mb-4">
+                            <span class="px-2 py-1 rounded text-xs font-semibold 
+                                {{ $game->difficulty === 'easy' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
+                                   ($game->difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 
+                                   'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200') }}">
+                                {{ ucfirst($game->difficulty) }}
+                            </span>
+                            <span class="px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">{{ $game->category }}</span>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <a href="#" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center text-sm">
+                                ▶️ Play
+                            </a>
+                            <a href="{{ route('games.leaderboard', $game->id) }}" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-center text-sm">
+                                📊 Leaderboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        @else
+            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
+                <p class="text-gray-600 dark:text-gray-400">No games available yet</p>
+            </div>
+        @endif
+    @endif
 </div>
+
 
 <style>
     .game-card {

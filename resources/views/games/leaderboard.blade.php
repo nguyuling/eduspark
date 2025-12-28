@@ -1,0 +1,68 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container mx-auto px-6 py-8">
+    <div class="mb-8">
+        <a href="{{ route('games.index') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 mb-4 inline-block">← Back to Games</a>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">📊 {{ $game->title }} - Leaderboard</h1>
+        <p class="text-gray-600 dark:text-gray-400">Top performers in this game</p>
+    </div>
+
+    @if($scores->count() > 0)
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Rank</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Player</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Score</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Time Taken</th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Completed</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @foreach($scores as $index => $score)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4">
+                            <span class="font-bold text-lg">
+                                @if($index === 0)
+                                    🥇 1st
+                                @elseif($index === 1)
+                                    🥈 2nd
+                                @elseif($index === 2)
+                                    🥉 3rd
+                                @else
+                                    {{ $index + 1 }}
+                                @endif
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col">
+                                <span class="font-medium text-gray-900 dark:text-white">{{ $score->user->name }}</span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ $score->user->email }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="font-bold text-lg text-blue-600 dark:text-blue-400">{{ $score->score }} pts</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                            {{ $score->time_taken ? gmdate('H:i:s', $score->time_taken) : 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                            {{ $score->completed_at?->format('M d, Y H:i') ?? 'N/A' }}
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @else
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <p class="text-gray-600 dark:text-gray-400 mb-4">No scores yet. Be the first to play!</p>
+            <a href="{{ route('games.index') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
+                Back to Games
+            </a>
+        </div>
+    @endif
+</div>
+@endsection

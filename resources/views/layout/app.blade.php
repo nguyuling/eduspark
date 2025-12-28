@@ -108,11 +108,7 @@ body.dark .sidebar{
             <a href="#"><span class="dot"></span> Materials</a>
             <a href="#"><span class="dot"></span> Assessments</a>
             <a href="#"><span class="dot"></span> Forum</a>
-            @if(auth()->check() && auth()->user()->role === 'teacher')
-                <a href="{{ route('teacher.games.index') }}" class="@if(Route::current()->getName() === 'teacher.games.index') active @endif"><span class="dot"></span> Manage Games</a>
-            @else
-                <a href="#"><span class="dot"></span> Games</a>
-            @endif
+            <a href="{{ route('games.index') }}" class="@if(Route::current()->getName() === 'games.index') active @endif"><span class="dot"></span> Games</a>
         </nav>
 
         <div class="logout">
