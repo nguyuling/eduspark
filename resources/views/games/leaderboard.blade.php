@@ -37,6 +37,8 @@
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Time Taken</th>
                         @if(auth()->user()->role === 'teacher')
                             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Attempts</th>
+                        @else
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Class</th>
                         @endif
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Completed</th>
                     </tr>
@@ -60,7 +62,11 @@
                         <td class="px-6 py-4">
                             <div class="flex flex-col">
                                 <span class="font-medium text-gray-900 dark:text-white">{{ $score->user->name }}</span>
-                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ $score->user->email }}</span>
+                                @if(auth()->user()->role === 'teacher')
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ $score->user->email }}</span>
+                                @else
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ $score->user->email }}</span>
+                                @endif
                             </div>
                         </td>
                         <td class="px-6 py-4">
@@ -72,6 +78,12 @@
                         @if(auth()->user()->role === 'teacher')
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                                 {{ $scores->where('user_id', $score->user_id)->count() }}
+                            </td>
+                        @else
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                                <span class="px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-semibold">
+                                    {{ $score->user->email }}
+                                </span>
                             </td>
                         @endif
                         <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
