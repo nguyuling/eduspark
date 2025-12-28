@@ -131,11 +131,8 @@
                         </div>
 
                         <div class="flex gap-2">
-                            <a href="#" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center text-sm">
+                            <a href="{{ route('games.play', $game->id) }}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center text-sm">
                                 ▶️ Play
-                            </a>
-                            <a href="{{ route('games.leaderboard', $game->id) }}" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-center text-sm">
-                                📊 Leaderboard
                             </a>
                         </div>
                     </div>

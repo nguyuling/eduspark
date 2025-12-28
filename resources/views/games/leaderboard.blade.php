@@ -25,6 +25,16 @@
                     <div class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">{{ $scores->groupBy('user_id')->count() }}</div>
                 </div>
             </div>
+        @else
+            <!-- Student View - Show their ranking -->
+            @if($highlightedUserIndex !== -1)
+            <div class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-6 mb-8">
+                <h3 class="font-bold text-blue-800 dark:text-blue-200 mb-2">🌟 Your Ranking</h3>
+                <p class="text-blue-700 dark:text-blue-300">
+                    You are ranked <span class="font-bold text-lg">{{ $highlightedUserIndex + 1 }}</span> out of {{ $scores->count() }} players
+                </p>
+            </div>
+            @endif
         @endif
 
         <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -45,7 +55,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach($scores as $index => $score)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <tr class="@if(auth()->user()->role !== 'teacher' && $score->user_id === $currentUser->id) bg-yellow-50 dark:bg-yellow-900 font-bold @else hover:bg-gray-50 dark:hover:bg-gray-700 @endif">
                         <td class="px-6 py-4">
                             <span class="font-bold text-lg">
                                 @if($index === 0)
@@ -61,13 +71,14 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex flex-col">
-                                <span class="font-medium text-gray-900 dark:text-white">{{ $score->user->name }}</span>
-                                <span class="text-sm text-gray-500 dark:text-gray-400">
-                                    @if(auth()->user()->role === 'teacher')
-                                        {{ $score->user->email }}
-                                    @else
-                                        {{ $score->user->email }}
+                                <span class="font-medium text-gray-900 dark:text-white">
+                                    {{ $score->user->name }}
+                                    @if(auth()->user()->role !== 'teacher' && $score->user_id === $currentUser->id)
+                                    <span class="ml-2 text-sm">👈 You</span>
                                     @endif
+                                </span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ $score->user->email }}
                                 </span>
                             </div>
                         </td>

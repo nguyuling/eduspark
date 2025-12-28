@@ -72,6 +72,9 @@ Route::middleware('auth')->group(function () {
 // Game routes (unified student/teacher view)
 Route::middleware('auth')->group(function () {
     Route::get('/games', [GameController::class, 'index'])->name('games.index');
+    Route::get('/games/{id}/play', [GameController::class, 'play'])->name('games.play');
+    Route::post('/games/{id}/result', [GameController::class, 'storeResult'])->name('games.storeResult');
+    Route::get('/games/{id}/result', [GameController::class, 'result'])->name('games.result');
     Route::put('/games/{id}', [GameController::class, 'update'])->name('games.update');
     Route::delete('/games/{id}', [GameController::class, 'destroy'])->name('games.destroy');
     Route::post('/games/{id}/restore', [GameController::class, 'restore'])->name('games.restore');
