@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/games', [GameController::class, 'index'])->name('games.index');
     Route::put('/games/{id}', [GameController::class, 'update'])->name('games.update');
     Route::delete('/games/{id}', [GameController::class, 'destroy'])->name('games.destroy');
+    Route::post('/games/{id}/restore', [GameController::class, 'restore'])->name('games.restore');
     Route::get('/games/{id}/leaderboard', [GameController::class, 'leaderboard'])->name('games.leaderboard');
     
     // Teacher game management routes
@@ -81,6 +82,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/teacher/games', [GameTeacherController::class, 'store'])->name('teacher.games.store');
     Route::get('/teacher/games/{id}/edit', [GameTeacherController::class, 'edit'])->name('teacher.games.edit');
     Route::put('/teacher/games/{id}', [GameTeacherController::class, 'update'])->name('teacher.games.update');
+    Route::delete('/teacher/games/{id}', [GameTeacherController::class, 'destroy'])->name('teacher.games.destroy');
+    Route::post('/teacher/games/{id}/restore', [GameTeacherController::class, 'restore'])->name('teacher.games.restore');
 });
 
 // Performance routes

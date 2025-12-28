@@ -57,7 +57,7 @@ class GameTeacherController extends Controller
      */
     public function edit($id)
     {
-        $game = Game::where('teacher_id', auth()->id())->findOrFail($id);
+        $game = Game::findOrFail($id);
         return view('games.teacher.edit', compact('game'));
     }
 
@@ -66,7 +66,7 @@ class GameTeacherController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $game = Game::where('teacher_id', auth()->id())->findOrFail($id);
+        $game = Game::findOrFail($id);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255|unique:games,title,' . $id,
@@ -91,14 +91,25 @@ class GameTeacherController extends Controller
     }
 
     /**
-     * Delete game
+     * Delete game (soft delete)
      */
     public function destroy($id)
     {
-        $game = Game::where('teacher_id', auth()->id())->findOrFail($id);
+        $game = Game::findOrFail($id);
         $game->delete();
 
-        return redirect()->route('teacher.games.index')
-            ->with('success', 'Game deleted successfully!');
+        return back()
+            ->with('success', 'Game deleted successfully! You can undo this action.');
     }
-}
+
+    /**
+     * Restore soft-deleted game
+     */
+    public function restore($id)
+    {
+        $game = Game::withTrashed()->findOrFail($id);
+        $game->restore();
+
+        return back()
+            ->with('success', 'Game restored successfully!');
+    }

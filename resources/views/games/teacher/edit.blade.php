@@ -3,7 +3,7 @@
 @section('content')
 <div class="container mx-auto px-6 py-8">
     <div class="mb-8">
-        <a href="{{ route('teacher.games.index') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 mb-4 inline-block">← Back to Games</a>
+        <a href="{{ route('games.index') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 mb-4 inline-block">← Back to Games</a>
         <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Edit Game: {{ $game->title }}</h1>
     </div>
 
@@ -76,7 +76,7 @@
 
         <div class="flex gap-4">
             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">Update Game</button>
-            <a href="{{ route('teacher.games.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Cancel</a>
+            <a href="{{ route('games.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Cancel</a>
         </div>
     </form>
 </div>

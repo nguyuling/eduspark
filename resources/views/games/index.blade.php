@@ -8,6 +8,18 @@
         </div>
     @endif
 
+    @if(session('success_undo'))
+        <div class="mb-6 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 text-green-700 dark:text-green-200 px-4 py-4 rounded-lg flex justify-between items-center">
+            <span>{{ session('success_undo') }}</span>
+            <form action="{{ route('games.restore', session('undo_game_id')) }}" method="POST" style="display: inline;">
+                @csrf
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-4 rounded text-sm ml-4">
+                    ↩️ Undo
+                </button>
+            </form>
+        </div>
+    @endif
+
     @if(auth()->user()->role === 'teacher')
         {{-- TEACHER VIEW --}}
         <div class="flex justify-between items-center mb-8">
@@ -77,11 +89,7 @@
                         <td class="px-6 py-4 text-sm space-x-3">
                             <a href="{{ route('games.leaderboard', $game->id) }}" class="text-purple-600 hover:text-purple-800 dark:text-purple-400 font-medium">📊 Leaderboard</a>
                             <a href="{{ route('teacher.games.edit', $game->id) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 font-medium">✏️ Edit</a>
-                            <form action="{{ route('games.destroy', $game->id) }}" method="POST" class="inline" onsubmit="return confirm('Delete this game?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 font-medium">🗑️ Delete</button>
-                            </form>
+                            <button type="button" onclick="showDeleteConfirm({{ $game->id }}, '{{ $game->title }}')" class="text-red-600 hover:text-red-800 dark:text-red-400 font-medium">🗑️ Delete</button>
                         </td>
                     </tr>
                     @endforeach
@@ -142,3 +150,44 @@
     @endif
 </div>
 @endsection
+
+<script>
+function showDeleteConfirm(gameId, gameTitle) {
+    const modal = document.createElement('div');
+    modal.id = 'deleteModal';
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-sm mx-4">
+            <div class="text-center">
+                <div class="text-5xl mb-4">⚠️</div>
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Delete Game?</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-2">"<strong>${gameTitle}</strong>" will be deleted.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-500 mb-6">Don't worry! You can restore it from the undo notification.</p>
+                
+                <div class="flex gap-3 justify-center">
+                    <button type="button" onclick="closeDeleteModal()" class="px-6 py-2 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white rounded-lg font-semibold hover:bg-gray-400 dark:hover:bg-gray-500">
+                        Cancel
+                    </button>
+                    <form action="/games/${gameId}" method="POST" style="display: inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold">
+                            Yes, Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeDeleteModal();
+    });
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    if (modal) modal.remove();
+}
+</script>

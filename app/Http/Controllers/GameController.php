@@ -17,8 +17,8 @@ class GameController extends Controller
         $games = collect(); // Initialize empty collection
         
         if ($user && $user->role === 'teacher') {
-            // Teacher view - show all their games with management options
-            $games = Game::where('teacher_id', $user->id)->get();
+            // Teacher view - show ALL games (all teachers can manage all games)
+            $games = Game::all();
         } else {
             // Student view - show published games
             $games = Game::where('is_published', true)->get();
@@ -33,11 +33,6 @@ class GameController extends Controller
     public function update(Request $request, $id)
     {
         $game = Game::findOrFail($id);
-        
-        // Verify teacher owns this game
-        if ($game->teacher_id !== auth()->id()) {
-            abort(403);
-        }
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -52,48 +47,41 @@ class GameController extends Controller
     }
 
     /**
-     * Delete game
+     * Delete game (soft delete)
      */
     public function destroy($id)
     {
         $game = Game::findOrFail($id);
-        
-        // Verify teacher owns this game
-        if ($game->teacher_id !== auth()->id()) {
-            abort(403);
-        }
-
         $game->delete();
 
-        return back()->with('success', 'Game deleted successfully!');
+        return back()
+            ->with('success_undo', "Game '{$game->title}' deleted! You can undo this action.")
+            ->with('undo_game_id', $id);
     }
 
     /**
-     * Get leaderboard for a game (for teachers to see class performance)
+     * Restore soft-deleted game
+     */
+    public function restore($id)
+    {
+        $game = Game::withTrashed()->findOrFail($id);
+        $game->restore();
+
+        return back()
+            ->with('success', 'Game restored successfully!');
+    }
+
+    /**
+     * Get leaderboard for a game
      */
     public function leaderboard($id)
     {
         $game = Game::findOrFail($id);
-        $user = auth()->user();
-        $scores = collect(); // Initialize empty collection
-
-        // Only teacher who created the game can view class leaderboard
-        // Students can view public leaderboard
-        if ($user && $user->role === 'teacher' && $game->teacher_id === $user->id) {
-            // Teacher view - all scores for this game
-            $scores = GameScore::where('game_id', $id)
-                ->with('user')
-                ->orderBy('score', 'desc')
-                ->orderBy('time_taken', 'asc')
-                ->get();
-        } else {
-            // Student view - all scores (could add privacy later)
-            $scores = GameScore::where('game_id', $id)
-                ->with('user')
-                ->orderBy('score', 'desc')
-                ->orderBy('time_taken', 'asc')
-                ->get();
-        }
+        $scores = GameScore::where('game_id', $id)
+            ->with('user')
+            ->orderBy('score', 'desc')
+            ->orderBy('time_taken', 'asc')
+            ->get();
         
         return view('games.leaderboard', compact('game', 'scores'));
     }
