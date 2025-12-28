@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use App\Models\GameScore;
+use App\Models\Leaderboard;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -78,44 +79,30 @@ class GameController extends Controller
     public function leaderboard($id)
     {
         $game = Game::findOrFail($id);
-        
-        // Try to fetch from backend API first, fallback to local GameScore table
         $scores = collect();
-        $backendUrl = env('BACKEND_API_URL', 'http://localhost:8001');
         
-        try {
-            // Fetch from backend leaderboard API
-            $response = file_get_contents("{$backendUrl}/api/leaderboard?game_id={$game->slug}");
-            if ($response) {
-                $apiScores = json_decode($response, true);
-                
-                // Transform backend API data to match our view expectations
-                if (is_array($apiScores)) {
-                    foreach ($apiScores as $apiScore) {
-                        $scores->push((object)[
-                            'user_id' => $apiScore['user_id'] ?? null,
-                            'score' => $apiScore['score'] ?? 0,
-                            'time_taken' => $apiScore['time_taken'] ?? null,
-                            'completed_at' => isset($apiScore['timestamp']) ? \Carbon\Carbon::parse($apiScore['timestamp']) : now(),
-                            'user' => (object)[
-                                'name' => $apiScore['username'] ?? 'Anonymous',
-                                'email' => $apiScore['class'] ?? 'N/A',
-                            ],
-                        ]);
-                    }
-                }
+        // First, try to get from existing leaderboard table
+        $leaderboardEntries = Leaderboard::where('game_id', $game->slug)
+            ->orderBy('score', 'desc')
+            ->orderBy('timestamp', 'asc')
+            ->get();
+        
+        if ($leaderboardEntries->isNotEmpty()) {
+            // Transform leaderboard data to match our view structure
+            foreach ($leaderboardEntries as $entry) {
+                $scores->push((object)[
+                    'user_id' => $entry->user_id,
+                    'score' => $entry->score,
+                    'time_taken' => null,
+                    'completed_at' => $entry->timestamp,
+                    'user' => (object)[
+                        'name' => $entry->username,
+                        'email' => $entry->class,
+                    ],
+                ]);
             }
-        } catch (\Exception $e) {
-            // Backend not available, use local GameScore table
-            $scores = GameScore::where('game_id', $id)
-                ->with('user')
-                ->orderBy('score', 'desc')
-                ->orderBy('time_taken', 'asc')
-                ->get();
-        }
-        
-        // If no scores from API, use local database
-        if ($scores->isEmpty()) {
+        } else {
+            // Fallback to GameScore table if no leaderboard entries
             $scores = GameScore::where('game_id', $id)
                 ->with('user')
                 ->orderBy('score', 'desc')

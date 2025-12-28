@@ -62,11 +62,13 @@
                         <td class="px-6 py-4">
                             <div class="flex flex-col">
                                 <span class="font-medium text-gray-900 dark:text-white">{{ $score->user->name }}</span>
-                                @if(auth()->user()->role === 'teacher')
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ $score->user->email }}</span>
-                                @else
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ $score->user->email }}</span>
-                                @endif
+                                <span class="text-sm text-gray-500 dark:text-gray-400">
+                                    @if(auth()->user()->role === 'teacher')
+                                        {{ $score->user->email }}
+                                    @else
+                                        {{ $score->user->email }}
+                                    @endif
+                                </span>
                             </div>
                         </td>
                         <td class="px-6 py-4">
