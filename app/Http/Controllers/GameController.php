@@ -86,7 +86,7 @@ class GameController extends Controller
         if (Schema::hasTable('leaderboard')) {
             $leaderboardEntries = Leaderboard::where('game_id', $game->slug)
                 ->orderBy('score', 'desc')
-                ->orderBy('timestamp', 'asc')
+                ->orderBy('timestamp', 'desc')
                 ->get();
             
             if ($leaderboardEntries->isNotEmpty()) {
