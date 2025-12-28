@@ -6,6 +6,7 @@ use App\Models\Game;
 use App\Models\GameScore;
 use App\Models\Leaderboard;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
 class GameController extends Controller
@@ -81,28 +82,32 @@ class GameController extends Controller
         $game = Game::findOrFail($id);
         $scores = collect();
         
-        // First, try to get from existing leaderboard table
-        $leaderboardEntries = Leaderboard::where('game_id', $game->slug)
-            ->orderBy('score', 'desc')
-            ->orderBy('timestamp', 'asc')
-            ->get();
-        
-        if ($leaderboardEntries->isNotEmpty()) {
-            // Transform leaderboard data to match our view structure
-            foreach ($leaderboardEntries as $entry) {
-                $scores->push((object)[
-                    'user_id' => $entry->user_id,
-                    'score' => $entry->score,
-                    'time_taken' => null,
-                    'completed_at' => $entry->timestamp,
-                    'user' => (object)[
-                        'name' => $entry->username,
-                        'email' => $entry->class,
-                    ],
-                ]);
+        // First, try to get from existing leaderboard table if it exists
+        if (Schema::hasTable('leaderboard')) {
+            $leaderboardEntries = Leaderboard::where('game_id', $game->slug)
+                ->orderBy('score', 'desc')
+                ->orderBy('timestamp', 'asc')
+                ->get();
+            
+            if ($leaderboardEntries->isNotEmpty()) {
+                // Transform leaderboard data to match our view structure
+                foreach ($leaderboardEntries as $entry) {
+                    $scores->push((object)[
+                        'user_id' => $entry->user_id,
+                        'score' => $entry->score,
+                        'time_taken' => null,
+                        'completed_at' => $entry->timestamp,
+                        'user' => (object)[
+                            'name' => $entry->username,
+                            'email' => $entry->class,
+                        ],
+                    ]);
+                }
             }
-        } else {
-            // Fallback to GameScore table if no leaderboard entries
+        }
+        
+        // Fallback to GameScore table if no leaderboard entries found
+        if ($scores->isEmpty()) {
             $scores = GameScore::where('game_id', $id)
                 ->with('user')
                 ->orderBy('score', 'desc')
