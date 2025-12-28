@@ -7,6 +7,7 @@ use App\Http\Controllers\QuizStudentController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\GameTeacherController;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
@@ -65,6 +66,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/quizzes/{quiz}/submit', [QuizStudentController::class, 'submit'])->name('student.quizzes.submit');
     Route::get('/quizzes/{attempt}/quit', [QuizStudentController::class, 'quit'])->name('student.quizzes.quit');
     Route::get('/quizzes/{attempt}/result', [QuizStudentController::class, 'showResult'])->name('student.quizzes.result');
+});
+
+// Game Teacher routes
+Route::middleware('auth')->group(function () {
+    Route::get('/teacher/games', [GameTeacherController::class, 'index'])->name('teacher.games.index');
+    Route::get('/teacher/games/create', [GameTeacherController::class, 'create'])->name('teacher.games.create');
+    Route::post('/teacher/games', [GameTeacherController::class, 'store'])->name('teacher.games.store');
+    Route::get('/teacher/games/{id}/edit', [GameTeacherController::class, 'edit'])->name('teacher.games.edit');
+    Route::put('/teacher/games/{id}', [GameTeacherController::class, 'update'])->name('teacher.games.update');
+    Route::delete('/teacher/games/{id}', [GameTeacherController::class, 'destroy'])->name('teacher.games.destroy');
 });
 
 // Performance routes
