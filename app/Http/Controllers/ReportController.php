@@ -188,84 +188,12 @@ class ReportController extends Controller
 
         // Compute stats
         $scores = [];
-        $topicScores = [];
-        $topicMaxScores = [];
-        $topicFullMarks = [];
-        $topicTitles = [];
-        $topicCount = [];
-        
         foreach ($attempts as $a) {
             if (isset($a->score) && is_numeric($a->score)) $scores[] = (float)$a->score;
-            
-            // Track scores by topic for strongest/weakest topic
-            $topic = $a->quiz_id ?? ($a->title ?? 'Unknown');
-            if (!isset($topicScores[$topic])) {
-                $topicScores[$topic] = [];
-                $topicMaxScores[$topic] = 0;
-                $topicFullMarks[$topic] = null;
-                $topicTitles[$topic] = null;
-                $topicCount[$topic] = 0;
-            }
-            if (isset($a->score) && is_numeric($a->score)) {
-                $topicScores[$topic][] = (float)$a->score;
-                // Track max score for this topic
-                if ($a->score > $topicMaxScores[$topic]) {
-                    $topicMaxScores[$topic] = $a->score;
-                }
-            }
-            // Get full mark and title for this quiz if not already set
-            if ($topicFullMarks[$topic] === null && isset($a->quiz_id)) {
-                if (Schema::hasTable('quizzes')) {
-                    $quiz = DB::table('quizzes')->where('id', $a->quiz_id)->first();
-                    if ($quiz) {
-                        if (isset($quiz->full_mark)) {
-                            $topicFullMarks[$topic] = $quiz->full_mark;
-                        }
-                        if (isset($quiz->title)) {
-                            $topicTitles[$topic] = $quiz->title;
-                        } elseif (isset($quiz->name)) {
-                            $topicTitles[$topic] = $quiz->name;
-                        }
-                    }
-                }
-                // If no full_mark field, try to sum quiz_options points
-                if ($topicFullMarks[$topic] === null && Schema::hasTable('quiz_options')) {
-                    $totalPoints = DB::table('quiz_options')->where('quiz_id', $a->quiz_id)->sum('points');
-                    if ($totalPoints > 0) {
-                        $topicFullMarks[$topic] = $totalPoints;
-                    }
-                }
-            }
-            $topicCount[$topic]++;
         }
-        
         $avg = count($scores) ? round(array_sum($scores) / count($scores), 0) : 'N/A';
         $highest = count($scores) ? max($scores) : 'N/A';
         $weakest = count($scores) ? min($scores) : 'N/A';
-        
-        // Calculate strongest and weakest topics (by average score)
-        $strongestTopic = null;
-        $strongestTopicScore = 'N/A';
-        $strongestTopicTitle = 'N/A';
-        $weakestTopic = null;
-        $weakestTopicScore = 'N/A';
-        $weakestTopicTitle = 'N/A';
-        
-        if (count($topicScores) > 0) {
-            $topicAverages = [];
-            foreach ($topicScores as $topic => $scores_list) {
-                $topicAverages[$topic] = round(array_sum($scores_list) / count($scores_list), 0);
-            }
-            $strongestTopic = array_keys($topicAverages, max($topicAverages))[0];
-            $fullMark = $topicFullMarks[$strongestTopic] ?? $topicMaxScores[$strongestTopic];
-            $strongestTopicScore = $topicAverages[$strongestTopic] . '/' . $fullMark;
-            $strongestTopicTitle = $topicTitles[$strongestTopic] ?? $strongestTopic;
-            
-            $weakestTopic = array_keys($topicAverages, min($topicAverages))[0];
-            $fullMark = $topicFullMarks[$weakestTopic] ?? $topicMaxScores[$weakestTopic];
-            $weakestTopicScore = $topicAverages[$weakestTopic] . '/' . $fullMark;
-            $weakestTopicTitle = $topicTitles[$weakestTopic] ?? $weakestTopic;
-        }
 
         // Map attempts for view partial
         $attemptsForView = [];
@@ -281,11 +209,9 @@ class ReportController extends Controller
         $stats = [
             'average_score' => $avg,
             'highest_score' => $highest,
-            'highest_subject' => $strongestTopicTitle,
-            'highest_subject_score' => $strongestTopicScore,
+            'highest_subject' => null,
             'weakest_score' => $weakest,
-            'weakest_subject' => $weakestTopicTitle,
-            'weakest_subject_score' => $weakestTopicScore,
+            'weakest_subject' => null,
             'attempts' => $attemptsForView
         ];
 
