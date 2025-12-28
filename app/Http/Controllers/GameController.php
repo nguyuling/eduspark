@@ -14,16 +14,17 @@ class GameController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $games = collect(); // Initialize empty collection
         
-        if ($user->role === 'teacher') {
+        if ($user && $user->role === 'teacher') {
             // Teacher view - show all their games with management options
             $games = Game::where('teacher_id', $user->id)->get();
-            return view('games.index', compact('games'));
         } else {
             // Student view - show published games
             $games = Game::where('is_published', true)->get();
-            return view('games.index', compact('games'));
         }
+        
+        return view('games.index', compact('games'));
     }
 
     /**
@@ -74,18 +75,26 @@ class GameController extends Controller
     {
         $game = Game::findOrFail($id);
         $user = auth()->user();
+        $scores = collect(); // Initialize empty collection
 
-        // Only teacher who created the game can view leaderboard
-        if ($user->role === 'teacher' && $game->teacher_id === $user->id) {
+        // Only teacher who created the game can view class leaderboard
+        // Students can view public leaderboard
+        if ($user && $user->role === 'teacher' && $game->teacher_id === $user->id) {
+            // Teacher view - all scores for this game
             $scores = GameScore::where('game_id', $id)
                 ->with('user')
                 ->orderBy('score', 'desc')
                 ->orderBy('time_taken', 'asc')
                 ->get();
-            
-            return view('games.leaderboard', compact('game', 'scores'));
+        } else {
+            // Student view - all scores (could add privacy later)
+            $scores = GameScore::where('game_id', $id)
+                ->with('user')
+                ->orderBy('score', 'desc')
+                ->orderBy('time_taken', 'asc')
+                ->get();
         }
-
-        abort(403);
+        
+        return view('games.leaderboard', compact('game', 'scores'));
     }
 }
