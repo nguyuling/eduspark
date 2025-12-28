@@ -172,7 +172,7 @@ class PerformanceController extends Controller
                     ->where("s.$gameUserCol", $studentId)
                     ->orderBy('s.score', 'desc')
                     ->limit(1)
-                    ->value('g.name') ?? 'N/A';
+                    ->value('g.title') ?? 'N/A';
             }
 
             // Determine timestamp column for games (created_at, updated_at, etc.)
