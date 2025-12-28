@@ -197,7 +197,7 @@ class PerformanceController extends Controller
                     ->where("s.$gameUserCol", $studentId)
                     ->orderBy('s.' . ($gameTimestampCol ?? 'id'), 'asc')
                     ->limit(6)
-                    ->select(array_merge(['g.name as title', 's.score'], ($gameTimestampCol ? ['s.' . $gameTimestampCol . ' as completed_at'] : [])))
+                    ->select(array_merge(['g.title as title', 's.score'], ($gameTimestampCol ? ['s.' . $gameTimestampCol . ' as completed_at'] : [])))
                     ->get();
 
                 foreach ($recentGameRows as $r) {
