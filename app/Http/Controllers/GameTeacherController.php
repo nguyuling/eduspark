@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class GameTeacherController extends Controller
 {
@@ -43,12 +44,12 @@ class GameTeacherController extends Controller
         $validated['is_published'] = $request->has('is_published');
 
         if (!isset($validated['slug'])) {
-            $validated['slug'] = str_slug($validated['title']);
+            $validated['slug'] = Str::slug($validated['title']);
         }
 
         Game::create($validated);
 
-        return redirect()->route('teacher.games.index')
+        return redirect()->route('games.index')
             ->with('success', 'Game created successfully!');
     }
 
@@ -81,12 +82,12 @@ class GameTeacherController extends Controller
         $validated['is_published'] = $request->has('is_published');
         
         if (!isset($validated['slug'])) {
-            $validated['slug'] = str_slug($validated['title']);
+            $validated['slug'] = Str::slug($validated['title']);
         }
 
         $game->update($validated);
 
-        return redirect()->route('teacher.games.index')
+        return redirect()->route('games.index')
             ->with('success', 'Game updated successfully!');
     }
 
@@ -113,3 +114,4 @@ class GameTeacherController extends Controller
         return back()
             ->with('success', 'Game restored successfully!');
     }
+}

@@ -5,10 +5,28 @@
     <div class="mb-8">
         <a href="{{ route('games.index') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 mb-4 inline-block">← Back to Games</a>
         <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">📊 {{ $game->title }} - Leaderboard</h1>
-        <p class="text-gray-600 dark:text-gray-400">Top performers in this game</p>
+        <p class="text-gray-600 dark:text-gray-400">{{ auth()->user()->role === 'teacher' ? 'Class performance analytics' : 'Top performers in this game' }}</p>
     </div>
 
     @if($scores->count() > 0)
+        @if(auth()->user()->role === 'teacher')
+            <!-- Teacher Analytics View -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="text-gray-600 dark:text-gray-400 font-semibold text-sm">Total Plays</div>
+                    <div class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">{{ $scores->count() }}</div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="text-gray-600 dark:text-gray-400 font-semibold text-sm">Average Score</div>
+                    <div class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">{{ number_format($scores->avg('score'), 0) }}</div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="text-gray-600 dark:text-gray-400 font-semibold text-sm">Unique Players</div>
+                    <div class="text-3xl font-bold mt-2 text-gray-800 dark:text-white">{{ $scores->groupBy('user_id')->count() }}</div>
+                </div>
+            </div>
+        @endif
+
         <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
             <table class="w-full">
                 <thead class="bg-gray-50 dark:bg-gray-700">
@@ -17,6 +35,9 @@
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Player</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Score</th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Time Taken</th>
+                        @if(auth()->user()->role === 'teacher')
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Attempts</th>
+                        @endif
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Completed</th>
                     </tr>
                 </thead>
@@ -48,6 +69,11 @@
                         <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                             {{ $score->time_taken ? gmdate('H:i:s', $score->time_taken) : 'N/A' }}
                         </td>
+                        @if(auth()->user()->role === 'teacher')
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                                {{ $scores->where('user_id', $score->user_id)->count() }}
+                            </td>
+                        @endif
                         <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                             {{ $score->completed_at?->format('M d, Y H:i') ?? 'N/A' }}
                         </td>
