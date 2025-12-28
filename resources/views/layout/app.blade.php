@@ -104,15 +104,22 @@ body.dark .sidebar{
         </div>
 
         <nav class="nav">
-            <a href="#" class="active"><span class="dot"></span> Dashboard</a>
+            <a href="{{ route('home') }}" class="@if(Route::current()->getName() === 'home') active @endif"><span class="dot"></span> Dashboard</a>
             <a href="#"><span class="dot"></span> Materials</a>
             <a href="#"><span class="dot"></span> Assessments</a>
             <a href="#"><span class="dot"></span> Forum</a>
-            <a href="#"><span class="dot"></span> Games</a>
+            @if(auth()->check() && auth()->user()->role === 'teacher')
+                <a href="{{ route('teacher.games.index') }}" class="@if(Route::current()->getName() === 'teacher.games.index') active @endif"><span class="dot"></span> Manage Games</a>
+            @else
+                <a href="#"><span class="dot"></span> Games</a>
+            @endif
         </nav>
 
         <div class="logout">
-            <a href="#" style="color:#ff8b94;font-weight:700;text-decoration:none;">🚪 Logout</a>
+            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                @csrf
+                <button type="submit" style="color:#ff8b94;font-weight:700;text-decoration:none;border:none;background:none;cursor:pointer;">🚪 Logout</button>
+            </form>
         </div>
     </aside>
 
