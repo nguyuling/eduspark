@@ -9732,6 +9732,7 @@ FATAL:  password authentication failed for user \"postgres\" at C:\\xampp\\php\\
 #13 /Users/nguyuling/eduspark/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
 #14 {main}
 "} 
+<<<<<<< HEAD
 [2025-12-18 14:38:56] local.INFO: studentsByClass: Found 11 rows for class: 4 Arif  
 [2025-12-18 18:59:40] local.ERROR: The C:\Users\fyqaz\Desktop\eduspark\bootstrap\cache directory must be present and writable. {"exception":"[object] (Exception(code: 0): The C:\\Users\\fyqaz\\Desktop\\eduspark\\bootstrap\\cache directory must be present and writable. at C:\\Users\\fyqaz\\Desktop\\eduspark\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\PackageManifest.php:179)
 [stacktrace]
@@ -11007,6 +11008,7 @@ FATAL:  password authentication failed for user \"postgres\" at C:\\xampp\\php\\
 #68 C:\\Users\\acham\\Documents\\eduspark\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('C:\\\\Users\\\\acham\\\\...')
 #69 {main}
 "} 
+<<<<<<< HEAD
 [2025-12-21 15:35:49] local.ERROR: filemtime(): stat failed for C:\Users\fyqaz\Desktop\eduspark\.env {"exception":"[object] (ErrorException(code: 0): filemtime(): stat failed for C:\\Users\\fyqaz\\Desktop\\eduspark\\.env at C:\\Users\\fyqaz\\Desktop\\eduspark\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\ServeCommand.php:147)
 [stacktrace]
 #0 C:\\Users\\fyqaz\\Desktop\\eduspark\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\HandleExceptions.php(258): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError(2, 'filemtime(): st...', 'C:\\\\Users\\\\fyqaz\\\\...', 147)
@@ -11028,3 +11030,52 @@ FATAL:  password authentication failed for user \"postgres\" at C:\\xampp\\php\\
 #16 C:\\Users\\fyqaz\\Desktop\\eduspark\\artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
 #17 {main}
 "} 
+=======
+=======
+[2025-12-23 04:25:47] local.ERROR: The /Users/nguyuling/eduspark/bootstrap/cache directory must be present and writable. {"exception":"[object] (Exception(code: 0): The /Users/nguyuling/eduspark/bootstrap/cache directory must be present and writable. at /Users/nguyuling/eduspark/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php:179)
+[stacktrace]
+#0 /Users/nguyuling/eduspark/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(132): Illuminate\\Foundation\\PackageManifest->write(Array)
+#1 /Users/nguyuling/eduspark/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(108): Illuminate\\Foundation\\PackageManifest->build()
+#2 /Users/nguyuling/eduspark/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(90): Illuminate\\Foundation\\PackageManifest->getManifest()
+#3 /Users/nguyuling/eduspark/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php(79): Illuminate\\Foundation\\PackageManifest->config('aliases')
+#4 /Users/nguyuling/eduspark/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/RegisterFacades.php(26): Illuminate\\Foundation\\PackageManifest->aliases()
+#5 /Users/nguyuling/eduspark/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\RegisterFacades->bootstrap(Object(Illuminate\\Foundation\\Application))
+#6 /Users/nguyuling/eduspark/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(494): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#7 /Users/nguyuling/eduspark/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(196): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#8 /Users/nguyuling/eduspark/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#9 /Users/nguyuling/eduspark/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#10 {main}
+"} 
+>>>>>>> eab76151 (fix merge conflict)
+[2025-12-23 05:04:20] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:04:40] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:06:03] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:09:05] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:09:54] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:14:40] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:24:38] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:25:12] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:25:21] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:29:12] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:29:52] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:29:59] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:33:40] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:33:43] local.INFO: studentsByClass: Found 11 rows for class: 5 Bestari  
+[2025-12-23 05:34:09] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:34:17] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:34:29] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:35:56] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:36:27] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:37:40] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:37:55] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:39:08] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:40:38] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:42:26] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:42:53] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2025-12-23 05:43:55] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:45:40] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:46:09] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:46:41] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:47:13] local.INFO: studentsByClass: Found 11 rows for class: 4 Bestari  
+[2025-12-23 05:48:36] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+>>>>>>> 4402f5e5a9adff7429ceca1873a758a0300f5b23

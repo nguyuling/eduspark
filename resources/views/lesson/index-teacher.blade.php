@@ -16,13 +16,21 @@
       </a>
     </div>
 
+    @if (session('success'))
+      <div class="alert-success">{{ session('success') }}</div>
+    @endif
+
+    @if (session('error'))
+      <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
+    @endif
+
     <!-- Lessons Panel -->
     <section class="panel" style="margin-bottom:20px; margin-top:10px;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
         <div style="display:flex; gap:8px; align-items:center;">
           <h2 style="margin:0; padding:0; font-size:18px; font-weight:700; line-height:1;">Senarai Bahan Pembelajaran</h2>
           <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px;">
-            {{ \App\Models\Lesson::count() }}
+            {{ count($lessons ?? []) }}
           </span>
         </div>
         <div style="display:flex; gap:8px;">
@@ -71,17 +79,15 @@
       <table>
         <thead>
           <tr>
-            <th style="width:5%">No.</th>
-            <th style="width:45%">Bahan</th>
+            <th style="width:50%">Bahan</th>
             <th style="width:18%">Fail</th>
             <th style="width:32%">Tindakan</th>
           </tr>
         </thead>
         <tbody>
-          @forelse ($lessons ?? [] as $index => $lesson)
+          @forelse ($lessons ?? [] as $lesson)
             <tr>
-              <td style="width:5%; text-align:center; font-weight:600;">{{ $index + 1 }}</td>
-              <td style="width:45%">
+              <td style="width:50%">
                 <div class="table-title">{{ $lesson->title }}</div>
                 <div class="table-subtitle">{{ $lesson->description ?: 'Tiada penerangan' }}</div>
                 <div class="table-meta">
@@ -89,9 +95,14 @@
                   <span class="table-badge">
                     <strong>Dicipta:</strong> {{ $lesson->created_at->format('M d, Y') }}
                   </span>
+                  @if($lesson->uploaded_by === Auth::id())
+                    <span class="table-badge" style="background:rgba(106,77,247,0.1); color:var(--accent);">
+                      <i class="bi bi-person-check" style="margin-right:4px;"></i><strong>Anda</strong>
+                    </span>
+                  @endif
                 </div>
               </td>
-              <td style="width:20%;" class="table-center">
+              <td style="width:18%;" class="table-center">
                 @if ($lesson->file_path)
                   <div class="table-title">{{ strtoupper(pathinfo($lesson->file_name ?? $lesson->file_path, PATHINFO_EXTENSION)) }}</div>
                   <div class="table-subtitle">{{ $lesson->file_name ?? basename($lesson->file_path) }}</div>
@@ -99,148 +110,63 @@
                   <div class="table-subtitle">Tiada fail</div>
                 @endif
               </td>
-              <td style="width:25%;" class="table-center">
-                <div style="display:flex; gap:20px; justify-content:center;">
+              <td style="width:32%;" class="table-center">
+                <div style="display:flex; gap:20px; justify-content:center; align-items:center;">
+                  <!-- VIEW BUTTON (NOW WORKING) -->
+                  <a href="{{ route('lesson.show', $lesson->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Lihat Butiran">
+                    <i class="bi bi-eye-fill"></i>
+                  </a>
+                  
                   @if ($lesson->file_path)
-                    <a href="{{ route('lesson.preview-file', $lesson->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Lihat">
-                      <i class="bi bi-eye-fill"></i>
-                    </a>
                     <a href="{{ route('lesson.download', $lesson->id) }}" download style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Muat Turun">
                       <i class="bi bi-download"></i>
                     </a>
                   @endif
-                  <button onclick="editLesson({{ $lesson->id }}, '{{ addslashes($lesson->title) }}', '{{ addslashes($lesson->description ?? '') }}', '{{ $lesson->class_group }}', '{{ $lesson->visibility }}')" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Kemaskini">
-                    <i class="bi bi-pencil-square"></i>
-                  </button>
-                  <button onclick="deleteLesson({{ $lesson->id }}, '{{ addslashes($lesson->title) }}')" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--danger); padding:0; font-size:24px; transition:opacity .2s ease; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Padam">
-                    <i class="bi bi-trash"></i>
-                  </button>
+                  
+                  <!-- EDIT BUTTON (WITH OWNER CHECK) -->
+                  @if($lesson->uploaded_by === Auth::id())
+                    <a href="{{ route('lesson.edit', $lesson->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Kemaskini">
+                      <i class="bi bi-pencil-square"></i>
+                    </a>
+                    
+                    <!-- DELETE BUTTON (WITH OWNER CHECK) -->
+                    <form action="{{ route('lesson.destroy', $lesson->id) }}" method="POST" onsubmit="return confirm('Adakah anda pasti ingin memadamkan \'{{ addslashes($lesson->title) }}\'?');" style="display:inline; margin:0;">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--danger); padding:0; font-size:24px; transition:opacity .2s ease; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Padam">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  @else
+                    <!-- Show locked icons for non-owners -->
+                    <span style="display:inline-flex; align-items:center; justify-content:center; color:var(--muted); padding:0; font-size:24px; opacity:0.3; cursor:not-allowed;" title="Hanya pemilik boleh edit">
+                      <i class="bi bi-pencil-square"></i>
+                    </span>
+                    <span style="display:inline-flex; align-items:center; justify-content:center; color:var(--muted); padding:0; font-size:24px; opacity:0.3; cursor:not-allowed;" title="Hanya pemilik boleh padam">
+                      <i class="bi bi-trash"></i>
+                    </span>
+                  @endif
                 </div>
               </td>
             </tr>
           @empty
             <tr>
-              <td colspan="4" class="empty-state">Tiada bahan ditemui.</td>
+              <td colspan="3" class="empty-state" style="text-align:center; padding:24px; color:var(--muted);">
+                @if (!empty(array_filter(['q' => request('q'), 'file_type' => request('file_type'), 'date_from' => request('date_from'), 'date_to' => request('date_to')])))
+                  Tiada bahan sepadan dengan kriteria anda.
+                @else
+                  Tiada bahan ditemui.
+                @endif
+              </td>
             </tr>
           @endforelse
         </tbody>
       </table>
-
-      <!-- Show More Section -->
-      @if ($hasMore ?? false)
-        <div style="text-align:center; margin-top:20px; padding:20px;">
-          <a href="{{ route('lesson.index', array_merge(request()->query(), ['limit' => $nextLimit])) }}" 
-             style="color:var(--accent); text-decoration:none; font-size:14px; cursor:pointer;" 
-             onmouseover="this.style.textDecoration='underline';" 
-             onmouseout="this.style.textDecoration='none';">
-            Tunjukkan 10 Bahan Lagi
-          </a>
-        </div>
-      @endif
     </section>
   </main>
 </div>
 
-<!-- Edit Modal -->
-<div id="editModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:50; align-items:center; justify-content:center;">
-  <div style="background:var(--card-dark); border-radius:12px; padding:24px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto;">
-    <h2 style="margin-bottom:16px;">Kemaskini Bahan</h2>
-    <form id="editLessonForm" enctype="multipart/form-data">
-      @csrf
-      <input type="hidden" id="editLessonId" name="lesson_id">
-      
-      <div style="margin-bottom:12px;">
-        <label>Tajuk:</label>
-        <input type="text" id="editTitle" name="title" required style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--control-border); background:var(--input-bg); color:inherit;">
-      </div>
-
-      <div style="margin-bottom:12px;">
-        <label>Penerangan:</label>
-        <textarea id="editDescription" name="description" rows="3" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--control-border); background:var(--input-bg); color:inherit;"></textarea>
-      </div>
-
-      <div style="margin-bottom:12px;">
-        <label>Kumpulan Kelas:</label>
-        <select id="editClassGroup" name="class_group" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--control-border); background:var(--input-bg); color:inherit;">
-          <option value="4A">4A</option>
-          <option value="4B">4B</option>
-          <option value="4C">4C</option>
-          <option value="5A">5A</option>
-          <option value="5B">5B</option>
-        </select>
-      </div>
-
-      <div style="margin-bottom:12px;">
-        <label>Keterlihatan:</label>
-        <select id="editVisibility" name="visibility" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--control-border); background:var(--input-bg); color:inherit;">
-          <option value="class">Kelas Sahaja</option>
-          <option value="public">Awam (Semua Pelajar)</option>
-        </select>
-      </div>
-
-      <div style="margin-bottom:16px;">
-        <label>Fail (Tinggalkan kosong untuk tidak mengubah):</label>
-        <input type="file" name="file" accept=".pdf,.docx,.pptx,.txt,.jpg,.png" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--control-border); background:var(--input-bg); color:inherit;">
-      </div>
-
-      <div style="display:flex; gap:8px;">
-        <button type="submit" class="btn btn-primary">Simpan</button>
-        <button type="button" onclick="closeEditModal()" class="btn" style="background:transparent; border:1px solid var(--control-border); color:inherit;">Batal</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-@endsection
-
 <script>
-const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-function editLesson(id, title, description, classGroup, visibility) {
-  document.getElementById('editLessonId').value = id;
-  document.getElementById('editTitle').value = title;
-  document.getElementById('editDescription').value = description;
-  document.getElementById('editClassGroup').value = classGroup;
-  document.getElementById('editVisibility').value = visibility;
-  document.getElementById('editModal').style.display = 'flex';
-}
-
-function closeEditModal() {
-  document.getElementById('editModal').style.display = 'none';
-}
-
-document.getElementById('editLessonForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const lessonId = document.getElementById('editLessonId').value;
-  const formData = new FormData(this);
-  
-  try {
-    const response = await fetch(`/api/lessons/${lessonId}`, {
-      method: 'POST',
-      headers: { 'X-CSRF-TOKEN': csrfToken },
-      body: formData
-    });
-    const data = await response.json();
-    if (!data.success) throw new Error(data.message || 'Error');
-    alert('Bahan dikemaskini!');
-    location.reload();
-  } catch(err) {
-    alert('Ralat: ' + err.message);
-  }
-});
-
-function deleteLesson(id, title) {
-  if (confirm('Adakah anda pasti ingin memadamkan "' + title + '"?')) {
-    fetch(`/api/lessons/${id}/delete`, {
-      method: 'POST',
-      headers: { 'X-CSRF-TOKEN': csrfToken }
-    }).then(r => r.json()).then(data => {
-      alert(data.message || 'Bahan dipadamkan');
-      location.reload();
-    }).catch(e => alert('Ralat: ' + e.message));
-  }
-}
-
 function toggleFilterPanel() {
   const filterPanel = document.getElementById('filter-panel');
   if (filterPanel.style.display === 'none') {
@@ -266,8 +192,6 @@ document.addEventListener('DOMContentLoaded', function() {
     sessionStorage.removeItem('keepFilterOpen');
   }
 });
-
-document.addEventListener('click', e => {
-  if (e.target.id === 'editModal') closeEditModal();
-});
 </script>
+
+@endsection
