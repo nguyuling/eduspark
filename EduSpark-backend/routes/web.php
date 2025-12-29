@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\GameTeacherController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -147,7 +148,12 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::middleware(['auth'])->group(function () {
     
     // ========== STUDENT ROUTES ==========
-    Route::middleware(['role:student'])->group(function () {
+    Route::middleware([function ($request, $next) {
+        if (auth()->user()->role !== 'student') {
+            abort(403, 'Unauthorized');
+        }
+        return $next($request);
+    }])->group(function () {
         // Student dashboard
         Route::get('/dashboard', function () {
             return view('student.dashboard');
@@ -163,7 +169,12 @@ Route::middleware(['auth'])->group(function () {
     });
     
     // ========== TEACHER ROUTES ==========
-    Route::middleware(['role:teacher'])->group(function () {
+    Route::middleware([function ($request, $next) {
+        if (auth()->user()->role !== 'teacher') {
+            abort(403, 'Unauthorized');
+        }
+        return $next($request);
+    }])->group(function () {
         // Teacher dashboard
         Route::get('/teacher/dashboard', function () {
             return view('teacher.dashboard');
@@ -220,7 +231,12 @@ Route::middleware(['auth'])->group(function () {
     });
     
     // ========== ADMIN ROUTES ==========
-    Route::middleware(['role:admin'])->group(function () {
+    Route::middleware([function ($request, $next) {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized');
+        }
+        return $next($request);
+    }])->group(function () {
         Route::get('/admin', function () {
             return view('admin.dashboard');
         })->name('admin.dashboard');
@@ -229,20 +245,66 @@ Route::middleware(['auth'])->group(function () {
 
 // ========== API ROUTES (for AJAX calls) ==========
 Route::prefix('api')->group(function () {
-    // Game API routes
+    // Public game API routes
     Route::get('/games', [GameController::class, 'apiIndex']);
     Route::get('/games/{id}', [GameController::class, 'apiShow']);
+    
+    // Game score saving (public for now, can be protected)
     Route::post('/games/{id}/score', [GameController::class, 'saveScore']);
     
-    // Game editing API (teacher only)
-    Route::middleware(['auth', 'role:teacher'])->group(function () {
-        Route::get('/teacher/games', [GameTeacherController::class, 'apiIndex']);
-        Route::post('/games', [GameController::class, 'store']);
-        Route::put('/games/{id}', [GameController::class, 'update']);
-        Route::delete('/games/{id}', [GameController::class, 'destroy']);
-        Route::post('/games/{id}/validate', [GameController::class, 'validateGameData']);
-        Route::get('/games/{id}/history', [GameController::class, 'getUpdateHistory']);
+    // Game summary and leaderboard routes (protected)
+    Route::middleware(['auth'])->group(function () {
+        // Game summary after completion
+        Route::get('/games/{game}/summary', [GameController::class, 'getGameSummary'])->name('api.games.summary');
+        
+        // Game leaderboard
+        Route::get('/games/{game}/leaderboard', [GameController::class, 'getLeaderboard'])->name('api.games.leaderboard');
+        
+        // Collect rewards
+        Route::post('/rewards/collect', [GameController::class, 'collectRewards'])->name('api.rewards.collect');
     });
+    
+    // Game editing API (teacher only)
+    Route::middleware(['auth'])->group(function () {
+        Route::middleware([function ($request, $next) {
+            if (auth()->user()->role !== 'teacher') {
+                abort(403, 'Unauthorized');
+            }
+            return $next($request);
+        }])->group(function () {
+            Route::get('/teacher/games', [GameTeacherController::class, 'apiIndex']);
+            Route::post('/games', [GameController::class, 'store']);
+            Route::put('/games/{id}', [GameController::class, 'update']);
+            Route::delete('/games/{id}', [GameController::class, 'destroy']);
+            Route::post('/games/{id}/validate', [GameController::class, 'validateGameData']);
+            Route::get('/games/{id}/history', [GameController::class, 'getUpdateHistory']);
+        });
+    });
+});
+
+// ========== PUBLIC GAME ROUTES (for playing games without auth) ==========
+Route::prefix('play')->group(function () {
+    Route::get('/games', [GameController::class, 'index'])->name('play.games.index');
+    Route::get('/games/{id}', [GameController::class, 'show'])->name('play.games.show');
+    
+    // Game summary page (public facing)
+    Route::get('/games/{game}/summary-page', function ($gameId) {
+        return view('games.summary', ['game_id' => $gameId]);
+    })->name('play.games.summary-page');
+    
+    // Leaderboard page (public facing)
+    Route::get('/games/{game}/leaderboard-page', function ($gameId) {
+        return view('games.leaderboard', ['game_id' => $gameId]);
+    })->name('play.games.leaderboard-page');
+});
+
+// ========== TEST ROUTES (Remove in production) ==========
+Route::get('/test-game-summary/{gameId}', function ($gameId) {
+    return view('test.game-summary-test', ['game_id' => $gameId]);
+});
+
+Route::get('/test-leaderboard/{gameId}', function ($gameId) {
+    return view('test.leaderboard-test', ['game_id' => $gameId]);
 });
 
 // ========== FALLBACK ROUTES ==========
