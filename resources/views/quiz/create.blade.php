@@ -799,6 +799,38 @@
         
     });
 
+    // Custom HTML5 validation messages in Malay
+    function setupMalayValidationMessages() {
+        const form = document.getElementById('quiz-form');
+        if (!form) return;
+        
+        form.addEventListener('invalid', function(e) {
+            const input = e.target;
+            
+            if (!input.validity.valid) {
+                if (input.validity.valueMissing) {
+                    input.setCustomValidity('Sila isi medan ini.');
+                } else if (input.validity.typeMismatch) {
+                    input.setCustomValidity('Sila masukkan format yang betul.');
+                } else if (input.validity.tooShort) {
+                    input.setCustomValidity(`Teks hendaklah sekurang-kurangnya ${input.minLength} aksara.`);
+                } else if (input.validity.tooLong) {
+                    input.setCustomValidity(`Teks tidak boleh lebih daripada ${input.maxLength} aksara.`);
+                } else if (input.validity.rangeUnderflow) {
+                    input.setCustomValidity(`Nilai mesti sekurang-kurangnya ${input.min}.`);
+                } else if (input.validity.rangeOverflow) {
+                    input.setCustomValidity(`Nilai tidak boleh lebih daripada ${input.max}.`);
+                }
+            }
+        }, true);
+        
+        form.addEventListener('input', function(e) {
+            if (e.target.validity.valid) {
+                e.target.setCustomValidity('');
+            }
+        }, true);
+    }
+    
     // Validation function to check that all coding questions have hidden lines
     function validateBeforeSubmit() {
         const container = document.getElementById('questions-container');
@@ -829,6 +861,11 @@
         
         return true;
     }
+    
+    // Initialize Malay validation messages when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        setupMalayValidationMessages();
+    });
 </script>
 
 @endsection

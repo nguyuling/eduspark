@@ -121,6 +121,10 @@ class QuizTeacherController extends Controller
             'description' => 'nullable|string|max:1000',
             'max_attempts' => 'required|integer|min:1',
             'due_at' => 'nullable|date',
+            'questions' => 'required|array|min:1',
+            'questions.*.question_text' => 'required|string|max:1000',
+            'questions.*.type' => 'required|string|in:multiple_choice,true_false,short_answer,checkbox,coding',
+            'questions.*.points' => 'required|integer|min:1',
         ]);
 
         // Automatically set the necessary fields
@@ -140,7 +144,7 @@ class QuizTeacherController extends Controller
             // --- PART 2: Save Questions and Options ---
             if ($request->has('questions') && is_array($request->input('questions'))) {
                 
-                $requestQuestions = $request->input('questions');
+                $requestQuestions = $validatedQuizData['questions'];
                 
                 foreach ($requestQuestions as $questionData) {
                     
@@ -153,6 +157,7 @@ class QuizTeacherController extends Controller
                     
                     // 2a. Create the NEW Question record
                     $question = $quiz->questions()->create([
+                        'teacher_id' => Auth::id(),
                         'question_text' => $questionData['question_text'],
                         'type' => $questionType, 
                         'points' => $questionData['points'] ?? 1,          
@@ -210,7 +215,7 @@ class QuizTeacherController extends Controller
 
             // --- PART 3: Redirect ---
             return redirect()->route('teacher.quizzes.index')
-                ->with('success', 'Quiz "' . $quiz->title . '" created successfully!');
+                ->with('success', 'Kuiz "' . $quiz->title . '" berjaya dicipta!');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -250,6 +255,10 @@ class QuizTeacherController extends Controller
             'description' => 'nullable|string|max:1000',
             'max_attempts' => 'required|integer|min:1',
             'due_at' => 'nullable|date',
+            'questions' => 'required|array|min:1',
+            'questions.*.question_text' => 'required|string|max:1000',
+            'questions.*.type' => 'required|string|in:multiple_choice,true_false,short_answer,checkbox,coding',
+            'questions.*.points' => 'required|integer|min:1',
             // No need to validate 'is_published' here
         ]);
         
@@ -280,7 +289,7 @@ class QuizTeacherController extends Controller
             
             if ($request->has('questions') && is_array($request->input('questions'))) {
                 
-                $requestQuestions = $request->input('questions');
+                $requestQuestions = $validatedQuizData['questions'];
                 
                 // Use a standard foreach; the keys are guaranteed to be sequential after the JS fix.
                 foreach ($requestQuestions as $questionData) {
@@ -294,6 +303,7 @@ class QuizTeacherController extends Controller
                     
                     // 3a. Create the NEW Question record
                     $question = $quiz->questions()->create([
+                        'teacher_id' => Auth::id(),
                         'question_text' => $questionData['question_text'], // FIX: Corrected key
                         'type' => $questionType, 
                         'points' => $questionData['points'] ?? 1,          
@@ -353,7 +363,7 @@ class QuizTeacherController extends Controller
 
             // --- PART 4: Redirect ---
             return redirect()->route('teacher.quizzes.index')
-                ->with('success', 'Quiz "' . $quiz->title . '" updated successfully!');
+                ->with('success', 'Kuiz "' . $quiz->title . '" berjaya dikemaskini!');
 
         } catch (\Exception $e) {
             DB::rollBack();
