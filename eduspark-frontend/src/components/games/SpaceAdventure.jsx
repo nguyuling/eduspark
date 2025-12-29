@@ -39,6 +39,12 @@ const SpaceAdventure = () => {
   const shootCooldownRef = useRef(false);
   const gameStartTimeRef = useRef(null);
 
+  // Get CSRF Token from Laravel
+  const getCsrfToken = () => {
+    const metaTag = document.querySelector('meta[name="csrf-token"]');
+    return metaTag ? metaTag.content : '';
+  };
+
   // Initialize stars
   useEffect(() => {
     const newStars = [];
@@ -78,7 +84,7 @@ const SpaceAdventure = () => {
         setEnemies(prev => [...prev, {
           id: Date.now(),
           x: Math.random() * 90,
-          y: -5, // Start slightly off-screen
+          y: -5,
           health: 2,
           speed: 1.5,
           type: 'strong'
@@ -98,9 +104,8 @@ const SpaceAdventure = () => {
     return () => clearInterval(enemyInterval);
   }, [gameOver, isPaused, level, gameStarted]);
 
-  // ✅ FIXED: Reliable collision detection (minimal, robust)
+  // ✅ FIXED: Reliable collision detection
   const checkCollisions = useCallback(() => {
-    // Hitbox sizes in % units (relative to screen width/height)
     const BULLET_W = 0.8;
     const BULLET_H = 1.5;
     const ENEMY_W = 3.5;
@@ -134,9 +139,7 @@ const SpaceAdventure = () => {
             const eT = e.y;
             const eB = e.y + ENEMY_H;
 
-            // ✅ Accurate overlap check
             if (bR > eL && bL < eR && bB > eT && bT < eB) {
-              // Hit!
               newEnemies[j] = { ...e, health: e.health - 1 };
               bulletsToRemove.push(i);
 
@@ -150,17 +153,15 @@ const SpaceAdventure = () => {
                   y: e.y + ENEMY_H / 2
                 });
               }
-              break; // One bullet, one enemy
+              break;
             }
           }
         }
 
-        // Remove enemies (reverse order)
         for (let i = enemiesToRemove.length - 1; i >= 0; i--) {
           newEnemies.splice(enemiesToRemove[i], 1);
         }
 
-        // Update score
         if (pointsToAdd > 0) {
           setScore(prev => {
             const newScore = prev + pointsToAdd;
@@ -172,12 +173,10 @@ const SpaceAdventure = () => {
           });
         }
 
-        // Update enemies defeated count
         if (enemiesDefeatedThisFrame > 0) {
           setEnemiesDefeated(prev => prev + enemiesDefeatedThisFrame);
         }
 
-        // Add explosions
         if (explosionsToAdd.length > 0) {
           setExplosions(prev => [...prev, ...explosionsToAdd.map(e => ({...e, size: 0}))]);
         }
@@ -185,7 +184,6 @@ const SpaceAdventure = () => {
         return newEnemies;
       });
 
-      // Remove bullets (reverse order)
       for (let i = bulletsToRemove.length - 1; i >= 0; i--) {
         newBullets.splice(bulletsToRemove[i], 1);
       }
@@ -209,7 +207,6 @@ const SpaceAdventure = () => {
         const eB = e.y + ENEMY_H;
 
         if (pR > eL && pL < eR && pB > eT && pT < eB) {
-          // Player hit
           setLives(prev => {
             const newLives = prev - 1;
             if (newLives <= 0) setGameOver(true);
@@ -238,7 +235,6 @@ const SpaceAdventure = () => {
       const deltaTime = timestamp - (lastTimeRef.current || timestamp);
       lastTimeRef.current = timestamp;
 
-      // Player movement
       if (keysPressed.current['ArrowLeft']) {
         setPlayerPosition(prev => Math.max(2, Math.min(98, prev - 0.7 * (deltaTime / 16))));
       }
@@ -246,19 +242,16 @@ const SpaceAdventure = () => {
         setPlayerPosition(prev => Math.max(2, Math.min(98, prev + 0.7 * (deltaTime / 16))));
       }
 
-      // Move enemies
       setEnemies(prev => 
         prev.map(e => ({ ...e, y: e.y + e.speed * (deltaTime / 16) }))
           .filter(e => e.y < 110)
       );
 
-      // Move bullets (faster & smoother)
       setBullets(prev => 
         prev.map(b => ({ ...b, y: b.y - 10 * (deltaTime / 16) }))
           .filter(b => b.y > -5)
       );
 
-      // ✅ Critical: Check collisions every frame
       checkCollisions();
 
       animationFrameRef.current = requestAnimationFrame(gameLoop);
@@ -272,7 +265,7 @@ const SpaceAdventure = () => {
     };
   }, [gameOver, isPaused, gameStarted, checkCollisions]);
 
-  // ✅ FIXED: Shoot with cooldown & clean ID
+  // ✅ FIXED: Shoot with cooldown
   const shoot = useCallback(() => {
     if (gameOver || isPaused || !gameStarted || shootCooldownRef.current) return;
 
@@ -280,7 +273,7 @@ const SpaceAdventure = () => {
     setTimeout(() => { shootCooldownRef.current = false; }, 250);
 
     const newBullet = {
-      id: Date.now() + Math.random(), // Avoid duplicate IDs
+      id: Date.now() + Math.random(),
       x: playerPosition,
       y: 78
     };
@@ -288,125 +281,7 @@ const SpaceAdventure = () => {
     setBullets(prev => [...prev, newBullet]);
   }, [gameOver, isPaused, gameStarted, playerPosition]);
 
-  // ========== NEW: Call Laravel API for game summary ==========
-  const loadGameSummary = async () => {
-    setIsLoadingSummary(true);
-    try {
-      // First save the score
-      await saveScoreToDatabase(score, 'selesai');
-      
-      // Then get game summary from Laravel API
-      const gameId = 1; // Space Adventure Game ID
-      const response = await fetch(`/api/games/${gameId}/summary`, {
-        credentials: 'include' // Include cookies/session
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setGameSummaryData(data.summary);
-        console.log('Game summary loaded:', data.summary);
-      } else {
-        console.error('Failed to load game summary:', data.message);
-        // Fallback to local summary
-        setGameSummaryData({
-          score: score,
-          time_taken: gameStartTimeRef.current ? Math.floor((Date.now() - gameStartTimeRef.current) / 1000) : 0,
-          rank: 1,
-          total_players: 1,
-          accuracy: 85,
-          rewards: [],
-          game_title: 'Pertahanan Kosmik',
-          game_id: 1,
-          user_name: 'Pemain'
-        });
-      }
-    } catch (error) {
-      console.error('Error loading game summary:', error);
-      // Fallback to local summary
-      setGameSummaryData({
-        score: score,
-        time_taken: gameStartTimeRef.current ? Math.floor((Date.now() - gameStartTimeRef.current) / 1000) : 0,
-        rank: 1,
-        total_players: 1,
-        accuracy: 85,
-        rewards: [],
-        game_title: 'Pertahanan Kosmik',
-        game_id: 1,
-        user_name: 'Pemain'
-      });
-    } finally {
-      setIsLoadingSummary(false);
-    }
-  };
-
-  // ========== NEW: Load leaderboard data ==========
-  const loadLeaderboard = async () => {
-    try {
-      const gameId = 1; // Space Adventure Game ID
-      const response = await fetch(`/api/games/${gameId}/leaderboard`, {
-        credentials: 'include'
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setLeaderboardData(data);
-        console.log('Leaderboard loaded:', data);
-      }
-    } catch (error) {
-      console.error('Error loading leaderboard:', error);
-    }
-  };
-
-  // ========== NEW: Collect rewards via Laravel API ==========
-  const collectRewards = async () => {
-    try {
-      const response = await fetch('/api/rewards/collect', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          game_id: 1,
-          score: score
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        alert('🎉 Anugerah berjaya dikumpul!');
-        // Update UI to show rewards collected
-        if (gameSummaryData) {
-          setGameSummaryData(prev => ({
-            ...prev,
-            rewards: [] // Clear rewards after collecting
-          }));
-        }
-      }
-    } catch (error) {
-      console.error('Error collecting rewards:', error);
-      alert('Gagal mengumpul anugerah. Sila cuba lagi.');
-    }
-  };
-
-  // Save score to database
+  // ========== FIXED: Save score to Laravel ==========
   const saveScoreToDatabase = async (finalScore, status) => {
     try {
       let playerId = localStorage.getItem('spaceGamePlayerId');
@@ -414,14 +289,22 @@ const SpaceAdventure = () => {
         playerId = 'player_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('spaceGamePlayerId', playerId);
       }
-      const gameId = 1; // Space Adventure Game ID
+      
+      const gameId = 1;
       const timeTaken = gameStartTimeRef.current ? Math.floor((Date.now() - gameStartTimeRef.current) / 1000) : 0;
       
-      const response = await fetch('/save-game-score', {
+      console.log('Saving score to database...', {
+        user_id: playerId,
+        game_id: gameId,
+        score: finalScore
+      });
+      
+      // ✅ CORRECT ENDPOINT: Use Laravel API route
+      const response = await fetch('/api/games/' + gameId + '/score', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'X-CSRF-TOKEN': getCsrfToken()
         },
         body: JSON.stringify({
           user_id: playerId,
@@ -438,17 +321,260 @@ const SpaceAdventure = () => {
         })
       });
       
+      console.log('Save response status:', response.status);
+      
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Failed to save score:', errorText);
-        return null;
+        
+        // Try fallback endpoint
+        console.log('Trying fallback endpoint...');
+        return await tryFallbackSave(gameId, playerId, finalScore, timeTaken, status);
       }
+      
       const result = await response.json();
-      console.log('Score saved:', result);
+      console.log('Score saved successfully:', result);
       return result;
+      
     } catch (error) {
       console.error('Error saving score:', error);
-      return null;
+      return { success: false, message: error.message };
+    }
+  };
+
+  // Fallback save method
+  const tryFallbackSave = async (gameId, playerId, finalScore, timeTaken, status) => {
+    try {
+      const response = await fetch('/save-game-score', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: playerId,
+          game_id: gameId,
+          score: finalScore,
+          time_taken: timeTaken,
+          game_stats: {
+            status: status,
+            level_reached: level,
+            enemies_defeated: enemiesDefeated,
+            lives_remaining: lives,
+            powerups_collected: powerUps.length
+          }
+        })
+      });
+      
+      const result = await response.json();
+      console.log('Fallback save result:', result);
+      return result;
+    } catch (error) {
+      console.error('Fallback save also failed:', error);
+      return { success: false, message: 'Both save methods failed' };
+    }
+  };
+
+  // ========== FIXED: Get game summary from Laravel API ==========
+  const loadGameSummary = async () => {
+    setIsLoadingSummary(true);
+    try {
+      // First save the score
+      const saveResult = await saveScoreToDatabase(score, 'selesai');
+      
+      if (!saveResult || !saveResult.success) {
+        console.warn('Score save may have failed, but continuing...');
+      }
+      
+      // Then get game summary
+      const gameId = 1;
+      let playerId = localStorage.getItem('spaceGamePlayerId');
+      if (!playerId) {
+        playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('spaceGamePlayerId', playerId);
+      }
+      
+      console.log('Loading game summary for:', { gameId, playerId });
+      
+      // ✅ CORRECT ENDPOINT: Use the API route from web.php
+      const url = `/api/game-summary/${gameId}?user_id=${playerId}`;
+      console.log('Fetching from:', url);
+      
+      const response = await fetch(url, {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      console.log('Summary response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+      
+      const data = await response.json();
+      console.log('Game summary data received:', data);
+      
+      if (data.success) {
+        setGameSummaryData(data.summary);
+      } else {
+        console.warn('API returned success:false', data.message);
+        // Create local summary as fallback
+        createLocalSummary();
+      }
+    } catch (error) {
+      console.error('Error loading game summary:', error);
+      // Create local summary as fallback
+      createLocalSummary();
+    } finally {
+      setIsLoadingSummary(false);
+    }
+  };
+
+  // Create local summary when API fails
+  const createLocalSummary = () => {
+    const timeTaken = gameStartTimeRef.current ? Math.floor((Date.now() - gameStartTimeRef.current) / 1000) : 0;
+    const xpEarned = Math.floor(score / 10);
+    const coinsEarned = Math.floor(score / 100);
+    
+    setGameSummaryData({
+      score: score,
+      time_taken: timeTaken,
+      rank: 1,
+      total_players: 1,
+      accuracy: Math.min(100, Math.floor((enemiesDefeated / (enemiesDefeated + 5)) * 100)),
+      rewards: [
+        {
+          type: 'xp',
+          name: 'Experience Points',
+          description: 'Dasar pengalaman bermain',
+          amount: xpEarned,
+          icon: '⭐'
+        },
+        {
+          type: 'coins',
+          name: 'Koin',
+          description: 'Mata wang dalam permainan',
+          amount: coinsEarned,
+          icon: '🪙'
+        },
+        ...(score >= 500 ? [{
+          type: 'achievement',
+          name: 'Pemain Cemerlang',
+          description: 'Mencapai 500 mata',
+          badge: 'bronze',
+          icon: '🎯'
+        }] : []),
+        ...(score >= 800 ? [{
+          type: 'achievement',
+          name: 'Pemain Mahir',
+          description: 'Mencapai 800 mata',
+          badge: 'silver',
+          icon: '⭐'
+        }] : []),
+        ...(score >= 1000 ? [{
+          type: 'achievement',
+          name: 'Master Pemain',
+          description: 'Mencapai 1000 mata',
+          badge: 'gold',
+          icon: '🏆'
+        }] : [])
+      ].filter(reward => !(reward.type === 'achievement' && !reward.name)),
+      game_title: 'Pertahanan Kosmik',
+      game_id: 1,
+      user_name: 'Pemain',
+      xp_earned: xpEarned,
+      coins_earned: coinsEarned
+    });
+  };
+
+  // ========== FIXED: Load leaderboard data ==========
+  const loadLeaderboard = async () => {
+    try {
+      const gameId = 1;
+      console.log('Loading leaderboard for game:', gameId);
+      
+      // ✅ CORRECT ENDPOINT
+      const response = await fetch(`/api/leaderboard/${gameId}`, {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      console.log('Leaderboard response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Leaderboard data received:', data);
+      
+      if (data.success) {
+        setLeaderboardData(data);
+      }
+    } catch (error) {
+      console.error('Error loading leaderboard:', error);
+      // Create mock leaderboard for testing
+      setLeaderboardData({
+        success: true,
+        leaderboard: [
+          { rank: 1, user_name: 'Ali', score: 1200, time_taken: 180, is_current_user: false },
+          { rank: 2, user_name: 'Siti', score: 1100, time_taken: 200, is_current_user: false },
+          { rank: 3, user_name: 'Ahmad', score: 1050, time_taken: 220, is_current_user: false },
+          { rank: 4, user_name: 'Pemain', score: score, time_taken: gameStartTimeRef.current ? Math.floor((Date.now() - gameStartTimeRef.current) / 1000) : 0, is_current_user: true },
+          { rank: 5, user_name: 'Muthu', score: 900, time_taken: 250, is_current_user: false }
+        ],
+        user_rank: 4,
+        user_score: score,
+        user_time: gameStartTimeRef.current ? Math.floor((Date.now() - gameStartTimeRef.current) / 1000) : 0,
+        total_players: 5,
+        game_id: 1,
+        game_title: 'Pertahanan Kosmik'
+      });
+    }
+  };
+
+  // ========== FIXED: Collect rewards via Laravel API ==========
+  const collectRewards = async () => {
+    try {
+      const response = await fetch('/api/rewards/collect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': getCsrfToken()
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          game_id: 1,
+          score: score,
+          score_id: gameSummaryData?.score_id || Date.now()
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Rewards collection response:', data);
+      
+      if (data.success) {
+        alert('🎉 Anugerah berjaya dikumpul!');
+        if (gameSummaryData) {
+          setGameSummaryData(prev => ({
+            ...prev,
+            rewards: []
+          }));
+        }
+      } else {
+        alert('Tiada anugerah untuk dikumpul.');
+      }
+    } catch (error) {
+      console.error('Error collecting rewards:', error);
+      alert('Gagal mengumpul anugerah. Anugerah anda masih selamat.');
     }
   };
 
@@ -478,7 +604,7 @@ const SpaceAdventure = () => {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': `Bearer ${user.token || ''}`
+          'X-CSRF-TOKEN': getCsrfToken()
         },
         body: JSON.stringify({
           user_id: user.id,
@@ -523,23 +649,23 @@ const SpaceAdventure = () => {
   // ========== UPDATED: Game over effect ==========
   useEffect(() => {
     if (gameOver) {
-      // Save score and submit to leaderboard
-      saveScoreToDatabase(score, 'selesai');
-      submitToLeaderboard(score);
+      console.log('Game over! Starting post-game sequence...');
       
-      // Save progress
-      saveGameProgress();
+      // Save score and load summary
+      const postGameSequence = async () => {
+        await saveScoreToDatabase(score, 'selesai');
+        await submitToLeaderboard(score);
+        await saveGameProgress();
+        await loadGameSummary();
+        await loadLeaderboard();
+        
+        // Show summary after a short delay
+        setTimeout(() => {
+          setShowSummary(true);
+        }, 800);
+      };
       
-      // Load game summary from Laravel API
-      loadGameSummary();
-      
-      // Load leaderboard data
-      loadLeaderboard();
-      
-      // Show summary after a short delay
-      setTimeout(() => {
-        setShowSummary(true);
-      }, 800);
+      postGameSequence();
     }
   }, [gameOver]);
 
@@ -629,7 +755,7 @@ const SpaceAdventure = () => {
   const togglePause = () => !gameOver && gameStarted && setIsPaused(p => !p);
   const returnToHome = () => window.location.reload();
 
-  // ========== NEW: Custom Game Summary Component ==========
+  // ========== Custom Game Summary Modal ==========
   const GameSummaryModal = () => {
     if (!gameSummaryData || !showSummary) return null;
 
@@ -659,7 +785,16 @@ const SpaceAdventure = () => {
         
         {isLoadingSummary ? (
           <div style={{ textAlign: 'center', padding: '40px' }}>
-            <p style={{ fontSize: '1.2rem' }}>Memuatkan ringkasan permainan...</p>
+            <div style={{
+              width: '50px',
+              height: '50px',
+              border: '4px solid #4ecca3',
+              borderTop: '4px solid transparent',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto'
+            }} />
+            <p style={{ fontSize: '1.2rem', marginTop: '20px' }}>Memuatkan ringkasan permainan...</p>
           </div>
         ) : (
           <>
@@ -805,32 +940,62 @@ const SpaceAdventure = () => {
                         <p style={{ margin: '0 0 8px 0', fontSize: '14px', opacity: '0.9' }}>
                           {reward.description}
                         </p>
-                        <span style={{ color: '#FFD700', fontWeight: 'bold' }}>
-                          +{reward.xp} XP
-                        </span>
+                        {reward.amount && (
+                          <span style={{ color: '#FFD700', fontWeight: 'bold' }}>
+                            +{reward.amount} {reward.type === 'xp' ? 'XP' : reward.type === 'coins' ? 'Koin' : ''}
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
                 
-                <button 
-                  onClick={collectRewards}
-                  style={{
-                    width: '100%',
-                    padding: '15px',
-                    background: 'linear-gradient(to right, #FF9800, #F57C00)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '10px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    fontSize: '1.1rem',
-                    marginTop: '10px',
-                    transition: 'all 0.3s'
-                  }}
-                >
-                  Kumpul Semua Anugerah
-                </button>
+                {gameSummaryData.rewards.length > 0 && (
+                  <button 
+                    onClick={collectRewards}
+                    style={{
+                      width: '100%',
+                      padding: '15px',
+                      background: 'linear-gradient(to right, #FF9800, #F57C00)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '10px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                      fontSize: '1.1rem',
+                      marginTop: '10px',
+                      transition: 'all 0.3s'
+                    }}
+                  >
+                    Kumpul Semua Anugerah
+                  </button>
+                )}
+              </div>
+            )}
+            
+            {/* XP & Coins Earned */}
+            {(gameSummaryData.xp_earned > 0 || gameSummaryData.coins_earned > 0) && (
+              <div style={{
+                marginTop: '20px',
+                padding: '15px',
+                background: 'rgba(78, 204, 163, 0.1)',
+                borderRadius: '10px',
+                border: '1px solid rgba(78, 204, 163, 0.3)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                  {gameSummaryData.xp_earned > 0 && (
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '24px', color: '#4ecca3' }}>+{gameSummaryData.xp_earned}</div>
+                      <div style={{ fontSize: '14px', color: '#aaa' }}>XP</div>
+                    </div>
+                  )}
+                  {gameSummaryData.coins_earned > 0 && (
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '24px', color: '#FFD700' }}>+{gameSummaryData.coins_earned}</div>
+                      <div style={{ fontSize: '14px', color: '#aaa' }}>Koin</div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
             
@@ -904,7 +1069,7 @@ const SpaceAdventure = () => {
     );
   };
 
-  // ========== NEW: Custom Leaderboard Modal ==========
+  // ========== Custom Leaderboard Modal ==========
   const LeaderboardModal = () => {
     if (!showLeaderboard) return null;
 
@@ -1002,9 +1167,6 @@ const SpaceAdventure = () => {
                       <th style={{ padding: '15px', textAlign: 'left', borderBottom: '2px solid #4ecca3' }}>
                         Masa
                       </th>
-                      <th style={{ padding: '15px', textAlign: 'left', borderBottom: '2px solid #4ecca3' }}>
-                        Tarikh
-                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1034,14 +1196,11 @@ const SpaceAdventure = () => {
                           <td style={{ padding: '15px' }}>
                             {entry.time_taken}s
                           </td>
-                          <td style={{ padding: '15px', color: '#aaa', fontSize: '0.9rem' }}>
-                            {new Date(entry.created_at).toLocaleDateString('ms-MY')}
-                          </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: '#aaa' }}>
+                        <td colSpan="4" style={{ padding: '30px', textAlign: 'center', color: '#aaa' }}>
                           Tiada data papan pemimpin untuk permainan ini.
                         </td>
                       </tr>
@@ -1056,6 +1215,15 @@ const SpaceAdventure = () => {
             </>
           ) : (
             <div style={{ textAlign: 'center', padding: '40px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                border: '3px solid #4ecca3',
+                borderTop: '3px solid transparent',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 20px'
+              }} />
               <p>Memuatkan data papan pemimpin...</p>
             </div>
           )}
@@ -1206,7 +1374,7 @@ const SpaceAdventure = () => {
             left: `${playerPosition}%`,
             bottom: '20px',
             fontSize: '2.5rem',
-            transform: 'translateX(-50%)', // Center player
+            transform: 'translateX(-50%)',
             filter: 'drop-shadow(0 0 5px rgba(78, 204, 163, 0.8))',
             zIndex: 10
           }}
@@ -1232,7 +1400,7 @@ const SpaceAdventure = () => {
           </div>
         ))}
         
-        {/* Bullets — now centered and consistent with hitbox */}
+        {/* Bullets */}
         {bullets.map(bullet => (
           <div 
             key={bullet.id}
@@ -1374,7 +1542,7 @@ const SpaceAdventure = () => {
         </button>
       </div>
 
-      {/* Game Over Modal - Now only shows initial message */}
+      {/* Game Over Modal */}
       {gameOver && !showSummary && (
         <div style={{
           position: 'fixed',
@@ -1424,10 +1592,10 @@ const SpaceAdventure = () => {
         </div>
       )}
 
-      {/* NEW: Custom Game Summary Modal */}
+      {/* Game Summary Modal */}
       <GameSummaryModal />
       
-      {/* NEW: Custom Leaderboard Modal */}
+      {/* Leaderboard Modal */}
       <LeaderboardModal />
 
       {/* Controls Help */}

@@ -143,36 +143,24 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 
-// ========== UNIVERSAL GAME SUMMARY ROUTES ==========
-// These work for ALL games - add this section
+// ========== PUBLIC GAME ROUTES ==========
 
-// Simple game summary page (with score in URL)
-Route::get('/game-summary', function() {
-    return view('game-summary'); // Your universal Blade file
-});
-
-// Game summary with game ID in URL (cleaner)
-Route::get('/games/{id}/summary', function($id) {
-    try {
-        $game = \App\Models\Game::find($id);
-        $gameTitle = $game ? $game->title : 'Permainan';
-    } catch (\Exception $e) {
-        $gameTitle = 'Permainan';
-    }
-    
+// Game summary page (accessible without auth)
+Route::get('/game-summary/{gameId}/{userId?}', function($gameId, $userId = null) {
     return view('game-summary', [
-        'game_id' => $id,
-        'game_title' => $gameTitle
+        'game_id' => $gameId,
+        'user_id' => $userId,
+        'game_title' => 'Permainan'
     ]);
-})->name('games.summary');
+})->name('game-summary');
 
-// Quick test route for game summary
-Route::get('/test-summary/{id?}', function($id = 1) {
-    return view('game-summary', [
-        'game_id' => $id,
-        'game_title' => 'Permainan Test'
+// Leaderboard page (accessible without auth)
+Route::get('/leaderboard/{gameId}', function($gameId) {
+    return view('leaderboard', [
+        'game_id' => $gameId,
+        'game_title' => 'Leaderboard'
     ]);
-});
+})->name('leaderboard');
 
 // ========== PROTECTED ROUTES (Require Authentication) ==========
 
@@ -283,14 +271,12 @@ Route::prefix('api')->group(function () {
     // Game score saving (public for now, can be protected)
     Route::post('/games/{id}/score', [GameController::class, 'saveScore']);
     
-    // Game summary and leaderboard routes (protected)
+    // GAME SUMMARY & LEADERBOARD API ROUTES - ADD THESE
+    Route::get('/game-summary/{gameId}', [GameController::class, 'getGameSummary'])->name('api.game-summary');
+    Route::get('/leaderboard/{gameId}', [GameController::class, 'getLeaderboard'])->name('api.leaderboard');
+    
+    // Collect rewards (protected)
     Route::middleware(['auth'])->group(function () {
-        // Game summary after completion
-        Route::get('/games/{game}/summary', [GameController::class, 'getGameSummary'])->name('api.games.summary');
-        
-        // Game leaderboard
-        Route::get('/games/{game}/leaderboard', [GameController::class, 'getLeaderboard'])->name('api.games.leaderboard');
-        
         // Collect rewards
         Route::post('/rewards/collect', [GameController::class, 'collectRewards'])->name('api.rewards.collect');
     });
@@ -313,20 +299,20 @@ Route::prefix('api')->group(function () {
     });
 });
 
-// ========== PUBLIC GAME ROUTES (for playing games without auth) ==========
+// ========== PUBLIC GAME PLAYING ROUTES ==========
 Route::prefix('play')->group(function () {
     Route::get('/games', [GameController::class, 'index'])->name('play.games.index');
     Route::get('/games/{id}', [GameController::class, 'show'])->name('play.games.show');
     
     // Game summary page (public facing)
-    Route::get('/games/{game}/summary-page', function ($gameId) {
-        return view('games.summary', ['game_id' => $gameId]);
-    })->name('play.games.summary-page');
+    Route::get('/games/{game}/summary', function ($gameId) {
+        return view('game-summary', ['game_id' => $gameId]);
+    })->name('play.games.summary');
     
     // Leaderboard page (public facing)
-    Route::get('/games/{game}/leaderboard-page', function ($gameId) {
-        return view('games.leaderboard', ['game_id' => $gameId]);
-    })->name('play.games.leaderboard-page');
+    Route::get('/games/{game}/leaderboard', function ($gameId) {
+        return view('leaderboard', ['game_id' => $gameId]);
+    })->name('play.games.leaderboard');
 });
 
 // ========== TEST ROUTES (Remove in production) ==========
@@ -336,6 +322,14 @@ Route::get('/test-game-summary/{gameId}', function ($gameId) {
 
 Route::get('/test-leaderboard/{gameId}', function ($gameId) {
     return view('test.leaderboard-test', ['game_id' => $gameId]);
+});
+
+// Simple test routes
+Route::get('/test-summary/{id?}', function($id = 1) {
+    return view('game-summary', [
+        'game_id' => $id,
+        'game_title' => 'Permainan Test'
+    ]);
 });
 
 // ========== FALLBACK ROUTES ==========
