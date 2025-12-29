@@ -38,22 +38,7 @@
         </button>
     </div>
 
-    <div id="student-panel-wrap">
-        @php
-            $dummyStudent = (object)['id'=>null,'name'=>'Tiada'];
-            $dummyStats = [
-                'average_score'=>'Tiada',
-                'highest_score'=>'Tiada',
-                'weakest_score'=>'Tiada',
-                'highest_subject'=>null,
-                'weakest_subject'=>null,
-                'attempts'=>[]
-            ];
-        @endphp
-        @include('reports.partials.student_panel', [
-            'student' => $dummyStudent,
-            'stats' => $dummyStats
-        ])
+    <div id="student-panel-wrap" style="display:none;">
     </div>
 
 
@@ -167,15 +152,18 @@ openStudentBtn.addEventListener('click', async () => {
         }
 
         const contentType = res.headers.get('content-type');
+        const panelWrap = document.getElementById('student-panel-wrap');
         if (!contentType || !contentType.includes('application/json')) {
             // Server returned HTML instead of JSON — render it directly as page update
             const html = await res.text();
-            document.getElementById('student-panel-wrap').innerHTML = html;
+            panelWrap.innerHTML = html;
+            panelWrap.style.display = 'block';
         } else {
             // Server returned JSON with HTML payload
             const json = await res.json();
             if (json && json.html) {
-                document.getElementById('student-panel-wrap').innerHTML = json.html;
+                panelWrap.innerHTML = json.html;
+                panelWrap.style.display = 'block';
             } else {
                 alert('Unexpected response format');
             }
