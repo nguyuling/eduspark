@@ -7,6 +7,8 @@ use App\Http\Controllers\QuizStudentController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ReportController;
+use App\Models\User;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
@@ -24,6 +26,22 @@ Route::get('/', function() {
     return redirect('/login');
 })->name('home');
 
+// Messages Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/messages', [App\Http\Controllers\MessageController::class, 'index'])->name('messages.index'); // Get users
+    Route::get('/messages/conversation/{user}', [App\Http\Controllers\MessageController::class, 'conversation'])->name('messages.conversation'); // Get conversation
+    Route::post('/messages/send', [App\Http\Controllers\MessageController::class, 'send'])->name('messages.send'); // Send message
+});
+
+
+// ==========================
+// TEMP USER PROFILE (COMING SOON)
+// ==========================
+Route::middleware('auth')->get('/users/{user}', function (User $user) {
+    return view('user.coming-soon', compact('user'));
+})->name('users.show');
+
+
 // Profile routes (authenticated only)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [UserController::class, 'profile'])->name('profile.show');
@@ -33,28 +51,26 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password.update');
 });
 
+
 // Lesson routes (authenticated only)
 Route::middleware('auth')->group(function () {
-    // List and Create
     Route::get('/lesson', [LessonController::class, 'index'])->name('lesson.index');
     Route::get('/lesson/create', [LessonController::class, 'create'])->name('lesson.create');
     Route::post('/lesson', [LessonController::class, 'store'])->name('lesson.store');
-    
-    // Preview and Download (MUST come before {id} routes)
-    Route::get('/lesson/{id}/preview', [LessonController::class, 'previewFile'])->name('lesson.preview-file');
+
+    // Preview and Download
     Route::get('/lesson/{id}/preview', [LessonController::class, 'preview'])->name('lesson.preview');
-    Route::get('/lesson/{id}/download', [LessonController::class, 'downloadLesson'])->name('lesson.download');
     Route::get('/lesson/{id}/preview-file', [LessonController::class, 'previewFile'])->name('lesson.preview-file');
+    Route::get('/lesson/{id}/download', [LessonController::class, 'downloadLesson'])->name('lesson.download');
     Route::get('/lesson/{id}/edit', [LessonController::class, 'edit'])->name('lesson.edit');
-    
-    // View, Update, Delete
+
     Route::get('/lesson/{id}', [LessonController::class, 'show'])->name('lesson.show');
     Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
     Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');
-    
-    // Legacy routes for compatibility
+
     Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
 });
+
 
 // Quiz Teacher routes
 Route::middleware('auth')->group(function () {
@@ -68,6 +84,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/teacher/quizzes/{quiz}', [QuizTeacherController::class, 'destroy'])->name('teacher.quizzes.destroy');
 });
 
+
 // Quiz Student routes
 Route::middleware('auth')->group(function () {
     Route::get('/quizzes', [QuizStudentController::class, 'index'])->name('student.quizzes.index');
@@ -77,41 +94,34 @@ Route::middleware('auth')->group(function () {
     Route::get('/quizzes/{attempt}/result', [QuizStudentController::class, 'showResult'])->name('student.quizzes.result');
 });
 
+
 // Performance routes
 Route::middleware('auth')->group(function () {
     Route::get('/performance', [PerformanceController::class, 'index'])->name('performance');
 });
 
-// Report routes (authenticated)
+
+// Report routes
 Route::middleware('auth')->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
-    // Students dropdown + detail
     Route::get('/reports/students-by-class/{class}', [ReportController::class, 'studentsByClass'])
         ->name('reports.students.byClass');
+
     Route::get('/reports/student/{id}', [ReportController::class, 'student'])
         ->name('reports.student');
+
     Route::get('/reports/student/{id}/export/csv', [ReportController::class, 'exportStudentCsv'])
         ->name('reports.student.csv');
+
     Route::get('/reports/student/{id}/export/print', [ReportController::class, 'exportStudentPdf'])
         ->name('reports.student.print');
 
-    // Class reports
-    Route::get('/reports/class', [ReportController::class, 'classIndex'])
-        ->name('reports.class');
-    Route::get('/reports/class/{class}/export/csv', [ReportController::class, 'exportClassCsv'])
-        ->name('reports.class.csv');
-    Route::get('/reports/class/{class}/export/pdf', [ReportController::class, 'exportClassPdf'])
-        ->name('reports.class.pdf');
-
-    // Student performance (optional, kept for compatibility)
-    Route::get('/reports/students', [ReportController::class, 'studentsPerformance'])
-        ->name('reports.students');
-    Route::get('/reports/students/export-csv', [ReportController::class, 'exportStudentsCsv'])
-        ->name('reports.students.csv');
-    Route::get('/reports/students/chart-data', [ReportController::class, 'studentsChartData'])
-        ->name('reports.students.chart');
+    Route::get('/reports/class', [ReportController::class, 'classIndex'])->name('reports.class');
+    Route::get('/reports/class/{class}/export/csv', [ReportController::class, 'exportClassCsv'])->name('reports.class.csv');
+    Route::get('/reports/class/{class}/export/pdf', [ReportController::class, 'exportClassPdf'])->name('reports.class.pdf');
 });
+
 
 // Forum routes
 Route::middleware('auth')->group(function () {
@@ -125,29 +135,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
 });
 
-// Games routes (Permainan in sidebar)
+
+// Games routes
 Route::middleware('auth')->group(function () {
-    Route::get('/games', function() {
-        return view('games.index');
-    })->name('games.index');
-    
-    Route::get('/games/quiz-challenge', function() {
-        return view('games.quiz-challenge');
-    })->name('games.quiz');
-    
-    Route::get('/games/whack-a-mole', function() {
-        return view('games.whack-a-mole');
-    })->name('games.whack');
-    
-    Route::get('/games/memory-match', function() {
-        return view('games.memory-match');
-    })->name('games.memory');
-    
-    Route::get('/games/cosmic-defender', function() {
-        return view('games.cosmic-defender');
-    })->name('games.cosmic');
-    
-    Route::get('/games/maze-game', function() {
-        return view('games.maze-game');
-    })->name('games.maze');
+    Route::get('/games', fn () => view('games.index'))->name('games.index');
+    Route::get('/games/quiz-challenge', fn () => view('games.quiz-challenge'))->name('games.quiz');
+    Route::get('/games/whack-a-mole', fn () => view('games.whack-a-mole'))->name('games.whack');
+    Route::get('/games/memory-match', fn () => view('games.memory-match'))->name('games.memory');
+    Route::get('/games/cosmic-defender', fn () => view('games.cosmic-defender'))->name('games.cosmic');
+    Route::get('/games/maze-game', fn () => view('games.maze-game'))->name('games.maze');
 });
