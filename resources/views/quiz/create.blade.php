@@ -109,6 +109,7 @@
               onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
               onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
               onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+              oninput="validateNaturalNumber(this)"
             >
             @error('max_attempts')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
           </div>
@@ -199,7 +200,7 @@
                 <div style="display: flex; flex-direction: column; gap: 12px;">
                     <div>
                         <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Markah <span style="color: var(--danger);">*</span></label>
-                        <input type="number" name="questions[${index}][points]" value="1" min="1" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"/>
+                        <input type="number" name="questions[${index}][points]" value="1" min="1" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';" oninput="validateNaturalNumber(this)"/>
                     </div>
                     <div>
                         <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Jenis Soalan <span style="color: var(--danger);">*</span></label>
@@ -831,6 +832,73 @@
         }, true);
     }
     
+    // Setup validation for natural number inputs (max_attempts and points)
+    function setupNaturalNumberValidation() {
+        // Setup max_attempts field
+        const maxAttemptsInput = document.getElementById('max_attempts');
+        if (maxAttemptsInput) {
+            validateNaturalNumber(maxAttemptsInput);
+        }
+        
+        // Setup delegation for points fields (they are dynamic)
+        const container = document.getElementById('questions-container');
+        if (container) {
+            container.addEventListener('change', function(e) {
+                if (e.target.name && e.target.name.includes('[points]')) {
+                    validateNaturalNumber(e.target);
+                }
+            });
+            
+            container.addEventListener('input', function(e) {
+                if (e.target.name && e.target.name.includes('[points]')) {
+                    validateNaturalNumber(e.target);
+                }
+            });
+        }
+    }
+    
+    // Function to validate natural number input
+    function validateNaturalNumber(input) {
+        // Remove non-digit characters
+        let value = input.value.replace(/[^0-9]/g, '');
+        
+        // Convert to number
+        let numValue = parseInt(value, 10);
+        
+        // Ensure minimum of 1
+        if (value === '' || numValue < 1 || isNaN(numValue)) {
+            input.value = '1';
+        } else {
+            input.value = numValue;
+        }
+    }
+    
+    // Handle paste events to ensure only natural numbers
+    function setupPasteValidation() {
+        const maxAttemptsInput = document.getElementById('max_attempts');
+        if (maxAttemptsInput) {
+            maxAttemptsInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                const numValue = parseInt(pastedText.replace(/[^0-9]/g, ''), 10);
+                this.value = (numValue >= 1) ? numValue : '1';
+            });
+        }
+        
+        // For dynamic points fields
+        const container = document.getElementById('questions-container');
+        if (container) {
+            container.addEventListener('paste', function(e) {
+                if (e.target.name && e.target.name.includes('[points]')) {
+                    e.preventDefault();
+                    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                    const numValue = parseInt(pastedText.replace(/[^0-9]/g, ''), 10);
+                    e.target.value = (numValue >= 1) ? numValue : '1';
+                }
+            });
+        }
+    }
+    
     // Validation function to check that all coding questions have hidden lines
     function validateBeforeSubmit() {
         const container = document.getElementById('questions-container');
@@ -862,9 +930,11 @@
         return true;
     }
     
-    // Initialize Malay validation messages when page loads
+    // Initialize Malay validation messages and natural number validation when page loads
     document.addEventListener('DOMContentLoaded', function() {
         setupMalayValidationMessages();
+        setupNaturalNumberValidation();
+        setupPasteValidation();
     });
 </script>
 

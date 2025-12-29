@@ -422,7 +422,7 @@ class QuizTeacherController extends Controller
 
             // 2. Redirect with success
             return redirect()->route('teacher.quizzes.index')
-                ->with('success', "Quiz \"{$quizTitle}\" and all associated data have been permanently deleted.");
+                ->with('success', "Kuiz \"{$quizTitle}\" dan semua data berkaitan telah dipadamkan secara kekal.");
 
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\DB::rollBack();
