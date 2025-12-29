@@ -28,6 +28,9 @@ const SpaceAdventure = () => {
   const [showSummary, setShowSummary] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [enemiesDefeated, setEnemiesDefeated] = useState(0);
+  const [gameSummaryData, setGameSummaryData] = useState(null);
+  const [leaderboardData, setLeaderboardData] = useState(null);
+  const [isLoadingSummary, setIsLoadingSummary] = useState(false);
   
   const gameAreaRef = useRef(null);
   const lastTimeRef = useRef(0);
@@ -285,6 +288,124 @@ const SpaceAdventure = () => {
     setBullets(prev => [...prev, newBullet]);
   }, [gameOver, isPaused, gameStarted, playerPosition]);
 
+  // ========== NEW: Call Laravel API for game summary ==========
+  const loadGameSummary = async () => {
+    setIsLoadingSummary(true);
+    try {
+      // First save the score
+      await saveScoreToDatabase(score, 'selesai');
+      
+      // Then get game summary from Laravel API
+      const gameId = 1; // Space Adventure Game ID
+      const response = await fetch(`/api/games/${gameId}/summary`, {
+        credentials: 'include' // Include cookies/session
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setGameSummaryData(data.summary);
+        console.log('Game summary loaded:', data.summary);
+      } else {
+        console.error('Failed to load game summary:', data.message);
+        // Fallback to local summary
+        setGameSummaryData({
+          score: score,
+          time_taken: gameStartTimeRef.current ? Math.floor((Date.now() - gameStartTimeRef.current) / 1000) : 0,
+          rank: 1,
+          total_players: 1,
+          accuracy: 85,
+          rewards: [],
+          game_title: 'Pertahanan Kosmik',
+          game_id: 1,
+          user_name: 'Pemain'
+        });
+      }
+    } catch (error) {
+      console.error('Error loading game summary:', error);
+      // Fallback to local summary
+      setGameSummaryData({
+        score: score,
+        time_taken: gameStartTimeRef.current ? Math.floor((Date.now() - gameStartTimeRef.current) / 1000) : 0,
+        rank: 1,
+        total_players: 1,
+        accuracy: 85,
+        rewards: [],
+        game_title: 'Pertahanan Kosmik',
+        game_id: 1,
+        user_name: 'Pemain'
+      });
+    } finally {
+      setIsLoadingSummary(false);
+    }
+  };
+
+  // ========== NEW: Load leaderboard data ==========
+  const loadLeaderboard = async () => {
+    try {
+      const gameId = 1; // Space Adventure Game ID
+      const response = await fetch(`/api/games/${gameId}/leaderboard`, {
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setLeaderboardData(data);
+        console.log('Leaderboard loaded:', data);
+      }
+    } catch (error) {
+      console.error('Error loading leaderboard:', error);
+    }
+  };
+
+  // ========== NEW: Collect rewards via Laravel API ==========
+  const collectRewards = async () => {
+    try {
+      const response = await fetch('/api/rewards/collect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          game_id: 1,
+          score: score
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        alert('🎉 Anugerah berjaya dikumpul!');
+        // Update UI to show rewards collected
+        if (gameSummaryData) {
+          setGameSummaryData(prev => ({
+            ...prev,
+            rewards: [] // Clear rewards after collecting
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error collecting rewards:', error);
+      alert('Gagal mengumpul anugerah. Sila cuba lagi.');
+    }
+  };
+
   // Save score to database
   const saveScoreToDatabase = async (finalScore, status) => {
     try {
@@ -296,7 +417,7 @@ const SpaceAdventure = () => {
       const gameId = 1; // Space Adventure Game ID
       const timeTaken = gameStartTimeRef.current ? Math.floor((Date.now() - gameStartTimeRef.current) / 1000) : 0;
       
-      const response = await fetch('/api/save-game-score', {
+      const response = await fetch('/save-game-score', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -399,6 +520,7 @@ const SpaceAdventure = () => {
     }
   };
 
+  // ========== UPDATED: Game over effect ==========
   useEffect(() => {
     if (gameOver) {
       // Save score and submit to leaderboard
@@ -408,10 +530,16 @@ const SpaceAdventure = () => {
       // Save progress
       saveGameProgress();
       
+      // Load game summary from Laravel API
+      loadGameSummary();
+      
+      // Load leaderboard data
+      loadLeaderboard();
+      
       // Show summary after a short delay
       setTimeout(() => {
         setShowSummary(true);
-      }, 500);
+      }, 800);
     }
   }, [gameOver]);
 
@@ -493,11 +621,448 @@ const SpaceAdventure = () => {
     setShowLeaderboard(false);
     setUnlockedRewards([]);
     setEnemiesDefeated(0);
+    setGameSummaryData(null);
+    setLeaderboardData(null);
     gameStartTimeRef.current = Date.now();
   };
   
   const togglePause = () => !gameOver && gameStarted && setIsPaused(p => !p);
   const returnToHome = () => window.location.reload();
+
+  // ========== NEW: Custom Game Summary Component ==========
+  const GameSummaryModal = () => {
+    if (!gameSummaryData || !showSummary) return null;
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: '#0f3460',
+        padding: '30px',
+        borderRadius: '16px',
+        border: '3px solid #4ecca3',
+        maxWidth: '600px',
+        width: '95%',
+        zIndex: 2000,
+        boxShadow: '0 0 30px rgba(78, 204, 163, 0.7)',
+        color: 'white'
+      }}>
+        <h2 style={{ 
+          fontSize: '2.2rem', 
+          color: '#4ecca3',
+          textAlign: 'center',
+          marginBottom: '25px',
+          textShadow: '0 0 8px rgba(78, 204, 163, 0.8)'
+        }}>🎮 Permainan Tamat!</h2>
+        
+        {isLoadingSummary ? (
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <p style={{ fontSize: '1.2rem' }}>Memuatkan ringkasan permainan...</p>
+          </div>
+        ) : (
+          <>
+            {/* Score Display */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center',
+              marginBottom: '25px'
+            }}>
+              <div style={{
+                width: '180px',
+                height: '180px',
+                borderRadius: '50%',
+                background: 'white',
+                color: '#333',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                boxShadow: '0 15px 35px rgba(0,0,0,0.3)'
+              }}>
+                <span style={{ 
+                  fontSize: '64px', 
+                  fontWeight: 'bold',
+                  color: '#4a5568'
+                }}>
+                  {gameSummaryData.score}
+                </span>
+                <span style={{ 
+                  fontSize: '16px', 
+                  color: '#718096',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px'
+                }}>
+                  MATA
+                </span>
+              </div>
+            </div>
+            
+            {/* Score Details */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '15px',
+              margin: '25px 0'
+            }}>
+              <div style={{
+                textAlign: 'center',
+                padding: '15px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '10px',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <div style={{ fontSize: '14px', opacity: '0.9', marginBottom: '5px' }}>
+                  Kedudukan
+                </div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#FFD700' }}>
+                  #{gameSummaryData.rank}
+                </div>
+              </div>
+              
+              <div style={{
+                textAlign: 'center',
+                padding: '15px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '10px',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <div style={{ fontSize: '14px', opacity: '0.9', marginBottom: '5px' }}>
+                  Masa
+                </div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#4ecca3' }}>
+                  {gameSummaryData.time_taken}s
+                </div>
+              </div>
+              
+              <div style={{
+                textAlign: 'center',
+                padding: '15px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '10px',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <div style={{ fontSize: '14px', opacity: '0.9', marginBottom: '5px' }}>
+                  Ketepatan
+                </div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#2196F3' }}>
+                  {gameSummaryData.accuracy}%
+                </div>
+              </div>
+              
+              <div style={{
+                textAlign: 'center',
+                padding: '15px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '10px',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <div style={{ fontSize: '14px', opacity: '0.9', marginBottom: '5px' }}>
+                  Pemain
+                </div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#9C27B0' }}>
+                  {gameSummaryData.total_players}
+                </div>
+              </div>
+            </div>
+            
+            {/* Rewards Section */}
+            {gameSummaryData.rewards && gameSummaryData.rewards.length > 0 && (
+              <div style={{ marginTop: '25px' }}>
+                <h3 style={{ 
+                  fontSize: '1.5rem', 
+                  color: '#FFD700',
+                  textAlign: 'center',
+                  marginBottom: '15px'
+                }}>
+                  🎁 Anugerah Diperolehi!
+                </h3>
+                
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                  gap: '15px',
+                  marginBottom: '20px'
+                }}>
+                  {gameSummaryData.rewards.map((reward, index) => (
+                    <div 
+                      key={index}
+                      style={{
+                        background: 'rgba(255,255,255,0.15)',
+                        borderRadius: '12px',
+                        padding: '15px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '15px',
+                        transition: 'transform 0.3s'
+                      }}
+                    >
+                      <div style={{ fontSize: '30px' }}>{reward.icon}</div>
+                      <div style={{ textAlign: 'left', flex: 1 }}>
+                        <h4 style={{ margin: '0 0 5px 0', fontSize: '16px' }}>{reward.name}</h4>
+                        <p style={{ margin: '0 0 8px 0', fontSize: '14px', opacity: '0.9' }}>
+                          {reward.description}
+                        </p>
+                        <span style={{ color: '#FFD700', fontWeight: 'bold' }}>
+                          +{reward.xp} XP
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <button 
+                  onClick={collectRewards}
+                  style={{
+                    width: '100%',
+                    padding: '15px',
+                    background: 'linear-gradient(to right, #FF9800, #F57C00)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '1.1rem',
+                    marginTop: '10px',
+                    transition: 'all 0.3s'
+                  }}
+                >
+                  Kumpul Semua Anugerah
+                </button>
+              </div>
+            )}
+            
+            {/* Action Buttons */}
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '12px', 
+              marginTop: '30px' 
+            }}>
+              <button 
+                style={{
+                  padding: '15px 25px',
+                  background: 'linear-gradient(to right, #4CAF50, #45a049)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s'
+                }}
+                onClick={() => {
+                  resetGame();
+                  setShowSummary(false);
+                }}
+              >
+                🔄 Main Semula
+              </button>
+              
+              <button 
+                style={{
+                  padding: '15px 25px',
+                  background: 'linear-gradient(to right, #2196F3, #1976D2)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s'
+                }}
+                onClick={() => {
+                  setShowSummary(false);
+                  setShowLeaderboard(true);
+                }}
+              >
+                🏆 Papan Pemimpin
+              </button>
+              
+              <button 
+                style={{
+                  padding: '15px 25px',
+                  background: 'linear-gradient(to right, #9C27B0, #7B1FA2)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s'
+                }}
+                onClick={returnToHome}
+              >
+                ← Kembali ke Menu
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  // ========== NEW: Custom Leaderboard Modal ==========
+  const LeaderboardModal = () => {
+    if (!showLeaderboard) return null;
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 2000,
+        padding: '20px'
+      }}>
+        <div style={{ 
+          width: '95%', 
+          maxWidth: '800px',
+          maxHeight: '85vh',
+          overflowY: 'auto',
+          borderRadius: '16px',
+          backgroundColor: '#0f3460',
+          border: '3px solid #4ecca3',
+          padding: '25px',
+          color: 'white'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            marginBottom: '20px'
+          }}>
+            <h2 style={{ 
+              fontSize: '2rem', 
+              color: '#4ecca3',
+              margin: 0
+            }}>
+              🏆 Papan Pemimpin
+            </h2>
+            <button 
+              onClick={() => setShowLeaderboard(false)}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#f44336',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              ✕ Tutup
+            </button>
+          </div>
+          
+          {leaderboardData ? (
+            <>
+              {leaderboardData.user_rank && leaderboardData.user_rank > 10 && (
+                <div style={{
+                  background: '#e3f2fd',
+                  padding: '15px',
+                  borderRadius: '10px',
+                  marginBottom: '20px',
+                  textAlign: 'center',
+                  color: '#1976D2'
+                }}>
+                  <h3 style={{ margin: '0 0 5px 0' }}>Kedudukan Anda: #{leaderboardData.user_rank}</h3>
+                  <p style={{ margin: '0', fontSize: '0.9rem' }}>
+                    Skor: {leaderboardData.user_score} mata | Masa: {leaderboardData.user_time}s
+                  </p>
+                </div>
+              )}
+              
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  borderRadius: '8px',
+                  overflow: 'hidden'
+                }}>
+                  <thead>
+                    <tr style={{ background: 'rgba(78, 204, 163, 0.2)' }}>
+                      <th style={{ padding: '15px', textAlign: 'left', borderBottom: '2px solid #4ecca3' }}>
+                        Kedudukan
+                      </th>
+                      <th style={{ padding: '15px', textAlign: 'left', borderBottom: '2px solid #4ecca3' }}>
+                        Nama
+                      </th>
+                      <th style={{ padding: '15px', textAlign: 'left', borderBottom: '2px solid #4ecca3' }}>
+                        Skor
+                      </th>
+                      <th style={{ padding: '15px', textAlign: 'left', borderBottom: '2px solid #4ecca3' }}>
+                        Masa
+                      </th>
+                      <th style={{ padding: '15px', textAlign: 'left', borderBottom: '2px solid #4ecca3' }}>
+                        Tarikh
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leaderboardData.leaderboard && leaderboardData.leaderboard.length > 0 ? (
+                      leaderboardData.leaderboard.map((entry, index) => (
+                        <tr 
+                          key={index}
+                          style={{
+                            background: entry.is_current_user ? 'rgba(255, 215, 0, 0.15)' : 'transparent',
+                            borderBottom: '1px solid rgba(255,255,255,0.1)'
+                          }}
+                        >
+                          <td style={{ padding: '15px' }}>
+                            <strong style={{ 
+                              color: entry.rank <= 3 ? 
+                                ['#FFD700', '#C0C0C0', '#CD7F32'][entry.rank-1] : '#666' 
+                            }}>
+                              {entry.rank <= 3 ? ['🥇', '🥈', '🥉'][entry.rank-1] : ''} #{entry.rank}
+                            </strong>
+                          </td>
+                          <td style={{ padding: '15px' }}>
+                            {entry.user_name} {entry.is_current_user ? ' (Anda)' : ''}
+                          </td>
+                          <td style={{ padding: '15px', fontWeight: 'bold' }}>
+                            {entry.score}
+                          </td>
+                          <td style={{ padding: '15px' }}>
+                            {entry.time_taken}s
+                          </td>
+                          <td style={{ padding: '15px', color: '#aaa', fontSize: '0.9rem' }}>
+                            {new Date(entry.created_at).toLocaleDateString('ms-MY')}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: '#aaa' }}>
+                          Tiada data papan pemimpin untuk permainan ini.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div style={{ marginTop: '20px', textAlign: 'center', color: '#aaa', fontSize: '0.9rem' }}>
+                Jumlah Pemain: {leaderboardData.total_players || 0}
+              </div>
+            </>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '40px' }}>
+              <p>Memuatkan data papan pemimpin...</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   // UI
   if (!gameStarted) {
@@ -809,8 +1374,8 @@ const SpaceAdventure = () => {
         </button>
       </div>
 
-      {/* Game Over Modal */}
-      {gameOver && (
+      {/* Game Over Modal - Now only shows initial message */}
+      {gameOver && !showSummary && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -833,87 +1398,37 @@ const SpaceAdventure = () => {
             width: '90%',
             boxShadow: '0 0 25px rgba(78, 204, 163, 0.7)'
           }}>
-            <h3 style={{ color: '#ff5252', fontSize: '2.2rem', marginBottom: '20px', textShadow: '0 0 6px rgba(255, 82, 82, 0.8)' }}>🛑 Permainan Tamat!</h3>
-            <p style={{ fontSize: '1.3rem', marginBottom: '12px', color: '#FFD700' }}>Markah Akhir: <strong style={{ color: '#4ecca3', fontSize: '1.4rem' }}>{score}</strong></p>
-            <p style={{ fontSize: '1.2rem', marginBottom: '12px' }}>Tahap Dicapai: <strong>{level}</strong></p>
-            <p style={{ fontSize: '1.2rem', marginBottom: '12px' }}>Musuh Ditumpaskan: <strong>{enemiesDefeated}</strong></p>
-            <p style={{ fontSize: '1.2rem', marginBottom: '20px' }}>Nyawa Baki: <strong>{lives}</strong></p>
-            
-            {showSummary && (
-              <>
-                <GameSummary progress={gameProgress} game={{ name: 'Pertahanan Kosmik' }} />
-                
-                {unlockedRewards.length > 0 && (
-                  <div style={{ marginTop: '20px' }}>
-                    <RewardsDisplay 
-                      rewards={unlockedRewards}
-                      onClaim={(reward) => console.log('Ganjaran dituntut:', reward)}
-                    />
-                  </div>
-                )}
-              </>
+            <h3 style={{ color: '#ff5252', fontSize: '2.2rem', marginBottom: '20px', textShadow: '0 0 6px rgba(255, 82, 82, 0.8)' }}>
+              🛑 Permainan Tamat!
+            </h3>
+            <p style={{ fontSize: '1.3rem', marginBottom: '12px', color: '#FFD700' }}>
+              Markah Akhir: <strong style={{ color: '#4ecca3', fontSize: '1.4rem' }}>{score}</strong>
+            </p>
+            <p style={{ fontSize: '1.1rem', marginBottom: '20px' }}>
+              Memuatkan ringkasan permainan...
+            </p>
+            {isLoadingSummary && (
+              <div style={{ margin: '20px 0' }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  border: '3px solid #4ecca3',
+                  borderTop: '3px solid transparent',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  margin: '0 auto'
+                }} />
+              </div>
             )}
-            
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '25px', flexWrap: 'wrap' }}>
-              <button 
-                style={{
-                  padding: '12px 25px',
-                  backgroundColor: '#4CAF50',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  fontSize: '1.1rem',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 6px rgba(76, 175, 80, 0.4)'
-                }}
-                onClick={() => {
-                  resetGame();
-                  setShowSummary(false);
-                  setUnlockedRewards([]);
-                }}
-              >
-                🔄 Main Semula
-              </button>
-              <button 
-                style={{
-                  padding: '12px 25px',
-                  backgroundColor: '#FF9800',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  fontSize: '1.1rem',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 6px rgba(255, 152, 0, 0.4)'
-                }}
-                onClick={() => setShowLeaderboard(true)}
-              >
-                📊 Lihat Kedudukan
-              </button>
-              <button 
-                style={{
-                  padding: '12px 25px',
-                  backgroundColor: '#9C27B0',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  fontSize: '1.1rem',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 6px rgba(156, 39, 176, 0.4)'
-                }}
-                onClick={returnToHome}
-              >
-                🏠 Halaman Utama
-              </button>
-            </div>
           </div>
         </div>
       )}
+
+      {/* NEW: Custom Game Summary Modal */}
+      <GameSummaryModal />
+      
+      {/* NEW: Custom Leaderboard Modal */}
+      <LeaderboardModal />
 
       {/* Controls Help */}
       {showControls && (
@@ -957,46 +1472,25 @@ const SpaceAdventure = () => {
         </div>
       )}
 
-      {/* Leaderboard Modal */}
-      {showLeaderboard && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(0, 0, 0, 0.95)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 2000,
-          padding: '20px'
-        }}>
-          <div style={{ 
-            width: '95%', 
-            maxWidth: '900px',
-            maxHeight: '85vh',
-            overflowY: 'auto',
-            borderRadius: '16px'
-          }}>
-            <Leaderboard 
-              gameId="game1" 
-              onClose={() => setShowLeaderboard(false)} 
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Explosion animation */}
+      {/* CSS Animations */}
       <style jsx>{`
         @keyframes explode {
           0% { width: 20px; height: 20px; opacity: 1; }
           100% { width: 50px; height: 50px; opacity: 0; }
         }
         
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
         button:hover {
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+        }
+        
+        button:active {
+          transform: translateY(0);
         }
       `}</style>
     </div>

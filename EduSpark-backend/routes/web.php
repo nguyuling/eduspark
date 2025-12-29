@@ -143,6 +143,37 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 
+// ========== UNIVERSAL GAME SUMMARY ROUTES ==========
+// These work for ALL games - add this section
+
+// Simple game summary page (with score in URL)
+Route::get('/game-summary', function() {
+    return view('game-summary'); // Your universal Blade file
+});
+
+// Game summary with game ID in URL (cleaner)
+Route::get('/games/{id}/summary', function($id) {
+    try {
+        $game = \App\Models\Game::find($id);
+        $gameTitle = $game ? $game->title : 'Permainan';
+    } catch (\Exception $e) {
+        $gameTitle = 'Permainan';
+    }
+    
+    return view('game-summary', [
+        'game_id' => $id,
+        'game_title' => $gameTitle
+    ]);
+})->name('games.summary');
+
+// Quick test route for game summary
+Route::get('/test-summary/{id?}', function($id = 1) {
+    return view('game-summary', [
+        'game_id' => $id,
+        'game_title' => 'Permainan Test'
+    ]);
+});
+
 // ========== PROTECTED ROUTES (Require Authentication) ==========
 
 Route::middleware(['auth'])->group(function () {
