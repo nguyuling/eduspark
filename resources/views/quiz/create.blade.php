@@ -538,11 +538,46 @@
                 .replace(new RegExp(`answers-container-${oldIndex}`, 'g'), `answers-container-${newIndex}`)
                 .replace(new RegExp(`data-index="${oldIndex}"`, 'g'), `data-index="${newIndex}"`);
             
+            // Re-attach event listeners for type change select
+            const typeSelect = card.querySelector(`.question-type-select[data-index="${newIndex}"]`);
+            if (typeSelect) {
+                // Remove all existing listeners by cloning and replacing
+                const newTypeSelect = typeSelect.cloneNode(true);
+                typeSelect.parentNode.replaceChild(newTypeSelect, typeSelect);
+                
+                // Attach new listener
+                newTypeSelect.addEventListener('change', function() {
+                    const qIndex = this.getAttribute('data-index');
+                    const type = this.value;
+                    renderAnswerFields(qIndex, type);
+                    
+                    // Handle points field based on question type
+                    const pointsInput = container.querySelector(`input[name="questions[${qIndex}][points]"]`);
+                    if (pointsInput) {
+                        if (type === QUESTION_TYPES.CODING) {
+                            pointsInput.readOnly = true;
+                            pointsInput.style.opacity = '0.6';
+                            pointsInput.style.cursor = 'not-allowed';
+                        } else {
+                            pointsInput.readOnly = false;
+                            pointsInput.style.opacity = '1';
+                            pointsInput.style.cursor = 'auto';
+                        }
+                    }
+                });
+            }
+            
             // Re-attach event listeners for code textarea if it's a coding question
             const fullCodeTextarea = card.querySelector(`.code-full-textarea[data-index="${newIndex}"]`);
             if (fullCodeTextarea) {
-                fullCodeTextarea.addEventListener('input', function() {
+                const newCodeTextarea = fullCodeTextarea.cloneNode(true);
+                fullCodeTextarea.parentNode.replaceChild(newCodeTextarea, fullCodeTextarea);
+                
+                newCodeTextarea.addEventListener('input', function() {
                     updateCodeLineNumbers(this, newIndex);
+                });
+                newCodeTextarea.addEventListener('keydown', function(e) {
+                    handleTabKey(e, newIndex);
                 });
             }
         });
@@ -626,17 +661,67 @@
         // 1. Initial Load: Render the first question
         // Fix: Use insertAdjacentHTML and renderAnswerFields to ensure correct setup
         container.insertAdjacentHTML('beforeend', questionTemplate(questionIndex));
-        renderAnswerFields(questionIndex, QUESTION_TYPES.MC); 
+        renderAnswerFields(questionIndex, QUESTION_TYPES.MC);
+        
+        // Setup type change listener for initial question
+        const initialTypeSelect = container.querySelector(`.question-type-select[data-index="${questionIndex}"]`);
+        if (initialTypeSelect) {
+            initialTypeSelect.addEventListener('change', function() {
+                const qIndex = this.getAttribute('data-index');
+                const type = this.value;
+                renderAnswerFields(qIndex, type);
+                
+                // Handle points field based on question type
+                const pointsInput = container.querySelector(`input[name="questions[${qIndex}][points]"]`);
+                if (pointsInput) {
+                    if (type === QUESTION_TYPES.CODING) {
+                        pointsInput.readOnly = true;
+                        pointsInput.style.opacity = '0.6';
+                        pointsInput.style.cursor = 'not-allowed';
+                    } else {
+                        pointsInput.readOnly = false;
+                        pointsInput.style.opacity = '1';
+                        pointsInput.style.cursor = 'auto';
+                    }
+                }
+            });
+        }
+        
         questionIndex++;
 
         // 2. Add Question Button
         addQuestionBtn.addEventListener('click', function() {
             container.insertAdjacentHTML('beforeend', questionTemplate(questionIndex));
             renderAnswerFields(questionIndex, QUESTION_TYPES.MC);
+            
+            // Setup type change listener for the new question
+            const newTypeSelect = container.querySelector(`.question-type-select[data-index="${questionIndex}"]`);
+            if (newTypeSelect) {
+                newTypeSelect.addEventListener('change', function() {
+                    const qIndex = this.getAttribute('data-index');
+                    const type = this.value;
+                    renderAnswerFields(qIndex, type);
+                    
+                    // Handle points field based on question type
+                    const pointsInput = container.querySelector(`input[name="questions[${qIndex}][points]"]`);
+                    if (pointsInput) {
+                        if (type === QUESTION_TYPES.CODING) {
+                            pointsInput.readOnly = true;
+                            pointsInput.style.opacity = '0.6';
+                            pointsInput.style.cursor = 'not-allowed';
+                        } else {
+                            pointsInput.readOnly = false;
+                            pointsInput.style.opacity = '1';
+                            pointsInput.style.cursor = 'auto';
+                        }
+                    }
+                });
+            }
+            
             questionIndex++;
         });
 
-        // 3. Delegation for Dynamic Events (Type Change, Remove Question/Option)
+        // 3. Delegation for Dynamic Events (Remove Question/Option)
         container.addEventListener('click', function(e) {
             
             // Remove Question
