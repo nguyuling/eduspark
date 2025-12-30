@@ -37,6 +37,9 @@
 </div>
 
 <script>
+    console.log('🚀 PLAY WRAPPER SCRIPT LOADED!');
+    alert('SCRIPT IS RUNNING - Check console!');
+    
     let gameStartTime = Date.now();
     let overrideInstalled = false;
     
