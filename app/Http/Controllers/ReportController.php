@@ -371,7 +371,7 @@ class ReportController extends Controller
 
             // Rows
             foreach ($attemptsQuery as $r) {
-                $dateStr = $r->date ? \Carbon\Carbon::parse($r->date)->format('Y-m-d') : '';
+                $dateStr = $r->date ? substr($r->date, 0, 10) : '';
                 $score = isset($r->score) ? (float)$r->score : 0;
                 $maxPoints = isset($r->max_points) && (float)$r->max_points > 0 ? (float)$r->max_points : 100;
                 $percentage = ($score / $maxPoints) * 100;
