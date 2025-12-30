@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/lesson', [LessonController::class, 'index'])->name('lesson.index');
     Route::get('/lesson/create', [LessonController::class, 'create'])->name('lesson.create');
     Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
+    Route::get('/lesson/{id}', [LessonController::class, 'show'])->name('lesson.show');
     Route::post('/lesson', [LessonController::class, 'store'])->name('lesson.store');
     Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
     Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');
@@ -142,4 +143,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/forum/{id}', [ForumController::class, 'update'])->name('forum.update');
     Route::delete('/forum/{id}', [ForumController::class, 'destroy'])->name('forum.destroy');
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
+    
+    // Messages routes for chat functionality
+    Route::get('/messages', [ForumController::class, 'getMessages'])->name('messages.index');
+    Route::get('/messages/conversation/{userId}', [ForumController::class, 'getConversation'])->name('messages.conversation');
+    Route::post('/messages/send', [ForumController::class, 'sendMessage'])->name('messages.send');
 });

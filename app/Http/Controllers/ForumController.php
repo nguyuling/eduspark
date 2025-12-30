@@ -123,4 +123,31 @@ class ForumController extends Controller
 
         return back()->with('success', 'Reply added!');
     }
+
+    /**
+     * Get all users for messaging
+     */
+    public function getMessages()
+    {
+        $users = User::where('id', '!=', Auth::id())->get(['id', 'name']);
+        return response()->json($users);
+    }
+
+    /**
+     * Get conversation between users
+     */
+    public function getConversation($userId)
+    {
+        // This is a placeholder - implement actual message retrieval
+        return response()->json([]);
+    }
+
+    /**
+     * Send a message
+     */
+    public function sendMessage(Request $request)
+    {
+        // This is a placeholder - implement actual message sending
+        return response()->json(['success' => true]);
+    }
 }
