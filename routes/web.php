@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/lesson/create', [LessonController::class, 'create'])->name('lesson.create');
     Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
     Route::get('/lesson/{id}', [LessonController::class, 'show'])->name('lesson.show');
+    Route::get('/lesson/{id}/edit', [LessonController::class, 'edit'])->name('lesson.edit');
     Route::post('/lesson', [LessonController::class, 'store'])->name('lesson.store');
     Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
     Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');
