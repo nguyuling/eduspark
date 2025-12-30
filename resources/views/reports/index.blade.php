@@ -309,15 +309,32 @@ let trendChart = null;
 async function loadStatistics() {
     const selectedClass = document.getElementById('stats-class-select').value;
     const dateRange = document.getElementById('stats-date-range').value;
+    
+    console.log('loadStatistics called with class:', selectedClass, 'range:', dateRange);
+    
+    const debugEl = document.getElementById('debug-info');
+    if (debugEl) {
+        debugEl.style.display = 'block';
+        document.getElementById('debug-status').textContent = 'Mengemuanya data...';
+    }
 
     try {
-        const res = await fetch(`/api/statistics?class=${encodeURIComponent(selectedClass)}&range=${dateRange}`);
+        const url = `/api/statistics?class=${encodeURIComponent(selectedClass)}&range=${dateRange}`;
+        console.log('Fetching from:', url);
+        
+        const res = await fetch(url);
+        console.log('Response status:', res.status);
+        
         if (!res.ok) {
-            console.error('API Error:', res.status, res.statusText);
-            return;
+            throw new Error(`HTTP Error: ${res.status} ${res.statusText}`);
         }
+        
         const data = await res.json();
-        console.log('Statistics data:', data);
+        console.log('Received data:', data);
+        
+        if (debugEl) {
+            document.getElementById('debug-status').textContent = 'Data loaded. Avg: ' + data.avgScore + ', Attempts: ' + data.totalAttempts;
+        }
 
         // Update stat cards with default values
         document.getElementById('stat-avg-score').textContent = data.avgScore !== undefined ? data.avgScore : '0';
@@ -325,45 +342,53 @@ async function loadStatistics() {
         document.getElementById('stat-active-students').textContent = data.activeStudents !== undefined ? data.activeStudents : '0';
         document.getElementById('stat-success-rate').textContent = (data.successRate !== undefined ? data.successRate : '0') + '%';
 
-        // Update topic chart
-        if (data.topicData && data.topicData.labels && data.topicData.labels.length > 0) {
-            updateTopicChart(data.topicData);
-        } else {
-            // Show empty chart
-            const ctx = document.getElementById('topicChart').getContext('2d');
-            if (statsChart) statsChart.destroy();
-            statsChart = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: [], datasets: [{ label: 'Tiada data', data: [], backgroundColor: '#ccc' }] },
-                options: { responsive: true, maintainAspectRatio: true, indexAxis: 'y' }
-            });
-        }
+        // Only draw charts if Chart.js is available
+        if (typeof Chart !== 'undefined') {
+            // Update topic chart
+            if (data.topicData && data.topicData.labels && data.topicData.labels.length > 0) {
+                updateTopicChart(data.topicData);
+            } else {
+                const ctx = document.getElementById('topicChart').getContext('2d');
+                if (statsChart) statsChart.destroy();
+                statsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels: ['Tiada data'], datasets: [{ label: 'N/A', data: [0], backgroundColor: '#ccc' }] },
+                    options: { responsive: true, maintainAspectRatio: true, indexAxis: 'y' }
+                });
+            }
 
-        // Update trend chart
-        if (data.trendData && data.trendData.dates && data.trendData.dates.length > 0) {
-            updateTrendChart(data.trendData);
+            // Update trend chart
+            if (data.trendData && data.trendData.dates && data.trendData.dates.length > 0) {
+                updateTrendChart(data.trendData);
+            } else {
+                const ctx = document.getElementById('trendChart').getContext('2d');
+                if (trendChart) trendChart.destroy();
+                trendChart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: ['Tiada data'], datasets: [{ label: 'N/A', data: [0], borderColor: '#ccc' }] },
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
         } else {
-            // Show empty chart
-            const ctx = document.getElementById('trendChart').getContext('2d');
-            if (trendChart) trendChart.destroy();
-            trendChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: [], datasets: [{ label: 'Tiada data', data: [], borderColor: '#ccc' }] },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
+            console.warn('Chart.js not loaded');
         }
 
         // Update stats table
         if (data.classStats && data.classStats.length > 0) {
             updateStatsTable(data.classStats);
         } else {
-            // Clear table
             const tbody = document.getElementById('stats-tbody');
             tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Tiada data tersedia.</td></tr>';
         }
+        
+        if (debugEl) {
+            document.getElementById('debug-status').textContent = 'Selesai dimuatkan!';
+        }
     } catch (error) {
         console.error('Error loading statistics:', error);
-        // Show error in UI
+        if (debugEl) {
+            document.getElementById('debug-status').textContent = 'Ralat: ' + error.message;
+        }
         const tbody = document.getElementById('stats-tbody');
         tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:red;">Ralat: ' + error.message + '</td></tr>';
     }
