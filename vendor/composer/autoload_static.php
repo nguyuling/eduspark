@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit2ca1833882fa9d5d1b4ffb1e1be91a86
+class ComposerStaticInit37945a873e49cbbb3e3f5fea76eff409
 {
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -2312,6 +2312,7 @@ class ComposerStaticInit2ca1833882fa9d5d1b4ffb1e1be91a86
         'Illuminate\\Database\\Events\\DatabaseRefreshed' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Events/DatabaseRefreshed.php',
         'Illuminate\\Database\\Events\\MigrationEnded' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Events/MigrationEnded.php',
         'Illuminate\\Database\\Events\\MigrationEvent' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Events/MigrationEvent.php',
+        'Illuminate\\Database\\Events\\MigrationSkipped' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Events/MigrationSkipped.php',
         'Illuminate\\Database\\Events\\MigrationStarted' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Events/MigrationStarted.php',
         'Illuminate\\Database\\Events\\MigrationsEnded' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Events/MigrationsEnded.php',
         'Illuminate\\Database\\Events\\MigrationsEvent' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Events/MigrationsEvent.php',
@@ -6093,6 +6094,7 @@ class ComposerStaticInit2ca1833882fa9d5d1b4ffb1e1be91a86
         'SebastianBergmann\\CodeCoverage\\Util\\DirectoryCouldNotBeCreatedException' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Exception/DirectoryCouldNotBeCreatedException.php',
         'SebastianBergmann\\CodeCoverage\\Util\\Filesystem' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Util/Filesystem.php',
         'SebastianBergmann\\CodeCoverage\\Util\\Percentage' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Util/Percentage.php',
+        'SebastianBergmann\\CodeCoverage\\Util\\Xml' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Util/Xml.php',
         'SebastianBergmann\\CodeCoverage\\Version' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Version.php',
         'SebastianBergmann\\CodeCoverage\\XmlException' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Exception/XmlException.php',
         'SebastianBergmann\\CodeUnitReverseLookup\\Wizard' => __DIR__ . '/..' . '/sebastian/code-unit-reverse-lookup/src/Wizard.php',
@@ -7343,10 +7345,10 @@ class ComposerStaticInit2ca1833882fa9d5d1b4ffb1e1be91a86
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit2ca1833882fa9d5d1b4ffb1e1be91a86::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit2ca1833882fa9d5d1b4ffb1e1be91a86::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit2ca1833882fa9d5d1b4ffb1e1be91a86::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit2ca1833882fa9d5d1b4ffb1e1be91a86::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit37945a873e49cbbb3e3f5fea76eff409::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit37945a873e49cbbb3e3f5fea76eff409::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit37945a873e49cbbb3e3f5fea76eff409::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit37945a873e49cbbb3e3f5fea76eff409::$classMap;
 
         }, null, ClassLoader::class);
     }
