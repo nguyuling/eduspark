@@ -10,7 +10,7 @@
         <div class="title">Kemaskini Kuiz: {{ $quiz->title }}</div>
         <div class="sub">Ubah soalan dan tetapan kuiz anda</div>
       </div>
-        <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali">
+        <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali" onclick="return confirm('Perubahan anda tidak akan disimpan. Adakah anda pasti untuk meninggalkan halaman ini?');">
             <i class="bi bi-arrow-left"></i>Kembali
         </a>
     </div>
@@ -422,7 +422,11 @@
                 optionsHtml += rowTemplate(qIndex, i);
             }
         } else {
-            optionsHtml = rowTemplate(qIndex, 0) + rowTemplate(qIndex, 1);
+            // Show 4 options by default for MC and CHECKBOX types, 2 for others
+            const defaultOptionCount = (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.CHECKBOX) ? 4 : 2;
+            for (let i = 0; i < defaultOptionCount; i++) {
+                optionsHtml += rowTemplate(qIndex, i);
+            }
         }
         return `
             <h6 style="margin:0 0 12px 0; font-weight:600; font-size:13px;">Pilihan & Jawapan Betul <span style="color: var(--danger);">*</span></h6>
@@ -502,11 +506,7 @@
             container.innerHTML = codingTemplate(qIndex);
         } else if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF || type === QUESTION_TYPES.CHECKBOX) {
             container.innerHTML = optionTemplate(qIndex, type, options);
-            // Re-bind the add option button using the correct template
-            const addBtn = container.querySelector('.add-option-btn');
-            addBtn.onclick = function() {
-                addOptionRow(qIndex, this.previousElementSibling, rowTemplate);
-            };
+            // Note: Do NOT bind onclick here as it's handled by event delegation below
             // For True/False, immediately adjust to only two options: True and False
             if (type === QUESTION_TYPES.TF) {
                 const optionsList = container.querySelector('.options-list');
@@ -539,6 +539,152 @@
         
         // Use the passed-in rowTemplate (radio or checkbox)
         optionsList.insertAdjacentHTML('beforeend', rowTemplate(qIndex, currentOptions));
+    };
+
+    // Validate quiz title and all questions before allowing a new one to be added
+    const validateAllQuestions = () => {
+        const container = document.getElementById('questions-container');
+        const questionCards = container.querySelectorAll('[question-card]');
+        
+        // First, check if quiz title is filled
+        const titleInput = document.getElementById('title');
+        const titleValue = titleInput ? titleInput.value.trim() : '';
+        
+        if (!titleValue) {
+            alert('Sila isi medan "Tajuk Kuiz" terlebih dahulu sebelum menambah soalan baru.');
+            return false;
+        }
+        
+        if (questionCards.length === 0) return true; // No questions yet, allow adding
+        
+        // Validate ALL questions (not just the last one)
+        for (let i = 0; i < questionCards.length; i++) {
+            const card = questionCards[i];
+            const questionNum = i + 1;
+            
+            // Check if question text is not empty
+            const textArea = card.querySelector('textarea[name*="question_text"]');
+            const questionText = textArea ? textArea.value.trim() : '';
+            
+            if (!questionText) {
+                alert(`Teks soalan untuk Soalan ${questionNum} tidak boleh kosong.`);
+                return false;
+            }
+            
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            // Validation for Checkbox questions
+            if (type === QUESTION_TYPES.CHECKBOX) {
+                const checkboxes = card.querySelectorAll('input[type="checkbox"][name*="correct_answers"]');
+                const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                
+                if (checkedCount < 2) {
+                    alert(`Soalan ${questionNum} (Kotak Semak): Sekurang-kurangnya 2 jawapan yang betul mesti dipilih.`);
+                    return false;
+                }
+            }
+            
+            // Validation for Coding questions
+            else if (type === QUESTION_TYPES.CODING) {
+                const hiddenLinesInput = card.querySelector('.hidden-lines-input');
+                const hiddenLines = hiddenLinesInput ? hiddenLinesInput.value.trim() : '';
+                
+                if (!hiddenLines) {
+                    alert(`Soalan ${questionNum} (Koding): Sekurang-kurangnya 1 baris mesti dipilih sebagai baris tersembunyi.`);
+                    return false;
+                }
+            }
+            
+            // Validation for Short Answer questions
+            else if (type === QUESTION_TYPES.SA) {
+                const correctAnswerInput = card.querySelector('input[name*="correct_answer"]');
+                const correctAnswer = correctAnswerInput ? correctAnswerInput.value.trim() : '';
+                
+                if (!correctAnswer) {
+                    alert(`Soalan ${questionNum} (Jawapan Pendek): Medan jawapan yang betul tidak boleh kosong.`);
+                    return false;
+                }
+            }
+            
+            // Validation for MC and TF - check that options have text
+            else if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF) {
+                const optionInputs = card.querySelectorAll('input[name*="options"][]');
+                let hasEmptyOption = false;
+                
+                optionInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        hasEmptyOption = true;
+                    }
+                });
+                
+                if (hasEmptyOption) {
+                    alert(`Soalan ${questionNum}: Semua pilihan mesti mempunyai teks. Sila isi semua medan pilihan.`);
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    };
+
+    // Validate the previous question before allowing a new one to be added
+    const validatePreviousQuestion = () => {
+        const container = document.getElementById('questions-container');
+        const questionCards = container.querySelectorAll('[question-card]');
+        
+        if (questionCards.length === 0) return true; // No questions yet, allow adding
+        
+        // Get the last (previous) question
+        const lastCard = questionCards[questionCards.length - 1];
+        const questionNum = questionCards.length;
+        
+        // First, check if question text is not empty
+        const textArea = lastCard.querySelector('textarea[name*="question_text"]');
+        const questionText = textArea ? textArea.value.trim() : '';
+        
+        if (!questionText) {
+            alert(`Teks soalan untuk Soalan ${questionNum} tidak boleh kosong.`);
+            return false;
+        }
+        
+        const typeSelect = lastCard.querySelector('.question-type-select');
+        const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+        
+        // Validation for Checkbox questions
+        if (type === QUESTION_TYPES.CHECKBOX) {
+            const checkboxes = lastCard.querySelectorAll('input[type="checkbox"][name*="correct_answers"]');
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            
+            if (checkedCount < 2) {
+                alert(`Sekurang-kurangnya 2 jawapan yang betul mesti dipilih bagi soalan jenis Kotak Semak.`);
+                return false;
+            }
+        }
+        
+        // Validation for Coding questions
+        else if (type === QUESTION_TYPES.CODING) {
+            const hiddenLinesInput = lastCard.querySelector('.hidden-lines-input');
+            const hiddenLines = hiddenLinesInput ? hiddenLinesInput.value.trim() : '';
+            
+            if (!hiddenLines) {
+                alert(`Sekurang-kurangnya 1 baris mesti dipilih sebagai baris tersembunyi bagi soalan jenis Koding.`);
+                return false;
+            }
+        }
+        
+        // Validation for Short Answer questions
+        else if (type === QUESTION_TYPES.SA) {
+            const correctAnswerInput = lastCard.querySelector('input[name*="correct_answer"]');
+            const correctAnswer = correctAnswerInput ? correctAnswerInput.value.trim() : '';
+            
+            if (!correctAnswer) {
+                alert(`Medan jawapan yang betul tidak boleh kosong bagi soalan jenis Jawapan Pendek.`);
+                return false;
+            }
+        }
+        
+        return true;
     };
 
     // Function to update question numbers after moving
@@ -770,6 +916,11 @@
 
         // 2. Add Question Button
         addQuestionBtn.addEventListener('click', function() {
+            // Validate all questions and quiz title before adding a new one
+            if (!validateAllQuestions()) {
+                return;
+            }
+            
             container.insertAdjacentHTML('beforeend', questionTemplate(questionIndex));
             renderAnswerFields(questionIndex, QUESTION_TYPES.MC);
             
@@ -898,6 +1049,19 @@
             }
         });
         
+        // Validate that quiz title is filled before allowing question text input
+        container.addEventListener('focus', function(e) {
+            if (e.target.tagName === 'TEXTAREA' && e.target.name.includes('question_text')) {
+                const titleInput = document.getElementById('title');
+                const titleValue = titleInput ? titleInput.value.trim() : '';
+                
+                if (!titleValue) {
+                    alert('Sila isi medan "Tajuk Kuiz" terlebih dahulu sebelum menulis teks soalan.');
+                    e.target.blur();
+                }
+            }
+        }, true);
+        
     });
 
     // Validation function to sync all radio/checkbox values with their option text before submission
@@ -933,6 +1097,30 @@
                 });
             }
         });
+        
+        // STEP 2: Validate checkbox questions have at least 2 correct answers
+        let hasInvalidCheckboxQuestion = false;
+        
+        container.querySelectorAll('[question-card]').forEach(card => {
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            if (type === QUESTION_TYPES.CHECKBOX) {
+                const checkboxes = card.querySelectorAll('input[type="checkbox"][name*="correct_answers"]');
+                const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                
+                if (checkedCount < 2) {
+                    hasInvalidCheckboxQuestion = true;
+                    const questionNum = card.getAttribute('data-index') + 1;
+                    console.warn(`Soalan ${questionNum} (Kotak Semak) mempunyai kurang daripada 2 jawapan yang betul yang dipilih`);
+                }
+            }
+        });
+        
+        if (hasInvalidCheckboxQuestion) {
+            alert('Untuk soalan jenis "Kotak Semak", sekurang-kurangnya 2 jawapan yang betul mesti dipilih. Sila semak jawapan yang betul untuk setiap soalan Kotak Semak.');
+            return false;
+        }
         
         return true;
     }
