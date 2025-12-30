@@ -105,6 +105,10 @@ Route::middleware('auth')->group(function () {
     // Statistics export
     Route::get('/reports/export-statistics', [ReportController::class, 'exportStatistics'])
         ->name('reports.statistics.export');
+    
+    // Statistics API
+    Route::get('/api/statistics', [ReportController::class, 'getStatistics'])
+        ->name('api.statistics');
 });
 
 // Forum routes

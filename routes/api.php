@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 
-// Statistics API (protected by web auth)
-Route::middleware('auth:web')->get('/statistics', [ReportController::class, 'getStatistics']);
+// Statistics API (publicly accessible since reports page is protected)
+Route::get('/statistics', [ReportController::class, 'getStatistics']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
