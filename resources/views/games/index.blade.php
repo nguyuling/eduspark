@@ -1,236 +1,223 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 sm:px-6 py-8">
-    <!-- Success Messages -->
-    @if(session('success'))
-        <div class="mb-6 bg-green-100 dark:bg-green-900 border-2 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 px-4 py-4 rounded-lg font-medium">
-            {{ session('success') }}
-        </div>
+
+<div class="app">
+  <!-- Main -->
+  <main class="main">
+    <div class="header">
+      <div>
+        <div class="title">Permainan</div>
+        <div class="sub">Mainkan permainan edukatif untuk meningkatkan prestasi anda</div>
+      </div>
+    </div>
+
+    @if (session('success'))
+      <div style="background:var(--success);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;font-size:14px;">{{ session('success') }}</div>
     @endif
 
-    @if(session('success_undo'))
-        <div class="mb-6 bg-green-100 dark:bg-green-900 border-2 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 px-4 py-4 rounded-lg flex justify-between items-center">
-            <span class="font-medium">{{ session('success_undo') }}</span>
-            <form action="{{ route('games.restore', session('undo_game_id')) }}" method="POST" style="display: inline;">
-                @csrf
-                <button type="submit" class="bg-green-700 hover:bg-green-800 text-white font-bold py-1 px-4 rounded text-sm ml-4">
-                    ↩️ Undo
-                </button>
-            </form>
-        </div>
+    @if (session('error'))
+      <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;font-size:14px;">{{ session('error') }}</div>
     @endif
 
     @if(auth()->user()->role === 'teacher')
-        {{-- TEACHER VIEW --}}
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white dark:bg-gray-800 p-6 rounded-lg border-2 border-gray-300 dark:border-gray-700">
-            <div class="mb-4 sm:mb-0">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">🎮 Manage Games</h1>
-                <p class="text-gray-700 dark:text-gray-300 text-base">Create, edit, and manage educational games for your students</p>
-            </div>
-            <a href="{{ route('teacher.games.create') }}" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center gap-2 whitespace-nowrap">
-                <span class="text-lg">+</span> Create New Game
-            </a>
+      {{-- TEACHER VIEW --}}
+      <!-- Games Management Section -->
+      <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+          <div style="display:flex; gap:8px; align-items:center;">
+            <h2 style="margin:0; padding:0; font-size:18px; font-weight:700; line-height:1;">Senarai Permainan</h2>
+            <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px;">
+              {{ count($games) }}
+            </span>
+          </div>
+          <a href="{{ route('teacher.games.create') }}" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:8px 14px; border-radius:6px; cursor:pointer; font-size:14px; font-weight:600; transition:all .2s ease; text-decoration:none; border:none;" onmouseover="this.style.opacity='0.9';" onmouseout="this.style.opacity='1';" title="Buat Permainan Baru">
+            + Buat Permainan
+          </a>
         </div>
-
-        <!-- Teacher Stats -->
-        @if($games->count() > 0)
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border-2 border-gray-300 dark:border-gray-700 shadow">
-                <div class="text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Total Games</div>
-                <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ $games->count() }}</div>
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border-2 border-gray-300 dark:border-gray-700 shadow">
-                <div class="text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Published</div>
-                <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ $games->where('is_published', true)->count() }}</div>
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border-2 border-gray-300 dark:border-gray-700 shadow">
-                <div class="text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Drafts</div>
-                <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ $games->where('is_published', false)->count() }}</div>
-            </div>
-        </div>
-
-        <!-- Teacher Game Management Table -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-300 dark:border-gray-700 overflow-hidden shadow-lg">
-            <div class="px-4 sm:px-6 py-4 bg-gray-100 dark:bg-gray-900 border-b-2 border-gray-300 dark:border-gray-700">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Games List</h2>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-700">
-                        <tr>
-                            <th class="px-4 sm:px-6 py-3 text-left text-sm font-bold text-gray-900 dark:text-gray-200 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-700">Title</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-sm font-bold text-gray-900 dark:text-gray-200 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-700">Category</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-sm font-bold text-gray-900 dark:text-gray-200 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-700">Difficulty</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-sm font-bold text-gray-900 dark:text-gray-200 uppercase tracking-wider border-r-2 border-gray-300 dark:border-gray-700">Status</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-sm font-bold text-gray-900 dark:text-gray-200 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y-2 divide-gray-300 dark:divide-gray-700">
-                        @foreach($games as $game)
-                        <tr class="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150">
-                            <!-- Title Column -->
-                            <td class="px-4 sm:px-6 py-4 border-r-2 border-gray-300 dark:border-gray-700">
-                                <div class="flex flex-col">
-                                    <span class="font-bold text-gray-900 dark:text-white text-sm sm:text-base">{{ $game->title }}</span>
-                                    <span class="text-xs text-gray-700 dark:text-gray-400 mt-1">{{ Str::limit($game->description, 60) ?? 'No description' }}</span>
-                                </div>
-                            </td>
-                            
-                            <!-- Category Column -->
-                            <td class="px-4 sm:px-6 py-4 border-r-2 border-gray-300 dark:border-gray-700">
-                                <span class="text-sm font-medium text-gray-900 dark:text-gray-300">
-                                    {{ $game->category ?? '-' }}
-                                </span>
-                            </td>
-                            
-                            <!-- Difficulty Column -->
-                            <td class="px-4 sm:px-6 py-4 border-r-2 border-gray-300 dark:border-gray-700">
-                                <span class="px-3 py-1 rounded-full text-xs font-bold 
-                                    {{ $game->difficulty === 'easy' ? 'bg-green-200 text-green-900 dark:bg-green-900 dark:text-green-200' : 
-                                       ($game->difficulty === 'medium' ? 'bg-yellow-200 text-yellow-900 dark:bg-yellow-900 dark:text-yellow-200' : 
-                                       'bg-red-200 text-red-900 dark:bg-red-900 dark:text-red-200') }}">
-                                    {{ ucfirst($game->difficulty) }}
-                                </span>
-                            </td>
-                            
-                            <!-- Status Column -->
-                            <td class="px-4 sm:px-6 py-4 border-r-2 border-gray-300 dark:border-gray-700">
-                                @if($game->is_published)
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-200 text-blue-900 dark:bg-blue-900 dark:text-blue-200">Published</span>
-                                @else
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-gray-200">Draft</span>
-                                @endif
-                            </td>
-                            
-                            <!-- Actions Column -->
-                            <td class="px-4 sm:px-6 py-4">
-                                <div class="flex flex-col sm:flex-row gap-2">
-                                    <a href="{{ route('games.leaderboard', $game->id) }}" class="text-purple-700 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300 font-bold text-sm flex items-center gap-1">
-                                        📊 Leaderboard
-                                    </a>
-                                    <a href="{{ route('teacher.games.edit', $game->id) }}" class="text-blue-700 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 font-bold text-sm flex items-center gap-1">
-                                        ✏️ Edit
-                                    </a>
-                                    <button type="button" onclick="showDeleteConfirm({{ $game->id }}, '{{ $game->title }}')" class="text-red-700 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 font-bold text-sm flex items-center gap-1">
-                                        🗑️ Delete
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        @else
-        <!-- Empty State -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-300 dark:border-gray-700 p-8 sm:p-12 text-center shadow">
-            <div class="text-4xl text-gray-400 dark:text-gray-600 mb-4">🎮</div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">No games created yet</h3>
-            <p class="text-gray-700 dark:text-gray-400 mb-6 text-base">Start by creating your first educational game!</p>
-            <a href="{{ route('teacher.games.create') }}" class="inline-block bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg text-base transition-colors duration-200">
-                Create Your First Game
-            </a>
-        </div>
-        @endif
+        
+        <table style="table-layout:fixed; width:100%; border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th style="width:5%;">No.</th>
+              <th style="width:50%; text-align:left;">Permainan</th>
+              <th style="width:20%; text-align:center;">Kesukaran</th>
+              <th style="width:15%; text-align:center;">Status</th>
+              <th style="width:10%; text-align:center;">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse ($games as $index => $game)
+              <tr>
+                <td style="width:5%; padding:12px; text-align:center; font-weight:600;">{{ $index + 1 }}</td>
+                <td style="width:50%; padding:12px;">
+                  <div style="font-weight:700; margin-bottom:4px;">{{ $game->title }}</div>
+                  <div style="font-size:13px; color:var(--muted); margin-bottom:8px; line-height:1.4;">{{ $game->description ?? 'Tiada penerangan' }}</div>
+                  <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:11px; align-items:center;">
+                    <span style="background:rgba(106,77,247,0.08); padding:4px 8px; border-radius:4px;"><strong>Kategori:</strong> {{ $game->category ?? 'N/A' }}</span>
+                  </div>
+                </td>
+                <td style="width:20%; text-align:center; padding:12px;">
+                  <div style="font-weight:600; font-size:12px; padding:4px 8px; border-radius:6px; display:inline-block; 
+                    {{ $game->difficulty === 'easy' ? 'background:rgba(74,222,128,0.2); color:#22c55e;' : 
+                       ($game->difficulty === 'medium' ? 'background:rgba(251,146,60,0.2); color:#f97316;' : 
+                       'background:rgba(239,68,68,0.2); color:#ef4444;') }}">
+                    {{ ucfirst($game->difficulty ?? 'easy') }}
+                  </div>
+                </td>
+                <td style="width:15%; text-align:center; padding:12px;">
+                  <div style="font-weight:600; font-size:12px; padding:4px 8px; border-radius:6px; display:inline-block; 
+                    {{ $game->is_published ? 'background:#6A4DF7; color:#fff;' : 'background:rgba(106,77,247,0.1);' }}">
+                    {{ $game->is_published ? 'Diterbitkan' : 'Draf' }}
+                  </div>
+                </td>
+                <td style="width:10%; text-align:center; padding:12px;">
+                  <div style="display:flex; gap:12px; justify-content:center;">
+                    <a href="{{ route('teacher.games.edit', $game->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:20px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Edit">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <button type="button" onclick="showDeleteConfirm({{ $game->id }}, '{{ $game->title }}')" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--danger); padding:0; font-size:20px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Padam">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="5" style="text-align:center; padding:24px; color:var(--muted);">
+                  Tiada permainan yang dibuat lagi.
+                </td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </section>
 
     @else
-        {{-- STUDENT VIEW --}}
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border-2 border-gray-300 dark:border-gray-700 mb-8">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">🎮 Available Games</h1>
-            <p class="text-gray-700 dark:text-gray-300 text-base">Play educational games to learn and earn rewards!</p>
+      {{-- STUDENT VIEW --}}
+      <!-- Games List -->
+      <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+          <div style="display:flex; gap:8px; align-items:center;">
+            <h2 style="margin:0; padding:0; font-size:18px; font-weight:700; line-height:1;">Senarai Permainan</h2>
+            <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px;">
+              {{ count($games) }}
+            </span>
+          </div>
         </div>
-
+        
         @if($games->count() > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach($games as $game)
-                <div class="bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-300 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 h-40 flex items-center justify-center">
-                        <span class="text-5xl">🎮</span>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-2">{{ $game->title }}</h3>
-                        <p class="text-sm text-gray-700 dark:text-gray-400 mb-4">{{ Str::limit($game->description, 80) ?? 'No description' }}</p>
-                        
-                        <div class="flex flex-wrap gap-2 mb-5">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold 
-                                {{ $game->difficulty === 'easy' ? 'bg-green-200 text-green-900 dark:bg-green-900 dark:text-green-200' : 
-                                   ($game->difficulty === 'medium' ? 'bg-yellow-200 text-yellow-900 dark:bg-yellow-900 dark:text-yellow-200' : 
-                                   'bg-red-200 text-red-900 dark:bg-red-900 dark:text-red-200') }}">
-                                {{ ucfirst($game->difficulty) }}
-                            </span>
-                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-200 text-blue-900 dark:bg-blue-900 dark:text-blue-200">
-                                {{ $game->category ?? 'General' }}
-                            </span>
-                        </div>
-
-                        <div class="flex">
-                            <a href="{{ route('games.play', $game->id) }}" class="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-4 rounded text-center text-base">
-                                ▶️ Play Now
-                            </a>
-                        </div>
-                    </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:24px;">
+            @foreach($games as $game)
+              <div class="panel game-card" onclick="playGame('{{ route('games.play', $game->id) }}')" style="cursor:pointer; display:flex; flex-direction:column; height:100%; gap:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                  <div style="font-size:48px;">
+                    {{ getGameEmoji($game->title) }}
+                  </div>
+                  <span class="game-difficulty" style="display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;
+                    {{ $game->difficulty === 'easy' ? 'background:rgba(74,222,128,0.2); color:#22c55e;' : 
+                       ($game->difficulty === 'medium' ? 'background:rgba(251,146,60,0.2); color:#f97316;' : 
+                       'background:rgba(239,68,68,0.2); color:#ef4444;') }}">
+                    {{ getDifficultyInMalay($game->difficulty ?? 'easy') }}
+                  </span>
                 </div>
-                @endforeach
-            </div>
+                <div style="flex:1;">
+                  <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:inherit;">{{ $game->title }}</div>
+                  <div style="font-size:13px; color:var(--muted); line-height:1.5;">{{ $game->description ?? 'Permainan edukatif yang menyenangkan' }}</div>
+                </div>
+              </div>
+            @endforeach
+          </div>
         @else
-            <!-- Empty State for Students -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-300 dark:border-gray-700 p-8 sm:p-12 text-center shadow">
-                <div class="text-4xl text-gray-400 dark:text-gray-600 mb-4">🎮</div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">No games available</h3>
-                <p class="text-gray-700 dark:text-gray-400 text-base">Check back later for new educational games!</p>
-            </div>
+          <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--muted);">
+            <p>Belum ada permainan tersedia</p>
+          </div>
         @endif
+      </section>
     @endif
+  </main>
 </div>
+
 @endsection
 
 <script>
-function showDeleteConfirm(gameId, gameTitle) {
-    const modal = document.createElement('div');
-    modal.id = 'deleteModal';
-    modal.className = 'fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4';
-    modal.innerHTML = `
-        <div class="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full border-4 border-gray-300 dark:border-gray-700">
-            <div class="text-center">
-                <div class="text-5xl mb-4 text-yellow-600 dark:text-yellow-400">⚠️</div>
-                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Delete Game?</h3>
-                <p class="text-gray-700 dark:text-gray-300 mb-2">Are you sure you want to delete:</p>
-                <p class="font-bold text-lg text-gray-900 dark:text-white mb-4">"${gameTitle}"</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Note: You can restore it from the undo notification if needed.</p>
-                
-                <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                    <button type="button" onclick="closeDeleteModal()" class="px-6 py-3 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-bold hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-200">
-                        Cancel
-                    </button>
-                    <form action="/games/${gameId}" method="POST" style="display: inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="px-6 py-3 bg-red-700 hover:bg-red-800 text-white rounded-lg font-bold transition-colors duration-200">
-                            Yes, Delete
+    function playGame(route) {
+        // Redirect to game page
+        window.location.href = route;
+    }
+    
+    function getGameEmoji(gameName) {
+        const emojiMap = {
+            'cosmic': '🚀',
+            'whack': '🔨',
+            'memory': '🧠',
+            'maze': '🗺️',
+            'puzzle': '🧩',
+            'quiz': '❓',
+            'snake': '🐍',
+            'flappy': '🐦'
+        };
+        
+        for (const [key, emoji] of Object.entries(emojiMap)) {
+            if (gameName.toLowerCase().includes(key)) {
+                return emoji;
+            }
+        }
+        return '🎮';
+    }
+    
+    function getDifficultyInMalay(difficulty) {
+        const difficultyMap = {
+            'easy': 'Mudah',
+            'medium': 'Sederhana',
+            'hard': 'Sukar'
+        };
+        return difficultyMap[difficulty.toLowerCase()] || 'Mudah';
+    }
+
+    function showDeleteConfirm(gameId, gameTitle) {
+        const modal = document.createElement('div');
+        modal.id = 'deleteModal';
+        modal.className = 'fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4';
+        modal.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full border-4 border-gray-300 dark:border-gray-700">
+                <div class="text-center">
+                    <div class="text-5xl mb-4 text-yellow-600 dark:text-yellow-400">⚠️</div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Delete Game?</h3>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2">Are you sure you want to delete:</p>
+                    <p class="font-bold text-lg text-gray-900 dark:text-white mb-4">"${gameTitle}"</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Note: You can restore it from the undo notification if needed.</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button type="button" onclick="closeDeleteModal()" class="px-6 py-3 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-bold hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-200">
+                            Cancel
                         </button>
-                    </form>
+                        <form action="/games/${gameId}" method="POST" style="display: inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="px-6 py-3 bg-red-700 hover:bg-red-800 text-white rounded-lg font-bold transition-colors duration-200">
+                                Yes, Delete
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeDeleteModal();
-    });
-    
-    // Prevent scrolling when modal is open
-    document.body.style.overflow = 'hidden';
-}
+        `;
+        
+        document.body.appendChild(modal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeDeleteModal();
+        });
+        
+        // Prevent scrolling when modal is open
+        document.body.style.overflow = 'hidden';
+    }
 
-function closeDeleteModal() {
-    const modal = document.getElementById('deleteModal');
-    if (modal) modal.remove();
-    document.body.style.overflow = 'auto';
-}
+    function closeDeleteModal() {
+        const modal = document.getElementById('deleteModal');
+        if (modal) modal.remove();
+        document.body.style.overflow = 'auto';
+    }
 </script>
 
 <style>
