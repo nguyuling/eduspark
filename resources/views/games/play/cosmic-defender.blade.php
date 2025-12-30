@@ -37,59 +37,72 @@
 </div>
 
 <script>
-    // Track game start time
     let gameStartTime = Date.now();
+    let overrideInstalled = false;
     
-    // Wait for the page to fully load, then override endGame
-    window.addEventListener('load', function() {
-        // Store the original endGame if it exists
-        const originalEndGame = window.endGame;
-        
-        // Override endGame function
-        window.endGame = function(scoreParam) {
-            console.log('Custom endGame called with score:', scoreParam);
+    // Aggressively poll and override endGame as soon as it exists
+    const installOverride = setInterval(function() {
+        if (typeof window.endGame === 'function' && !overrideInstalled) {
+            console.log('Found endGame function, installing override...');
             
-            // Get the final score from various possible sources
-            const finalScore = scoreParam || window.score || 0;
-            const timeInSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
+            // Store original
+            const originalEndGame = window.endGame;
             
-            console.log('Final score:', finalScore, 'Time:', timeInSeconds);
+            // Override it
+            window.endGame = function(scoreParam) {
+                console.log('CUSTOM endGame triggered! Score:', scoreParam);
+                
+                const finalScore = scoreParam || window.score || 0;
+                const timeInSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
+                
+                // FORCE hide everything from the game
+                setTimeout(function() {
+                    const gameOverScreen = document.getElementById('gameOverScreen');
+                    const canvas = document.getElementById('gameCanvas');
+                    const header = document.getElementById('gameHeader');
+                    const startScreen = document.getElementById('startScreen');
+                    
+                    if (gameOverScreen) gameOverScreen.style.display = 'none !important';
+                    if (canvas) canvas.style.display = 'none !important';
+                    if (header) header.style.display = 'none !important';
+                    if (startScreen) startScreen.style.display = 'none !important';
+                    
+                    // Update our overlay
+                    document.getElementById('final-score').textContent = finalScore;
+                    document.getElementById('final-time').textContent = timeInSeconds;
+                    document.getElementById('score-input').value = finalScore;
+                    document.getElementById('time-input').value = timeInSeconds;
+                    document.getElementById('score-overlay').style.display = 'flex';
+                    
+                    console.log('Score overlay should now be visible!');
+                }, 10);
+                
+                return false; // Don't let original run
+            };
             
-            // Hide the game's built-in game over screen
-            const gameOverScreen = document.getElementById('gameOverScreen');
-            if (gameOverScreen) {
-                gameOverScreen.style.display = 'none';
-                console.log('Hid game over screen');
-            }
-            
-            // Hide canvas and header too
-            const canvas = document.getElementById('gameCanvas');
-            const header = document.getElementById('gameHeader');
-            if (canvas) canvas.style.display = 'none';
-            if (header) header.style.display = 'none';
-            
-            // Show our overlay
-            document.getElementById('final-score').textContent = finalScore;
-            document.getElementById('final-time').textContent = timeInSeconds;
-            document.getElementById('score-input').value = finalScore;
-            document.getElementById('time-input').value = timeInSeconds;
-            document.getElementById('score-overlay').style.display = 'flex';
-            
-            console.log('Showed score overlay');
-        };
-        
-        console.log('endGame override installed');
-    });
+            overrideInstalled = true;
+            clearInterval(installOverride);
+            console.log('Override successfully installed!');
+        }
+    }, 50); // Check every 50ms
     
-    // Also track when startGame is called to reset timer
+    // Track game start
     setTimeout(function() {
         const startBtn = document.getElementById('startBtn');
         if (startBtn) {
             startBtn.addEventListener('click', function() {
                 gameStartTime = Date.now();
-                console.log('Game started, timer reset');
+                console.log('Timer reset - game started');
             });
         }
-    }, 100);
+    }, 500);
+    
+    // Safety timeout - stop checking after 10 seconds
+    setTimeout(function() {
+        clearInterval(installOverride);
+        if (!overrideInstalled) {
+            console.error('Failed to install endGame override after 10 seconds');
+        }
+    }, 10000);
 </script>
 @endsection
