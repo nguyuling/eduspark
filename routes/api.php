@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 
+// Statistics API (protected by web auth)
+Route::middleware('auth:web')->get('/statistics', [ReportController::class, 'getStatistics']);
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [UserController::class, 'profile']);
@@ -20,9 +23,4 @@ Route::middleware('auth:web')->group(function () {
     Route::post('/lessons/{id}', [LessonController::class, 'update']); // For _method=PUT workaround
     Route::post('/lessons/{id}/delete', [LessonController::class, 'destroy']);
     Route::get('/lessons/{id}/preview', [LessonController::class, 'preview']);
-});
-
-// Statistics API (protected by web auth)
-Route::middleware('auth:web')->group(function () {
-    Route::get('/statistics', [ReportController::class, 'getStatistics']);
 });
