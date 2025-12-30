@@ -130,14 +130,17 @@
             @foreach($games as $game)
               <div class="panel game-card" onclick="playGame('{{ route('games.play', $game->id) }}')" style="cursor:pointer; display:flex; flex-direction:column; height:100%; gap:16px;">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                  <div style="font-size:48px;">
-                    🎮
-                  </div>
                   <span class="game-difficulty" style="display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;
                     {{ $game->difficulty === 'easy' ? 'background:rgba(74,222,128,0.2); color:#22c55e;' : 
                        ($game->difficulty === 'medium' ? 'background:rgba(251,146,60,0.2); color:#f97316;' : 
                        'background:rgba(239,68,68,0.2); color:#ef4444;') }}">
-                    {{ getDifficultyInMalay($game->difficulty ?? 'easy') }}
+                    @if($game->difficulty === 'easy')
+                      Mudah
+                    @elseif($game->difficulty === 'medium')
+                      Sederhana
+                    @else
+                      Sukar
+                    @endif
                   </span>
                 </div>
                 <div style="flex:1;">
