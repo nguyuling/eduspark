@@ -218,9 +218,9 @@ class ReportController extends Controller
             $topicAverages[$topic] = array_sum($scores_arr) / count($scores_arr);
         }
 
-        $avg = count($scores) ? round(array_sum($scores) / count($scores), 2) : 'N/A';
-        $highest = count($scores) ? round(max($scores), 2) : 'N/A';
-        $weakest = count($scores) ? round(min($scores), 2) : 'N/A';
+        $avg = count($scores) ? round(array_sum($scores) / count($scores), 2) . '%' : 'N/A';
+        $highest = count($scores) ? round(max($scores), 2) . '%' : 'N/A';
+        $weakest = count($scores) ? round(min($scores), 2) . '%' : 'N/A';
         
         $highestTopic = count($topicAverages) > 0 ? array_search(max($topicAverages), $topicAverages) : 'N/A';
         $weakestTopic = count($topicAverages) > 0 ? array_search(min($topicAverages), $topicAverages) : 'N/A';
@@ -231,7 +231,7 @@ class ReportController extends Controller
             $attemptsForView[] = [
                 'date' => $a->created_at ? date('Y-m-d', strtotime($a->created_at)) : '',
                 'title' => $a->title ?? 'N/A',
-                'score' => isset($a->score) ? round($a->score, 2) : ''
+                'score' => isset($a->score) ? round($a->score, 2) . '%' : ''
             ];
         }
 

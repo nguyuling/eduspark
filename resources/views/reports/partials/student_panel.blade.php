@@ -42,25 +42,23 @@
 
   <hr style="margin:16px 0;border:none;border-top:1px solid rgba(0,0,0,0.08)">
 
-  <div style="font-weight:700;margin-bottom:10px;">Attempts</div>
+  <div style="font-weight:700;margin-bottom:10px;">Rekod Percubaan</div>
 
   @if(!empty($stats['attempts']) && count($stats['attempts'])>0)
     <div style="overflow:auto;">
       <table style="width:100%;border-collapse:collapse;">
         <thead style="text-align:left;color:var(--muted);font-size:13px;">
           <tr>
-            <th style="padding:8px 6px;">Date</th>
-            <th style="padding:8px 6px;">Type</th>
-            <th style="padding:8px 6px;">Topic</th>
-            <th style="padding:8px 6px;">Score</th>
+            <th style="padding:8px 6px;">Tarikh</th>
+            <th style="padding:8px 6px;">Topik</th>
+            <th style="padding:8px 6px;">Skor</th>
           </tr>
         </thead>
         <tbody>
           @foreach($stats['attempts'] as $a)
             <tr>
               <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['date'] ?? '' }}</td>
-              <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['type'] ?? '' }}</td>
-              <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['topic'] ?? '' }}</td>
+              <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['title'] ?? $a['topic'] ?? '' }}</td>
               <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['score'] ?? '' }}</td>
             </tr>
           @endforeach
