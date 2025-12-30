@@ -50,53 +50,55 @@
   </div>
 
   <h2>Prestasi Mengikut Topik</h2>
-  @if(!empty($statsData['topicData']) && is_array($statsData['topicData']))
-    @if(count($statsData['topicData']) > 0)
-      <table>
-        <thead>
+  @php
+    $topicLabels = $statsData['topicData']['labels'] ?? [];
+    $topicScores = $statsData['topicData']['scores'] ?? [];
+    $hasTopicData = !empty($topicLabels) && !empty($topicScores) && count($topicLabels) > 0;
+  @endphp
+  @if($hasTopicData)
+    <table>
+      <thead>
+        <tr>
+          <th>Topik</th>
+          <th style="width:100px;" class="text-right">Purata Skor (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($topicLabels as $index => $label)
           <tr>
-            <th>Topik</th>
-            <th style="width:100px;" class="text-right">Purata Skor (%)</th>
+            <td>{{ $label ?? 'N/A' }}</td>
+            <td class="text-right">{{ number_format($topicScores[$index] ?? 0, 2) }}%</td>
           </tr>
-        </thead>
-        <tbody>
-          @foreach($statsData['topicData'] as $topic)
-            <tr>
-              <td>{{ $topic['name'] ?? $topic['label'] ?? 'N/A' }}</td>
-              <td class="text-right">{{ number_format($topic['score'] ?? 0, 2) }}%</td>
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
-    @else
-      <div class="no-data">Tiada data topik tersedia.</div>
-    @endif
+        @endforeach
+      </tbody>
+    </table>
   @else
     <div class="no-data">Tiada data topik tersedia.</div>
   @endif
 
   <h2>Tren Prestasi</h2>
-  @if(!empty($statsData['trendData']) && is_array($statsData['trendData']))
-    @if(count($statsData['trendData']) > 0)
-      <table>
-        <thead>
+  @php
+    $trendDates = $statsData['trendData']['dates'] ?? [];
+    $trendScores = $statsData['trendData']['scores'] ?? [];
+    $hasTrendData = !empty($trendDates) && !empty($trendScores) && count($trendDates) > 0;
+  @endphp
+  @if($hasTrendData)
+    <table>
+      <thead>
+        <tr>
+          <th>Tarikh</th>
+          <th style="width:100px;" class="text-right">Purata Skor (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($trendDates as $index => $date)
           <tr>
-            <th>Tarikh</th>
-            <th style="width:100px;" class="text-right">Purata Skor (%)</th>
+            <td>{{ $date ?? 'N/A' }}</td>
+            <td class="text-right">{{ number_format($trendScores[$index] ?? 0, 2) }}%</td>
           </tr>
-        </thead>
-        <tbody>
-          @foreach($statsData['trendData'] as $trend)
-            <tr>
-              <td>{{ $trend['date'] ?? $trend['label'] ?? 'N/A' }}</td>
-              <td class="text-right">{{ number_format($trend['score'] ?? 0, 2) }}%</td>
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
-    @else
-      <div class="no-data">Tiada data tren tersedia.</div>
-    @endif
+        @endforeach
+      </tbody>
+    </table>
   @else
     <div class="no-data">Tiada data tren tersedia.</div>
   @endif
