@@ -1082,42 +1082,45 @@ class ReportController extends Controller
         ->sort()
         ->values();
 
-        // Class comparison
+        // Class comparison - only include if no specific class filter applied
         $classStats = [];
-        $classes = [];
-        if (Schema::hasTable('classrooms')) {
-            $classes = DB::table('classrooms')->orderBy('name')->pluck('name')->toArray();
-        } elseif (Schema::hasTable('students')) {
-            $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
-            foreach ($possible as $col) {
-                if (Schema::hasColumn('students', $col)) {
-                    $classes = DB::table('students')->select($col)->distinct()->orderBy($col)->pluck($col)->toArray();
-                    break;
+        if (!$selectedClass || $selectedClass === 'semua' || $selectedClass === '') {
+            $classes = [];
+            if (Schema::hasTable('classrooms')) {
+                $classes = DB::table('classrooms')->orderBy('name')->pluck('name')->toArray();
+            } elseif (Schema::hasTable('students')) {
+                $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
+                foreach ($possible as $col) {
+                    if (Schema::hasColumn('students', $col)) {
+                        $classes = DB::table('students')->select($col)->distinct()->orderBy($col)->pluck($col)->toArray();
+                        break;
+                    }
+                }
+            }
+
+            foreach ($classes as $cls) {
+                $classAttempts = $attempts;
+                if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
+                    $classroom = DB::table('classrooms')->where('name', $cls)->first();
+                    if ($classroom) {
+                        $studentIds = DB::table('students')->where('classroom_id', $classroom->id)->pluck('user_id');
+                        $classAttempts = $attempts->whereIn('student_id', $studentIds->toArray());
+                    }
+                }
+
+                $classScores = $classAttempts->pluck('score')->filter(function($v) { return is_numeric($v); })->map(function($v) { return (float)$v; });
+                
+                if ($classScores->count() > 0) {
+                    $classStats[] = [
+                        'name' => $cls,
+                        'avgScore' => round($classScores->avg(), 2) . '%',
+                        'maxScore' => round($classScores->max(), 2) . '%',
+                        'minScore' => round($classScores->min(), 2) . '%',
+                        'studentCount' => $classAttempts->pluck('student_id')->unique()->count()
+                    ];
                 }
             }
         }
-
-        foreach ($classes as $cls) {
-            $classAttempts = $attempts;
-            if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
-                $classroom = DB::table('classrooms')->where('name', $cls)->first();
-                if ($classroom) {
-                    $studentIds = DB::table('students')->where('classroom_id', $classroom->id)->pluck('user_id');
-                    $classAttempts = $attempts->whereIn('student_id', $studentIds->toArray());
-                }
-            }
-
-            $classScores = $classAttempts->pluck('score')->filter(function($v) { return is_numeric($v); })->map(function($v) { return (float)$v; });
-            
-            if ($classScores->count() > 0) {
-                $classStats[] = [
-                    'name' => $cls,
-                    'avgScore' => round($classScores->avg(), 1),
-                    'maxScore' => $classScores->max(),
-                    'minScore' => $classScores->min(),
-                    'studentCount' => $classAttempts->pluck('student_id')->unique()->count()
-                ];
-            }
         }
 
         return response()->json([
