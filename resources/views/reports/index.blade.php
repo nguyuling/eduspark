@@ -86,7 +86,7 @@
     </div>
 
     {{-- Performance Table --}}
-    <div style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;">
+    <div id="stats-table-container" style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;display:none;">
         <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Perbandingan Prestasi Kelas</div>
         <div style="overflow:auto;">
             <table id="stats-table" style="width:100%;border-collapse:collapse;font-size:13px;">
@@ -315,11 +315,20 @@ async function loadStatistics() {
     if (!selectedClass) {
         const tbody = document.getElementById('stats-tbody');
         tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Sila pilih kelas untuk melihat data.</td></tr>';
+        document.getElementById('stats-table-container').style.display = 'none';
         if (typeof Chart !== 'undefined') {
             if (statsChart) statsChart.destroy();
             if (trendChart) trendChart.destroy();
         }
         return;
+    }
+    
+    // Show table container only if 'Semua Kelas' is selected
+    const tableContainer = document.getElementById('stats-table-container');
+    if (selectedClass === 'semua') {
+        tableContainer.style.display = 'block';
+    } else {
+        tableContainer.style.display = 'none';
     }
     
     console.log('loadStatistics called with class:', selectedClass, 'range:', dateRange);
@@ -471,14 +480,6 @@ function updateTrendChart(data) {
 
 function updateStatsTable(classStats) {
     const tbody = document.getElementById('stats-tbody');
-    const selectedClass = document.getElementById('stats-class-select').value;
-    
-    // Only show table if 'Semua Kelas' is selected
-    if (selectedClass !== 'semua') {
-        tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Pilih "Semua Kelas" untuk melihat perbandingan.</td></tr>';
-        return;
-    }
-    
     tbody.innerHTML = '';
     
     if (!classStats || classStats.length === 0) {
