@@ -115,47 +115,33 @@
     @else
       {{-- STUDENT VIEW --}}
       <!-- Games List -->
-      <section class="panel" style="margin-bottom:20px; margin-top:10px;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
-          <div style="display:flex; gap:8px; align-items:center;">
-            <h2 style="margin:0; padding:0; font-size:18px; font-weight:700; line-height:1;">Senarai Permainan</h2>
-            <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px;">
-              {{ count($games) }}
-            </span>
-          </div>
-        </div>
-        
-        @if($games->count() > 0)
-          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:24px;">
-            @foreach($games as $game)
-              <div class="panel game-card" onclick="playGame('{{ route('games.play', $game->id) }}')" style="cursor:pointer; display:flex; flex-direction:column; height:100%; gap:16px;">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                  <span class="game-difficulty" style="display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;
-                    {{ $game->difficulty === 'easy' ? 'background:rgba(74,222,128,0.2); color:#22c55e;' : 
-                       ($game->difficulty === 'medium' ? 'background:rgba(251,146,60,0.2); color:#f97316;' : 
-                       'background:rgba(239,68,68,0.2); color:#ef4444;') }}">
-                    @if($game->difficulty === 'easy')
-                      Mudah
-                    @elseif($game->difficulty === 'medium')
-                      Sederhana
-                    @else
-                      Sukar
-                    @endif
-                  </span>
+      @if($games->count() > 0)
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:24px;">
+          @foreach($games as $game)
+            <div class="panel game-card" onclick="playGame('{{ route('games.play', $game->id) }}')" style="cursor:pointer; display:flex; flex-direction:column; height:100%; gap:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div style="font-size:48px;">
+                  🎮
                 </div>
-                <div style="flex:1;">
-                  <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:inherit;">{{ $game->title }}</div>
-                  <div style="font-size:13px; color:var(--muted); line-height:1.5;">{{ $game->description ?? 'Permainan edukatif yang menyenangkan' }}</div>
-                </div>
+                <span class="game-difficulty" style="display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;
+                  {{ $game->difficulty === 'easy' ? 'background:rgba(74,222,128,0.2); color:#22c55e;' : 
+                     ($game->difficulty === 'medium' ? 'background:rgba(251,146,60,0.2); color:#f97316;' : 
+                     'background:rgba(239,68,68,0.2); color:#ef4444;') }}">
+                  {{ $game->difficulty === 'easy' ? 'Mudah' : ($game->difficulty === 'medium' ? 'Sederhana' : 'Sukar') }}
+                </span>
               </div>
-            @endforeach
-          </div>
-        @else
-          <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--muted);">
-            <p>Belum ada permainan tersedia</p>
-          </div>
-        @endif
-      </section>
+              <div style="flex:1;">
+                <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:inherit;">{{ $game->title }}</div>
+                <div style="font-size:13px; color:var(--muted); line-height:1.5;">{{ $game->description ?? 'Permainan edukatif yang menyenangkan' }}</div>
+              </div>
+            </div>
+          @endforeach
+        </div>
+      @else
+        <div style="text-align:center; padding:40px; color:var(--muted);">
+          <p>Belum ada permainan tersedia</p>
+        </div>
+      @endif
     @endif
   </main>
 </div>
