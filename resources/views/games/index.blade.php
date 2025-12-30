@@ -11,8 +11,9 @@
         <div class="sub">Mainkan permainan edukatif untuk meningkatkan prestasi anda</div>
       </div>
       @if(auth()->user()->role === 'teacher')
-        <a href="{{ route('teacher.games.create') }}" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:8px 14px; border-radius:6px; cursor:pointer; font-size:14px; font-weight:600; transition:all .2s ease; text-decoration:none; border:none; white-space:nowrap;" onmouseover="this.style.opacity='0.9';" onmouseout="this.style.opacity='1';" title="Cipta Permainan Baru">
-          + Cipta Permainan
+        <a href="{{ route('teacher.games.create') }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer; margin-top:15px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+          <i class="bi bi-plus-lg"></i>
+          Cipta Permainan
         </a>
       @endif
     </div>
