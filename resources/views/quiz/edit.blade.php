@@ -437,39 +437,39 @@
     
     // Template for a single option row (Radio button for MC/TF)
     const optionRow = (qIndex, oIndex) => `
-        <div style="display:flex; gap:8px; align-items:flex-start;" class="option-row" data-o-index="${oIndex}">
+        <div style="display:flex; gap:8px; align-items:center;" class="option-row" data-o-index="${oIndex}">
             <input class="form-check-input mt-0 correct-option-radio" type="radio" 
                    name="questions[${qIndex}][correct_answer]" 
                    value="" 
                    data-option-text-target 
-                   ${oIndex === 0 ? 'checked' : ''} required style="width:18px; height:18px; margin-top:11px; cursor:pointer;">
+                   ${oIndex === 0 ? 'checked' : ''} required style="width:18px; height:18px; cursor:pointer; flex-shrink:0;">
             <input type="text" 
                    name="questions[${qIndex}][options][]" 
                    class="option-text-input" 
                    placeholder="Teks Pilihan" 
                    required
                    oninput="updateRadioValue(this)"
-                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
-            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); padding:8px 10px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
+                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
+            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; width:42px; height:42px; padding:0; display:flex; align-items:center; justify-content:center; flex-shrink:0;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
         </div>
     `;
 
     // Template for a single option row (Checkbox)
     const checkboxOptionRow = (qIndex, oIndex) => `
-        <div style="display:flex; gap:8px; align-items:flex-start;" class="option-row" data-o-index="${oIndex}">
+        <div style="display:flex; gap:8px; align-items:center;" class="option-row" data-o-index="${oIndex}">
             <input class="form-check-input mt-0 correct-option-checkbox" type="checkbox" 
                    name="questions[${qIndex}][correct_answers][]" 
                    value="" 
                    data-option-text-target
-                   style="width:18px; height:18px; margin-top:11px; cursor:pointer;">
+                   style="width:18px; height:18px; cursor:pointer; flex-shrink:0;">
             <input type="text" 
                    name="questions[${qIndex}][options][]" 
                    class="option-text-input" 
                    placeholder="Teks Pilihan" 
                    required
                    oninput="updateCheckboxValue(this)"
-                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
-            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); padding:8px 10px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
+                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
+            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; width:42px; height:42px; padding:0; display:flex; align-items:center; justify-content:center; flex-shrink:0;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
         </div>
     `;
 
