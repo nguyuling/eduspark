@@ -7,6 +7,8 @@ use App\Http\Controllers\QuizStudentController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\GameTeacherController;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
@@ -77,6 +79,26 @@ Route::middleware('auth')->group(function () {
     Route::get('/quizzes/{attempt}/result', [QuizStudentController::class, 'showResult'])->name('student.quizzes.result');
 });
 
+// Game routes (unified student/teacher view)
+Route::middleware('auth')->group(function () {
+    Route::get('/games', [GameController::class, 'index'])->name('games.index');
+    Route::get('/games/{id}/play', [GameController::class, 'play'])->name('games.play');
+    Route::post('/games/{id}/result', [GameController::class, 'storeResult'])->name('games.storeResult');
+    Route::get('/games/{id}/result', [GameController::class, 'result'])->name('games.result');
+    Route::put('/games/{id}', [GameController::class, 'update'])->name('games.update');
+    Route::delete('/games/{id}', [GameController::class, 'destroy'])->name('games.destroy');
+    Route::post('/games/{id}/restore', [GameController::class, 'restore'])->name('games.restore');
+    Route::get('/games/{id}/leaderboard', [GameController::class, 'leaderboard'])->name('games.leaderboard');
+    
+    // Teacher game management routes
+    Route::get('/teacher/games/create', [GameTeacherController::class, 'create'])->name('teacher.games.create');
+    Route::post('/teacher/games', [GameTeacherController::class, 'store'])->name('teacher.games.store');
+    Route::get('/teacher/games/{id}/edit', [GameTeacherController::class, 'edit'])->name('teacher.games.edit');
+    Route::put('/teacher/games/{id}', [GameTeacherController::class, 'update'])->name('teacher.games.update');
+    Route::delete('/teacher/games/{id}', [GameTeacherController::class, 'destroy'])->name('teacher.games.destroy');
+    Route::post('/teacher/games/{id}/restore', [GameTeacherController::class, 'restore'])->name('teacher.games.restore');
+});
+
 // Performance routes
 Route::middleware('auth')->group(function () {
     Route::get('/performance', [PerformanceController::class, 'index'])->name('performance');
@@ -125,12 +147,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
 });
 
-// Games routes (Permainan in sidebar)
+// Individual game routes (old legacy routes - these still work)
 Route::middleware('auth')->group(function () {
-    Route::get('/games', function() {
-        return view('games.index');
-    })->name('games.index');
-    
     Route::get('/games/quiz-challenge', function() {
         return view('games.quiz-challenge');
     })->name('games.quiz');
