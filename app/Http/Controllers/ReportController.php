@@ -237,13 +237,13 @@ class ReportController extends Controller
         $highestTopic = count($topicAverages) > 0 ? array_search(max($topicAverages), $topicAverages) : 'N/A';
         $weakestTopic = count($topicAverages) > 0 ? array_search(min($topicAverages), $topicAverages) : 'N/A';
 
-        // Map attempts for view partial
+        // Map attempts for view partial with converted percentages
         $attemptsForView = [];
         foreach ($attempts as $a) {
             $attemptsForView[] = [
-                'date' => $a->created_at ? date('Y-m-d', strtotime($a->created_at)) : '',
+                'date' => $a->created_at ? date('d/m/Y', strtotime($a->created_at)) : '',
                 'title' => $a->title ?? 'N/A',
-                'score' => isset($a->score) ? round($a->score, 2) . '%' : ''
+                'score' => isset($a->percentage) ? round($a->percentage, 2) . '%' : ''
             ];
         }
 
