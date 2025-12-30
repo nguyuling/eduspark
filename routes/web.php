@@ -101,6 +101,10 @@ Route::middleware('auth')->group(function () {
         ->name('reports.students.csv');
     Route::get('/reports/students/chart-data', [ReportController::class, 'studentsChartData'])
         ->name('reports.students.chart');
+    
+    // Statistics export
+    Route::get('/reports/export-statistics', [ReportController::class, 'exportStatistics'])
+        ->name('reports.statistics.export');
 });
 
 // Forum routes
