@@ -1121,7 +1121,6 @@ class ReportController extends Controller
                 }
             }
         }
-        }
 
         return response()->json([
             'avgScore' => $avgScore,
