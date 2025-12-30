@@ -10,7 +10,7 @@
         <div class="title">Cipta Kuiz Baru</div>
         <div class="sub">Sediakan kuiz anda dengan soalan dan pilihan</div>
       </div>
-      <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali">
+      <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali" onclick="return confirm('Kuiz anda tidak akan disimpan sebagai draf atau diterbitkan. Adakah anda pasti untuk meninggalkan halaman ini?');">
         <i class="bi bi-arrow-left"></i>Kembali
       </a>
     </div>
@@ -451,12 +451,18 @@
     // Template for Options container (used by MC, TF, and CHECKBOX)
     const optionTemplate = (qIndex, type) => {
         const rowTemplate = (type === QUESTION_TYPES.CHECKBOX) ? checkboxOptionRow : optionRow;
+        
+        // Show 4 options by default for MC and CHECKBOX types, 2 for others
+        const defaultOptionCount = (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.CHECKBOX) ? 4 : 2;
+        let optionsHtml = '';
+        for (let i = 0; i < defaultOptionCount; i++) {
+            optionsHtml += rowTemplate(qIndex, i);
+        }
 
         return `
             <h6 style="margin:0 0 12px 0; font-weight:600; font-size:13px;">Pilihan & Jawapan Betul <span style="color: var(--danger);">*</span></h6>
             <div class="options-list" data-q-index="${qIndex}" style="display:flex; flex-direction:column; gap:8px;">
-                ${rowTemplate(qIndex, 0)}
-                ${rowTemplate(qIndex, 1)}
+                ${optionsHtml}
             </div>
             <button type="button" style="display:inline-block; padding:8px 14px; background:transparent; color:var(--accent); border:1px solid var(--accent); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; cursor:pointer; margin-top:12px;" class="add-option-btn" data-q-index="${qIndex}">
                 <i class="bi bi-plus-lg"></i> Tambah Pilihan
@@ -466,39 +472,39 @@
     
     // Template for a single option row (Radio button for MC/TF)
     const optionRow = (qIndex, oIndex) => `
-        <div style="display:flex; gap:8px; align-items:flex-start;" class="option-row" data-o-index="${oIndex}">
+        <div style="display:flex; gap:8px; align-items:center;" class="option-row" data-o-index="${oIndex}">
             <input class="form-check-input mt-0 correct-option-radio" type="radio" 
                    name="questions[${qIndex}][correct_answer]" 
                    value="" 
                    data-option-text-target 
-                   ${oIndex === 0 ? 'checked' : ''} required style="width:18px; height:18px; margin-top:11px; cursor:pointer;">
+                   ${oIndex === 0 ? 'checked' : ''} required style="width:18px; height:18px; cursor:pointer; flex-shrink:0;">
             <input type="text" 
                    name="questions[${qIndex}][options][]" 
                    class="option-text-input" 
                    placeholder="Teks Pilihan" 
                    required
                    oninput="updateRadioValue(this)"
-                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
-            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); padding:8px 10px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
+                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
+            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; width:42px; height:42px; padding:0; display:flex; align-items:center; justify-content:center; flex-shrink:0;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
         </div>
     `;
 
     // Template for a single option row (Checkbox)
     const checkboxOptionRow = (qIndex, oIndex) => `
-        <div style="display:flex; gap:8px; align-items:flex-start;" class="option-row" data-o-index="${oIndex}">
+        <div style="display:flex; gap:8px; align-items:center;" class="option-row" data-o-index="${oIndex}">
             <input class="form-check-input mt-0 correct-option-checkbox" type="checkbox" 
                    name="questions[${qIndex}][correct_answers][]" 
                    value="" 
                    data-option-text-target
-                   style="width:18px; height:18px; margin-top:11px; cursor:pointer;">
+                   style="width:18px; height:18px; cursor:pointer; flex-shrink:0;">
             <input type="text" 
                    name="questions[${qIndex}][options][]" 
                    class="option-text-input" 
                    placeholder="Teks Pilihan" 
                    required
                    oninput="updateCheckboxValue(this)"
-                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
-            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); padding:8px 10px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
+                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
+            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; width:42px; height:42px; padding:0; display:flex; align-items:center; justify-content:center; flex-shrink:0;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
         </div>
     `;
 
@@ -645,11 +651,7 @@
             
             container.innerHTML = optionTemplate(qIndex, type);
             
-            // Re-bind the add option button using the correct template
-            const addBtn = container.querySelector('.add-option-btn');
-            addBtn.onclick = function() {
-                addOptionRow(qIndex, this.previousElementSibling, rowTemplate);
-            };
+            // Note: Do NOT bind onclick here as it's handled by event delegation below
 
             // For True/False, immediately adjust to only two options: True and False
             if (type === QUESTION_TYPES.TF) {
@@ -683,6 +685,93 @@
         
         // Use the passed-in rowTemplate (radio or checkbox)
         optionsList.insertAdjacentHTML('beforeend', rowTemplate(qIndex, currentOptions));
+    };
+
+    // Validate quiz title and all questions before allowing a new one to be added
+    const validateAllQuestions = () => {
+        const container = document.getElementById('questions-container');
+        const questionCards = container.querySelectorAll('[question-card]');
+        
+        // First, check if quiz title is filled
+        const titleInput = document.getElementById('title');
+        const titleValue = titleInput ? titleInput.value.trim() : '';
+        
+        if (!titleValue) {
+            alert('Sila isi medan "Tajuk Kuiz" terlebih dahulu sebelum menambah soalan baru.');
+            return false;
+        }
+        
+        if (questionCards.length === 0) return true; // No questions yet, allow adding
+        
+        // Validate ALL questions (not just the last one)
+        for (let i = 0; i < questionCards.length; i++) {
+            const card = questionCards[i];
+            const questionNum = i + 1;
+            
+            // Check if question text is not empty
+            const textArea = card.querySelector('textarea[name*="question_text"]');
+            const questionText = textArea ? textArea.value.trim() : '';
+            
+            if (!questionText) {
+                alert(`Teks soalan untuk Soalan ${questionNum} tidak boleh kosong.`);
+                return false;
+            }
+            
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            // Validation for Checkbox questions
+            if (type === QUESTION_TYPES.CHECKBOX) {
+                const checkboxes = card.querySelectorAll('input[type="checkbox"][name*="correct_answers"]');
+                const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                
+                if (checkedCount < 2) {
+                    alert(`Soalan ${questionNum} (Kotak Semak): Sekurang-kurangnya 2 jawapan yang betul mesti dipilih.`);
+                    return false;
+                }
+            }
+            
+            // Validation for Coding questions
+            else if (type === QUESTION_TYPES.CODING) {
+                const hiddenLinesInput = card.querySelector('.hidden-lines-input');
+                const hiddenLines = hiddenLinesInput ? hiddenLinesInput.value.trim() : '';
+                
+                if (!hiddenLines) {
+                    alert(`Soalan ${questionNum} (Koding): Sekurang-kurangnya 1 baris mesti dipilih sebagai baris tersembunyi.`);
+                    return false;
+                }
+            }
+            
+            // Validation for Short Answer questions
+            else if (type === QUESTION_TYPES.SA) {
+                const correctAnswerInput = card.querySelector('input[name*="correct_answer"]');
+                const correctAnswer = correctAnswerInput ? correctAnswerInput.value.trim() : '';
+                
+                if (!correctAnswer) {
+                    alert(`Soalan ${questionNum} (Jawapan Pendek): Medan jawapan yang betul tidak boleh kosong.`);
+                    return false;
+                }
+            }
+            
+            // Validation for MC and TF - check that options have text
+            else if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF) {
+                const optionInputs = card.querySelectorAll('input[name*="options"][]');
+                let hasEmptyOption = false;
+                
+                optionInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        hasEmptyOption = true;
+                    }
+                });
+                
+                if (hasEmptyOption) {
+                    alert(`Soalan ${questionNum}: Semua pilihan mesti mempunyai teks. Sila isi semua medan pilihan.`);
+                    return false;
+                }
+            }
+        }
+        
+        return true;
     };
 
 
@@ -726,6 +815,11 @@
 
         // 2. Add Question Button
         addQuestionBtn.addEventListener('click', function() {
+            // Validate all questions and quiz title before adding a new one
+            if (!validateAllQuestions()) {
+                return;
+            }
+            
             container.insertAdjacentHTML('beforeend', questionTemplate(questionIndex));
             renderAnswerFields(questionIndex, QUESTION_TYPES.MC);
             
@@ -918,6 +1012,19 @@
             }
         });
         
+        // Validate that quiz title is filled before allowing question text input
+        container.addEventListener('focus', function(e) {
+            if (e.target.tagName === 'TEXTAREA' && e.target.name.includes('question_text')) {
+                const titleInput = document.getElementById('title');
+                const titleValue = titleInput ? titleInput.value.trim() : '';
+                
+                if (!titleValue) {
+                    alert('Sila isi medan "Tajuk Kuiz" terlebih dahulu.');
+                    e.target.blur();
+                }
+            }
+        }, true);
+        
     });
 
     // Custom HTML5 validation messages in Malay
@@ -1093,6 +1200,30 @@
         
         if (hasInvalidCodingQuestion) {
             alert('Semua soalan Pengaturaan (Coding) mesti mempunyai sekurang-kurangnya satu baris yang dipilih sebagai baris yang perlu dijawab oleh pelajar. Sila klik checkbox untuk menandakan baris.');
+            return false;
+        }
+
+        // STEP 3: Validate checkbox questions have at least 2 correct answers
+        let hasInvalidCheckboxQuestion = false;
+        
+        codingQuestions.forEach(card => {
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            if (type === QUESTION_TYPES.CHECKBOX) {
+                const checkboxes = card.querySelectorAll('input[type="checkbox"][name*="correct_answers"]');
+                const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                
+                if (checkedCount < 2) {
+                    hasInvalidCheckboxQuestion = true;
+                    const questionNum = card.getAttribute('data-index') + 1;
+                    console.warn(`Soalan ${questionNum} (Kotak Semak) mempunyai kurang daripada 2 jawapan yang betul yang dipilih`);
+                }
+            }
+        });
+        
+        if (hasInvalidCheckboxQuestion) {
+            alert('Untuk soalan jenis "Kotak Semak", sekurang-kurangnya 2 jawapan yang betul mesti dipilih. Sila semak jawapan yang betul untuk setiap soalan Kotak Semak.');
             return false;
         }
         
