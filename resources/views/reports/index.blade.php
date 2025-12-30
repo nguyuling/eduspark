@@ -67,6 +67,11 @@
         </div>
     </div>
 
+    {{-- Debug info --}}
+    <div id="debug-info" style="background:#f0f0f0;padding:12px;border-radius:8px;margin-bottom:16px;font-size:12px;color:#666;display:none;">
+        Status: <span id="debug-status">Menunggu...</span>
+    </div>
+
     {{-- Charts Container --}}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;">

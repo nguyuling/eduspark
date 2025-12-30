@@ -10677,3 +10677,4 @@ FATAL:  password authentication failed for user \"postgres\" at C:\\xampp\\php\\
 #53 C:\\Users\\fyqaz\\Desktop\\eduspark\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('C:\\\\Users\\\\fyqaz\\\\...')
 #54 {main}
 "} 
+[2025-12-30 01:28:48] local.INFO: studentsByClass: Found 11 rows for class: 4 Arif  
