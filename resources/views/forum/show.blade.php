@@ -37,7 +37,12 @@
                         {{ $firstLetter }}
                     </div>
                     <div style="flex:1;">
-                        <p style="font-weight:700; margin-bottom:4px; font-size:15px;">{{ $userName }}</p>
+                        <p style="font-weight:700; margin-bottom:4px; font-size:15px;"
+   class="user-name"
+   data-user-id="{{ $post->user->id }}">
+   {{ $userName }}
+</p>
+
                         <p style="font-size:12px; color:var(--muted);">{{ $post->created_at->format('M d, Y') }}</p>
                     </div>
                 </div>
