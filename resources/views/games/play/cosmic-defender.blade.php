@@ -40,21 +40,33 @@
     // Track game start time
     let gameStartTime = Date.now();
     
-    // Override the game's endGame function to use our overlay
-    (function() {
-        // Wait for the game's endGame to be defined
+    // Wait for the page to fully load, then override endGame
+    window.addEventListener('load', function() {
+        // Store the original endGame if it exists
         const originalEndGame = window.endGame;
         
-        // Create our custom endGame that intercepts the game over
+        // Override endGame function
         window.endGame = function(scoreParam) {
+            console.log('Custom endGame called with score:', scoreParam);
+            
+            // Get the final score from various possible sources
             const finalScore = scoreParam || window.score || 0;
             const timeInSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
+            
+            console.log('Final score:', finalScore, 'Time:', timeInSeconds);
             
             // Hide the game's built-in game over screen
             const gameOverScreen = document.getElementById('gameOverScreen');
             if (gameOverScreen) {
                 gameOverScreen.style.display = 'none';
+                console.log('Hid game over screen');
             }
+            
+            // Hide canvas and header too
+            const canvas = document.getElementById('gameCanvas');
+            const header = document.getElementById('gameHeader');
+            if (canvas) canvas.style.display = 'none';
+            if (header) header.style.display = 'none';
             
             // Show our overlay
             document.getElementById('final-score').textContent = finalScore;
@@ -62,16 +74,22 @@
             document.getElementById('score-input').value = finalScore;
             document.getElementById('time-input').value = timeInSeconds;
             document.getElementById('score-overlay').style.display = 'flex';
+            
+            console.log('Showed score overlay');
         };
         
-        // Also intercept when game actually starts to reset timer
-        const originalStartGame = window.startGame;
-        if (typeof originalStartGame === 'function') {
-            window.startGame = function() {
+        console.log('endGame override installed');
+    });
+    
+    // Also track when startGame is called to reset timer
+    setTimeout(function() {
+        const startBtn = document.getElementById('startBtn');
+        if (startBtn) {
+            startBtn.addEventListener('click', function() {
                 gameStartTime = Date.now();
-                originalStartGame.apply(this, arguments);
-            };
+                console.log('Game started, timer reset');
+            });
         }
-    })();
+    }, 100);
 </script>
 @endsection
