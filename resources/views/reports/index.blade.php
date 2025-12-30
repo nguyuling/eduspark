@@ -462,10 +462,9 @@ document.getElementById('export-stats-btn').addEventListener('click', function()
 });
 
 // Load statistics on page load
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof Chart !== 'undefined') {
-        loadStatistics();
-    }
+window.addEventListener('load', function() {
+    console.log('Page loaded, Chart available:', typeof Chart !== 'undefined');
+    loadStatistics();
 });
 </script>
 @endsection
