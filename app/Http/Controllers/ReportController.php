@@ -687,15 +687,62 @@ class ReportController extends Controller
             }
 
             $avgScore = 'N/A';
+            $totalAttempts = 0;
+            $successRate = 'N/A';
+            $topicStats = [];
+            
             if (!empty($userIds) && Schema::hasTable('quiz_attempts')) {
-                $avg = DB::table('quiz_attempts')->whereIn('student_id', $userIds)->avg('score');
-                $avgScore = $avg ? round($avg, 0) : 'N/A';
+                // Get all attempts with quiz info
+                $attempts = DB::table('quiz_attempts as qa')
+                    ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
+                    ->select('qa.score', 'q.max_points', 'q.title')
+                    ->whereIn('qa.student_id', $userIds)
+                    ->get();
+                
+                $totalAttempts = $attempts->count();
+                
+                if ($totalAttempts > 0) {
+                    // Calculate average with percentage
+                    $scores = [];
+                    foreach ($attempts as $a) {
+                        $score = isset($a->score) ? (float)$a->score : 0;
+                        $maxPoints = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
+                        $percentage = ($score / $maxPoints) * 100;
+                        $scores[] = $percentage;
+                        
+                        // Aggregate by topic
+                        $topic = $a->title ?? 'Unknown';
+                        if (!isset($topicStats[$topic])) {
+                            $topicStats[$topic] = [];
+                        }
+                        $topicStats[$topic][] = $percentage;
+                    }
+                    
+                    $avgPercentage = array_sum($scores) / count($scores);
+                    $avgScore = round($avgPercentage, 2) . '%';
+                    
+                    // Calculate success rate (attempts with score >= 70%)
+                    $successCount = count(array_filter($scores, fn($s) => $s >= 70));
+                    $successRate = round(($successCount / count($scores)) * 100, 2) . '%';
+                }
+            }
+            
+            // Find weakest topic
+            $weakestTopic = 'N/A';
+            if (!empty($topicStats)) {
+                $topicAverages = [];
+                foreach ($topicStats as $topic => $scores) {
+                    $topicAverages[$topic] = array_sum($scores) / count($scores);
+                }
+                $weakestTopic = array_keys($topicAverages, min($topicAverages))[0] ?? 'N/A';
             }
 
             $classStats = [
                 'student_count' => count($students),
                 'avg_score' => $avgScore,
-                'weakest_subject' => 'N/A'
+                'total_attempts' => $totalAttempts,
+                'success_rate' => $successRate,
+                'weakest_subject' => $weakestTopic
             ];
         }
 
