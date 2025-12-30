@@ -1,0 +1,13 @@
+id,teacher_id,title,description,max_attempts,due_at,is_published,created_at,updated_at,unique_code,user_id,max_points
+30,2,Java: Asas Sintaks dan Jenis Data,"Kuiz ini menguji pengetahuan asas tentang sintaks Java, pemboleh ubah, dan jenis data primitif.",5,2026-01-17 05:35:37,1,2025-12-18 05:35:37,2025-12-18 05:35:37,IzUuB323,2,37
+31,3,Java: Konsep Pengaturcaraan Berorientasi Objek (OOP),"Kuiz ini menguji pemahaman anda tentang Kelas, Objek, Pewarisan, dan Polimorfisme.",3,2026-01-17 05:35:37,1,2025-12-18 05:35:37,2025-12-18 05:35:37,cSG5HWGu,2,64
+32,4,Java: Struktur Kawalan dan Titasusunan (Array) ,"Kuiz mengenai pernyataan if-else, loops, dan manipulasi tatasusunan (arrays).",5,2026-01-17 05:35:37,1,2025-12-18 05:35:37,2025-12-18 05:35:37,qXpn2UA4,2,37
+33,5,"Tingkatan 5, Bab 1: Etika Komputer dan Undang-undang Siber","Kuiz ini merangkumi konsep etika dalam pengkomputeran, hak cipta, dan undang-undang siber.",2,2026-02-01 05:35:37,1,2025-12-18 05:35:38,2025-12-18 05:35:38,WAYEGVjl,2,37
+34,6,"Tingkatan 5, Bab 1: Pembangunan Aplikasi Laman Web (Asas)",Kuiz ini menguji asas pembangunan aplikasi web termasuk bahasa skrip.,4,2026-02-01 05:35:37,1,2025-12-18 05:35:38,2025-12-18 05:35:38,tJykD6gv,2,37
+35,7,Tingkatan 5 Bab 1: Komputer & Impak Sosial,Kuiz mengenai impak komputer dan teknologi terhadap masyarakat dan ekonomi.,3,2026-01-17 05:35:37,1,2025-12-18 05:35:38,2025-12-18 05:35:38,1efjX5kQ,2,37
+36,2,Tingkatan 5 Bab 1: Seni Bina Komputer,Kuiz mengenai struktur dan komponen utama seni bina komputer.,3,2026-01-17 05:35:37,1,2025-12-18 05:35:38,2025-12-18 05:35:38,whdPxuzY,2,37
+37,3,Tingkatan 5 Bab 1: Gerbang Logik,Kuiz mengenai gerbang logik asas dan operasi logik dalam seni bina digital.,3,2026-01-17 05:35:37,1,2025-12-18 05:35:38,2025-12-18 05:35:38,uJJGE5wm,2,37
+38,4,Tingkatan 5: Pengaturcaraan Java - Soalan Kod,Kuiz pengekodan yang memerlukan pelajar menulis kod Java dari awal atau melengkapkan templat yang disediakan.,3,2026-02-01 05:35:37,1,2025-12-18 05:35:38,2025-12-18 05:35:38,gaEseo6q,2,37
+39,5,Java: Soalan Kod OOP Mudah,Kuiz ini mengandungi 5 soalan pengaturcaraan tentang konsep OOP yang mudah dalam Java.,3,2026-02-01 05:35:37,1,2025-12-18 05:35:38,2025-12-18 05:35:38,xsuinLu9,2,37
+40,6,"Java: Ciri-ciri OOP (Pengkapsulan, Abstrak, Pewarisan)","Kuiz ini menguji pemahaman mendalam tentang pengkapsulan, kelas abstrak, dan pewarisan dalam OOP.",3,2026-02-06 05:35:37,1,2025-12-18 05:35:38,2025-12-18 05:35:38,GOmiEogW,2,37
+41,7,Java: Program Pengaturcaraan Komprehensif,Kuiz ini mengandungi 2 soalan pengaturcaraan jarak panjang yang menguji kefahaman mendalam tentang konsep Java.,2,2026-02-16 05:35:37,1,2025-12-18 05:35:38,2025-12-18 05:35:38,VeSe1xRp,2,37
