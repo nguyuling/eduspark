@@ -178,40 +178,69 @@ class ReportController extends Controller
             if (is_null($lookupUserId)) $lookupUserId = $studentRecord->id;
         }
 
-        // Fetch attempts
+        // Fetch attempts with quiz titles
         $attempts = [];
         if (Schema::hasTable('quiz_attempts') && $lookupUserId) {
-            $attempts = DB::table('quiz_attempts')->where('student_id', $lookupUserId)->orderBy('created_at', 'desc')->get()->toArray();
+            $attempts = DB::table('quiz_attempts as qa')
+                ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
+                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.quiz_id')
+                ->where('qa.student_id', $lookupUserId)
+                ->orderBy('qa.created_at', 'desc')
+                ->get()
+                ->toArray();
         } elseif (Schema::hasTable('quiz_attempt') && $lookupUserId) {
-            $attempts = DB::table('quiz_attempt')->where('user_id', $lookupUserId)->orderBy('created_at', 'desc')->get()->toArray();
+            $attempts = DB::table('quiz_attempt as qa')
+                ->leftJoin('quiz as q', 'qa.quiz_id', '=', 'q.id')
+                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.quiz_id')
+                ->where('qa.user_id', $lookupUserId)
+                ->orderBy('qa.created_at', 'desc')
+                ->get()
+                ->toArray();
         }
 
         // Compute stats
         $scores = [];
+        $topicScores = [];
         foreach ($attempts as $a) {
-            if (isset($a->score) && is_numeric($a->score)) $scores[] = (float)$a->score;
+            if (isset($a->score) && is_numeric($a->score)) {
+                $scores[] = (float)$a->score;
+                $title = $a->title ?? 'Unknown';
+                if (!isset($topicScores[$title])) {
+                    $topicScores[$title] = [];
+                }
+                $topicScores[$title][] = (float)$a->score;
+            }
         }
-        $avg = count($scores) ? round(array_sum($scores) / count($scores), 0) : 'N/A';
-        $highest = count($scores) ? max($scores) : 'N/A';
-        $weakest = count($scores) ? min($scores) : 'N/A';
+
+        // Calculate averages and find strongest/weakest topics
+        $topicAverages = [];
+        foreach ($topicScores as $topic => $scores_arr) {
+            $topicAverages[$topic] = array_sum($scores_arr) / count($scores_arr);
+        }
+
+        $avg = count($scores) ? round(array_sum($scores) / count($scores), 2) : 'N/A';
+        $highest = count($scores) ? round(max($scores), 2) : 'N/A';
+        $weakest = count($scores) ? round(min($scores), 2) : 'N/A';
+        
+        $highestTopic = count($topicAverages) > 0 ? array_search(max($topicAverages), $topicAverages) : 'N/A';
+        $weakestTopic = count($topicAverages) > 0 ? array_search(min($topicAverages), $topicAverages) : 'N/A';
 
         // Map attempts for view partial
         $attemptsForView = [];
         foreach ($attempts as $a) {
             $attemptsForView[] = [
-                'date' => $a->created_at ?? ($a->completed_at ?? ''),
-                'type' => property_exists($a, 'type') ? $a->type : 'Kuiz',
-                'topic' => $a->quiz_id ?? ($a->title ?? ''),
-                'score' => isset($a->score) ? $a->score : ''
+                'date' => $a->created_at ? date('Y-m-d', strtotime($a->created_at)) : '',
+                'title' => $a->title ?? 'N/A',
+                'score' => isset($a->score) ? round($a->score, 2) : ''
             ];
         }
 
         $stats = [
             'average_score' => $avg,
             'highest_score' => $highest,
-            'highest_subject' => null,
+            'highest_subject' => $highestTopic,
             'weakest_score' => $weakest,
-            'weakest_subject' => null,
+            'weakest_subject' => $weakestTopic,
             'attempts' => $attemptsForView
         ];
 
