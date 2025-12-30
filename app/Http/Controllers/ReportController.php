@@ -371,13 +371,14 @@ class ReportController extends Controller
 
             // Rows
             foreach ($attemptsQuery as $r) {
+                $dateStr = $r->date ? \Carbon\Carbon::parse($r->date)->format('Y-m-d') : '';
                 $score = isset($r->score) ? (float)$r->score : 0;
                 $maxPoints = isset($r->max_points) && (float)$r->max_points > 0 ? (float)$r->max_points : 100;
                 $percentage = ($score / $maxPoints) * 100;
                 $scoreDisplay = round($score, 2) . '/' . (int)$maxPoints . ' (' . round($percentage, 2) . '%)';
                 
                 fputcsv($out, [
-                    $r->date ? date('Y-m-d', strtotime($r->date)) : '',
+                    $dateStr,
                     $r->type ?? '',
                     $r->topic ?? 'N/A',
                     $scoreDisplay
@@ -478,16 +479,21 @@ class ReportController extends Controller
         if (Schema::hasTable('quiz_attempts')) {
             $attempts = DB::table('quiz_attempts as qa')
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
-                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score')
+                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'q.max_points')
                 ->where('qa.student_id', $userId)
                 ->orderBy('qa.created_at', 'desc')
                 ->get()
                 ->map(function ($r) {
+                    $dateStr = $r->date ? \Carbon\Carbon::parse($r->date)->format('Y-m-d') : '';
+                    $score = isset($r->score) ? (float)$r->score : 0;
+                    $maxPoints = isset($r->max_points) && (float)$r->max_points > 0 ? (float)$r->max_points : 100;
+                    $percentage = ($score / $maxPoints) * 100;
+                    $scoreDisplay = round($score, 2) . '/' . (int)$maxPoints . ' (' . round($percentage, 2) . '%)';
                     return [
-                        'Tarikh' => $r->date ? date('Y-m-d', strtotime($r->date)) : '',
+                        'Tarikh' => $dateStr,
                         'Jenis' => $r->type ?? 'Kuiz',
                         'Topik' => $r->topic ?? 'N/A',
-                        'Skor' => $r->score ?? ''
+                        'Skor' => $scoreDisplay
                     ];
                 })->toArray();
         }
