@@ -485,7 +485,7 @@ function updateStatsTable(classStats) {
     tbody.innerHTML = '';
     
     if (!classStats || classStats.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Tiada data tersedia.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--muted);">Tiada data tersedia.</td></tr>';
         return;
     }
     
@@ -496,7 +496,8 @@ function updateStatsTable(classStats) {
             <td style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.05);">${cls.avgScore || 'N/A'}</td>
             <td style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.05);">${cls.maxScore || 'N/A'}</td>
             <td style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.05);">${cls.minScore || 'N/A'}</td>
-            <td style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.05);">${cls.studentCount || '0'}</td>
+            <td style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.05);">${cls.highestQuiz || 'N/A'}</td>
+            <td style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.05);">${cls.lowestQuiz || 'N/A'}</td>
         `;
         tbody.appendChild(row);
     });
