@@ -40,21 +40,24 @@
           <thead>
             <tr>
               <th style="width:5%;">No.</th>
-              <th style="width:50%; text-align:left;">Permainan</th>
+              <th style="width:55%; text-align:left;">Permainan</th>
               <th style="width:20%; text-align:center;">Kesukaran</th>
-              <th style="width:15%; text-align:center;">Status</th>
-              <th style="width:10%; text-align:center;">Tindakan</th>
+              <th style="width:20%; text-align:center;">Tindakan</th>
             </tr>
           </thead>
           <tbody>
             @forelse ($games as $index => $game)
               <tr>
                 <td style="width:5%; padding:12px; text-align:center; font-weight:600;">{{ $index + 1 }}</td>
-                <td style="width:50%; padding:12px;">
+                <td style="width:55%; padding:12px;">
                   <div style="font-weight:700; margin-bottom:4px;">{{ $game->title }}</div>
                   <div style="font-size:13px; color:var(--muted); margin-bottom:8px; line-height:1.4;">{{ $game->description ?? 'Tiada penerangan' }}</div>
                   <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:11px; align-items:center;">
                     <span style="background:rgba(106,77,247,0.08); padding:4px 8px; border-radius:4px;"><strong>Kategori:</strong> {{ $game->category ?? 'N/A' }}</span>
+                    <div style="font-weight:600; font-size:12px; padding:4px 8px; border-radius:6px; display:inline-block; 
+                      {{ $game->is_published ? 'background:#6A4DF7; color:#fff;' : 'background:rgba(106,77,247,0.1);' }}">
+                      {{ $game->is_published ? 'Diterbitkan' : 'Draf' }}
+                    </div>
                   </div>
                 </td>
                 <td style="width:20%; text-align:center; padding:12px;">
@@ -65,13 +68,7 @@
                     {{ ucfirst($game->difficulty ?? 'easy') }}
                   </div>
                 </td>
-                <td style="width:15%; text-align:center; padding:12px;">
-                  <div style="font-weight:600; font-size:12px; padding:4px 8px; border-radius:6px; display:inline-block; 
-                    {{ $game->is_published ? 'background:#6A4DF7; color:#fff;' : 'background:rgba(106,77,247,0.1);' }}">
-                    {{ $game->is_published ? 'Diterbitkan' : 'Draf' }}
-                  </div>
-                </td>
-                <td style="width:10%; text-align:center; padding:12px;">
+                <td style="width:20%; text-align:center; padding:12px;">
                   <div style="display:flex; gap:12px; justify-content:center;">
                     <a href="{{ route('teacher.games.edit', $game->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:20px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Edit">
                       <i class="bi bi-pencil"></i>
