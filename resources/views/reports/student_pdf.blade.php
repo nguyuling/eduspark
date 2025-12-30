@@ -27,7 +27,7 @@
         <th style="width:140px;">Tarikh</th>
         <th style="width:110px;">Jenis</th>
         <th>Topik</th>
-        <th style="width:80px;">Skor</th>
+        <th style="width:120px;">Skor</th>
       </tr>
     </thead>
     <tbody>
@@ -37,7 +37,7 @@
             <td>{{ $a['date'] }}</td>
             <td>{{ $a['type'] }}</td>
             <td>{{ $a['topic'] }}</td>
-            <td>{{ $a['score'] }}</td>
+            <td>{{ isset($a['raw_score']) && isset($a['max_points']) ? $a['raw_score'] . '/' . $a['max_points'] : '' }} ({{ isset($a['percentage']) ? $a['percentage'] . '%' : '' }})</td>
           </tr>
         @endforeach
       @else

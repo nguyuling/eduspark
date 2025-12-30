@@ -565,16 +565,21 @@ class ReportController extends Controller
         if (Schema::hasTable('quiz_attempts')) {
             $attempts = DB::table('quiz_attempts as qa')
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
-                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score')
+                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'q.max_points')
                 ->where('qa.student_id', $userId)
                 ->orderBy('qa.created_at', 'desc')
                 ->get()
                 ->map(function($r){
+                    $score = isset($r->score) ? (float)$r->score : 0;
+                    $maxPoints = isset($r->max_points) && (float)$r->max_points > 0 ? (float)$r->max_points : 100;
+                    $percentage = ($score / $maxPoints) * 100;
                     return [
                         'date' => $r->date ? date('Y-m-d', strtotime($r->date)) : '',
                         'type' => $r->type ?? 'Kuiz',
                         'topic'=> $r->topic ?? 'N/A',
-                        'score'=> $r->score ?? ''
+                        'raw_score' => round($score, 2),
+                        'max_points' => (int)$maxPoints,
+                        'percentage' => round($percentage, 2)
                     ];
                 });
         }
