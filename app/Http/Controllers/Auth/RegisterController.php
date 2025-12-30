@@ -51,7 +51,7 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/^[mg]-\d{7}@moe-dl\.edu\.my$/'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'in:student,teacher'],
             'district' => ['required', 'string', 'max:100'],
@@ -108,6 +108,6 @@ class RegisterController extends Controller
 
         // DO NOT auto-login, redirect to login page instead
         return redirect($this->redirectPath())
-            ->with('success', 'Account created successfully! Please log in.');
+            ->with('success', 'Akaun berjaya dicipta! Anda kini boleh log masuk.');
     }
 }

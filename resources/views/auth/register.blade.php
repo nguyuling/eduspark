@@ -56,7 +56,12 @@
 
         <div class="auth-form-group">
             <label for="email">Alamat Email*</label>
-            <input type="email" id="email" name="email" required placeholder="anda@contoh.com" value="{{ old('email') }}">
+                <input type="email" id="email" name="email" required
+        placeholder="m-1234567@moe-dl.edu.my / g-1234567@moe-dl.edu.my"
+        pattern="^[mg]-\d{7}@moe-dl\.edu\.my$"
+        title="m-xxxxxxx@moe-dl.edu.my untuk pelajar, g-xxxxxxx@moe-dl.edu.my untuk guru"
+        value="{{ old('email') }}">
+    <span class="error-msg" id="email-feedback"></span>
         </div>
 
         <div class="auth-form-group">
@@ -185,9 +190,7 @@
     function updateFieldVisibility() {
       // Show role if all 4 basic fields are filled
       const basicFieldsFilled = isFieldFilled(nameInput) && 
-                                 isFieldFilled(emailInput) && 
-                                 isFieldFilled(passwordInput) && 
-                                 isFieldFilled(passwordConfirmInput);
+                                 isFieldFilled(emailInput);
       
       if (basicFieldsFilled) {
         roleGroup.style.display = 'block';
@@ -262,8 +265,6 @@
     // Add event listeners for field visibility
     nameInput.addEventListener('input', updateFieldVisibility);
     emailInput.addEventListener('input', updateFieldVisibility);
-    passwordInput.addEventListener('input', updateFieldVisibility);
-    passwordConfirmInput.addEventListener('input', updateFieldVisibility);
     roleSelect.addEventListener('change', updateFieldVisibility);
     districtSelect.addEventListener('change', function() {
       updateSchools();
@@ -271,8 +272,58 @@
     });
     schoolSelect.addEventListener('change', updateFieldVisibility);
 
+    // Password confirmation validation, not resetting the page
+    function checkPasswordMatch() {
+      if (
+        passwordConfirmInput.value &&
+        passwordInput.value !== passwordConfirmInput.value
+      ) {
+        passwordConfirmInput.setCustomValidity('Kata laluan tidak sepadan');
+      } else {
+        passwordConfirmInput.setCustomValidity('');
+      }
+    }
+
+    function checkPasswordStrength() {
+      const password = passwordInput.value;
+      const strongRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+      if (password && !strongRegex.test(password)) {
+        passwordInput.setCustomValidity(
+          'Kata laluan mesti sekurang-kurangnya 8 aksara, satu huruf besar, satu nombor dan satu simbol'
+        );
+      } else {
+        passwordInput.setCustomValidity('');
+      }
+    }
+      passwordInput.addEventListener('input', function () {
+        // updateFieldVisibility();
+        checkPasswordStrength();
+        checkPasswordMatch();
+      });
+
+      passwordConfirmInput.addEventListener('input', function () {
+        // updateFieldVisibility();
+        checkPasswordMatch();
+      });
+
+
     // Initialize visibility on page load (for old form values)
     updateFieldVisibility();
+
+    // Prevent form submission if password is invalid (no page reload)
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', function (e) {
+      checkPasswordStrength();
+      checkPasswordMatch();
+
+      if (!form.checkValidity()) {
+        e.preventDefault();       // stop submit
+        form.reportValidity();    // show inline browser errors
+      }
+    });
+
 
     // Apply dark theme based on system preference or localStorage
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
