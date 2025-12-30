@@ -37,8 +37,9 @@
 
         <label style="font-weight:700;color:var(--muted);font-size:13px;margin-left:16px;">Jangka Masa:</label>
         <select id="stats-date-range" class="select" style="padding:8px 12px;border-radius:8px;min-width:140px;border:2px solid #ddd;background:#f9f9f9;">
+            <option value="">-- Sila Pilih --</option>
             <option value="week">Minggu Ini</option>
-            <option value="month" selected>Bulan Ini</option>
+            <option value="month">Bulan Ini</option>
             <option value="quarter">Suku Tahun</option>
             <option value="all">Semua Masa</option>
         </select>
