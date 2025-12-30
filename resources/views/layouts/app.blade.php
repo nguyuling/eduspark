@@ -102,6 +102,16 @@
         }
         .nav a:hover::before { transform:scaleY(1); }
         .nav a.active::before { transform:scaleY(1); }
+
+        /* Page content offset to clear the fixed sidebar */
+        .page-content {
+          margin-left: 296px;
+          padding: 28px;
+          min-height: 100vh;
+        }
+        @media (max-width: 920px) {
+          .page-content { margin-left: 0; padding: 18px; }
+        }
     </style>
 </head>
 <body class="light">
@@ -112,12 +122,16 @@
         @endauth
         
         {{-- Page Content --}}
+          <main class="page-content">
             @yield('content')
+          </main>
         </div>
     </div>
 
     <footer class="page-footer">
         © 2025 EduSpark • Belajar • Bermain • Berkembang
     </footer>
+
+    @yield('scripts')
 </body>
 </html>

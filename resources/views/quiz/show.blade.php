@@ -103,16 +103,66 @@
                 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color:var(--success);">Jawapan Betul</label>
                 <div style="font-size: 14px; font-weight: 600; padding:12px; background:rgba(42, 157, 143, 0.08); border-radius:8px; border-left:3px solid var(--success);">{{ $question->correct_answer }}</div>
               </div>
+
+            @elseif($question->type === 'coding')
+              <!-- Coding Question Section -->
+              <div>
+                <!-- Code Template Display -->
+                @if ($question->coding_template)
+                  <div style="margin-bottom:20px;">
+                    <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color:var(--muted);">Template Kod:</label>
+                    <div style="background:#f5f5f5; padding:12px; border-radius:8px; border:2px solid #d1d5db; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; white-space:pre; overflow-x:auto;">{{ $question->coding_template }}</div>
+                  </div>
+                @endif
+
+                <!-- Full Code Display with Hidden Lines -->
+                @if ($question->coding_full_code)
+                  <div style="margin-top:20px;">
+                    <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px; color:var(--muted);">Kod Lengkap (Garis tersembunyi ditandai):</label>
+                    <div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:0; min-height:100px; display: flex;">
+                      @php
+                        $hiddenLines = !empty($question->hidden_line_numbers) ? array_map('intval', explode(',', $question->hidden_line_numbers)) : [];
+                        $lines = explode("\n", $question->coding_full_code);
+                      @endphp
+                      
+                      <!-- Line Numbers Column -->
+                      <div style="flex-shrink: 0; width: 40px; background: #e8e8e8; padding: 8px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none; padding-right: 6px; display: flex; flex-direction: column;">
+                        @foreach ($lines as $index => $line)
+                          <div style="height: 1.5em; display: flex; align-items: center; justify-content: flex-end;">{{ $index + 1 }}</div>
+                        @endforeach
+                      </div>
+                      
+                      <!-- Code Content Column -->
+                      <div style="flex: 1; padding: 8px 8px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit; white-space: pre; overflow-x: auto; display: flex; flex-direction: column;">
+                        @foreach ($lines as $index => $line)
+                          @php $lineNum = $index + 1; $isHidden = in_array($lineNum, $hiddenLines); @endphp
+                          <div style="height: 1.5em; display: flex; align-items: center; background: {{ $isHidden ? 'rgba(255, 193, 7, 0.2)' : 'transparent' }}; flex-shrink: 0;">{{ $line }}</div>
+                        @endforeach
+                      </div>
+                    </div>
+                  </div>
+                @endif
+              </div>
+
             @else
+              <!-- Multiple Choice, True/False, Checkbox Options -->
               <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 12px; color:var(--muted);">Pilihan & Jawapan Betul</label>
               <div style="display:flex; flex-direction:column; gap:8px;">
                 @forelse($question->options->sortBy('id') as $option)
                   <div style="display:flex; gap:12px; align-items:center; padding:12px; border-radius:8px; border:2px solid {{ $option->is_correct == true || $option->is_correct == 1 ? 'var(--success)' : '#d1d5db' }}; background:{{ $option->is_correct == true || $option->is_correct == 1 ? 'rgba(42, 157, 143, 0.08)' : 'rgba(200, 200, 200, 0.04)' }};">
                     <div style="width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                      @if($option->is_correct == true || $option->is_correct == 1)
-                        <span style="color:var(--success); font-weight:bold; font-size:18px;">✓</span>
+                      @if($question->type === 'checkbox')
+                        @if($option->is_correct == true || $option->is_correct == 1)
+                          <span style="color:var(--success); font-weight:bold; font-size:18px;">☑</span>
+                        @else
+                          <span style="color:var(--muted); font-size:18px;">☐</span>
+                        @endif
                       @else
-                        <span style="color:var(--muted); font-size:18px;">○</span>
+                        @if($option->is_correct == true || $option->is_correct == 1)
+                          <span style="color:var(--success); font-weight:bold; font-size:18px;">●</span>
+                        @else
+                          <span style="color:var(--muted); font-size:18px;">○</span>
+                        @endif
                       @endif
                     </div>
                     <div style="flex:1;">{{ $option->option_text }}</div>

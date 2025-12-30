@@ -6,6 +6,7 @@ use App\Http\Controllers\QuizTeacherController;
 use App\Http\Controllers\QuizStudentController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\PerformanceController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
@@ -14,7 +15,11 @@ require __DIR__ . '/auth.php';
 Route::get('/', function() {
     if (auth()->check()) {
         $user = auth()->user();
-        return redirect('/performance');
+        // Teachers land on reports, others on performance
+        if (($user->role ?? null) === 'teacher') {
+            return redirect()->route('reports.index');
+        }
+        return redirect()->route('performance');
     }
     return redirect('/login');
 })->name('home');
@@ -77,6 +82,37 @@ Route::middleware('auth')->group(function () {
     Route::get('/performance', [PerformanceController::class, 'index'])->name('performance');
 });
 
+// Report routes (authenticated)
+Route::middleware('auth')->group(function () {
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
+    // Students dropdown + detail
+    Route::get('/reports/students-by-class/{class}', [ReportController::class, 'studentsByClass'])
+        ->name('reports.students.byClass');
+    Route::get('/reports/student/{id}', [ReportController::class, 'student'])
+        ->name('reports.student');
+    Route::get('/reports/student/{id}/export/csv', [ReportController::class, 'exportStudentCsv'])
+        ->name('reports.student.csv');
+    Route::get('/reports/student/{id}/export/print', [ReportController::class, 'exportStudentPdf'])
+        ->name('reports.student.print');
+
+    // Class reports
+    Route::get('/reports/class', [ReportController::class, 'classIndex'])
+        ->name('reports.class');
+    Route::get('/reports/class/{class}/export/csv', [ReportController::class, 'exportClassCsv'])
+        ->name('reports.class.csv');
+    Route::get('/reports/class/{class}/export/pdf', [ReportController::class, 'exportClassPdf'])
+        ->name('reports.class.pdf');
+
+    // Student performance (optional, kept for compatibility)
+    Route::get('/reports/students', [ReportController::class, 'studentsPerformance'])
+        ->name('reports.students');
+    Route::get('/reports/students/export-csv', [ReportController::class, 'exportStudentsCsv'])
+        ->name('reports.students.csv');
+    Route::get('/reports/students/chart-data', [ReportController::class, 'studentsChartData'])
+        ->name('reports.students.chart');
+});
+
 // Forum routes
 Route::middleware('auth')->group(function () {
     Route::get('/forum', [ForumController::class, 'index'])->name('forum.index');
@@ -87,4 +123,31 @@ Route::middleware('auth')->group(function () {
     Route::put('/forum/{id}', [ForumController::class, 'update'])->name('forum.update');
     Route::delete('/forum/{id}', [ForumController::class, 'destroy'])->name('forum.destroy');
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
+});
+
+// Games routes (Permainan in sidebar)
+Route::middleware('auth')->group(function () {
+    Route::get('/games', function() {
+        return view('games.index');
+    })->name('games.index');
+    
+    Route::get('/games/quiz-challenge', function() {
+        return view('games.quiz-challenge');
+    })->name('games.quiz');
+    
+    Route::get('/games/whack-a-mole', function() {
+        return view('games.whack-a-mole');
+    })->name('games.whack');
+    
+    Route::get('/games/memory-match', function() {
+        return view('games.memory-match');
+    })->name('games.memory');
+    
+    Route::get('/games/cosmic-defender', function() {
+        return view('games.cosmic-defender');
+    })->name('games.cosmic');
+    
+    Route::get('/games/maze-game', function() {
+        return view('games.maze-game');
+    })->name('games.maze');
 });

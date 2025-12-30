@@ -154,7 +154,7 @@
 
       <!-- Action Buttons Row -->
       <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0;">
-        <button type="submit" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
+        <button type="submit" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'" onclick="return validateBeforeSubmit()">
           <i class="bi bi-save"></i>Simpan Kuiz
         </button>
     </form>
@@ -208,7 +208,7 @@
                             <option value="${QUESTION_TYPES.CHECKBOX}">Kotak Semak</option>
                             <option value="${QUESTION_TYPES.SA}">Jawapan Pendek</option>
                             <option value="${QUESTION_TYPES.TF}">Benar/Salah</option>
-                            <option value="${QUESTION_TYPES.CODING}">Pengaturcaraan</option>
+                            <option value="${QUESTION_TYPES.CODING}">Koding</option>
                         </select>
                     </div>
                 </div>
@@ -413,14 +413,21 @@
 
 
     // Template for Options container (used by MC, TF, and CHECKBOX)
-    const optionTemplate = (qIndex, type) => {
+    // Accepts an optional options array to render all options
+    const optionTemplate = (qIndex, type, options = null) => {
         const rowTemplate = (type === QUESTION_TYPES.CHECKBOX) ? checkboxOptionRow : optionRow;
-
+        let optionsHtml = '';
+        if (Array.isArray(options) && options.length > 0) {
+            for (let i = 0; i < options.length; i++) {
+                optionsHtml += rowTemplate(qIndex, i);
+            }
+        } else {
+            optionsHtml = rowTemplate(qIndex, 0) + rowTemplate(qIndex, 1);
+        }
         return `
             <h6 style="margin:0 0 12px 0; font-weight:600; font-size:13px;">Pilihan & Jawapan Betul <span style="color: var(--danger);">*</span></h6>
             <div class="options-list" data-q-index="${qIndex}" style="display:flex; flex-direction:column; gap:8px;">
-                ${rowTemplate(qIndex, 0)}
-                ${rowTemplate(qIndex, 1)}
+                ${optionsHtml}
             </div>
             <button type="button" style="display:inline-block; padding:8px 14px; background:transparent; color:var(--accent); border:1px solid var(--accent); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; cursor:pointer; margin-top:12px;" class="add-option-btn" data-q-index="${qIndex}">
                 + Tambah Pilihan
@@ -485,26 +492,21 @@
     }
 
     // Renders the correct answer fields based on the selected type
-    const renderAnswerFields = (qIndex, type) => {
+    const renderAnswerFields = (qIndex, type, options = null) => {
         const container = document.getElementById(`answers-container-${qIndex}`);
-        container.innerHTML = ''; // Clear previous content
-        
+        container.innerHTML = '';
         const rowTemplate = (type === QUESTION_TYPES.CHECKBOX) ? checkboxOptionRow : optionRow;
-
         if (type === QUESTION_TYPES.SA) {
             container.innerHTML = shortAnswerTemplate(qIndex);
         } else if (type === QUESTION_TYPES.CODING) {
             container.innerHTML = codingTemplate(qIndex);
         } else if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF || type === QUESTION_TYPES.CHECKBOX) {
-            
-            container.innerHTML = optionTemplate(qIndex, type);
-            
+            container.innerHTML = optionTemplate(qIndex, type, options);
             // Re-bind the add option button using the correct template
             const addBtn = container.querySelector('.add-option-btn');
             addBtn.onclick = function() {
                 addOptionRow(qIndex, this.previousElementSibling, rowTemplate);
             };
-
             // For True/False, immediately adjust to only two options: True and False
             if (type === QUESTION_TYPES.TF) {
                 const optionsList = container.querySelector('.options-list');
@@ -522,7 +524,7 @@
                         <button type="button" style="background:transparent; color:var(--muted); border:1px solid var(--muted); padding:8px 10px; border-radius:6px; font-size:12px; font-weight:600; cursor:not-allowed; opacity:0.5;" disabled>✕</button>
                     </div>
                 `;
-                container.querySelector('.add-option-btn').style.display = 'none'; // Hide add button
+                container.querySelector('.add-option-btn').style.display = 'none';
             }
         }
     };
@@ -548,6 +550,20 @@
             const oldIndex = parseInt(card.getAttribute('data-index'));
             const newIndex = index;
             
+            // CRITICAL: Preserve all form field values BEFORE innerHTML replacement
+            const fieldValues = {};
+            card.querySelectorAll('input, textarea, select').forEach(field => {
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    fieldValues[field.name] = {
+                        value: field.value,
+                        checked: field.checked,
+                        type: field.type
+                    };
+                } else {
+                    fieldValues[field.name] = field.value;
+                }
+            });
+            
             // Update question number display
             const titleElement = card.querySelector('h3');
             if (titleElement) {
@@ -566,11 +582,67 @@
                 .replace(new RegExp(`answers-container-${oldIndex}`, 'g'), `answers-container-${newIndex}`)
                 .replace(new RegExp(`data-index="${oldIndex}"`, 'g'), `data-index="${newIndex}"`);
             
+            // CRITICAL: Restore all form field values and reattach listeners
+            const newFieldNames = {};
+            card.querySelectorAll('input, textarea, select').forEach(field => {
+                // Build map of new field names to elements
+                newFieldNames[field.name] = field;
+            });
+            
+            // Restore values using old names mapped to new elements
+            for (let oldName in fieldValues) {
+                const newName = oldName.replace(new RegExp(`questions\\[${oldIndex}\\]`), `questions[${newIndex}]`);
+                if (newFieldNames[newName]) {
+                    const field = newFieldNames[newName];
+                    if (field.type === 'checkbox' || field.type === 'radio') {
+                        field.checked = fieldValues[oldName].checked;
+                        field.value = fieldValues[oldName].value;
+                    } else {
+                        field.value = fieldValues[oldName];
+                    }
+                }
+            }
+            
+            // Re-attach event listeners for type change select
+            const typeSelect = card.querySelector(`.question-type-select[data-index="${newIndex}"]`);
+            if (typeSelect) {
+                // Remove all existing listeners by cloning and replacing
+                const newTypeSelect = typeSelect.cloneNode(true);
+                typeSelect.parentNode.replaceChild(newTypeSelect, typeSelect);
+                
+                // Attach new listener
+                newTypeSelect.addEventListener('change', function() {
+                    const qIndex = this.getAttribute('data-index');
+                    const type = this.value;
+                    renderAnswerFields(qIndex, type);
+                    
+                    // Handle points field based on question type
+                    const pointsInput = container.querySelector(`input[name="questions[${qIndex}][points]"]`);
+                    if (pointsInput) {
+                        if (type === QUESTION_TYPES.CODING) {
+                            pointsInput.readOnly = true;
+                            pointsInput.style.opacity = '0.6';
+                            pointsInput.style.cursor = 'not-allowed';
+                        } else {
+                            pointsInput.readOnly = false;
+                            pointsInput.style.opacity = '1';
+                            pointsInput.style.cursor = 'auto';
+                        }
+                    }
+                });
+            }
+            
             // Re-attach event listeners for code textarea if it's a coding question
             const fullCodeTextarea = card.querySelector(`.code-full-textarea[data-index="${newIndex}"]`);
             if (fullCodeTextarea) {
-                fullCodeTextarea.addEventListener('input', function() {
+                const newCodeTextarea = fullCodeTextarea.cloneNode(true);
+                fullCodeTextarea.parentNode.replaceChild(newCodeTextarea, fullCodeTextarea);
+                
+                newCodeTextarea.addEventListener('input', function() {
                     updateCodeLineNumbers(this, newIndex);
+                });
+                newCodeTextarea.addEventListener('keydown', function(e) {
+                    handleTabKey(e, newIndex);
                 });
             }
             
@@ -594,32 +666,34 @@
         if (existingQuestions.length > 0) {
             existingQuestions.forEach((qData, i) => {
                 container.insertAdjacentHTML('beforeend', questionTemplate(i));
-                renderAnswerFields(i, qData.type); 
-                
+                // For MC, Checkbox, pass options array to render all rows
+                let options = null;
+                if ((qData.type === QUESTION_TYPES.MC || qData.type === QUESTION_TYPES.CHECKBOX) && Array.isArray(qData.options)) {
+                    options = qData.options;
+                }
+                renderAnswerFields(i, qData.type, options);
                 // Populate existing data into the form inputs
                 const card = container.querySelector(`[question-card][data-index="${i}"]`);
-                
                 if (!card) {
                     console.error(`Could not find card with data-index="${i}"`);
                     return;
                 }
-                
                 // Set question text
                 const textArea = card.querySelector('textarea[name*="question_text"]');
                 if (textArea) textArea.value = qData.question_text || '';
-                
                 // Set points
                 const pointsInput = card.querySelector('input[name*="points"]');
                 if (pointsInput) pointsInput.value = qData.points || 1;
-                
                 // Set type select
                 const typeSelect = card.querySelector('select[name*="type"]');
                 if (typeSelect) typeSelect.value = qData.type || QUESTION_TYPES.MC;
-                
                 // Populate options/answers
                 if (qData.type === QUESTION_TYPES.SA) {
-                    const correctInput = card.querySelector('input[name*="correct_answer"]');
-                    if (correctInput) correctInput.value = qData.correct_answer || '';
+                    // Wait for DOM update to ensure input exists
+                    setTimeout(() => {
+                        const correctInput = card.querySelector('input[name*="correct_answer"]');
+                        if (correctInput) correctInput.value = qData.correct_answer || '';
+                    }, 0);
                 } else if (qData.type === QUESTION_TYPES.CODING) {
                     // Handle Coding question
                     const codeTextarea = card.querySelector('textarea[name*="coding_full_code"]');
@@ -629,11 +703,9 @@
                         if (hiddenLinesInput && qData.hidden_line_numbers) {
                             hiddenLinesInput.value = qData.hidden_line_numbers;
                         }
-                        
                         // Now set code and update display (which will use the hidden lines)
                         codeTextarea.value = qData.coding_full_code || '';
                         updateCodeLineNumbers(codeTextarea, i);
-                        
                         // Add event listeners for coding textarea
                         codeTextarea.addEventListener('input', function() {
                             updateCodeLineNumbers(this, i);
@@ -652,7 +724,7 @@
                             radios[1].checked = true;
                         }
                     });
-                } else {
+                } else if (qData.type === QUESTION_TYPES.MC || qData.type === QUESTION_TYPES.CHECKBOX) {
                     // Handle MC/Checkbox
                     const optionInputs = card.querySelectorAll('input[name*="options"]');
                     let optIndex = 0;
@@ -662,7 +734,6 @@
                             optIndex++;
                         }
                     });
-                    
                     // Set correct answers
                     if (qData.type === QUESTION_TYPES.CHECKBOX) {
                         const checkboxes = card.querySelectorAll('input[type="checkbox"][name*="correct_answer"]');
@@ -686,11 +757,31 @@
             renderAnswerFields(questionIndex, QUESTION_TYPES.MC); 
             questionIndex++;
         }
+        
+        // Setup type change listeners for all existing questions
+        document.querySelectorAll('.question-type-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const qIndex = this.getAttribute('data-index');
+                const type = this.value;
+                renderAnswerFields(qIndex, type);
+            });
+        });
 
         // 2. Add Question Button
         addQuestionBtn.addEventListener('click', function() {
             container.insertAdjacentHTML('beforeend', questionTemplate(questionIndex));
             renderAnswerFields(questionIndex, QUESTION_TYPES.MC);
+            
+            // Setup event listener for the new question's type select
+            const newTypeSelect = container.querySelector(`.question-type-select[data-index="${questionIndex}"]`);
+            if (newTypeSelect) {
+                newTypeSelect.addEventListener('change', function() {
+                    const qIndex = this.getAttribute('data-index');
+                    const type = this.value;
+                    renderAnswerFields(qIndex, type);
+                });
+            }
+            
             questionIndex++;
         });
 
@@ -797,7 +888,7 @@
             }
         });
 
-        // 5. Type Change Listener (Delegation required for dynamic elements)
+        // 5. Delegation for Change Events (Only handles dynamically added questions now)
         container.addEventListener('change', function(e) {
             if (e.target.classList.contains('question-type-select')) {
                 const qIndex = e.target.getAttribute('data-index');
@@ -807,5 +898,42 @@
         });
         
     });
+
+    // Validation function to sync all radio/checkbox values with their option text before submission
+    function validateBeforeSubmit() {
+        const container = document.getElementById('questions-container');
+        
+        // STEP 1: Sync all radio buttons and checkboxes with their option text values
+        container.querySelectorAll('[question-card]').forEach(card => {
+            const qIndex = card.getAttribute('data-index');
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            // For multiple choice and true/false (radio buttons)
+            if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF) {
+                const radios = card.querySelectorAll('input[type="radio"][name*="correct_answer"]');
+                const optionInputs = card.querySelectorAll('input[name*="options"]');
+                
+                radios.forEach((radio, index) => {
+                    if (optionInputs[index]) {
+                        radio.value = optionInputs[index].value;
+                    }
+                });
+            }
+            // For checkbox questions
+            else if (type === QUESTION_TYPES.CHECKBOX) {
+                const checkboxes = card.querySelectorAll('input[type="checkbox"][name*="correct_answer"]');
+                const optionInputs = card.querySelectorAll('input[name*="options"]');
+                
+                checkboxes.forEach((checkbox, index) => {
+                    if (optionInputs[index]) {
+                        checkbox.value = optionInputs[index].value;
+                    }
+                });
+            }
+        });
+        
+        return true;
+    }
 </script>
 @endsection

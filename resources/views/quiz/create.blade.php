@@ -109,6 +109,7 @@
               onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
               onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
               onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+              oninput="validateNaturalNumber(this)"
             >
             @error('max_attempts')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
           </div>
@@ -199,7 +200,7 @@
                 <div style="display: flex; flex-direction: column; gap: 12px;">
                     <div>
                         <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Markah <span style="color: var(--danger);">*</span></label>
-                        <input type="number" name="questions[${index}][points]" value="1" min="1" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"/>
+                        <input type="number" name="questions[${index}][points]" value="1" min="1" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';" oninput="validateNaturalNumber(this)"/>
                     </div>
                     <div>
                         <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Jenis Soalan <span style="color: var(--danger);">*</span></label>
@@ -208,7 +209,7 @@
                             <option value="${QUESTION_TYPES.CHECKBOX}">Kotak Semak</option>
                             <option value="${QUESTION_TYPES.SA}">Jawapan Pendek</option>
                             <option value="${QUESTION_TYPES.TF}">Benar/Salah</option>
-                            <option value="${QUESTION_TYPES.CODING}">Pengaturcaraan</option>
+                            <option value="${QUESTION_TYPES.CODING}">Koding</option>
                         </select>
                     </div>
                 </div>
@@ -519,6 +520,20 @@
             const oldIndex = parseInt(card.getAttribute('data-index'));
             const newIndex = index;
             
+            // CRITICAL: Preserve all form field values BEFORE innerHTML replacement
+            const fieldValues = {};
+            card.querySelectorAll('input, textarea, select').forEach(field => {
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    fieldValues[field.name] = {
+                        value: field.value,
+                        checked: field.checked,
+                        type: field.type
+                    };
+                } else {
+                    fieldValues[field.name] = field.value;
+                }
+            });
+            
             // Update question number display
             const titleElement = card.querySelector('h3');
             if (titleElement) {
@@ -537,11 +552,67 @@
                 .replace(new RegExp(`answers-container-${oldIndex}`, 'g'), `answers-container-${newIndex}`)
                 .replace(new RegExp(`data-index="${oldIndex}"`, 'g'), `data-index="${newIndex}"`);
             
+            // CRITICAL: Restore all form field values and reattach listeners
+            const newFieldNames = {};
+            card.querySelectorAll('input, textarea, select').forEach(field => {
+                // Build map of new field names to elements
+                newFieldNames[field.name] = field;
+            });
+            
+            // Restore values using old names mapped to new elements
+            for (let oldName in fieldValues) {
+                const newName = oldName.replace(new RegExp(`questions\\[${oldIndex}\\]`), `questions[${newIndex}]`);
+                if (newFieldNames[newName]) {
+                    const field = newFieldNames[newName];
+                    if (field.type === 'checkbox' || field.type === 'radio') {
+                        field.checked = fieldValues[oldName].checked;
+                        field.value = fieldValues[oldName].value;
+                    } else {
+                        field.value = fieldValues[oldName];
+                    }
+                }
+            }
+            
+            // Re-attach event listeners for type change select
+            const typeSelect = card.querySelector(`.question-type-select[data-index="${newIndex}"]`);
+            if (typeSelect) {
+                // Remove all existing listeners by cloning and replacing
+                const newTypeSelect = typeSelect.cloneNode(true);
+                typeSelect.parentNode.replaceChild(newTypeSelect, typeSelect);
+                
+                // Attach new listener
+                newTypeSelect.addEventListener('change', function() {
+                    const qIndex = this.getAttribute('data-index');
+                    const type = this.value;
+                    renderAnswerFields(qIndex, type);
+                    
+                    // Handle points field based on question type
+                    const pointsInput = container.querySelector(`input[name="questions[${qIndex}][points]"]`);
+                    if (pointsInput) {
+                        if (type === QUESTION_TYPES.CODING) {
+                            pointsInput.readOnly = true;
+                            pointsInput.style.opacity = '0.6';
+                            pointsInput.style.cursor = 'not-allowed';
+                        } else {
+                            pointsInput.readOnly = false;
+                            pointsInput.style.opacity = '1';
+                            pointsInput.style.cursor = 'auto';
+                        }
+                    }
+                });
+            }
+            
             // Re-attach event listeners for code textarea if it's a coding question
             const fullCodeTextarea = card.querySelector(`.code-full-textarea[data-index="${newIndex}"]`);
             if (fullCodeTextarea) {
-                fullCodeTextarea.addEventListener('input', function() {
+                const newCodeTextarea = fullCodeTextarea.cloneNode(true);
+                fullCodeTextarea.parentNode.replaceChild(newCodeTextarea, fullCodeTextarea);
+                
+                newCodeTextarea.addEventListener('input', function() {
                     updateCodeLineNumbers(this, newIndex);
+                });
+                newCodeTextarea.addEventListener('keydown', function(e) {
+                    handleTabKey(e, newIndex);
                 });
             }
         });
@@ -625,17 +696,67 @@
         // 1. Initial Load: Render the first question
         // Fix: Use insertAdjacentHTML and renderAnswerFields to ensure correct setup
         container.insertAdjacentHTML('beforeend', questionTemplate(questionIndex));
-        renderAnswerFields(questionIndex, QUESTION_TYPES.MC); 
+        renderAnswerFields(questionIndex, QUESTION_TYPES.MC);
+        
+        // Setup type change listener for initial question
+        const initialTypeSelect = container.querySelector(`.question-type-select[data-index="${questionIndex}"]`);
+        if (initialTypeSelect) {
+            initialTypeSelect.addEventListener('change', function() {
+                const qIndex = this.getAttribute('data-index');
+                const type = this.value;
+                renderAnswerFields(qIndex, type);
+                
+                // Handle points field based on question type
+                const pointsInput = container.querySelector(`input[name="questions[${qIndex}][points]"]`);
+                if (pointsInput) {
+                    if (type === QUESTION_TYPES.CODING) {
+                        pointsInput.readOnly = true;
+                        pointsInput.style.opacity = '0.6';
+                        pointsInput.style.cursor = 'not-allowed';
+                    } else {
+                        pointsInput.readOnly = false;
+                        pointsInput.style.opacity = '1';
+                        pointsInput.style.cursor = 'auto';
+                    }
+                }
+            });
+        }
+        
         questionIndex++;
 
         // 2. Add Question Button
         addQuestionBtn.addEventListener('click', function() {
             container.insertAdjacentHTML('beforeend', questionTemplate(questionIndex));
             renderAnswerFields(questionIndex, QUESTION_TYPES.MC);
+            
+            // Setup type change listener for the new question
+            const newTypeSelect = container.querySelector(`.question-type-select[data-index="${questionIndex}"]`);
+            if (newTypeSelect) {
+                newTypeSelect.addEventListener('change', function() {
+                    const qIndex = this.getAttribute('data-index');
+                    const type = this.value;
+                    renderAnswerFields(qIndex, type);
+                    
+                    // Handle points field based on question type
+                    const pointsInput = container.querySelector(`input[name="questions[${qIndex}][points]"]`);
+                    if (pointsInput) {
+                        if (type === QUESTION_TYPES.CODING) {
+                            pointsInput.readOnly = true;
+                            pointsInput.style.opacity = '0.6';
+                            pointsInput.style.cursor = 'not-allowed';
+                        } else {
+                            pointsInput.readOnly = false;
+                            pointsInput.style.opacity = '1';
+                            pointsInput.style.cursor = 'auto';
+                        }
+                    }
+                });
+            }
+            
             questionIndex++;
         });
 
-        // 3. Delegation for Dynamic Events (Type Change, Remove Question/Option)
+        // 3. Delegation for Dynamic Events (Remove Question/Option)
         container.addEventListener('click', function(e) {
             
             // Remove Question
@@ -799,11 +920,159 @@
         
     });
 
+    // Custom HTML5 validation messages in Malay
+    function setupMalayValidationMessages() {
+        const form = document.getElementById('quiz-form');
+        if (!form) return;
+        
+        form.addEventListener('invalid', function(e) {
+            const input = e.target;
+            
+            if (!input.validity.valid) {
+                if (input.validity.valueMissing) {
+                    input.setCustomValidity('Sila isi medan ini.');
+                } else if (input.validity.typeMismatch) {
+                    input.setCustomValidity('Sila masukkan format yang betul.');
+                } else if (input.validity.tooShort) {
+                    input.setCustomValidity(`Teks hendaklah sekurang-kurangnya ${input.minLength} aksara.`);
+                } else if (input.validity.tooLong) {
+                    input.setCustomValidity(`Teks tidak boleh lebih daripada ${input.maxLength} aksara.`);
+                } else if (input.validity.rangeUnderflow) {
+                    input.setCustomValidity(`Nilai mesti sekurang-kurangnya ${input.min}.`);
+                } else if (input.validity.rangeOverflow) {
+                    input.setCustomValidity(`Nilai tidak boleh lebih daripada ${input.max}.`);
+                }
+            }
+        }, true);
+        
+        form.addEventListener('input', function(e) {
+            if (e.target.validity.valid) {
+                e.target.setCustomValidity('');
+            }
+        }, true);
+    }
+    
+    // Setup validation for natural number inputs (max_attempts and points)
+    function setupNaturalNumberValidation() {
+        // Setup max_attempts field
+        const maxAttemptsInput = document.getElementById('max_attempts');
+        if (maxAttemptsInput) {
+            validateNaturalNumber(maxAttemptsInput);
+        }
+        
+        // Setup delegation for points fields (they are dynamic)
+        const container = document.getElementById('questions-container');
+        if (container) {
+            container.addEventListener('change', function(e) {
+                if (e.target.name && e.target.name.includes('[points]')) {
+                    validateNaturalNumber(e.target);
+                }
+            });
+            
+            container.addEventListener('input', function(e) {
+                if (e.target.name && e.target.name.includes('[points]')) {
+                    validateNaturalNumber(e.target);
+                }
+            });
+        }
+    }
+    
+    // Function to validate natural number input
+    function validateNaturalNumber(input) {
+        // Remove non-digit characters
+        let value = input.value.replace(/[^0-9]/g, '');
+        
+        // Convert to number
+        let numValue = parseInt(value, 10);
+        
+        // Ensure minimum of 1
+        if (value === '' || numValue < 1 || isNaN(numValue)) {
+            input.value = '1';
+        } else {
+            input.value = numValue;
+        }
+    }
+    
+    // Handle paste events to ensure only natural numbers
+    function setupPasteValidation() {
+        const maxAttemptsInput = document.getElementById('max_attempts');
+        if (maxAttemptsInput) {
+            maxAttemptsInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                const numValue = parseInt(pastedText.replace(/[^0-9]/g, ''), 10);
+                this.value = (numValue >= 1) ? numValue : '1';
+            });
+        }
+        
+        // For dynamic points fields
+        const container = document.getElementById('questions-container');
+        if (container) {
+            container.addEventListener('paste', function(e) {
+                if (e.target.name && e.target.name.includes('[points]')) {
+                    e.preventDefault();
+                    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                    const numValue = parseInt(pastedText.replace(/[^0-9]/g, ''), 10);
+                    e.target.value = (numValue >= 1) ? numValue : '1';
+                }
+            });
+        }
+    }
     // Validation function to check that all coding questions have hidden lines
+    // AND sync all radio/checkbox values with their option text before submission
     function validateBeforeSubmit() {
         const container = document.getElementById('questions-container');
         const codingQuestions = container.querySelectorAll('[question-card]');
         
+        // DEBUG: Log form data before submission
+        console.log('=== FORM DATA DEBUG ===');
+        const formData = new FormData(document.getElementById('quiz-form'));
+        let questionCount = 0;
+        for (let pair of formData.entries()) {
+            console.log(pair[0], '=', pair[1]);
+            if (pair[0].includes('question_text')) questionCount++;
+        }
+        console.log('Total questions detected:', questionCount);
+        
+        // STEP 1: Sync all radio buttons and checkboxes with their option text values
+        container.querySelectorAll('[question-card]').forEach(card => {
+            const qIndex = card.getAttribute('data-index');
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            console.log(`Question ${qIndex}, Type: ${type}`);
+            
+            // For multiple choice and true/false (radio buttons)
+            if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF) {
+                const radios = card.querySelectorAll('input[type="radio"][name*="correct_answer"]');
+                const optionInputs = card.querySelectorAll('input[name*="options"]');
+                
+                console.log(`  MC/TF: Found ${radios.length} radios, ${optionInputs.length} options`);
+                
+                radios.forEach((radio, index) => {
+                    if (optionInputs[index]) {
+                        radio.value = optionInputs[index].value;
+                        console.log(`    Radio ${index} value set to: ${radio.value}`);
+                    }
+                });
+            }
+            // For checkbox questions
+            else if (type === QUESTION_TYPES.CHECKBOX) {
+                const checkboxes = card.querySelectorAll('input[type="checkbox"][name*="correct_answer"]');
+                const optionInputs = card.querySelectorAll('input[name*="options"]');
+                
+                console.log(`  CHECKBOX: Found ${checkboxes.length} checkboxes, ${optionInputs.length} options`);
+                
+                checkboxes.forEach((checkbox, index) => {
+                    if (optionInputs[index]) {
+                        checkbox.value = optionInputs[index].value;
+                        console.log(`    Checkbox ${index} value set to: ${checkbox.value}`);
+                    }
+                });
+            }
+        });
+        
+        // STEP 2: Validate coding questions have hidden lines
         let hasInvalidCodingQuestion = false;
         
         codingQuestions.forEach(card => {
@@ -827,8 +1096,16 @@
             return false;
         }
         
+        console.log('=== END DEBUG ===');
         return true;
     }
+    
+    // Initialize Malay validation messages and natural number validation when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        setupMalayValidationMessages();
+        setupNaturalNumberValidation();
+        setupPasteValidation();
+    });
 </script>
 
 @endsection

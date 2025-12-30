@@ -79,16 +79,14 @@
       <table>
         <thead>
           <tr>
-            <th style="width:5%">No.</th>
-            <th style="width:45%">Bahan</th>
+            <th style="width:50%">Bahan</th>
             <th style="width:18%">Fail</th>
             <th style="width:32%">Tindakan</th>
           </tr>
         </thead>
         <tbody>
-          @forelse ($lessons ?? [] as $index => $lesson)
+          @forelse ($lessons ?? [] as $lesson)
             <tr>
-              <td style="text-align:center;">{{ $index + 1 }}</td>
               <td style="width:50%">
                 <div class="table-title">{{ $lesson->title }}</div>
                 <div class="table-subtitle">{{ $lesson->description ?: 'Tiada penerangan' }}</div>
@@ -114,7 +112,7 @@
               </td>
               <td style="width:32%;" class="table-center">
                 <div style="display:flex; gap:20px; justify-content:center; align-items:center;">
-                  <!-- VIEW BUTTON -->
+                  <!-- VIEW BUTTON (NOW WORKING) -->
                   <a href="{{ route('lesson.show', $lesson->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Lihat Butiran">
                     <i class="bi bi-eye-fill"></i>
                   </a>
@@ -124,12 +122,14 @@
                       <i class="bi bi-download"></i>
                     </a>
                   @endif
-
-                  <!-- EDIT & DELETE BUTTONS: Only show if owner -->
+                  
+                  <!-- EDIT BUTTON (WITH OWNER CHECK) -->
                   @if($lesson->uploaded_by === Auth::id())
                     <a href="{{ route('lesson.edit', $lesson->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Kemaskini">
                       <i class="bi bi-pencil-square"></i>
                     </a>
+                    
+                    <!-- DELETE BUTTON (WITH OWNER CHECK) -->
                     <form action="{{ route('lesson.destroy', $lesson->id) }}" method="POST" onsubmit="return confirm('Adakah anda pasti ingin memadamkan \'{{ addslashes($lesson->title) }}\'?');" style="display:inline; margin:0;">
                       @csrf
                       @method('DELETE')
@@ -137,6 +137,14 @@
                         <i class="bi bi-trash"></i>
                       </button>
                     </form>
+                  @else
+                    <!-- Show locked icons for non-owners -->
+                    <span style="display:inline-flex; align-items:center; justify-content:center; color:var(--muted); padding:0; font-size:24px; opacity:0.3; cursor:not-allowed;" title="Hanya pemilik boleh edit">
+                      <i class="bi bi-pencil-square"></i>
+                    </span>
+                    <span style="display:inline-flex; align-items:center; justify-content:center; color:var(--muted); padding:0; font-size:24px; opacity:0.3; cursor:not-allowed;" title="Hanya pemilik boleh padam">
+                      <i class="bi bi-trash"></i>
+                    </span>
                   @endif
                 </div>
               </td>
@@ -154,18 +162,6 @@
           @endforelse
         </tbody>
       </table>
-
-      <!-- Show More Section -->
-      @if ($hasMore ?? false)
-        <div style="text-align:center; margin-top:20px; padding:20px;">
-          <a href="{{ route('lesson.index', array_merge(request()->query(), ['limit' => $nextLimit])) }}" 
-             style="color:var(--accent); text-decoration:none; font-size:14px; cursor:pointer;" 
-             onmouseover="this.style.textDecoration='underline';" 
-             onmouseout="this.style.textDecoration='none';">
-            Tunjukkan 10 Bahan Lagi
-          </a>
-        </div>
-      @endif
     </section>
   </main>
 </div>
