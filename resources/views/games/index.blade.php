@@ -91,7 +91,7 @@
                   </div>
                 </td>
                 <td style="width:20%; text-align:center; padding:12px;">
-                  <div style="display:flex; gap:12px; justify-content:center;">
+                  <div style="display:flex; gap:20px; justify-content:center;">
                     <a href="{{ route('teacher.games.edit', $game->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:20px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Edit">
                       <i class="bi bi-pencil"></i>
                     </a>
