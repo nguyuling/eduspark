@@ -941,5 +941,3 @@ class ReportController extends Controller
         return $pdf->download('statistik_prestasi_' . now()->format('Y-m-d') . '.pdf');
     }
 }
-
-```
