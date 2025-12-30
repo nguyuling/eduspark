@@ -183,7 +183,7 @@ class ReportController extends Controller
         if (Schema::hasTable('quiz_attempts') && $lookupUserId) {
             $attempts = DB::table('quiz_attempts as qa')
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
-                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.quiz_id', 'q.max_score')
+                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.quiz_id', 'q.max_points')
                 ->where('qa.student_id', $lookupUserId)
                 ->orderBy('qa.created_at', 'desc')
                 ->get()
@@ -191,18 +191,18 @@ class ReportController extends Controller
         } elseif (Schema::hasTable('quiz_attempt') && $lookupUserId) {
             $attempts = DB::table('quiz_attempt as qa')
                 ->leftJoin('quiz as q', 'qa.quiz_id', '=', 'q.id')
-                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.quiz_id', 'q.max_score')
+                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.quiz_id', 'q.max_points')
                 ->where('qa.user_id', $lookupUserId)
                 ->orderBy('qa.created_at', 'desc')
                 ->get()
                 ->toArray();
         }
 
-        // Convert scores to percentages based on max_score
+        // Convert scores to percentages based on max_points
         $convertedAttempts = [];
         foreach ($attempts as $a) {
             $score = isset($a->score) ? (float)$a->score : 0;
-            $maxScore = isset($a->max_score) && (float)$a->max_score > 0 ? (float)$a->max_score : 100;
+            $maxScore = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
             $percentage = ($score / $maxScore) * 100;
             
             $a->percentage = round($percentage, 2);
