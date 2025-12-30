@@ -1079,10 +1079,11 @@ class ReportController extends Controller
 
         // Class comparison - only include if no specific class filter applied
         $classStats = [];
+        $processedClasses = [];
         if (!$selectedClass || $selectedClass === 'semua' || $selectedClass === '') {
             $classes = [];
             if (Schema::hasTable('classrooms')) {
-                $classes = DB::table('classrooms')->orderBy('name')->pluck('name')->toArray();
+                $classes = DB::table('classrooms')->select('name')->distinct()->orderBy('name')->pluck('name')->toArray();
             } elseif (Schema::hasTable('students')) {
                 $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
                 foreach ($possible as $col) {
@@ -1094,6 +1095,12 @@ class ReportController extends Controller
             }
 
             foreach ($classes as $cls) {
+                // Skip if already processed (avoid duplicates)
+                if (in_array($cls, $processedClasses)) {
+                    continue;
+                }
+                $processedClasses[] = $cls;
+                
                 $classAttempts = $attempts;
                 if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
                     $classroom = DB::table('classrooms')->where('name', $cls)->first();
@@ -1106,12 +1113,20 @@ class ReportController extends Controller
                 $classScores = $classAttempts->pluck('score')->filter(function($v) { return is_numeric($v); })->map(function($v) { return (float)$v; });
                 
                 if ($classScores->count() > 0) {
+                    // Get lowest and highest quiz titles
+                    $lowestQuiz = $classAttempts->sortBy('score')->first();
+                    $highestQuiz = $classAttempts->sortByDesc('score')->first();
+                    
+                    $lowestQuizTitle = $lowestQuiz ? ($lowestQuiz->title ?? 'Unknown') : 'N/A';
+                    $highestQuizTitle = $highestQuiz ? ($highestQuiz->title ?? 'Unknown') : 'N/A';
+                    
                     $classStats[] = [
                         'name' => $cls,
                         'avgScore' => round($classScores->avg(), 2) . '%',
                         'maxScore' => round($classScores->max(), 2) . '%',
                         'minScore' => round($classScores->min(), 2) . '%',
-                        'studentCount' => $classAttempts->pluck('student_id')->unique()->count()
+                        'lowestQuiz' => $lowestQuizTitle,
+                        'highestQuiz' => $highestQuizTitle
                     ];
                 }
             }

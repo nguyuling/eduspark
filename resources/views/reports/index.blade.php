@@ -97,7 +97,8 @@
                         <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Purata Skor</th>
                         <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Tertinggi</th>
                         <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Terendah</th>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Bilangan Pelajar</th>
+                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kuiz Tertinggi</th>
+                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kuiz Terendah</th>
                     </tr>
                 </thead>
                 <tbody id="stats-tbody">
