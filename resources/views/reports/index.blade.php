@@ -20,7 +20,7 @@
         <h3 style="margin:0;font-weight:700;">Statistik Kelas</h3>
         <div style="display:flex;gap:8px;">
             <button id="export-stats-btn" class="btn" style="padding:6px 12px;border-radius:8px;background:var(--success);color:#fff;border:0;font-weight:600;font-size:13px;cursor:pointer;">
-                Cetak/Eksport
+                Export
             </button>
         </div>
     </div>
