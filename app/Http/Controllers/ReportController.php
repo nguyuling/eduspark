@@ -1024,16 +1024,32 @@ class ReportController extends Controller
             }
 
             $attempts = $query->where('qa.created_at', '>=', $fromDate)
-                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.student_id')
+                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.student_id', 'q.max_points')
                 ->get();
         }
 
+        // Convert scores to percentages
+        $convertedAttempts = [];
+        foreach ($attempts as $a) {
+            $score = isset($a->score) ? (float)$a->score : 0;
+            $maxPoints = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
+            $percentage = ($score / $maxPoints) * 100;
+            
+            $convertedAttempts[] = (object)[
+                'created_at' => $a->created_at,
+                'score' => round($percentage, 2),
+                'title' => $a->title,
+                'student_id' => $a->student_id
+            ];
+        }
+        $attempts = collect($convertedAttempts);
+
         // Calculate statistics
         $scores = $attempts->pluck('score')->filter(function($v) { return is_numeric($v); })->map(function($v) { return (float)$v; });
-        $avgScore = $scores->count() > 0 ? round($scores->avg(), 1) : 0;
+        $avgScore = $scores->count() > 0 ? round($scores->avg(), 2) : 0;
         $totalAttempts = $attempts->count();
         $activeStudents = $attempts->pluck('student_id')->unique()->count();
-        $successRate = $scores->count() > 0 ? round(($scores->filter(function($v) { return $v >= 70; })->count() / $scores->count()) * 100) : 0;
+        $successRate = $scores->count() > 0 ? round(($scores->filter(function($v) { return $v >= 70; })->count() / $scores->count()) * 100, 2) : 0;
 
         // Topic performance
         $topicData = $attempts->groupBy('title')
@@ -1041,7 +1057,7 @@ class ReportController extends Controller
                 $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
                 return [
                     'label' => $group->first()->title ?? 'Unknown',
-                    'score' => $scores->count() > 0 ? round($scores->avg(), 1) : 0
+                    'score' => $scores->count() > 0 ? round($scores->avg(), 2) : 0
                 ];
             })
             ->sortByDesc('score')
@@ -1054,7 +1070,7 @@ class ReportController extends Controller
         })
         ->map(function($group) {
             $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
-            return round($scores->count() > 0 ? $scores->avg() : 0, 1);
+            return round($scores->count() > 0 ? $scores->avg() : 0, 2);
         })
         ->sort()
         ->values();
