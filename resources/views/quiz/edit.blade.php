@@ -221,10 +221,10 @@
     `;
 
     // Template for the Short Answer input (Only one text box)
-    const shortAnswerTemplate = (index) => `
+    const shortAnswerTemplate = (index, correctAnswer = '') => `
         <div style="margin-top:12px;">
             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color: var(--success);">Jawapan Betul <span style="color: var(--danger);">*</span></label>
-            <input type="text" name="questions[${index}][correct_answer]" placeholder="Masukkan jawapan yang tepat" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
+            <input type="text" name="questions[${index}][correct_answer]" value="${correctAnswer}" placeholder="Masukkan jawapan yang tepat" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
         </div>
     `;
 
@@ -492,12 +492,12 @@
     }
 
     // Renders the correct answer fields based on the selected type
-    const renderAnswerFields = (qIndex, type, options = null) => {
+    const renderAnswerFields = (qIndex, type, options = null, correctAnswer = '') => {
         const container = document.getElementById(`answers-container-${qIndex}`);
         container.innerHTML = '';
         const rowTemplate = (type === QUESTION_TYPES.CHECKBOX) ? checkboxOptionRow : optionRow;
         if (type === QUESTION_TYPES.SA) {
-            container.innerHTML = shortAnswerTemplate(qIndex);
+            container.innerHTML = shortAnswerTemplate(qIndex, correctAnswer);
         } else if (type === QUESTION_TYPES.CODING) {
             container.innerHTML = codingTemplate(qIndex);
         } else if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF || type === QUESTION_TYPES.CHECKBOX) {
@@ -671,7 +671,12 @@
                 if ((qData.type === QUESTION_TYPES.MC || qData.type === QUESTION_TYPES.CHECKBOX) && Array.isArray(qData.options)) {
                     options = qData.options;
                 }
-                renderAnswerFields(i, qData.type, options);
+                // For Short Answer, pass the correct_answer
+                let correctAnswer = '';
+                if (qData.type === QUESTION_TYPES.SA) {
+                    correctAnswer = qData.correct_answer || '';
+                }
+                renderAnswerFields(i, qData.type, options, correctAnswer);
                 // Populate existing data into the form inputs
                 const card = container.querySelector(`[question-card][data-index="${i}"]`);
                 if (!card) {
@@ -689,11 +694,7 @@
                 if (typeSelect) typeSelect.value = qData.type || QUESTION_TYPES.MC;
                 // Populate options/answers
                 if (qData.type === QUESTION_TYPES.SA) {
-                    // Wait for DOM update to ensure input exists
-                    setTimeout(() => {
-                        const correctInput = card.querySelector('input[name*="correct_answer"]');
-                        if (correctInput) correctInput.value = qData.correct_answer || '';
-                    }, 0);
+                    // Short answer is now populated via template with correctAnswer parameter
                 } else if (qData.type === QUESTION_TYPES.CODING) {
                     // Handle Coding question
                     const codeTextarea = card.querySelector('textarea[name*="coding_full_code"]');

@@ -13484,3 +13484,5 @@ FATAL:  password authentication failed for user \"postgres\" at C:\\xampp\\php\\
 #51 /Users/nguyuling/eduspark/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/Users/nguyulin...')
 #52 {main}
 "} 
+[2025-12-30 07:22:32] local.INFO: Quiz Store - Raw Request Data: {"_token":"rXqfrEQK4ecjkbN84Qq5dO2BWVZFSVNHIEwp516Q","title":"dweqdew","description":null,"due_at":null,"max_attempts":"1","questions":[{"question_text":"dewqdewqd","points":"1","type":"true_false","options":["Benar","Salah"],"correct_answer":"Salah"}]} 
+[2025-12-30 07:22:32] local.INFO: Quiz Store - Validated Data: {"title":"dweqdew","description":null,"max_attempts":"1","due_at":null,"questions":[{"question_text":"dewqdewqd","type":"true_false","points":"1","options":["Benar","Salah"],"correct_answer":"Salah"}]} 
