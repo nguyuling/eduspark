@@ -1145,11 +1145,11 @@ class ReportController extends Controller
         $selectedClass = $request->query('class', 'semua');
         $dateRange = $request->query('range', 'month');
 
-        $data = json_decode(json_encode([
+        $data = [
             'class' => $selectedClass,
             'range' => $dateRange,
             'generatedAt' => now()->format('Y-m-d H:i:s')
-        ]));
+        ];
 
         $pdf = Pdf::loadView('reports.statistics_pdf', $data)->setPaper('a4', 'landscape');
         return $pdf->download('statistik_prestasi_' . now()->format('Y-m-d') . '.pdf');
