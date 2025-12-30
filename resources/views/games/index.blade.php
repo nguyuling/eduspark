@@ -10,6 +10,11 @@
         <div class="title">Permainan</div>
         <div class="sub">Mainkan permainan edukatif untuk meningkatkan prestasi anda</div>
       </div>
+      @if(auth()->user()->role === 'teacher')
+        <a href="{{ route('teacher.games.create') }}" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:8px 14px; border-radius:6px; cursor:pointer; font-size:14px; font-weight:600; transition:all .2s ease; text-decoration:none; border:none; white-space:nowrap;" onmouseover="this.style.opacity='0.9';" onmouseout="this.style.opacity='1';" title="Cipta Permainan Baru">
+          + Cipta Permainan
+        </a>
+      @endif
     </div>
 
     @if (session('success'))
@@ -50,9 +55,6 @@
               {{ count($games) }}
             </span>
           </div>
-          <a href="{{ route('teacher.games.create') }}" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:8px 14px; border-radius:6px; cursor:pointer; font-size:14px; font-weight:600; transition:all .2s ease; text-decoration:none; border:none;" onmouseover="this.style.opacity='0.9';" onmouseout="this.style.opacity='1';" title="Buat Permainan Baru">
-            + Buat Permainan
-          </a>
         </div>
         
         <table style="table-layout:fixed; width:100%; border-collapse:collapse;">
