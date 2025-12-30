@@ -1145,10 +1145,15 @@ class ReportController extends Controller
         $selectedClass = $request->query('class', 'semua');
         $dateRange = $request->query('range', 'month');
 
+        // Get statistics data
+        $statsResponse = $this->getStatistics($request);
+        $statsData = $statsResponse->getData(true); // Get as array
+
         $data = [
             'class' => $selectedClass,
             'range' => $dateRange,
-            'generatedAt' => now()->format('Y-m-d H:i:s')
+            'generatedAt' => now()->format('Y-m-d H:i:s'),
+            'statsData' => $statsData
         ];
 
         $pdf = Pdf::loadView('reports.statistics_pdf', $data)->setPaper('a4', 'landscape');
