@@ -28,7 +28,8 @@
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
         <label style="font-weight:700;color:var(--muted);font-size:13px;">Filter Kelas:</label>
         <select id="stats-class-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:160px;border:2px solid #ddd;background:#f9f9f9;">
-            <option value="">-- Semua Kelas --</option>
+            <option value="">-- Sila Pilih --</option>
+            <option value="semua">Semua Kelas</option>
             @foreach($classes as $c)
                 <option value="{{ $c }}">{{ $c }}</option>
             @endforeach
@@ -310,6 +311,17 @@ async function loadStatistics() {
     const selectedClass = document.getElementById('stats-class-select').value;
     const dateRange = document.getElementById('stats-date-range').value;
     
+    // If no class selected, don't load
+    if (!selectedClass) {
+        const tbody = document.getElementById('stats-tbody');
+        tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Sila pilih kelas untuk melihat data.</td></tr>';
+        if (typeof Chart !== 'undefined') {
+            if (statsChart) statsChart.destroy();
+            if (trendChart) trendChart.destroy();
+        }
+        return;
+    }
+    
     console.log('loadStatistics called with class:', selectedClass, 'range:', dateRange);
     
     const debugEl = document.getElementById('debug-info');
@@ -459,6 +471,14 @@ function updateTrendChart(data) {
 
 function updateStatsTable(classStats) {
     const tbody = document.getElementById('stats-tbody');
+    const selectedClass = document.getElementById('stats-class-select').value;
+    
+    // Only show table if 'Semua Kelas' is selected
+    if (selectedClass !== 'semua') {
+        tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Pilih "Semua Kelas" untuk melihat perbandingan.</td></tr>';
+        return;
+    }
+    
     tbody.innerHTML = '';
     
     if (!classStats || classStats.length === 0) {
@@ -486,7 +506,11 @@ document.getElementById('stats-date-range').addEventListener('change', loadStati
 
 // Export statistics
 document.getElementById('export-stats-btn').addEventListener('click', function() {
-    const selectedClass = document.getElementById('stats-class-select').value || 'semua';
+    const selectedClass = document.getElementById('stats-class-select').value;
+    if (!selectedClass) {
+        alert('Sila pilih kelas terlebih dahulu.');
+        return;
+    }
     const dateRange = document.getElementById('stats-date-range').value;
     window.location.href = `/reports/export-statistics?class=${encodeURIComponent(selectedClass)}&range=${dateRange}`;
 });
