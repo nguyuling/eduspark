@@ -1064,23 +1064,18 @@ class ReportController extends Controller
             ->take(10)
             ->values();
 
-        // Trend data (by week)
-        $trendData = $attempts->groupBy(function($item) {
+        // Trend data (by date)
+        $trendDataGrouped = $attempts->groupBy(function($item) {
             return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
         })
         ->map(function($group) {
             $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
             return round($scores->count() > 0 ? $scores->avg() : 0, 2);
         })
-        ->sort()
-        ->values();
+        ->sortKeys(); // Sort by date keys, not by values
 
-        $trendDates = $attempts->groupBy(function($item) {
-            return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
-        })
-        ->keys()
-        ->sort()
-        ->values();
+        $trendDates = $trendDataGrouped->keys()->values();
+        $trendData = $trendDataGrouped->values();
 
         // Class comparison - only include if no specific class filter applied
         $classStats = [];
