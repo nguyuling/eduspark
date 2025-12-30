@@ -20,7 +20,9 @@ Route::middleware('auth:web')->group(function () {
     Route::post('/lessons/{id}', [LessonController::class, 'update']); // For _method=PUT workaround
     Route::post('/lessons/{id}/delete', [LessonController::class, 'destroy']);
     Route::get('/lessons/{id}/preview', [LessonController::class, 'preview']);
-    
-    // Statistics API
+});
+
+// Statistics API (protected by web auth)
+Route::middleware('auth:web')->group(function () {
     Route::get('/statistics', [ReportController::class, 'getStatistics']);
 });
