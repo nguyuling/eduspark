@@ -1,5 +1,6 @@
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Http\Request;
 
 Route::post('/register', [UserController::class, 'register']);

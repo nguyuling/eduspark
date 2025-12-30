@@ -774,4 +774,172 @@ class ReportController extends Controller
             'data' => []
         ]);
     }
+
+    /**
+     * API: Get statistics for dashboard
+     */
+    public function getStatistics(Request $request)
+    {
+        $selectedClass = $request->query('class', '');
+        $dateRange = $request->query('range', 'month');
+
+        // Calculate date range
+        $fromDate = now()->startOfDay();
+        switch ($dateRange) {
+            case 'week':
+                $fromDate = now()->subDays(7)->startOfDay();
+                break;
+            case 'quarter':
+                $fromDate = now()->subMonths(3)->startOfDay();
+                break;
+            case 'all':
+                $fromDate = now()->subYears(10)->startOfDay();
+                break;
+            case 'month':
+            default:
+                $fromDate = now()->subMonth()->startOfDay();
+        }
+
+        $attempts = collect();
+        if (Schema::hasTable('quiz_attempts')) {
+            $query = DB::table('quiz_attempts as qa')
+                ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id');
+            
+            if ($selectedClass && $selectedClass !== '') {
+                // Filter by class if specified
+                if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
+                    $classroom = DB::table('classrooms')->where('name', $selectedClass)->first();
+                    if ($classroom) {
+                        $studentIds = DB::table('students')->where('classroom_id', $classroom->id)->pluck('user_id');
+                        $query = $query->whereIn('qa.student_id', $studentIds);
+                    }
+                } elseif (Schema::hasTable('students')) {
+                    $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
+                    foreach ($possible as $col) {
+                        if (Schema::hasColumn('students', $col)) {
+                            $studentIds = DB::table('students')->where($col, $selectedClass)->pluck('user_id');
+                            $query = $query->whereIn('qa.student_id', $studentIds);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            $attempts = $query->where('qa.created_at', '>=', $fromDate)
+                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.student_id')
+                ->get();
+        }
+
+        // Calculate statistics
+        $scores = $attempts->pluck('score')->filter(function($v) { return is_numeric($v); })->map(function($v) { return (float)$v; });
+        $avgScore = $scores->count() > 0 ? round($scores->avg(), 1) : 0;
+        $totalAttempts = $attempts->count();
+        $activeStudents = $attempts->pluck('student_id')->unique()->count();
+        $successRate = $scores->count() > 0 ? round(($scores->filter(function($v) { return $v >= 70; })->count() / $scores->count()) * 100) : 0;
+
+        // Topic performance
+        $topicData = $attempts->groupBy('title')
+            ->map(function($group) {
+                $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
+                return [
+                    'label' => $group->first()->title ?? 'Unknown',
+                    'score' => $scores->count() > 0 ? round($scores->avg(), 1) : 0
+                ];
+            })
+            ->sortByDesc('score')
+            ->take(10)
+            ->values();
+
+        // Trend data (by week)
+        $trendData = $attempts->groupBy(function($item) {
+            return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
+        })
+        ->map(function($group) {
+            $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
+            return round($scores->count() > 0 ? $scores->avg() : 0, 1);
+        })
+        ->sort()
+        ->values();
+
+        $trendDates = $attempts->groupBy(function($item) {
+            return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
+        })
+        ->keys()
+        ->sort()
+        ->values();
+
+        // Class comparison
+        $classStats = [];
+        $classes = [];
+        if (Schema::hasTable('classrooms')) {
+            $classes = DB::table('classrooms')->orderBy('name')->pluck('name')->toArray();
+        } elseif (Schema::hasTable('students')) {
+            $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
+            foreach ($possible as $col) {
+                if (Schema::hasColumn('students', $col)) {
+                    $classes = DB::table('students')->select($col)->distinct()->orderBy($col)->pluck($col)->toArray();
+                    break;
+                }
+            }
+        }
+
+        foreach ($classes as $cls) {
+            $classAttempts = $attempts;
+            if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
+                $classroom = DB::table('classrooms')->where('name', $cls)->first();
+                if ($classroom) {
+                    $studentIds = DB::table('students')->where('classroom_id', $classroom->id)->pluck('user_id');
+                    $classAttempts = $attempts->whereIn('student_id', $studentIds->toArray());
+                }
+            }
+
+            $classScores = $classAttempts->pluck('score')->filter(function($v) { return is_numeric($v); })->map(function($v) { return (float)$v; });
+            
+            if ($classScores->count() > 0) {
+                $classStats[] = [
+                    'name' => $cls,
+                    'avgScore' => round($classScores->avg(), 1),
+                    'maxScore' => $classScores->max(),
+                    'minScore' => $classScores->min(),
+                    'studentCount' => $classAttempts->pluck('student_id')->unique()->count()
+                ];
+            }
+        }
+
+        return response()->json([
+            'avgScore' => $avgScore,
+            'totalAttempts' => $totalAttempts,
+            'activeStudents' => $activeStudents,
+            'successRate' => $successRate,
+            'topicData' => [
+                'labels' => $topicData->pluck('label')->toArray(),
+                'scores' => $topicData->pluck('score')->toArray()
+            ],
+            'trendData' => [
+                'dates' => $trendDates->toArray(),
+                'scores' => $trendData->toArray()
+            ],
+            'classStats' => $classStats
+        ]);
+    }
+
+    /**
+     * Export statistics as PDF
+     */
+    public function exportStatistics(Request $request)
+    {
+        $selectedClass = $request->query('class', 'semua');
+        $dateRange = $request->query('range', 'month');
+
+        $data = json_decode(json_encode([
+            'class' => $selectedClass,
+            'range' => $dateRange,
+            'generatedAt' => now()->format('Y-m-d H:i:s')
+        ]));
+
+        $pdf = Pdf::loadView('reports.statistics_pdf', $data)->setPaper('a4', 'landscape');
+        return $pdf->download('statistik_prestasi_' . now()->format('Y-m-d') . '.pdf');
+    }
 }
+
+```
