@@ -776,9 +776,6 @@ class ReportController extends Controller
         ]);
     }
 
-    /**
-     * Export class CSV - simple stream implementation
-     */
     public function exportClassCsv($class)
     {
         $students = collect();
@@ -794,20 +791,70 @@ class ReportController extends Controller
             if ($classCol) $students = DB::table('students')->where($classCol, $class)->get();
         }
 
+        // Calculate average score for each student
+        $studentData = [];
+        $classAverageTotal = 0;
+        $classAttemptCount = 0;
+        
+        foreach ($students as $s) {
+            $name = $s->name ?? null;
+            if (!$name && isset($s->user_id) && Schema::hasTable('users')) {
+                $u = DB::table('users')->where('id', $s->user_id)->first();
+                $name = $u->name ?? null;
+            }
+            
+            $studentId = $s->user_id ?? $s->id;
+            $avgScore = 0;
+            
+            if (Schema::hasTable('quiz_attempts')) {
+                $attempts = DB::table('quiz_attempts as qa')
+                    ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
+                    ->select('qa.score', 'q.max_points')
+                    ->where('qa.student_id', $studentId)
+                    ->get();
+                
+                if ($attempts->count() > 0) {
+                    $scores = [];
+                    foreach ($attempts as $a) {
+                        $score = isset($a->score) ? (float)$a->score : 0;
+                        $maxPoints = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
+                        $percentage = ($score / $maxPoints) * 100;
+                        $scores[] = $percentage;
+                        $classAverageTotal += $percentage;
+                        $classAttemptCount++;
+                    }
+                    $avgScore = array_sum($scores) / count($scores);
+                }
+            }
+            
+            $studentData[] = [
+                'id' => $s->id ?? '',
+                'name' => $name ?? 'N/A',
+                'avg_score' => round($avgScore, 2)
+            ];
+        }
+        
+        // Sort by average score (highest first)
+        usort($studentData, function($a, $b) {
+            return $b['avg_score'] <=> $a['avg_score'];
+        });
+        
+        // Calculate class average
+        $classAverage = $classAttemptCount > 0 ? round($classAverageTotal / $classAttemptCount, 2) : 0;
+
         $filename = 'class_' . Str::slug($class) . '_report.csv';
-        $response = new StreamedResponse(function() use ($students) {
+        $response = new StreamedResponse(function() use ($studentData, $class, $classAverage) {
             $out = fopen('php://output','w');
             // header
-            fputcsv($out, ['Class:', $students->isEmpty() ? '' : ($students[0]->class ?? $students[0]->classroom ?? $students[0]->class_name ?? '')]);
+            fputcsv($out, ['Class:', $class]);
+            fputcsv($out, ['Purata Skor Kelas:', $classAverage . '%']);
             fputcsv($out, []);
-            fputcsv($out, ['student_id','name']);
-            foreach ($students as $s) {
-                $name = $s->name ?? null;
-                if (!$name && isset($s->user_id) && Schema::hasTable('users')) {
-                    $u = DB::table('users')->where('id', $s->user_id)->first();
-                    $name = $u->name ?? null;
-                }
-                fputcsv($out, [$s->id ?? '', $name ?? 'N/A']);
+            fputcsv($out, ['Kedudukan','student_id','nama','Purata Skor']);
+            
+            $rank = 1;
+            foreach ($studentData as $s) {
+                fputcsv($out, [$rank, $s['id'], $s['name'], $s['avg_score'] . '%']);
+                $rank++;
             }
             fclose($out);
         }, 200, [
@@ -830,18 +877,61 @@ class ReportController extends Controller
             if ($classCol) $students = DB::table('students')->where($classCol, $class)->get();
         }
 
-        $studentRows = $students->map(function($s){
+        // Calculate average score for each student
+        $studentRows = [];
+        $classAverageTotal = 0;
+        $classAttemptCount = 0;
+        
+        foreach ($students as $s) {
             $name = $s->name ?? null;
             if (!$name && isset($s->user_id) && Schema::hasTable('users')) {
                 $u = DB::table('users')->where('id', $s->user_id)->first();
                 $name = $u->name ?? null;
             }
-            return ['id' => $s->id ?? '', 'name' => $name ?? 'N/A'];
-        })->toArray();
+            
+            $studentId = $s->user_id ?? $s->id;
+            $avgScore = 0;
+            
+            if (Schema::hasTable('quiz_attempts')) {
+                $attempts = DB::table('quiz_attempts as qa')
+                    ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
+                    ->select('qa.score', 'q.max_points')
+                    ->where('qa.student_id', $studentId)
+                    ->get();
+                
+                if ($attempts->count() > 0) {
+                    $scores = [];
+                    foreach ($attempts as $a) {
+                        $score = isset($a->score) ? (float)$a->score : 0;
+                        $maxPoints = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
+                        $percentage = ($score / $maxPoints) * 100;
+                        $scores[] = $percentage;
+                        $classAverageTotal += $percentage;
+                        $classAttemptCount++;
+                    }
+                    $avgScore = array_sum($scores) / count($scores);
+                }
+            }
+            
+            $studentRows[] = [
+                'id' => $s->id ?? '',
+                'name' => $name ?? 'N/A',
+                'avg_score' => round($avgScore, 2)
+            ];
+        }
+        
+        // Sort by average score (highest first)
+        usort($studentRows, function($a, $b) {
+            return $b['avg_score'] <=> $a['avg_score'];
+        });
+        
+        // Calculate class average
+        $classAverage = $classAttemptCount > 0 ? round($classAverageTotal / $classAttemptCount, 2) : 0;
 
         $pdf = Pdf::loadView('reports.class_pdf', [
             'class' => $class,
             'students' => $studentRows,
+            'classAverage' => $classAverage . '%',
             'title' => 'LAPORAN PRESTASI KELAS'
         ])->setPaper('a4','portrait');
 
