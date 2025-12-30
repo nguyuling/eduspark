@@ -119,15 +119,15 @@
         </div>
 
         {{-- Floating Chat Button --}}
-        <div id="chat-container" style="position:fixed; bottom:20px; right:20px; width:300px; z-index:9999;">
+        <div id="chat-container" style="position:fixed; bottom:80px; right:100px; width:auto; z-index:9999; display:flex; flex-direction:row-reverse; align-items:flex-end; gap:10px;">
             <button id="chat-toggle"
         style="width:50px; height:50px; border-radius:50%; background:#6a4df7; color:white; font-size:24px; border:none; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.3); 
-               display:flex; align-items:center; justify-content:center;">
+               display:flex; align-items:center; justify-content:center; flex-shrink:0;">
     📩
 </button>
 
 
-            <div id="chat-box" style="display:none; background:white; border:1px solid #ccc; border-radius:12px; width:100%; max-height:500px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+            <div id="chat-box" style="display:none; background:white; border:1px solid #ccc; border-radius:12px; width:300px; max-height:500px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.2);">
                 <div id="chat-header" style="background:#6a4df7; color:white; padding:10px; font-weight:bold; cursor:move;">
                     Mesej
                     <span id="chat-close" style="float:right; cursor:pointer;">✖</span>
