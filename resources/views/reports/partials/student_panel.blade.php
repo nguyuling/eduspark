@@ -59,7 +59,7 @@
             <tr>
               <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['date'] ?? '' }}</td>
               <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['title'] ?? $a['topic'] ?? '' }}</td>
-              <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['score'] ?? '' }}</td>
+              <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ isset($a['raw_score']) && isset($a['max_points']) ? $a['raw_score'] . '/' . $a['max_points'] : '' }} ({{ $a['score'] ?? '' }})</td>
             </tr>
           @endforeach
         </tbody>

@@ -240,10 +240,14 @@ class ReportController extends Controller
         // Map attempts for view partial with converted percentages
         $attemptsForView = [];
         foreach ($attempts as $a) {
+            $rawScore = isset($a->score) ? round($a->score, 2) : 0;
+            $maxPoints = isset($a->max_points) ? (int)$a->max_points : 100;
             $attemptsForView[] = [
                 'date' => $a->created_at ? date('d/m/Y', strtotime($a->created_at)) : '',
                 'title' => $a->title ?? 'N/A',
-                'score' => isset($a->percentage) ? round($a->percentage, 2) . '%' : ''
+                'score' => isset($a->percentage) ? round($a->percentage, 2) . '%' : '',
+                'raw_score' => $rawScore,
+                'max_points' => $maxPoints
             ];
         }
 
