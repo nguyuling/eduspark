@@ -22,6 +22,25 @@
 
     @if(auth()->user()->role === 'teacher')
       {{-- TEACHER VIEW --}}
+      <!-- Games Stats -->
+      @if($games->count() > 0)
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:20px; margin-top:10px;">
+          <div class="panel" style="display:flex; flex-direction:column; gap:8px;">
+            <div style="font-size:12px; color:var(--muted); font-weight:600;">Jumlah Permainan</div>
+            <div style="font-size:28px; font-weight:700; color:var(--accent);">{{ $games->count() }}</div>
+          </div>
+          <div class="panel" style="display:flex; flex-direction:column; gap:8px;">
+            <div style="font-size:12px; color:var(--muted); font-weight:600;">Diterbitkan</div>
+            <div style="font-size:28px; font-weight:700; color:#22c55e;">{{ $games->where('is_published', true)->count() }}</div>
+          </div>
+          <div class="panel" style="display:flex; flex-direction:column; gap:8px;">
+            <div style="font-size:12px; color:var(--muted); font-weight:600;">Draf</div>
+            <div style="font-size:28px; font-weight:700; color:#f97316;">{{ $games->where('is_published', false)->count() }}</div>
+          </div>
+        </div>
+      @endif
+
+      {{-- TEACHER VIEW --}}
       <!-- Games Management Section -->
       <section class="panel" style="margin-bottom:20px; margin-top:10px;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
