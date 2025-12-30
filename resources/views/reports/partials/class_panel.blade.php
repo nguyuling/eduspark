@@ -2,18 +2,39 @@
 <div class="card" style="padding:18px;border-radius:12px;">
     <h3 style="margin-top:0;">Ringkasan Kelas: {{ $selectedClass }}</h3>
 
-    <div style="display:flex;gap:12px;margin-top:12px;">
-        <div style="background:white;padding:16px;border-radius:10px;flex:1;">
+    <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;">
+        <div style="background:white;padding:16px;border-radius:10px;flex:1;min-width:200px;">
             <strong>Bilangan Pelajar</strong>
-            <div style="margin-top:6px;color:var(--muted);">
+            <div style="margin-top:6px;color:var(--muted);font-size:18px;">
                 {{ $classStats['student_count'] ?? 0 }}
             </div>
         </div>
 
-        <div style="background:white;padding:16px;border-radius:10px;flex:1;">
+        <div style="background:white;padding:16px;border-radius:10px;flex:1;min-width:200px;">
             <strong>Purata Skor Kelas</strong>
-            <div style="margin-top:6px;color:var(--muted);">
+            <div style="margin-top:6px;color:var(--muted);font-size:18px;">
                 {{ $classStats['avg_score'] ?? 'N/A' }}
+            </div>
+        </div>
+
+        <div style="background:white;padding:16px;border-radius:10px;flex:1;min-width:200px;">
+            <strong>Jumlah Percubaan</strong>
+            <div style="margin-top:6px;color:var(--muted);font-size:18px;">
+                {{ $classStats['total_attempts'] ?? 0 }}
+            </div>
+        </div>
+
+        <div style="background:white;padding:16px;border-radius:10px;flex:1;min-width:200px;">
+            <strong>Kadar Kejayaan</strong>
+            <div style="margin-top:6px;color:var(--muted);font-size:18px;">
+                {{ $classStats['success_rate'] ?? 'N/A' }}
+            </div>
+        </div>
+
+        <div style="background:white;padding:16px;border-radius:10px;flex:1;min-width:200px;">
+            <strong>Topik Lemah</strong>
+            <div style="margin-top:6px;color:var(--muted);font-size:13px;word-wrap:break-word;">
+                {{ $classStats['weakest_subject'] ?? 'N/A' }}
             </div>
         </div>
     </div>
