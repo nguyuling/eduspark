@@ -7,13 +7,25 @@
 
 @section('content')
 <div class="panel card" style="margin-top:18px;">
-  <div style="margin-bottom:20px;">
-    <div style="font-weight:700;font-size:20px;">{{ $student->name ?? 'N/A' }}</div>
-    <div style="color:var(--muted);font-size:13px;">ID: {{ $student->id ?? '—' }}</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <strong style="font-size:18px;">Pelajar</strong>
+      <div style="color:var(--muted);font-size:13px;">Prestasi pelajar terpilih</div>
+    </div>
+
+    <div style="text-align:right;">
+      @if(!empty($student->id))
+        <div style="font-weight:700">{{ $student->name }}</div>
+        <div style="color:var(--muted);font-size:13px;">ID: {{ $student->id }}</div>
+      @else
+        <div style="font-weight:700">N/A</div>
+        <div style="color:var(--muted);font-size:13px;">ID: —</div>
+      @endif
+    </div>
   </div>
 
   {{-- three-column small cards --}}
-  <div class="cards" style="margin-top:18px; grid-template-columns: repeat(3, 1fr); gap:16px; max-width:600px;">
+  <div class="cards" style="margin-top:18px; grid-template-columns: repeat(3, 1fr); gap:16px;">
     <div class="card" style="padding:16px;text-align:center;min-height:110px;">
       <div class="label" style="font-size:13px;color:var(--muted);font-weight:700;">Purata</div>
       <div class="value" style="margin-top:10px;">
@@ -83,7 +95,7 @@
     </div>
   @endif
 
-  <div style="display:flex;gap:10px;margin-top:12px;justify-content:center;">
+  <div style="display:flex;gap:10px;margin-top:12px;">
       @if(!empty($student->id))
         <a href="/reports/student/{{ $student->id }}/export/csv"
            class="btn"

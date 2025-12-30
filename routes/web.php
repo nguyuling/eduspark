@@ -7,8 +7,6 @@ use App\Http\Controllers\QuizStudentController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\GameController;
-use App\Http\Controllers\GameTeacherController;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
@@ -37,25 +35,15 @@ Route::middleware('auth')->group(function () {
 
 // Lesson routes (authenticated only)
 Route::middleware('auth')->group(function () {
-    // List and Create
     Route::get('/lesson', [LessonController::class, 'index'])->name('lesson.index');
     Route::get('/lesson/create', [LessonController::class, 'create'])->name('lesson.create');
+    Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
     Route::post('/lesson', [LessonController::class, 'store'])->name('lesson.store');
-    
-    // Preview and Download (MUST come before {id} routes)
-    Route::get('/lesson/{id}/preview', [LessonController::class, 'previewFile'])->name('lesson.preview-file');
+    Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
+    Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');
     Route::get('/lesson/{id}/preview', [LessonController::class, 'preview'])->name('lesson.preview');
     Route::get('/lesson/{id}/download', [LessonController::class, 'downloadLesson'])->name('lesson.download');
     Route::get('/lesson/{id}/preview-file', [LessonController::class, 'previewFile'])->name('lesson.preview-file');
-    Route::get('/lesson/{id}/edit', [LessonController::class, 'edit'])->name('lesson.edit');
-    
-    // View, Update, Delete
-    Route::get('/lesson/{id}', [LessonController::class, 'show'])->name('lesson.show');
-    Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
-    Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');
-    
-    // Legacy routes for compatibility
-    Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
 });
 
 // Quiz Teacher routes
@@ -77,26 +65,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/quizzes/{quiz}/submit', [QuizStudentController::class, 'submit'])->name('student.quizzes.submit');
     Route::get('/quizzes/{attempt}/quit', [QuizStudentController::class, 'quit'])->name('student.quizzes.quit');
     Route::get('/quizzes/{attempt}/result', [QuizStudentController::class, 'showResult'])->name('student.quizzes.result');
-});
-
-// Game routes (unified student/teacher view)
-Route::middleware('auth')->group(function () {
-    Route::get('/games', [GameController::class, 'index'])->name('games.index');
-    Route::get('/games/{id}/play', [GameController::class, 'play'])->name('games.play');
-    Route::post('/games/{id}/result', [GameController::class, 'storeResult'])->name('games.storeResult');
-    Route::get('/games/{id}/result', [GameController::class, 'result'])->name('games.result');
-    Route::put('/games/{id}', [GameController::class, 'update'])->name('games.update');
-    Route::delete('/games/{id}', [GameController::class, 'destroy'])->name('games.destroy');
-    Route::post('/games/{id}/restore', [GameController::class, 'restore'])->name('games.restore');
-    Route::get('/games/{id}/leaderboard', [GameController::class, 'leaderboard'])->name('games.leaderboard');
-    
-    // Teacher game management routes
-    Route::get('/teacher/games/create', [GameTeacherController::class, 'create'])->name('teacher.games.create');
-    Route::post('/teacher/games', [GameTeacherController::class, 'store'])->name('teacher.games.store');
-    Route::get('/teacher/games/{id}/edit', [GameTeacherController::class, 'edit'])->name('teacher.games.edit');
-    Route::put('/teacher/games/{id}', [GameTeacherController::class, 'update'])->name('teacher.games.update');
-    Route::delete('/teacher/games/{id}', [GameTeacherController::class, 'destroy'])->name('teacher.games.destroy');
-    Route::post('/teacher/games/{id}/restore', [GameTeacherController::class, 'restore'])->name('teacher.games.restore');
 });
 
 // Performance routes
@@ -133,6 +101,14 @@ Route::middleware('auth')->group(function () {
         ->name('reports.students.csv');
     Route::get('/reports/students/chart-data', [ReportController::class, 'studentsChartData'])
         ->name('reports.students.chart');
+    
+    // Statistics export
+    Route::get('/reports/export-statistics', [ReportController::class, 'exportStatistics'])
+        ->name('reports.statistics.export');
+    
+    // Statistics API
+    Route::get('/api/statistics', [ReportController::class, 'getStatistics'])
+        ->name('api.statistics');
 });
 
 // Forum routes
@@ -145,27 +121,4 @@ Route::middleware('auth')->group(function () {
     Route::put('/forum/{id}', [ForumController::class, 'update'])->name('forum.update');
     Route::delete('/forum/{id}', [ForumController::class, 'destroy'])->name('forum.destroy');
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
-});
-
-// Individual game routes (old legacy routes - these still work)
-Route::middleware('auth')->group(function () {
-    Route::get('/games/quiz-challenge', function() {
-        return view('games.quiz-challenge');
-    })->name('games.quiz');
-    
-    Route::get('/games/whack-a-mole', function() {
-        return view('games.whack-a-mole');
-    })->name('games.whack');
-    
-    Route::get('/games/memory-match', function() {
-        return view('games.memory-match');
-    })->name('games.memory');
-    
-    Route::get('/games/cosmic-defender', function() {
-        return view('games.cosmic-defender');
-    })->name('games.cosmic');
-    
-    Route::get('/games/maze-game', function() {
-        return view('games.maze-game');
-    })->name('games.maze');
 });
