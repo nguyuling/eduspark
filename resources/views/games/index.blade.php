@@ -131,7 +131,7 @@
               <div class="panel game-card" onclick="playGame('{{ route('games.play', $game->id) }}')" style="cursor:pointer; display:flex; flex-direction:column; height:100%; gap:16px;">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                   <div style="font-size:48px;">
-                    {{ getGameEmoji($game->title) }}
+                    🎮
                   </div>
                   <span class="game-difficulty" style="display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;
                     {{ $game->difficulty === 'easy' ? 'background:rgba(74,222,128,0.2); color:#22c55e;' : 
