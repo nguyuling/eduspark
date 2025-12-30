@@ -9,6 +9,13 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
+public function show($id)
+{
+    $user = User::findOrFail($id); // fetch the user by id from the URL
+    return view('users.show', compact('user'));
+}
+
+
     // 🔹 UPDATED: Register — now with phone, district, school_code & auto user_id
     public function register(Request $request)
     {
