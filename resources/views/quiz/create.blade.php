@@ -520,6 +520,20 @@
             const oldIndex = parseInt(card.getAttribute('data-index'));
             const newIndex = index;
             
+            // CRITICAL: Preserve all form field values BEFORE innerHTML replacement
+            const fieldValues = {};
+            card.querySelectorAll('input, textarea, select').forEach(field => {
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    fieldValues[field.name] = {
+                        value: field.value,
+                        checked: field.checked,
+                        type: field.type
+                    };
+                } else {
+                    fieldValues[field.name] = field.value;
+                }
+            });
+            
             // Update question number display
             const titleElement = card.querySelector('h3');
             if (titleElement) {
@@ -537,6 +551,27 @@
                 .replace(new RegExp(`code-preview-${oldIndex}`, 'g'), `code-preview-${newIndex}`)
                 .replace(new RegExp(`answers-container-${oldIndex}`, 'g'), `answers-container-${newIndex}`)
                 .replace(new RegExp(`data-index="${oldIndex}"`, 'g'), `data-index="${newIndex}"`);
+            
+            // CRITICAL: Restore all form field values and reattach listeners
+            const newFieldNames = {};
+            card.querySelectorAll('input, textarea, select').forEach(field => {
+                // Build map of new field names to elements
+                newFieldNames[field.name] = field;
+            });
+            
+            // Restore values using old names mapped to new elements
+            for (let oldName in fieldValues) {
+                const newName = oldName.replace(new RegExp(`questions\\[${oldIndex}\\]`), `questions[${newIndex}]`);
+                if (newFieldNames[newName]) {
+                    const field = newFieldNames[newName];
+                    if (field.type === 'checkbox' || field.type === 'radio') {
+                        field.checked = fieldValues[oldName].checked;
+                        field.value = fieldValues[oldName].value;
+                    } else {
+                        field.value = fieldValues[oldName];
+                    }
+                }
+            }
             
             // Re-attach event listeners for type change select
             const typeSelect = card.querySelector(`.question-type-select[data-index="${newIndex}"]`);
@@ -983,12 +1018,61 @@
             });
         }
     }
-    
     // Validation function to check that all coding questions have hidden lines
+    // AND sync all radio/checkbox values with their option text before submission
     function validateBeforeSubmit() {
         const container = document.getElementById('questions-container');
         const codingQuestions = container.querySelectorAll('[question-card]');
         
+        // DEBUG: Log form data before submission
+        console.log('=== FORM DATA DEBUG ===');
+        const formData = new FormData(document.getElementById('quiz-form'));
+        let questionCount = 0;
+        for (let pair of formData.entries()) {
+            console.log(pair[0], '=', pair[1]);
+            if (pair[0].includes('question_text')) questionCount++;
+        }
+        console.log('Total questions detected:', questionCount);
+        
+        // STEP 1: Sync all radio buttons and checkboxes with their option text values
+        container.querySelectorAll('[question-card]').forEach(card => {
+            const qIndex = card.getAttribute('data-index');
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            console.log(`Question ${qIndex}, Type: ${type}`);
+            
+            // For multiple choice and true/false (radio buttons)
+            if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF) {
+                const radios = card.querySelectorAll('input[type="radio"][name*="correct_answer"]');
+                const optionInputs = card.querySelectorAll('input[name*="options"]');
+                
+                console.log(`  MC/TF: Found ${radios.length} radios, ${optionInputs.length} options`);
+                
+                radios.forEach((radio, index) => {
+                    if (optionInputs[index]) {
+                        radio.value = optionInputs[index].value;
+                        console.log(`    Radio ${index} value set to: ${radio.value}`);
+                    }
+                });
+            }
+            // For checkbox questions
+            else if (type === QUESTION_TYPES.CHECKBOX) {
+                const checkboxes = card.querySelectorAll('input[type="checkbox"][name*="correct_answer"]');
+                const optionInputs = card.querySelectorAll('input[name*="options"]');
+                
+                console.log(`  CHECKBOX: Found ${checkboxes.length} checkboxes, ${optionInputs.length} options`);
+                
+                checkboxes.forEach((checkbox, index) => {
+                    if (optionInputs[index]) {
+                        checkbox.value = optionInputs[index].value;
+                        console.log(`    Checkbox ${index} value set to: ${checkbox.value}`);
+                    }
+                });
+            }
+        });
+        
+        // STEP 2: Validate coding questions have hidden lines
         let hasInvalidCodingQuestion = false;
         
         codingQuestions.forEach(card => {
@@ -1012,6 +1096,7 @@
             return false;
         }
         
+        console.log('=== END DEBUG ===');
         return true;
     }
     

@@ -115,6 +115,9 @@ class QuizTeacherController extends Controller
      */
     public function store(Request $request)
     {
+        // DEBUG: Log all request data
+        \Log::info('Quiz Store - Raw Request Data:', $request->all());
+        
         // --- PART 1: Quiz Header Validation ---
         $validatedQuizData = $request->validate([
             'title' => 'required|string|max:255',
@@ -125,7 +128,17 @@ class QuizTeacherController extends Controller
             'questions.*.question_text' => 'required|string|max:1000',
             'questions.*.type' => 'required|string|in:multiple_choice,true_false,short_answer,checkbox,coding',
             'questions.*.points' => 'required|integer|min:1',
+            'questions.*.options' => 'nullable|array',
+            'questions.*.options.*' => 'nullable|string|max:500',
+            'questions.*.correct_answer' => 'nullable|string|max:500',
+            'questions.*.correct_answers' => 'nullable|array',
+            'questions.*.correct_answers.*' => 'nullable|string|max:500',
+            'questions.*.coding_full_code' => 'nullable|string',
+            'questions.*.hidden_line_numbers' => 'nullable|string',
         ]);
+        
+        // DEBUG: Log validated data
+        \Log::info('Quiz Store - Validated Data:', $validatedQuizData);
 
         // Automatically set the necessary fields
         $validatedQuizData['teacher_id'] = Auth::id();
@@ -259,6 +272,13 @@ class QuizTeacherController extends Controller
             'questions.*.question_text' => 'required|string|max:1000',
             'questions.*.type' => 'required|string|in:multiple_choice,true_false,short_answer,checkbox,coding',
             'questions.*.points' => 'required|integer|min:1',
+            'questions.*.options' => 'nullable|array',
+            'questions.*.options.*' => 'nullable|string|max:500',
+            'questions.*.correct_answer' => 'nullable|string|max:500',
+            'questions.*.correct_answers' => 'nullable|array',
+            'questions.*.correct_answers.*' => 'nullable|string|max:500',
+            'questions.*.coding_full_code' => 'nullable|string',
+            'questions.*.hidden_line_numbers' => 'nullable|string',
             // No need to validate 'is_published' here
         ]);
         

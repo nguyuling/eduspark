@@ -154,7 +154,7 @@
 
       <!-- Action Buttons Row -->
       <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0;">
-        <button type="submit" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
+        <button type="submit" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'" onclick="return validateBeforeSubmit()">
           <i class="bi bi-save"></i>Simpan Kuiz
         </button>
     </form>
@@ -550,6 +550,20 @@
             const oldIndex = parseInt(card.getAttribute('data-index'));
             const newIndex = index;
             
+            // CRITICAL: Preserve all form field values BEFORE innerHTML replacement
+            const fieldValues = {};
+            card.querySelectorAll('input, textarea, select').forEach(field => {
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    fieldValues[field.name] = {
+                        value: field.value,
+                        checked: field.checked,
+                        type: field.type
+                    };
+                } else {
+                    fieldValues[field.name] = field.value;
+                }
+            });
+            
             // Update question number display
             const titleElement = card.querySelector('h3');
             if (titleElement) {
@@ -567,6 +581,27 @@
                 .replace(new RegExp(`code-preview-${oldIndex}`, 'g'), `code-preview-${newIndex}`)
                 .replace(new RegExp(`answers-container-${oldIndex}`, 'g'), `answers-container-${newIndex}`)
                 .replace(new RegExp(`data-index="${oldIndex}"`, 'g'), `data-index="${newIndex}"`);
+            
+            // CRITICAL: Restore all form field values and reattach listeners
+            const newFieldNames = {};
+            card.querySelectorAll('input, textarea, select').forEach(field => {
+                // Build map of new field names to elements
+                newFieldNames[field.name] = field;
+            });
+            
+            // Restore values using old names mapped to new elements
+            for (let oldName in fieldValues) {
+                const newName = oldName.replace(new RegExp(`questions\\[${oldIndex}\\]`), `questions[${newIndex}]`);
+                if (newFieldNames[newName]) {
+                    const field = newFieldNames[newName];
+                    if (field.type === 'checkbox' || field.type === 'radio') {
+                        field.checked = fieldValues[oldName].checked;
+                        field.value = fieldValues[oldName].value;
+                    } else {
+                        field.value = fieldValues[oldName];
+                    }
+                }
+            }
             
             // Re-attach event listeners for type change select
             const typeSelect = card.querySelector(`.question-type-select[data-index="${newIndex}"]`);
@@ -863,5 +898,42 @@
         });
         
     });
+
+    // Validation function to sync all radio/checkbox values with their option text before submission
+    function validateBeforeSubmit() {
+        const container = document.getElementById('questions-container');
+        
+        // STEP 1: Sync all radio buttons and checkboxes with their option text values
+        container.querySelectorAll('[question-card]').forEach(card => {
+            const qIndex = card.getAttribute('data-index');
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            // For multiple choice and true/false (radio buttons)
+            if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF) {
+                const radios = card.querySelectorAll('input[type="radio"][name*="correct_answer"]');
+                const optionInputs = card.querySelectorAll('input[name*="options"]');
+                
+                radios.forEach((radio, index) => {
+                    if (optionInputs[index]) {
+                        radio.value = optionInputs[index].value;
+                    }
+                });
+            }
+            // For checkbox questions
+            else if (type === QUESTION_TYPES.CHECKBOX) {
+                const checkboxes = card.querySelectorAll('input[type="checkbox"][name*="correct_answer"]');
+                const optionInputs = card.querySelectorAll('input[name*="options"]');
+                
+                checkboxes.forEach((checkbox, index) => {
+                    if (optionInputs[index]) {
+                        checkbox.value = optionInputs[index].value;
+                    }
+                });
+            }
+        });
+        
+        return true;
+    }
 </script>
 @endsection
