@@ -307,30 +307,60 @@ async function loadStatistics() {
 
     try {
         const res = await fetch(`/api/statistics?class=${encodeURIComponent(selectedClass)}&range=${dateRange}`);
+        if (!res.ok) {
+            console.error('API Error:', res.status, res.statusText);
+            return;
+        }
         const data = await res.json();
+        console.log('Statistics data:', data);
 
-        // Update stat cards
-        document.getElementById('stat-avg-score').textContent = data.avgScore || '0';
-        document.getElementById('stat-total-attempts').textContent = data.totalAttempts || '0';
-        document.getElementById('stat-active-students').textContent = data.activeStudents || '0';
-        document.getElementById('stat-success-rate').textContent = (data.successRate || '0') + '%';
+        // Update stat cards with default values
+        document.getElementById('stat-avg-score').textContent = data.avgScore !== undefined ? data.avgScore : '0';
+        document.getElementById('stat-total-attempts').textContent = data.totalAttempts !== undefined ? data.totalAttempts : '0';
+        document.getElementById('stat-active-students').textContent = data.activeStudents !== undefined ? data.activeStudents : '0';
+        document.getElementById('stat-success-rate').textContent = (data.successRate !== undefined ? data.successRate : '0') + '%';
 
         // Update topic chart
-        if (data.topicData) {
+        if (data.topicData && data.topicData.labels && data.topicData.labels.length > 0) {
             updateTopicChart(data.topicData);
+        } else {
+            // Show empty chart
+            const ctx = document.getElementById('topicChart').getContext('2d');
+            if (statsChart) statsChart.destroy();
+            statsChart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: [], datasets: [{ label: 'Tiada data', data: [], backgroundColor: '#ccc' }] },
+                options: { responsive: true, maintainAspectRatio: true, indexAxis: 'y' }
+            });
         }
 
         // Update trend chart
-        if (data.trendData) {
+        if (data.trendData && data.trendData.dates && data.trendData.dates.length > 0) {
             updateTrendChart(data.trendData);
+        } else {
+            // Show empty chart
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            if (trendChart) trendChart.destroy();
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: [], datasets: [{ label: 'Tiada data', data: [], borderColor: '#ccc' }] },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
         }
 
         // Update stats table
-        if (data.classStats) {
+        if (data.classStats && data.classStats.length > 0) {
             updateStatsTable(data.classStats);
+        } else {
+            // Clear table
+            const tbody = document.getElementById('stats-tbody');
+            tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Tiada data tersedia.</td></tr>';
         }
     } catch (error) {
         console.error('Error loading statistics:', error);
+        // Show error in UI
+        const tbody = document.getElementById('stats-tbody');
+        tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:red;">Ralat: ' + error.message + '</td></tr>';
     }
 }
 
