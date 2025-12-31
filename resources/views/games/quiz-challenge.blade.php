@@ -3,24 +3,30 @@
 @section('content')
 <div class="app">
     <main class="main">
-        <div id="gameContainer" style="padding: 20px;">
-            <!-- Game Header -->
-            <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                <div>
-                    <h1 style="margin: 0; font-size: 28px; font-weight: 700;">❓ Quiz Challenge</h1>
-                    <p style="color: var(--muted); margin-top: 8px;">Cabaran kuiz pantas - Jawab soalan dengan betul sebanyak mungkin!</p>
-                </div>
+        <!-- Game Header -->
+        <div id="gameHeader" class="header">
+            <div>
+                <div class="title">Quiz Challenge</div>
+                <div class="sub">Cabaran kuiz pantas - Jawab soalan dengan betul sebanyak mungkin!</div>
+            </div>
+            <div style="display: flex; gap: 60px; align-items: center;">
                 <div style="display: flex; gap: 20px; align-items: center;">
                     <div style="text-align: center;">
-                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Skor</div>
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Skor</div>
                         <div id="scoreDisplay" style="font-size: 32px; font-weight: 700; color: var(--accent);">0</div>
                     </div>
                     <div style="text-align: center;">
-                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Masa</div>
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Masa</div>
                         <div id="timerDisplay" style="font-size: 32px; font-weight: 700; color: #ef4444;">60</div>
                     </div>
                 </div>
+                <a href="{{ route('games.index') }}" class="btn-kembali">
+                    <i class="bi bi-arrow-left"></i>Kembali
+                </a>
             </div>
+        </div>
+
+        <div id="gameContainer" style="padding: 20px;">
 
             <!-- Game Area -->
             <div id="gameContent" style="display: none;">
@@ -35,15 +41,17 @@
             </div>
 
             <!-- Start Screen -->
-            <div id="startScreen" style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">❓</div>
-                <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Quiz Challenge</h2>
-                <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px; max-width: 500px; margin-left: auto; margin-right: auto;">
-                    Anda akan mendapat 10 soalan kuiz yang berbeza. Jawab dengan betul sebanyak mungkin dalam 60 saat. Setiap jawapan yang betul memberikan 10 poin!
-                </p>
-                <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, var(--accent), #9d4edd); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
-                    Mula Bermain ▶
-                </button>
+            <div id="startScreen" style="text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <section class="panel" style="width: 100%; max-width: 500px; padding: 40px;">
+                    <div style="font-size: 80px; margin-bottom: 20px;">❓</div>
+                    <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Quiz Challenge</h2>
+                    <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px;">
+                        Anda akan mendapat 10 soalan kuiz yang berbeza. Jawab dengan betul sebanyak mungkin dalam 60 saat. Setiap jawapan yang betul memberikan 10 poin!
+                    </p>
+                    <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
+                        Mula
+                    </button>
+                </section>
             </div>
 
             <!-- Game Over Screen -->

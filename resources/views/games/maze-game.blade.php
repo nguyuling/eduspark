@@ -13,29 +13,35 @@
 </style>
 
 <div class="app">
-    <main class="main" style="padding: 20px;">
-        <div id="gameContainer">
-            <!-- Game Header -->
-            <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <div>
-                    <h1 style="margin: 0; font-size: 32px; font-weight: 900;">🌳 Taman Labirin Java</h1>
-                    <p style="color: #6b7280; margin-top: 8px; font-size: 16px;">Navigasi taman sambil menjawab soalan Java!</p>
-                </div>
-                <div style="display: flex; gap: 30px; align-items: center;">
-                    <div style="text-align: center;">
-                        <div style="color: #6b7280; font-size: 14px; font-weight: 700; text-transform: uppercase;">Soalan Betul</div>
-                        <div id="correctDisplay" style="font-size: 36px; font-weight: 900; color: #10b981;">0</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="color: #6b7280; font-size: 14px; font-weight: 700; text-transform: uppercase;">Skor</div>
-                        <div id="scoreDisplay" style="font-size: 36px; font-weight: 900; color: #f59e0b;">0</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="color: #6b7280; font-size: 14px; font-weight: 700; text-transform: uppercase;">Masa</div>
-                        <div id="timerDisplay" style="font-size: 36px; font-weight: 900; color: #ef4444;">0</div>
-                    </div>
-                </div>
+    <main class="main">
+        <!-- Game Header -->
+        <div id="gameHeader" class="header">
+            <div>
+                <div class="title">Taman Labirin Java</div>
+                <div class="sub">Navigasi taman sambil menjawab soalan Java!</div>
             </div>
+            <div style="display: flex; gap: 60px; align-items: center;">
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <div style="text-align: center;">
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Skor Betul</div>
+                        <div id="correctDisplay" style="font-size: 32px; font-weight: 700; color: #10b981;">0</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Markah</div>
+                        <div id="scoreDisplay" style="font-size: 32px; font-weight: 700; color: #f59e0b;">0</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Masa</div>
+                        <div id="timerDisplay" style="font-size: 32px; font-weight: 700; color: #ef4444;">0</div>
+                    </div>
+                </div>
+                <a href="{{ route('games.index') }}" class="btn-kembali">
+                    <i class="bi bi-arrow-left"></i>Kembali
+                </a>
+            </div>
+        </div>
+
+        <div id="gameContainer" style="padding: 20px;">
 
             <!-- Game Area -->
             <div id="gameContent" style="display: none;">
@@ -54,22 +60,38 @@
             </div>
 
             <!-- Start Screen -->
-            <div id="startScreen" style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 120px; margin-bottom: 30px;">🌳🌺🦋</div>
-                <h2 style="font-size: 48px; font-weight: 900; margin-bottom: 20px; color: #1f2937;">Taman Labirin Java</h2>
-                <div style="background: #dbeafe; border: 4px solid #3b82f6; border-radius: 16px; padding: 30px; max-width: 600px; margin: 0 auto 40px auto;">
-                    <p style="font-size: 20px; color: #1e3a8a; margin-bottom: 15px; font-weight: 700;">📚 Cara Bermain:</p>
-                    <ul style="text-align: left; color: #1e40af; font-size: 18px; line-height: 2; font-weight: 600;">
-                        <li>🌺 Kumpulkan 15 bunga di taman labirin</li>
-                        <li>❓ Setiap bunga dikumpul = 1 soalan Java</li>
-                        <li>✅ Jawapan betul = +100 mata</li>
-                        <li>❌ Jawapan salah = Tiada mata</li>
-                        <li>⚡ Masa lebih pantas = Skor lebih tinggi!</li>
-                    </ul>
+            <div id="startScreen" style="text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <section class="panel" style="width: 100%; max-width: 500px; padding: 40px;">
+                    <div style="font-size: 80px; margin-bottom: 20px;">🌳</div>
+                    <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Taman Labirin Java</h2>
+                    <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px;">
+                        Kumpulkan 15 bunga di taman labirin sambil menjawab soalan Java. Setiap bunga yang dikumpul memberikan satu soalan dan 100 mata untuk jawapan yang betul.
+                    </p>
+                    <button id="startBtn" style="padding: 16px 40px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 16px rgba(0,0,0,0.2); transition: transform 0.2s;">
+                        Mula
+                    </button>
+                </section>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div>
+                    <div style="font-size: 100px; margin-bottom: 30px;">🎉</div>
+                    <h2 style="font-size: 48px; font-weight: 900; margin-bottom: 20px; color: #1f2937;">Tahniah!</h2>
+                    <div style="background: #dbeafe; border: 4px solid #3b82f6; border-radius: 16px; padding: 40px; max-width: 500px; margin: 0 auto 40px auto;">
+                        <div style="margin-bottom: 30px;">
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Skor Akhir</div>
+                            <div id="finalScore" style="font-size: 48px; font-weight: 700; color: #f59e0b;">0</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Soalan Dijawab dengan Betul</div>
+                            <div id="finalCorrect" style="font-size: 28px; font-weight: 700; color: #10b981;">0/15</div>
+                        </div>
+                    </div>
+                    <button id="mulaBeramainBtn" style="padding: 20px 60px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 12px; font-size: 20px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 16px rgba(0,0,0,0.2); transition: transform 0.2s;">
+                        🎮 Mula Bermain
+                    </button>
                 </div>
-                <button id="startBtn" style="padding: 20px 60px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 12px; font-size: 24px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 16px rgba(0,0,0,0.2); transition: transform 0.2s;">
-                    🎮 Mula Bermain
-                </button>
             </div>
         </div>
     </main>
@@ -423,7 +445,15 @@
 
     function endGame() {
         clearInterval(timerInterval);
+        gameActive = false;
         
+        document.getElementById('gameContent').style.display = 'none';
+        document.getElementById('gameOverScreen').style.display = 'flex';
+        document.getElementById('finalScore').textContent = score;
+        document.getElementById('finalCorrect').textContent = `${correctAnswers}/15`;
+    }
+    
+    function submitGameResult() {}
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '{{ route("games.storeResult", 4) }}';
@@ -483,5 +513,7 @@
     }
 
     document.getElementById('startBtn').addEventListener('click', startGame);
+    
+    document.getElementById('mulaBeramainBtn').addEventListener('click', submitGameResult);
 </script>
 @endsection
