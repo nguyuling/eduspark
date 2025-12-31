@@ -40,6 +40,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/lesson', [LessonController::class, 'index'])->name('lesson.index');
     Route::get('/lesson/create', [LessonController::class, 'create'])->name('lesson.create');
     Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
+    Route::get('/lesson/{id}', [LessonController::class, 'show'])->name('lesson.show');
+    Route::get('/lesson/{id}/edit', [LessonController::class, 'edit'])->name('lesson.edit');
     Route::post('/lesson', [LessonController::class, 'store'])->name('lesson.store');
     Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
     Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');
@@ -67,26 +69,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/quizzes/{quiz}/submit', [QuizStudentController::class, 'submit'])->name('student.quizzes.submit');
     Route::get('/quizzes/{attempt}/quit', [QuizStudentController::class, 'quit'])->name('student.quizzes.quit');
     Route::get('/quizzes/{attempt}/result', [QuizStudentController::class, 'showResult'])->name('student.quizzes.result');
-});
-
-// Game routes (unified student/teacher view)
-Route::middleware('auth')->group(function () {
-    Route::get('/games', [GameController::class, 'index'])->name('games.index');
-    Route::get('/games/{id}/play', [GameController::class, 'play'])->name('games.play');
-    Route::post('/games/{id}/result', [GameController::class, 'storeResult'])->name('games.storeResult');
-    Route::get('/games/{id}/result', [GameController::class, 'result'])->name('games.result');
-    Route::put('/games/{id}', [GameController::class, 'update'])->name('games.update');
-    Route::delete('/games/{id}', [GameController::class, 'destroy'])->name('games.destroy');
-    Route::post('/games/{id}/restore', [GameController::class, 'restore'])->name('games.restore');
-    Route::get('/games/{id}/leaderboard', [GameController::class, 'leaderboard'])->name('games.leaderboard');
-    
-    // Teacher game management routes
-    Route::get('/teacher/games/create', [GameTeacherController::class, 'create'])->name('teacher.games.create');
-    Route::post('/teacher/games', [GameTeacherController::class, 'store'])->name('teacher.games.store');
-    Route::get('/teacher/games/{id}/edit', [GameTeacherController::class, 'edit'])->name('teacher.games.edit');
-    Route::put('/teacher/games/{id}', [GameTeacherController::class, 'update'])->name('teacher.games.update');
-    Route::delete('/teacher/games/{id}', [GameTeacherController::class, 'destroy'])->name('teacher.games.destroy');
-    Route::post('/teacher/games/{id}/restore', [GameTeacherController::class, 'restore'])->name('teacher.games.restore');
 });
 
 // Performance routes
@@ -123,6 +105,33 @@ Route::middleware('auth')->group(function () {
         ->name('reports.students.csv');
     Route::get('/reports/students/chart-data', [ReportController::class, 'studentsChartData'])
         ->name('reports.students.chart');
+    
+    // Statistics export
+    Route::get('/reports/export-statistics', [ReportController::class, 'exportStatistics'])
+        ->name('reports.statistics.export');
+    
+    // Statistics API
+    Route::get('/api/statistics', [ReportController::class, 'getStatistics'])
+        ->name('api.statistics');
+});
+
+// Games routes (authenticated)
+Route::middleware('auth')->group(function () {
+    Route::get('/games', [GameController::class, 'index'])->name('games.index');
+    Route::get('/games/{id}/play', [GameController::class, 'play'])->name('games.play');
+    Route::post('/games/{id}/result', [GameController::class, 'storeResult'])->name('games.storeResult');
+    Route::get('/games/{id}/result', [GameController::class, 'result'])->name('games.result');
+    Route::put('/games/{id}', [GameController::class, 'update'])->name('games.update');
+    Route::delete('/games/{id}', [GameController::class, 'destroy'])->name('games.destroy');
+    Route::post('/games/{id}/restore', [GameController::class, 'restore'])->name('games.restore');
+    Route::get('/games/{id}/leaderboard', [GameController::class, 'leaderboard'])->name('games.leaderboard');
+    
+    // Teacher games routes
+    Route::get('/teacher/games/create', [GameTeacherController::class, 'create'])->name('teacher.games.create');
+    Route::post('/teacher/games', [GameTeacherController::class, 'store'])->name('teacher.games.store');
+    Route::get('/teacher/games/{id}/edit', [GameTeacherController::class, 'edit'])->name('teacher.games.edit');
+    Route::put('/teacher/games/{id}', [GameTeacherController::class, 'update'])->name('teacher.games.update');
+    Route::delete('/teacher/games/{id}', [GameTeacherController::class, 'destroy'])->name('teacher.games.destroy');
 });
 
 // Forum routes
@@ -139,3 +148,9 @@ Route::middleware('auth')->group(function () {
 
 // OLD LEGACY ROUTES REMOVED - All games now go through GameController@play
 // This ensures the game summary and leaderboard flow works properly
+    
+    // Messages routes for chat functionality
+    Route::get('/messages', [ForumController::class, 'getMessages'])->name('messages.index');
+    Route::get('/messages/conversation/{userId}', [ForumController::class, 'getConversation'])->name('messages.conversation');
+    Route::post('/messages/send', [ForumController::class, 'sendMessage'])->name('messages.send');
+});

@@ -12,62 +12,54 @@
   </div>
 
   <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
-    <div class="card" style="min-width:150px;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;">
-      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Average</div>
+    <div class="card" style="min-width:250px;padding:20px 18px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Purata Skor</div>
       <div class="value">
-        <span class="badge-pill" style="display:inline-block;margin-top:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
+        <span class="badge-pill" style="display:inline-block;background:linear-gradient(90deg,var(--accent),var(--accent-2)); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
           {{ $stats['average_score'] ?? 'N/A' }}
         </span>
       </div>
     </div>
 
-    <div class="card" style="min-width:150px;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;">
-      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Highest</div>
+    <div class="card" style="min-width:250px;padding:20px 18px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Topik Terkuat</div>
       <div class="value">
-        <span class="badge-pill" style="display:inline-block;margin-top:8px;background:var(--success); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
-          {{ $stats['highest_score'] ?? 'N/A' }}
+        <span class="badge-pill" style="display:inline-block;background:var(--success); padding:6px 12px; font-size:12px;border-radius:999px;color:#fff;max-width:200px;word-wrap:break-word;line-height:1.3;">
+          {{ $stats['highest_subject'] ?? 'N/A' }}
         </span>
-      </div>
-      <div style="color:var(--muted);font-size:12px;margin-top:6px">
-        {{ $stats['highest_subject'] ?? '' }}
       </div>
     </div>
 
-    <div class="card" style="min-width:150px;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;">
-      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Weakest</div>
+    <div class="card" style="min-width:250px;padding:20px 18px;border-radius:12px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 6px 12px rgba(0,0,0,0.03);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+      <div class="label" style="font-size:12px;letter-spacing:0.4px;text-transform:uppercase;color:var(--muted);font-weight:700;">Topik Lemah</div>
       <div class="value">
-        <span class="badge-pill" style="display:inline-block;margin-top:8px;background:var(--danger); padding:6px 12px; font-size:13px;border-radius:999px;color:#fff;">
-          {{ $stats['weakest_score'] ?? 'N/A' }}
+        <span class="badge-pill" style="display:inline-block;background:var(--danger); padding:6px 12px; font-size:12px;border-radius:999px;color:#fff;max-width:200px;word-wrap:break-word;line-height:1.3;">
+          {{ $stats['weakest_subject'] ?? 'N/A' }}
         </span>
-      </div>
-      <div style="color:var(--muted);font-size:12px;margin-top:6px">
-        {{ $stats['weakest_subject'] ?? '' }}
       </div>
     </div>
   </div>
 
   <hr style="margin:16px 0;border:none;border-top:1px solid rgba(0,0,0,0.08)">
 
-  <div style="font-weight:700;margin-bottom:10px;">Attempts</div>
+  <div style="font-weight:700;margin-bottom:10px;">Rekod Percubaan</div>
 
   @if(!empty($stats['attempts']) && count($stats['attempts'])>0)
     <div style="overflow:auto;">
       <table style="width:100%;border-collapse:collapse;">
         <thead style="text-align:left;color:var(--muted);font-size:13px;">
           <tr>
-            <th style="padding:8px 6px;">Date</th>
-            <th style="padding:8px 6px;">Type</th>
-            <th style="padding:8px 6px;">Topic</th>
-            <th style="padding:8px 6px;">Score</th>
+            <th style="padding:8px 6px;">Tarikh</th>
+            <th style="padding:8px 6px;">Topik</th>
+            <th style="padding:8px 6px;">Skor</th>
           </tr>
         </thead>
         <tbody>
           @foreach($stats['attempts'] as $a)
             <tr>
               <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['date'] ?? '' }}</td>
-              <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['type'] ?? '' }}</td>
-              <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['topic'] ?? '' }}</td>
-              <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['score'] ?? '' }}</td>
+              <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ $a['title'] ?? $a['topic'] ?? '' }}</td>
+              <td style="padding:8px 6px;border-top:1px solid rgba(0,0,0,0.04);">{{ isset($a['raw_score']) && isset($a['max_points']) ? $a['raw_score'] . '/' . $a['max_points'] : '' }} ({{ $a['score'] ?? '' }})</td>
             </tr>
           @endforeach
         </tbody>
