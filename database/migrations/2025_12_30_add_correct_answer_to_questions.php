@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('quizzes', function (Blueprint $table) {
-            $table->integer('max_points')->default(100)->nullable();
+        Schema::table('questions', function (Blueprint $table) {
+            $table->text('correct_answer')->nullable()->after('hidden_line_numbers');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('quizzes', function (Blueprint $table) {
-            $table->dropColumn('max_points');
+        Schema::table('questions', function (Blueprint $table) {
+            $table->dropColumn('correct_answer');
         });
     }
 };

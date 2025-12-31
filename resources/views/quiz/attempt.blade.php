@@ -10,7 +10,7 @@
             <div class="title">{{ $quiz->title }}</div>
             <div class="sub">Attempt {{ $attempt->attempt_number }} of {{ $quiz->max_attempts }}</div>
         </div>
-        <a href="{{ route('student.quizzes.index') }}" class="btn-kembali">
+        <a href="{{ route('student.quizzes.index') }}" class="btn-kembali" id="back-btn" onclick="return confirmBackAction()">
             <i class="bi bi-arrow-left"></i>Kembali
         </a>
     </div>
@@ -267,7 +267,7 @@ function checkAllQuestionsAnswered() {
 function submitQuizData() {
     // Check if all questions are answered
     if (!checkAllQuestionsAnswered()) {
-        alert('Please answer all questions before submitting the quiz.');
+        alert('Sila jawab semua soalan sebelum menghantar kuiz.');
         return;
     }
 
@@ -372,6 +372,12 @@ function submitQuizData() {
         console.error('Network error during quiz submission:', error);
         alert('A network error occurred. Please check your connection and try again.');
     });
+}
+
+// Function to confirm back action with warning
+function confirmBackAction() {
+    const confirmDialog = confirm('Jika anda keluar sekarang, percubaan kuiz anda TIDAK akan disimpan dan semua jawapan akan hilang.\n\nAdakah anda pasti ingin keluar?');
+    return confirmDialog; // Return true to allow navigation, false to prevent it
 }
 </script>
 @endsection

@@ -41,145 +41,132 @@
         @endif
 
         <!-- Answers Review Section -->
-        <section class="panel">
-            <h3 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Ulasan Jawapan</h3>
-            
+        <section style="margin-top:40px; margin-bottom:20px;">
+            <h2 style="margin:0; font-size:18px; font-weight:700;">Ulasan Jawapan</h2>
+        </section>
+
+        <div id="answers-container">
             @forelse($attempt->answers as $index => $answer)
-                <div style="margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid #e5e7eb;">
-                    <!-- Question Title -->
-                    <div style="margin-bottom:16px;">
-                        <div style="font-size:14px; font-weight:700; color:var(--muted);">Soalan {{ $index + 1 }}</div>
-                        <div style="font-size:16px; font-weight:700; color:#0b1220; margin-top:4px;">{{ $answer->question->question_text }}</div>
+                <section class="panel" style="margin-bottom:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #d4c5f9;">
+                        <h3 style="margin:0; font-size:16px; font-weight:700;">Soalan {{ $index + 1 }}</h3>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <span style="background:{{ $answer->is_correct ? 'rgba(42, 157, 143, 0.1)' : 'rgba(230, 57, 70, 0.1)' }}; color:{{ $answer->is_correct ? 'var(--success)' : 'var(--danger)' }}; padding:6px 12px; border-radius:6px; font-weight:600; font-size:12px;">{{ $answer->score_gained ?? 0 }}/{{ $answer->question->points }} markah</span>
+                        </div>
                     </div>
 
-                    <!-- Answer -->
-                    <div style="margin:0; padding:0;">
-                        <div style="font-size:12px; color:var(--muted); margin-bottom:4px; font-weight:600;">Jawapan Anda:</div>
-                        
-                        @if($answer->question->type === 'short_answer')
-                            <div style="font-size:14px; color:#0b1220;">{{ $answer->submitted_text ?: '(Tidak dijawab)' }}</div>
-                        @elseif($answer->question->type === 'multiple_choice' || $answer->question->type === 'true_false')
-                            @php
-                                $selectedOption = $answer->options?->first();
-                            @endphp
-                            <div style="font-size:14px; color:#0b1220;">
-                                {{ $selectedOption?->option_text ?? '(Tidak dijawab)' }}
-                            </div>
-                        @elseif($answer->question->type === 'checkbox')
-                            @php
-                                $selectedOptions = $answer->options ?? collect();
-                            @endphp
-                            @if($selectedOptions->count() > 0)
-                                <ul style="margin:0; padding-left:20px;">
-                                    @foreach($selectedOptions as $option)
-                                        <li style="font-size:14px; color:#0b1220; margin-bottom:4px;">{{ $option->option_text }}</li>
-                                    @endforeach
-                                </ul>
-                            @else
-                                <div style="font-size:14px; color:#0b1220;">(Tidak dijawab)</div>
-                            @endif
-                        @elseif($answer->question->type === 'coding')
-                            @php
-                                $submittedAnswers = json_decode($answer->submitted_text, true) ?? [];
-                                $hiddenLineNumbers = !empty($answer->question->hidden_line_numbers) 
-                                    ? array_map('intval', explode(',', $answer->question->hidden_line_numbers))
-                                    : [];
-                                $codeLines = explode("\n", $answer->question->coding_full_code);
-                            @endphp
-                            @if(count($codeLines) > 0)
-                                <div style="font-family:monospace; font-size:13px; background:#f5f5f5; padding:6px 8px; border-radius:6px; line-height:1.5;">
-                                    @foreach($codeLines as $index => $codeLine)
-                                        @php
-                                            $lineNum = $index + 1;
-                                            $isHidden = in_array($lineNum, $hiddenLineNumbers);
-                                            $lineKey = 'line_' . $lineNum;
-                                            $studentAnswer = $submittedAnswers[$lineKey] ?? '';
-                                            $expectedCode = trim($codeLine);
-                                            $isCorrect = trim($studentAnswer) === $expectedCode;
-                                        @endphp
-                                        <div style="margin-bottom:4px; display:flex; gap:12px; align-items:center; padding:6px 8px; background:{{ $isHidden && $isCorrect ? 'rgba(42,157,143,0.15)' : ($isHidden && !$isCorrect ? 'rgba(230,57,70,0.15)' : 'transparent') }}; border-radius:4px;">
-                                            <span style="color:#999; min-width:30px; text-align:right;">{{ $lineNum }}:</span>
-                                            @if($isHidden)
-                                                {{-- Hidden line: show student's answer with status --}}
-                                                <span style="color:#0b1220; padding:0; font-family:monospace; white-space:nowrap;">
-                                                    {{ $studentAnswer ?: '(Tidak dijawab)' }}
-                                                </span>
-                                                <span style="font-size:11px; font-weight:700; padding:2px 6px; border-radius:4px; background:{{ $isCorrect ? 'rgba(42,157,143,0.3)' : 'rgba(230,57,70,0.3)' }}; color:{{ $isCorrect ? '#2A9D8F' : '#E63946' }}; white-space:nowrap; margin-left:auto;">
-                                                    {{ $isCorrect ? '✓ Betul' : '✗ Salah' }}
-                                                </span>
-                                            @else
-                                                {{-- Non-hidden line: show as read-only --}}
-                                                <span style="color:#666; font-family:monospace; white-space:pre;">{{ $codeLine }}</span>
-                                            @endif
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @else
-                                <div style="font-size:14px; color:#0b1220;">(Tidak dijawab)</div>
-                            @endif
-                        @endif
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom:20px;">
+                        <!-- Left: Teks Soalan -->
+                        <div>
+                            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color:var(--muted);">Teks Soalan</label>
+                            <div style="font-size: 14px; line-height:1.6; white-space: pre-wrap; word-wrap: break-word;">{{ $answer->question->question_text }}</div>
+                        </div>
                     </div>
 
-                    <!-- Correct Answer (if wrong) -->
-                    @if(!$answer->is_correct)
-                        <div style="margin:8px 0 0 0; padding:0;">
-                            <div style="font-size:12px; color:var(--muted); margin-bottom:4px; font-weight:600;">Jawapan yang Betul:</div>
-                            
-                            @php
-                                $correctOptions = $answer->question->options->where('is_correct', true);
-                            @endphp
-                            
+                    <!-- Student's Answer Section -->
+                    <div style="margin-bottom:20px;">
+                        <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color:var(--muted);">Jawapan Anda</label>
+                        <div>
                             @if($answer->question->type === 'short_answer')
-                                <div style="font-size:14px; color:#2A9D8F; font-weight:600;">
-                                    {{ $correctOptions->first()?->option_text ?? 'N/A' }}
+                                <div style="font-size: 14px; font-weight: 600; padding:12px; background:rgba(200, 200, 200, 0.04); border-radius:8px; border-left:3px solid {{ $answer->is_correct ? 'var(--success)' : 'var(--danger)' }};">
+                                    {{ $answer->submitted_text ?: '(Tidak dijawab)' }}
                                 </div>
+
                             @elseif($answer->question->type === 'coding')
                                 @php
+                                    $submittedAnswers = json_decode($answer->submitted_text, true) ?? [];
                                     $hiddenLineNumbers = !empty($answer->question->hidden_line_numbers) 
                                         ? array_map('intval', explode(',', $answer->question->hidden_line_numbers))
                                         : [];
                                     $codeLines = explode("\n", $answer->question->coding_full_code);
                                 @endphp
-                                @if(count($hiddenLineNumbers) > 0)
-                                    <div style="font-family:monospace; font-size:13px; background:#f0fef5; padding:6px 8px; border-radius:6px; line-height:1.5;">
-                                        @foreach($codeLines as $index => $codeLine)
-                                            @php
-                                                $lineNum = $index + 1;
-                                                $isHidden = in_array($lineNum, $hiddenLineNumbers);
-                                            @endphp
-                                            @if($isHidden)
-                                                <div style="margin-bottom:2px; display:flex; gap:12px; align-items:flex-start;">
-                                                    <span style="color:#999; min-width:30px; text-align:right;">{{ $lineNum }}:</span>
-                                                    <span style="color:#2A9D8F; font-weight:600; padding:0; background:rgba(42,157,143,0.1); border-radius:4px; font-family:monospace; white-space:nowrap;">{{ $codeLine }}</span>
-                                                </div>
-                                            @endif
-                                        @endforeach
+                                @if(count($codeLines) > 0)
+                                    <div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:0; min-height:100px; display: flex;">
+                                        <!-- Line Numbers Column -->
+                                        <div style="flex-shrink: 0; width: 40px; background: #e8e8e8; padding: 8px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none; padding-right: 6px; display: flex; flex-direction: column;">
+                                            @foreach ($codeLines as $lineIndex => $line)
+                                                <div style="height: 1.5em; display: flex; align-items: center; justify-content: flex-end;">{{ $lineIndex + 1 }}</div>
+                                            @endforeach
+                                        </div>
+                                        <!-- Code Content Column -->
+                                        <div style="flex: 1; padding: 8px 8px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit; white-space: pre; overflow-x: auto; display: flex; flex-direction: column;">
+                                            @foreach ($codeLines as $lineIndex => $codeLine)
+                                                @php
+                                                    $lineNum = $lineIndex + 1;
+                                                    $isHidden = in_array($lineNum, $hiddenLineNumbers);
+                                                    $lineKey = 'line_' . $lineNum;
+                                                    $studentAnswer = $submittedAnswers[$lineKey] ?? '';
+                                                    $expectedCode = trim($codeLine);
+                                                    $isCorrect = trim($studentAnswer) === $expectedCode;
+                                                @endphp
+                                                <div style="height: 1.5em; display: flex; align-items: center; background: {{ $isHidden ? ($isCorrect ? 'rgba(42,157,143,0.15)' : 'rgba(230,57,70,0.15)') : 'transparent' }}; flex-shrink: 0;">{{ $isHidden ? ($studentAnswer ?: '(Walang sagot)') : $codeLine }}</div>
+                                            @endforeach
+                                        </div>
                                     </div>
+                                @else
+                                    <div style="font-size:14px; color:#0b1220;">(Tidak dijawab)</div>
                                 @endif
+
                             @else
-                                @if($correctOptions->count() > 0)
-                                    <ul style="margin:0; padding-left:20px;">
-                                        @foreach($correctOptions as $option)
-                                            <li style="font-size:14px; color:#2A9D8F; font-weight:600; margin-bottom:4px;">{{ $option->option_text }}</li>
-                                        @endforeach
-                                    </ul>
-                                @endif
+                                <!-- Multiple Choice, True/False, Checkbox Options -->
+                                <div style="display:flex; flex-direction:column; gap:8px;">
+                                    @php
+                                        $selectedOptions = $answer->options ?? collect();
+                                        $correctOptions = $answer->question->options->where('is_correct', true);
+                                    @endphp
+                                    @forelse($answer->question->options->sortBy('id') as $option)
+                                        @php
+                                            $isSelected = $selectedOptions->contains('id', $option->id);
+                                            $isCorrectAnswer = $option->is_correct == true || $option->is_correct == 1;
+                                        @endphp
+                                        <div style="display:flex; gap:12px; align-items:center; padding:12px; border-radius:8px; border:2px solid {{ ($isSelected && $isCorrectAnswer) || ($isCorrectAnswer && !$answer->is_correct) ? 'var(--success)' : ($isSelected && !$isCorrectAnswer ? 'var(--danger)' : '#d1d5db') }}; background:{{ ($isSelected && $isCorrectAnswer) || ($isCorrectAnswer && !$answer->is_correct) ? 'rgba(42, 157, 143, 0.08)' : ($isSelected && !$isCorrectAnswer ? 'rgba(230, 57, 70, 0.08)' : 'rgba(200, 200, 200, 0.04)') }}; position:relative;">
+                                            <div style="width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                                @if($answer->question->type === 'checkbox')
+                                                    @if($isSelected)
+                                                        <span style="color:{{ $isCorrectAnswer ? 'var(--success)' : 'var(--danger)' }}; font-weight:bold; font-size:18px;">☑</span>
+                                                    @else
+                                                        <span style="color:{{ $isCorrectAnswer ? 'var(--success)' : 'var(--muted)' }}; font-size:18px;">{{ $isCorrectAnswer ? '☑' : '☐' }}</span>
+                                                    @endif
+                                                @else
+                                                    @if($isSelected)
+                                                        <span style="color:{{ $isCorrectAnswer ? 'var(--success)' : 'var(--danger)' }}; font-weight:bold; font-size:18px;">●</span>
+                                                    @else
+                                                        <span style="color:{{ $isCorrectAnswer ? 'var(--success)' : 'var(--muted)' }}; font-size:18px;">{{ $isCorrectAnswer ? '●' : '○' }}</span>
+                                                    @endif
+                                                @endif
+                                            </div>
+                                            <div style="flex:1;">{{ $option->option_text }}</div>
+                                            @if($isSelected && !$isCorrectAnswer)
+                                                <span style="background:var(--danger); color:#fff; padding:4px 10px; border-radius:4px; font-size:11px; font-weight:600; white-space:nowrap;">Salah</span>
+                                            @elseif($isCorrectAnswer)
+                                                <span style="background:var(--success); color:#fff; padding:4px 10px; border-radius:4px; font-size:11px; font-weight:600; white-space:nowrap;">{{ ($answer->question->type === 'checkbox' && $isSelected) ? 'Dipilih' : 'Betul' }}</span>
+                                            @endif
+                                        </div>
+                                    @empty
+                                        <div style="color:var(--muted); font-size:14px; padding:12px;">Tiada pilihan</div>
+                                    @endforelse
+                                </div>
                             @endif
                         </div>
-                    @endif
-
-                    <!-- Points -->
-                    <div style="margin-top:12px; padding:8px 0; font-size:13px; color:var(--muted);">
-                        Markah: 
-                        <strong style="color:var(--accent);">{{ $answer->score_gained ?? 0 }} / {{ $answer->question->points }}</strong>
                     </div>
-                </div>
+
+                    <!-- Correct Answer (only for short answer if wrong) -->
+                    @if(!$answer->is_correct && $answer->question->type === 'short_answer')
+                        <div style="margin-bottom:20px;">
+                            <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color:var(--muted);">Jawapan yang Betul</label>
+                            <div style="font-size: 14px; font-weight: 600; padding:12px; background:rgba(42, 157, 143, 0.08); border-radius:8px; border-left:3px solid var(--success);">
+                                {{ $answer->question->correct_answer }}
+                            </div>
+                        </div>
+                    @endif
+                </section>
             @empty
-                <div style="text-align:center; padding:40px; color:var(--muted);">
-                    <p style="font-size:16px;">Tiada jawapan ditemui.</p>
-                </div>
+                <section class="panel" style="text-align:center; padding:40px;">
+                    <div style="font-size:48px; margin-bottom:12px;">📝</div>
+                    <div style="color:var(--muted); font-size:14px;">Tiada jawapan ditemui.</div>
+                </section>
             @endforelse
-        </section>
+        </div>
     </main>
 </div>
 

@@ -17,27 +17,32 @@
 
   <div class="meta">
     <strong>Class:</strong> {{ $class ?? 'N/A' }}<br>
+    <strong>Purata Skor Kelas:</strong> {{ $classAverage ?? 'N/A' }}<br>
     <small>Dicipta pada: {{ date('Y-m-d H:i') }}</small>
   </div>
 
   <table>
     <thead>
       <tr>
-        <th style="width:120px;">student_id</th>
-        <th>name</th>
+        <th style="width:60px;">Kedudukan</th>
+        <th style="width:80px;">student_id</th>
+        <th>nama</th>
+        <th style="width:100px;">Purata Skor</th>
       </tr>
     </thead>
     <tbody>
       @if(!empty($students))
-        @foreach($students as $s)
+        @foreach($students as $index => $s)
           <tr>
+            <td>{{ $index + 1 }}</td>
             <td>{{ $s['id'] }}</td>
             <td>{{ $s['name'] }}</td>
+            <td>{{ isset($s['avg_score']) ? $s['avg_score'] . '%' : 'N/A' }}</td>
           </tr>
         @endforeach
       @else
         <tr>
-          <td colspan="2" style="text-align:center;color:#666;">Tiada rekod pelajar.</td>
+          <td colspan="4" style="text-align:center;color:#666;">Tiada rekod pelajar.</td>
         </tr>
       @endif
     </tbody>
