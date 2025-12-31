@@ -10,9 +10,9 @@
                     <div class="title">Memory Match</div>
                     <div class="sub">Padankan kad yang sama untuk menang!</div>
                 </div>
-                <div style="display: flex; gap: 40px; align-items: center;">
+                <div style="display: flex; gap: 60px; align-items: center;">
                     <div style="text-align: center;">
-                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Pergerakan</div>
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Markah</div>
                         <div id="moveCount" style="font-size: 32px; font-weight: 700; color: var(--accent);">0</div>
                     </div>
                     <a href="{{ route('games.index') }}" class="btn-kembali">
@@ -31,9 +31,9 @@
             </div>
 
             <!-- Start Screen -->
-            <div id="startScreen" style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">🎴</div>
-                <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Memory Match</h2>
+            <div id="startScreen" style="text-align: center; padding: 80px 40px;">
+                <div style="font-size: 80px; margin-bottom: 20px;">🎴</div>
+                <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Memory Match</h2>
                 <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px; max-width: 500px; margin-left: auto; margin-right: auto;">
                     Padankan semua pasangan kad dalam bilangan pergerakan yang paling sedikit! Pilih 2 kad pada satu masa untuk mendedahkannya.
                 </p>
@@ -43,15 +43,17 @@
             </div>
 
             <!-- Game Over Screen -->
-            <div id="gameOverScreen" style="display: none; text-align: center; padding: 60px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">🎉</div>
-                <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Anda Menang!</h2>
-                <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 40px; max-width: 400px; margin: 20px auto; margin-bottom: 30px;">
-                    <div style="margin-bottom: 20px;">
-                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Jumlah Pergerakan</div>
-                        <div id="finalMoves" style="font-size: 48px; font-weight: 700; color: var(--accent);">0</div>
+            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px;">
+                <div style="font-size: 80px; margin-bottom: 20px;">🎉</div>
+                <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 32px;">Anda Menang!</h2>
+                <section class="panel" style="max-width: 450px; margin: 0 auto 40px;">
+                    <div style="padding: 32px;">
+                        <div>
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Jumlah Pergerakan</div>
+                            <div id="finalMoves" style="font-size: 48px; font-weight: 700; color: var(--accent);">0</div>
+                        </div>
                     </div>
-                </div>
+                </section>
                 <div style="display: flex; gap: 12px; justify-content: center;">
                     <button id="playAgainBtn" style="padding: 12px 30px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
                         Main Semula

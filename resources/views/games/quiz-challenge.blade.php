@@ -10,14 +10,14 @@
                     <div class="title">Quiz Challenge</div>
                     <div class="sub">Cabaran kuiz pantas - Jawab soalan dengan betul sebanyak mungkin!</div>
                 </div>
-                <div style="display: flex; gap: 40px; align-items: center;">
+                <div style="display: flex; gap: 60px; align-items: center;">
                     <div style="display: flex; gap: 20px; align-items: center;">
                         <div style="text-align: center;">
-                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Skor</div>
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Skor</div>
                             <div id="scoreDisplay" style="font-size: 32px; font-weight: 700; color: var(--accent);">0</div>
                         </div>
                         <div style="text-align: center;">
-                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Masa</div>
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Masa</div>
                             <div id="timerDisplay" style="font-size: 32px; font-weight: 700; color: #ef4444;">60</div>
                         </div>
                     </div>

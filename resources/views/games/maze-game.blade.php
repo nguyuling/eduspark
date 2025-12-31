@@ -18,22 +18,22 @@
             <!-- Game Header -->
             <div id="gameHeader" class="header">
                 <div>
-                    <div class="title">🌳🌺🦋 Taman Labirin Java</div>
+                    <div class="title">Taman Labirin Java</div>
                     <div class="sub">Navigasi taman sambil menjawab soalan Java!</div>
                 </div>
-                <div style="display: flex; gap: 40px; align-items: center;">
-                    <div style="display: flex; gap: 30px; align-items: center;">
+                <div style="display: flex; gap: 60px; align-items: center;">
+                    <div style="display: flex; gap: 20px; align-items: center;">
                         <div style="text-align: center;">
-                            <div style="color: #6b7280; font-size: 14px; font-weight: 700; text-transform: uppercase;">Soalan Betul</div>
-                            <div id="correctDisplay" style="font-size: 36px; font-weight: 900; color: #10b981;">0</div>
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Skor Betul</div>
+                            <div id="correctDisplay" style="font-size: 32px; font-weight: 700; color: #10b981;">0</div>
                         </div>
                         <div style="text-align: center;">
-                            <div style="color: #6b7280; font-size: 14px; font-weight: 700; text-transform: uppercase;">Skor</div>
-                            <div id="scoreDisplay" style="font-size: 36px; font-weight: 900; color: #f59e0b;">0</div>
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Markah</div>
+                            <div id="scoreDisplay" style="font-size: 32px; font-weight: 700; color: #f59e0b;">0</div>
                         </div>
                         <div style="text-align: center;">
-                            <div style="color: #6b7280; font-size: 14px; font-weight: 700; text-transform: uppercase;">Masa</div>
-                            <div id="timerDisplay" style="font-size: 36px; font-weight: 900; color: #ef4444;">0</div>
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Masa</div>
+                            <div id="timerDisplay" style="font-size: 32px; font-weight: 700; color: #ef4444;">0</div>
                         </div>
                     </div>
                     <a href="{{ route('games.index') }}" class="btn-kembali">
