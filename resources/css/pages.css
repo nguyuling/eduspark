@@ -284,21 +284,34 @@ label {
 .panel form input[type="text"],
 .panel form input[type="email"],
 .panel form input[type="date"],
+.panel form textarea,
 .panel form select {
   border: 2px solid #d1d5db !important;
   background: transparent !important;
   color: inherit;
   padding: 11px 14px !important;
-  height: 44px !important;
   box-sizing: border-box;
   border-radius: 8px;
   transition: border-color 0.2s ease, background 0.2s ease;
   width: 100% !important;
+  min-height: auto !important;
+}
+
+.panel form input[type="text"],
+.panel form input[type="email"],
+.panel form input[type="date"],
+.panel form select {
+  height: 44px !important;
+}
+
+.panel form textarea {
+  min-height: 84px !important;
 }
 
 .panel form input[type="text"]:hover,
 .panel form input[type="email"]:hover,
 .panel form input[type="date"]:hover,
+.panel form textarea:hover,
 .panel form select:hover {
   border-color: #9ca3af !important;
   background: rgba(200, 200, 200, 0.08) !important;
@@ -307,6 +320,7 @@ label {
 .panel form input[type="text"]:focus,
 .panel form input[type="email"]:focus,
 .panel form input[type="date"]:focus,
+.panel form textarea:focus,
 .panel form select:focus {
   border-color: #9ca3af !important;
   background: rgba(200, 200, 200, 0.08) !important;

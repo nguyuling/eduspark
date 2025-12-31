@@ -19,13 +19,12 @@
     </div>
 
     @if (session('success'))
-      <div style="background:var(--success);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;font-size:14px;">{{ session('success') }}</div>
+      <div class="alert-success">{{ session('success') }}</div>
     @endif
 
     @if (session('error'))
-      <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;font-size:14px;">{{ session('error') }}</div>
+      <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
     @endif
-
     @if(auth()->user()->role === 'teacher')
       {{-- TEACHER VIEW --}}
       <!-- Games Stats -->
@@ -75,11 +74,21 @@
                   <div style="font-weight:700; margin-bottom:4px;">{{ $game->title }}</div>
                   <div style="font-size:13px; color:var(--muted); margin-bottom:8px; line-height:1.4;">{{ $game->description ?? 'Tiada penerangan' }}</div>
                   <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:11px; align-items:center;">
-                    <span style="background:rgba(106,77,247,0.08); padding:4px 8px; border-radius:4px;"><strong>Kategori:</strong> {{ $game->category ?? 'N/A' }}</span>
-                    <div style="font-weight:600; font-size:12px; padding:4px 8px; border-radius:6px; display:inline-block; 
-                      {{ $game->is_published ? 'background:#6A4DF7; color:#fff;' : 'background:rgba(106,77,247,0.1);' }}">
-                      {{ $game->is_published ? 'Diterbitkan' : 'Draf' }}
-                    </div>
+                    @if(!$game->is_published)
+                      <span style="background:rgba(230,57,70,0.1); padding:4px 8px; border-radius:4px; color:var(--danger); font-weight:600;">Draf</span>
+                    @endif
+                    <span style="background:rgba(106,77,247,0.08); padding:4px 8px; border-radius:4px;"><strong>Kategori:</strong> 
+                      @php
+                        $categoryMap = [
+                            'Action' => 'Aksi',
+                            'Casual' => 'Santai',
+                            'Puzzled' => 'Teka-teki',
+                            'Education' => 'Pendidikan',
+                            'Others' => 'Lain-lain'
+                        ];
+                        echo $categoryMap[$game->category] ?? $game->category ?? 'N/A';
+                      @endphp
+                    </span>
                   </div>
                 </td>
                 <td style="width:20%; text-align:center; padding:12px;">
@@ -92,10 +101,10 @@
                 </td>
                 <td style="width:20%; text-align:center; padding:12px;">
                   <div style="display:flex; gap:20px; justify-content:center;">
-                    <a href="{{ route('teacher.games.edit', $game->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:20px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Edit">
-                      <i class="bi bi-pencil"></i>
+                    <a href="{{ route('teacher.games.edit', $game->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Kemaskini">
+                      <i class="bi bi-pencil-square"></i>
                     </a>
-                    <button type="button" onclick="showDeleteConfirm({{ $game->id }}, '{{ $game->title }}')" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--danger); padding:0; font-size:20px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Padam">
+                    <button type="button" onclick="showDeleteConfirm({{ $game->id }}, '{{ $game->title }}')" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; box-shadow:none; color:var(--danger); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Buang">
                       <i class="bi bi-trash"></i>
                     </button>
                   </div>
@@ -184,47 +193,17 @@
     }
 
     function showDeleteConfirm(gameId, gameTitle) {
-        const modal = document.createElement('div');
-        modal.id = 'deleteModal';
-        modal.className = 'fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4';
-        modal.innerHTML = `
-            <div class="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full border-4 border-gray-300 dark:border-gray-700">
-                <div class="text-center">
-                    <div class="text-5xl mb-4 text-yellow-600 dark:text-yellow-400">⚠️</div>
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Delete Game?</h3>
-                    <p class="text-gray-700 dark:text-gray-300 mb-2">Are you sure you want to delete:</p>
-                    <p class="font-bold text-lg text-gray-900 dark:text-white mb-4">"${gameTitle}"</p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Note: You can restore it from the undo notification if needed.</p>
-                    
-                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                        <button type="button" onclick="closeDeleteModal()" class="px-6 py-3 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-bold hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-200">
-                            Cancel
-                        </button>
-                        <form action="/games/${gameId}" method="POST" style="display: inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="px-6 py-3 bg-red-700 hover:bg-red-800 text-white rounded-lg font-bold transition-colors duration-200">
-                                Yes, Delete
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeDeleteModal();
-        });
-        
-        // Prevent scrolling when modal is open
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeDeleteModal() {
-        const modal = document.getElementById('deleteModal');
-        if (modal) modal.remove();
-        document.body.style.overflow = 'auto';
+        if (confirm(`Adakah anda pasti ingin menghapus permainan ini? Tindakan ini tidak boleh dibatalkan!`)) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/games/${gameId}`;
+            form.innerHTML = `
+                @csrf
+                @method('DELETE')
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
     }
 </script>
 

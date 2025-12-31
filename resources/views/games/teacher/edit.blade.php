@@ -1,83 +1,164 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-6 py-8">
-    <div class="mb-8">
-        <a href="{{ route('games.index') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 mb-4 inline-block">← Back to Games</a>
-        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Edit Game: {{ $game->title }}</h1>
+<div class="app">
+  <main class="main">
+    <div class="header">
+      <div>
+        <div class="title">Kemaskini Permainan: {{ $game->title }}</div>
+        <div class="sub">Kemaskini butiran dan tetapan permainan</div>
+      </div>
+      <a href="{{ route('games.index') }}" class="btn-kembali">
+        <i class="bi bi-arrow-left"></i>Kembali
+      </a>
     </div>
 
-    <form action="{{ route('teacher.games.update', $game->id) }}" method="POST" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-8 max-w-2xl">
-        @csrf
-        @method('PUT')
+    @if(session('success'))
+      <div class="alert-success">{{ session('success') }}</div>
+    @endif
 
-        <div class="mb-6">
-            <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Game Title *</label>
-            <input type="text" id="title" name="title" value="{{ old('title', $game->title) }}" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter game title">
-            @error('title')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-            @enderror
+    @if(session('error'))
+      <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
+    @endif
+
+    <!-- Error Messages -->
+    @if ($errors->any())
+      <section style="margin-left:40px; margin-right:40px; margin-bottom:20px; background: rgba(230, 57, 70, 0.1); border-left: 3px solid var(--danger); padding:16px 18px; border-radius:var(--card-radius);">
+        <div style="font-weight: 700; color: var(--danger); margin-bottom: 8px;">Sila betulkan ralat berikut:</div>
+        <ul style="margin: 0; padding-left: 20px; color: var(--danger); font-size: 14px;">
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </section>
+    @endif
+
+    <!-- Start Main Form -->
+    <form method="POST" action="{{ route('teacher.games.update', $game->id) }}" id="game-form">
+      @csrf
+      @method('PUT')
+
+      <!-- Game Format Section -->
+      <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">
+          <h2 style="margin:0; font-size:18px; font-weight:700;">Maklumat Asas</h2>
         </div>
 
-        <div class="mb-6">
-            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
-            <textarea id="description" name="description" rows="4" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Describe your game...">{{ old('description', $game->description) }}</textarea>
-            @error('description')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-            @enderror
+        <!-- Title -->
+        <div style="margin-bottom: 20px;">
+          <label for="title" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Tajuk Permainan <span style="color: var(--danger);">*</span></label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            placeholder="Masukkan tajuk permainan"
+            value="{{ old('title', $game->title) }}" 
+            required
+            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box;" 
+            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+          >
+          @error('title')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
         </div>
 
-        <div class="grid grid-cols-2 gap-6 mb-6">
-            <div>
-                <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category *</label>
-                <input type="text" id="category" name="category" value="{{ old('category', $game->category) }}" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Action, Puzzle">
-                @error('category')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div>
-                <label for="difficulty" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Difficulty *</label>
-                <select id="difficulty" name="difficulty" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="easy" {{ old('difficulty', $game->difficulty) === 'easy' ? 'selected' : '' }}>Easy</option>
-                    <option value="medium" {{ old('difficulty', $game->difficulty) === 'medium' ? 'selected' : '' }}>Medium</option>
-                    <option value="hard" {{ old('difficulty', $game->difficulty) === 'hard' ? 'selected' : '' }}>Hard</option>
-                </select>
-                @error('difficulty')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+        <!-- Description -->
+        <div style="margin-bottom: 20px;">
+          <label for="description" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Penerangan (Pilihan)</label>
+          <textarea 
+            id="description" 
+            name="description" 
+            rows="3"
+            placeholder="Huraikan permainan anda..."
+            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; resize: vertical; box-sizing: border-box;"
+            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+          >{{ old('description', $game->description) }}</textarea>
+          @error('description')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
         </div>
 
-        <div class="grid grid-cols-2 gap-6 mb-6">
-            <div>
-                <label for="game_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Game Type</label>
-                <input type="text" id="game_type" name="game_type" value="{{ old('game_type', $game->game_type) }}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Arcade, Adventure">
-                @error('game_type')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+        <!-- Publish Checkbox -->
+        <div style="display: flex; align-items: flex-end; padding-bottom: 2px;">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: rgba(106,77,247,0.05); border-radius: 8px; border: 2px solid #d1d5db; width: 100%;">
+            <input 
+              type="checkbox" 
+              id="is_published" 
+              name="is_published"
+              value="1"
+              {{ old('is_published', $game->is_published) ? 'checked' : '' }}
+              style="width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;"
+            >
+            <label for="is_published" style="margin: 0; cursor: pointer; font-weight: 500; font-size: 14px; white-space: nowrap;">Terbitkan Segera</label>
+          </div>
+        </div>
+      </section>
 
-            <div>
-                <label for="topic" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Topic</label>
-                <input type="text" id="topic" name="topic" value="{{ old('topic', $game->topic) }}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Programming, Math">
-                @error('topic')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+      <!-- Classification Section -->
+      <section class="panel" style="margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">
+          <h2 style="margin:0; font-size:18px; font-weight:700;">Pengelasan</h2>
         </div>
 
-        <div class="mb-6">
-            <label class="flex items-center">
-                <input type="checkbox" id="is_published" name="is_published" value="1" {{ old('is_published', $game->is_published) ? 'checked' : '' }} class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Publish this game (make it visible to students)</span>
-            </label>
-        </div>
+        <!-- Bottom Row: Category, Difficulty -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <!-- Category -->
+          <div>
+            <label for="category" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Kategori <span style="color: var(--danger);">*</span></label>
+            <select 
+              id="category" 
+              name="category" 
+              required
+              style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 44px; transition: border-color 0.2s ease, background 0.2s ease; cursor: pointer;"
+              onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+              onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            >
+              <option value="">-- Pilih Kategori --</option>
+              <option value="Action" {{ old('category', $game->category) === 'Action' ? 'selected' : '' }}>Aksi</option>
+              <option value="Casual" {{ old('category', $game->category) === 'Casual' ? 'selected' : '' }}>Santai</option>
+              <option value="Puzzled" {{ old('category', $game->category) === 'Puzzled' ? 'selected' : '' }}>Teka-teki</option>
+              <option value="Education" {{ old('category', $game->category) === 'Education' ? 'selected' : '' }}>Pendidikan</option>
+              <option value="Others" {{ old('category', $game->category) === 'Others' ? 'selected' : '' }}>Lain-lain</option>
+            </select>
+            @error('category')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
+          </div>
 
-        <div class="flex gap-4">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">Update Game</button>
-            <a href="{{ route('games.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Cancel</a>
+          <!-- Difficulty -->
+          <div>
+            <label for="difficulty" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Tahap Kesukaran <span style="color: var(--danger);">*</span></label>
+            <select 
+              id="difficulty" 
+              name="difficulty" 
+              required
+              style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 44px; transition: border-color 0.2s ease, background 0.2s ease; cursor: pointer;"
+              onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+              onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+              onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            >
+              <option value="">-- Pilih Tahap Kesukaran --</option>
+              <option value="easy" {{ old('difficulty', $game->difficulty) === 'easy' ? 'selected' : '' }}>Mudah</option>
+              <option value="medium" {{ old('difficulty', $game->difficulty) === 'medium' ? 'selected' : '' }}>Sederhana</option>
+              <option value="hard" {{ old('difficulty', $game->difficulty) === 'hard' ? 'selected' : '' }}>Sukar</option>
+            </select>
+            @error('difficulty')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
+          </div>
         </div>
+      </section>
+
+      <!-- Action Buttons Row -->
+      <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0;">
+        <button type="submit" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
+          <i class="bi bi-save"></i>Kemaskini Permainan
+        </button>
+      </div>
     </form>
+
+
+  </main>
 </div>
 @endsection
