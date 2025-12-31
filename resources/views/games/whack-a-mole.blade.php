@@ -122,6 +122,7 @@
     let gameActive = false;
     let moleHitCount = 0;
     let activeMole = null;
+    let gameStartTime = 0;
 
     const elements = {
         gameContainer: document.getElementById('gameContainer'),
@@ -148,6 +149,7 @@
         score = 0;
         timeLeft = 30;
         moleHitCount = 0;
+        gameStartTime = Date.now();
 
         elements.startScreen.style.display = 'none';
         elements.gameContent.style.display = 'block';
@@ -230,16 +232,34 @@
     function endGame() {
         gameStarted = false;
         gameActive = false;
-        elements.gameContent.style.display = 'none';
-        elements.gameHeader.style.display = 'none';
-        elements.gameOverScreen.style.display = 'block';
-        elements.finalScore.textContent = score;
-        elements.moleHits.textContent = moleHitCount;
-
-        if (activeMole) {
-            activeMole.textContent = '';
-            activeMole.classList.add('empty');
-        }
+        
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("games.storeResult", 2) }}';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
+        
+        const scoreInput = document.createElement('input');
+        scoreInput.type = 'hidden';
+        scoreInput.name = 'score';
+        scoreInput.value = score;
+        form.appendChild(scoreInput);
+        
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 'time_taken';
+        timeInput.value = timeInSeconds;
+        form.appendChild(timeInput);
+        
+        document.body.appendChild(form);
+        form.submit();
     }
 
     function resetGame() {

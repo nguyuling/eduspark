@@ -77,6 +77,7 @@
     let score = 0;
     let gameStarted = false;
     let gameActive = false;
+    let gameStartTime = 0;
 
     const player = {
         x: 20,
@@ -193,6 +194,7 @@
         score = 0;
         player.x = 20;
         player.y = 20;
+        gameStartTime = Date.now();
 
         document.getElementById('startScreen').style.display = 'none';
         document.getElementById('gameContent').style.display = 'block';
@@ -208,12 +210,34 @@
     function winLevel() {
         gameActive = false;
         score += (level * 100);
-
-        document.getElementById('gameContent').style.display = 'none';
-        document.getElementById('gameHeader').style.display = 'none';
-        document.getElementById('gameOverScreen').style.display = 'block';
-        document.getElementById('finalScore').textContent = score;
-        document.getElementById('finalLevel').textContent = level;
+        
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("games.storeResult", 4) }}';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
+        
+        const scoreInput = document.createElement('input');
+        scoreInput.type = 'hidden';
+        scoreInput.name = 'score';
+        scoreInput.value = score;
+        form.appendChild(scoreInput);
+        
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 'time_taken';
+        timeInput.value = timeInSeconds;
+        form.appendChild(timeInput);
+        
+        document.body.appendChild(form);
+        form.submit();
     }
 
     document.getElementById('startBtn').addEventListener('click', startGame);

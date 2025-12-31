@@ -181,6 +181,7 @@
     let gameStarted = false;
     let gameActive = false;
     let selectedAnswer = null;
+    let gameStartTime = 0;
 
     const elements = {
         gameContainer: document.getElementById('gameContainer'),
@@ -211,6 +212,7 @@
         correctCount = 0;
         timeLeft = 60;
         selectedAnswer = null;
+        gameStartTime = Date.now();
 
         elements.startScreen.style.display = 'none';
         elements.gameContent.style.display = 'block';
@@ -287,11 +289,34 @@
     function endGame() {
         gameStarted = false;
         gameActive = false;
-        elements.gameContent.style.display = 'none';
-        elements.gameHeader.style.display = 'none';
-        elements.gameOverScreen.style.display = 'block';
-        elements.finalScore.textContent = score;
-        elements.correctAnswers.textContent = `${correctCount}/${quizzes.length}`;
+        
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("games.storeResult", 5) }}';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
+        
+        const scoreInput = document.createElement('input');
+        scoreInput.type = 'hidden';
+        scoreInput.name = 'score';
+        scoreInput.value = score;
+        form.appendChild(scoreInput);
+        
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 'time_taken';
+        timeInput.value = timeInSeconds;
+        form.appendChild(timeInput);
+        
+        document.body.appendChild(form);
+        form.submit();
     }
 
     function resetGame() {

@@ -74,6 +74,7 @@
     let gameActive = false;
     let score = 0;
     let lives = 3;
+    let gameStartTime = 0; // Track when game starts
 
     // Player
     const player = {
@@ -116,6 +117,7 @@
         lives = 3;
         enemies = [];
         player.bullets = [];
+        gameStartTime = Date.now(); // Record start time
 
         document.getElementById('startScreen').style.display = 'none';
         document.getElementById('gameCanvas').style.display = 'block';
@@ -213,10 +215,39 @@
 
     function endGame() {
         gameActive = false;
-        document.getElementById('gameCanvas').style.display = 'none';
-        document.getElementById('gameHeader').style.display = 'none';
-        document.getElementById('gameOverScreen').style.display = 'flex';
-        document.getElementById('finalScore').textContent = score;
+        
+        // Calculate time taken (from game start to now)
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
+        // Submit score to server
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("games.storeResult", 1) }}'; // Game ID 1 for Cosmic Defender
+        
+        // CSRF token
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
+        
+        // Score
+        const scoreInput = document.createElement('input');
+        scoreInput.type = 'hidden';
+        scoreInput.name = 'score';
+        scoreInput.value = score;
+        form.appendChild(scoreInput);
+        
+        // Time
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 'time_taken';
+        timeInput.value = timeInSeconds;
+        form.appendChild(timeInput);
+        
+        document.body.appendChild(form);
+        form.submit();
     }
 
     document.getElementById('startBtn').addEventListener('click', startGame);

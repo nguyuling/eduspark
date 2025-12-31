@@ -12,11 +12,13 @@
 /.vscode
 /.zed
 /auth.json
+/database/database.sqlite
 /node_modules
 /public/build
 /public/hot
 /public/storage
 /storage/*.key
+/storage/logs/laravel.log
 /storage/pail
 /vendor
 bootstrap/cache/*.php

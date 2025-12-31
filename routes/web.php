@@ -144,6 +144,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/forum/{id}', [ForumController::class, 'update'])->name('forum.update');
     Route::delete('/forum/{id}', [ForumController::class, 'destroy'])->name('forum.destroy');
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
+});
+
+// OLD LEGACY ROUTES REMOVED - All games now go through GameController@play
+// This ensures the game summary and leaderboard flow works properly
     
     // Messages routes for chat functionality
     Route::get('/messages', [ForumController::class, 'getMessages'])->name('messages.index');
