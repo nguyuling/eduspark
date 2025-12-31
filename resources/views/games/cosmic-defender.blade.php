@@ -29,7 +29,7 @@
         <div id="gameContainer" style="padding: 20px;">
 
             <!-- Game Canvas -->
-            <canvas id="gameCanvas" style="display: none; flex: 1;"></canvas>
+            <canvas id="gameCanvas" style="display: none; max-width: 100%; height: auto; border-radius: 12px;"></canvas>
 
             <!-- Start Screen -->
             <div id="startScreen" style="text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
@@ -58,7 +58,7 @@
                     </div>
                 </section>
                 <div style="display: flex; gap: 12px; justify-content: center;\">
-                    <button id="playAgainBtn" style="padding: 12px 30px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;\">
+                    <button id="playAgainBtn" style="padding: 12px 30px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
                         Main Semula
                     </button>
                     <a href="/games" style="padding: 12px 30px; background: var(--border); color: var(--text); border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;\">
@@ -101,14 +101,11 @@
 
     function resizeCanvas() {
         const gameContainer = document.getElementById('gameContainer');
-        const header = document.getElementById('gameHeader');
         const canvas = document.getElementById('gameCanvas');
         
-        // Get actual available height by calculating from gameContainer minus header
-        const availableHeight = gameContainer.clientHeight - header.clientHeight;
-        
-        canvas.width = gameContainer.clientWidth;
-        canvas.height = availableHeight;
+        // Set canvas size with proper aspect ratio
+        canvas.width = Math.min(gameContainer.clientWidth - 40, 800);
+        canvas.height = 500;
         
         player.x = canvas.width / 2 - player.width / 2;
         player.y = canvas.height - 60;
@@ -137,9 +134,17 @@
     function gameLoop() {
         if (!gameActive) return;
 
-        // Clear
-        ctx.fillStyle = 'rgba(0, 20, 50, 0.1)';
+        // Clear with space-like gradient
+        ctx.fillStyle = '#001433';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Add subtle stars effect
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        for (let i = 0; i < 5; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            ctx.fillRect(x, y, 2, 2);
+        }
 
         // Update player
         if (keys['ArrowLeft'] || keys['a']) player.x = Math.max(0, player.x - player.speed);
