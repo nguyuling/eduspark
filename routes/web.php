@@ -146,10 +146,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
 });
 
-// OLD LEGACY ROUTES REMOVED - All games now go through GameController@play
-// This ensures the game summary and leaderboard flow works properly
-    
-    // Messages routes for chat functionality
+// Messages routes for chat functionality
+Route::middleware('auth')->group(function () {
     Route::get('/messages', [ForumController::class, 'getMessages'])->name('messages.index');
     Route::get('/messages/conversation/{userId}', [ForumController::class, 'getConversation'])->name('messages.conversation');
     Route::post('/messages/send', [ForumController::class, 'sendMessage'])->name('messages.send');
