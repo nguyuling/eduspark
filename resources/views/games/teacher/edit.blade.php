@@ -1,83 +1,160 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-6 py-8">
-    <div class="mb-8">
-        <a href="{{ route('games.index') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 mb-4 inline-block">← Back to Games</a>
-        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Edit Game: {{ $game->title }}</h1>
+<div class="app">
+  <main class="main">
+    <div class="header">
+      <div>
+        <div class="title">Kemaskini Permainan: {{ $game->title }}</div>
+        <div class="sub">Kemaskini butiran dan tetapan permainan</div>
+      </div>
+      <a href="{{ route('games.index') }}" class="btn-kembali">
+        <i class="bi bi-arrow-left"></i>Kembali
+      </a>
     </div>
 
-    <form action="{{ route('teacher.games.update', $game->id) }}" method="POST" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-8 max-w-2xl">
+    @if(session('success'))
+      <div class="alert alert-success">
+        <span style="font-size: 18px;">✓</span>
+        <div>
+          <div class="alert-title">Berjaya</div>
+          {{ session('success') }}
+        </div>
+      </div>
+    @endif
+
+    @if($errors->any())
+      <div class="alert alert-danger">
+        <span style="font-size: 18px;">⚠️</span>
+        <div>
+          <div class="alert-title">Ralat</div>
+          Sila betulkan ralat berikut sebelum menyimpan.
+        </div>
+      </div>
+    @endif
+
+    <section class="panel">
+      <div class="panel-header">
+        <h3>Maklumat Asas</h3>
+      </div>
+
+      <form method="POST" action="{{ route('teacher.games.update', $game->id) }}">
         @csrf
         @method('PUT')
 
-        <div class="mb-6">
-            <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Game Title *</label>
-            <input type="text" id="title" name="title" value="{{ old('title', $game->title) }}" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter game title">
-            @error('title')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+        <div class="form-group">
+          <label for="title">Tajuk Permainan *</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            value="{{ old('title', $game->title) }}"
+            required
+            placeholder="Masukkan tajuk permainan"
+          >
+          @error('title')
+            <div class="error-msg">{{ $message }}</div>
+          @enderror
+        </div>
+
+        <div class="form-group">
+          <label for="description">Penerangan</label>
+          <textarea
+            id="description"
+            name="description"
+            class="form-input"
+            placeholder="Huraikan permainan anda..."
+          >{{ old('description', $game->description) }}</textarea>
+          @error('description')
+            <div class="error-msg">{{ $message }}</div>
+          @enderror
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; align-items: center;">
+            <input 
+              type="checkbox" 
+              id="is_published" 
+              name="is_published" 
+              value="1" 
+              {{ old('is_published', $game->is_published) ? 'checked' : '' }}
+            >
+            <span style="margin-left: 8px; color: inherit;">Terbitkan Segera</span>
+          </label>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h3>Pengelasan</h3>
+      </div>
+
+      <form method="POST" action="{{ route('teacher.games.update', $game->id) }}">
+        @csrf
+        @method('PUT')
+
+        <div class="info-grid">
+          <div class="form-group">
+            <label for="category">Kategori *</label>
+            <input
+              type="text"
+              id="category"
+              name="category"
+              value="{{ old('category', $game->category) }}"
+              required
+              placeholder="Cth: Aksi, Teka-teki"
+            >
+            @error('category')
+              <div class="error-msg">{{ $message }}</div>
             @enderror
-        </div>
+          </div>
 
-        <div class="mb-6">
-            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
-            <textarea id="description" name="description" rows="4" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Describe your game...">{{ old('description', $game->description) }}</textarea>
-            @error('description')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+          <div class="form-group">
+            <label for="difficulty">Tahap Kesukaran *</label>
+            <select id="difficulty" name="difficulty" required>
+              <option value="">-- Pilih Tahap Kesukaran --</option>
+              <option value="easy" {{ old('difficulty', $game->difficulty) === 'easy' ? 'selected' : '' }}>Mudah</option>
+              <option value="medium" {{ old('difficulty', $game->difficulty) === 'medium' ? 'selected' : '' }}>Sederhana</option>
+              <option value="hard" {{ old('difficulty', $game->difficulty) === 'hard' ? 'selected' : '' }}>Sukar</option>
+            </select>
+            @error('difficulty')
+              <div class="error-msg">{{ $message }}</div>
             @enderror
+          </div>
+
+          <div class="form-group">
+            <label for="game_type">Jenis Permainan</label>
+            <input
+              type="text"
+              id="game_type"
+              name="game_type"
+              value="{{ old('game_type', $game->game_type) }}"
+              placeholder="Cth: Arkad, Pengembaraan"
+            >
+            @error('game_type')
+              <div class="error-msg">{{ $message }}</div>
+            @enderror
+          </div>
+
+          <div class="form-group">
+            <label for="topic">Topik</label>
+            <input
+              type="text"
+              id="topic"
+              name="topic"
+              value="{{ old('topic', $game->topic) }}"
+              placeholder="Cth: Pengaturcaraan, Matematik"
+            >
+            @error('topic')
+              <div class="error-msg">{{ $message }}</div>
+            @enderror
+          </div>
         </div>
+      </form>
+    </section>
 
-        <div class="grid grid-cols-2 gap-6 mb-6">
-            <div>
-                <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category *</label>
-                <input type="text" id="category" name="category" value="{{ old('category', $game->category) }}" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Action, Puzzle">
-                @error('category')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
 
-            <div>
-                <label for="difficulty" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Difficulty *</label>
-                <select id="difficulty" name="difficulty" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="easy" {{ old('difficulty', $game->difficulty) === 'easy' ? 'selected' : '' }}>Easy</option>
-                    <option value="medium" {{ old('difficulty', $game->difficulty) === 'medium' ? 'selected' : '' }}>Medium</option>
-                    <option value="hard" {{ old('difficulty', $game->difficulty) === 'hard' ? 'selected' : '' }}>Hard</option>
-                </select>
-                @error('difficulty')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-6 mb-6">
-            <div>
-                <label for="game_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Game Type</label>
-                <input type="text" id="game_type" name="game_type" value="{{ old('game_type', $game->game_type) }}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Arcade, Adventure">
-                @error('game_type')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div>
-                <label for="topic" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Topic</label>
-                <input type="text" id="topic" name="topic" value="{{ old('topic', $game->topic) }}" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Programming, Math">
-                @error('topic')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-        </div>
-
-        <div class="mb-6">
-            <label class="flex items-center">
-                <input type="checkbox" id="is_published" name="is_published" value="1" {{ old('is_published', $game->is_published) ? 'checked' : '' }} class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Publish this game (make it visible to students)</span>
-            </label>
-        </div>
-
-        <div class="flex gap-4">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">Update Game</button>
-            <a href="{{ route('games.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg">Cancel</a>
-        </div>
-    </form>
+  </main>
 </div>
 @endsection
