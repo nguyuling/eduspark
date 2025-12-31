@@ -16,10 +16,10 @@
     <main class="main" style="padding: 20px;">
         <div id="gameContainer">
             <!-- Game Header -->
-            <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div id="gameHeader" class="header">
                 <div>
-                    <h1 style="margin: 0; font-size: 32px; font-weight: 900;">🌳 Taman Labirin Java</h1>
-                    <p style="color: #6b7280; margin-top: 8px; font-size: 16px;">Navigasi taman sambil menjawab soalan Java!</p>
+                    <div class="title">Taman Labirin Java</div>
+                    <div class="sub">Navigasi taman sambil menjawab soalan Java!</div>
                 </div>
                 <div style="display: flex; gap: 30px; align-items: center;">
                     <div style="text-align: center;">
@@ -55,7 +55,7 @@
 
             <!-- Start Screen -->
             <div id="startScreen" style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 120px; margin-bottom: 30px;">🌳🌺🦋</div>
+                <div style="font-size: 120px; margin-bottom: 30px;">🌳</div>
                 <h2 style="font-size: 48px; font-weight: 900; margin-bottom: 20px; color: #1f2937;">Taman Labirin Java</h2>
                 <div style="background: #dbeafe; border: 4px solid #3b82f6; border-radius: 16px; padding: 30px; max-width: 600px; margin: 0 auto 40px auto;">
                     <p style="font-size: 20px; color: #1e3a8a; margin-bottom: 15px; font-weight: 700;">📚 Cara Bermain:</p>

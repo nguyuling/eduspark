@@ -5,10 +5,10 @@
     <main class="main">
         <div id="gameContainer" style="padding: 20px;">
             <!-- Game Header -->
-            <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div id="gameHeader" class="header">
                 <div>
-                    <h1 style="margin: 0; font-size: 28px; font-weight: 700;">🎴 Memory Match</h1>
-                    <p style="color: var(--muted); margin-top: 8px;">Padankan kad yang sama untuk menang!</p>
+                    <div class="title">Memory Match</div>
+                    <div class="sub">Padankan kad yang sama untuk menang!</div>
                 </div>
                 <div style="display: flex; gap: 20px; align-items: center;">
                     <div style="text-align: center;">

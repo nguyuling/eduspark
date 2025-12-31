@@ -8,9 +8,9 @@
     <main class="main" style="overflow: hidden; margin: 0; padding: 0; flex: 1; display: flex; flex-direction: column; width: 100%; max-width: 100%;">
         <div id="gameContainer" style="padding: 0; width: 100%; flex: 1; display: flex; flex-direction: column; background: #000;">
             <!-- Game Header -->
-            <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10; height: auto;">
+            <div id="gameHeader" class="header" style="padding: 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10;">
                 <div style="color: white;">
-                    <h1 style="margin: 0; font-size: 24px; font-weight: 700;">🚀 Cosmic Defender</h1>
+                    <div class="title">Cosmic Defender</div>
                 </div>
                 <div style="display: flex; gap: 20px; align-items: center;">
                     <div style="text-align: center; color: white;">
