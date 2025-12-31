@@ -29,7 +29,11 @@
         <div id="gameContainer" style="padding: 20px;">
 
             <!-- Game Canvas -->
-            <canvas id="gameCanvas" style="display: none; max-width: 100%; height: auto; border-radius: 12px;"></canvas>
+            <div id="gameCanvasWrapper" style="display: none; justify-content: center;">
+                <section class="panel" style="width: 100%; max-width: 600px; padding: 20px;">
+                    <canvas id="gameCanvas" style="max-width: 100%; height: auto; border-radius: 12px; background: white;"></canvas>
+                </section>
+            </div>
 
             <!-- Start Screen -->
             <div id="startScreen" style="text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
@@ -100,12 +104,11 @@
     window.addEventListener('keyup', (e) => { keys[e.key] = false; });
 
     function resizeCanvas() {
-        const gameContainer = document.getElementById('gameContainer');
         const canvas = document.getElementById('gameCanvas');
         
-        // Set canvas size with proper aspect ratio
-        canvas.width = Math.min(gameContainer.clientWidth - 40, 800);
-        canvas.height = 500;
+        // Set canvas size with proper aspect ratio - larger for better visibility
+        canvas.width = 600;
+        canvas.height = 400;
         
         player.x = canvas.width / 2 - player.width / 2;
         player.y = canvas.height - 60;
@@ -121,7 +124,7 @@
         gameStartTime = Date.now(); // Record start time
 
         document.getElementById('startScreen').style.display = 'none';
-        document.getElementById('gameCanvas').style.display = 'block';
+        document.getElementById('gameCanvasWrapper').style.display = 'flex';
         document.getElementById('gameOverScreen').style.display = 'none';
         document.getElementById('gameHeader').style.display = 'flex';
         document.getElementById('scoreDisplay').textContent = '0';
@@ -134,16 +137,24 @@
     function gameLoop() {
         if (!gameActive) return;
 
-        // Clear with space-like gradient
-        ctx.fillStyle = '#001433';
+        // Clear with white background
+        ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Add subtle stars effect
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-        for (let i = 0; i < 5; i++) {
-            const x = Math.random() * canvas.width;
-            const y = Math.random() * canvas.height;
-            ctx.fillRect(x, y, 2, 2);
+        // Add subtle grid pattern
+        ctx.strokeStyle = 'rgba(200, 200, 200, 0.1)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < canvas.width; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, canvas.height);
+            ctx.stroke();
+        }
+        for (let i = 0; i < canvas.height; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(canvas.width, i);
+            ctx.stroke();
         }
 
         // Update player
@@ -231,7 +242,7 @@
         
         // Show game over screen
         document.getElementById('gameOverScreen').style.display = 'flex';
-        document.getElementById('gameCanvas').style.display = 'none';
+        document.getElementById('gameCanvasWrapper').style.display = 'none';
         document.getElementById('finalScore').textContent = score;
     }
 

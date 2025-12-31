@@ -30,13 +30,11 @@
 
             <!-- Game Area -->
             <div id="gameContent" style="display: none;">
-                <section class="panel" style="margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: center; padding: 40px;">
-                        <div id="gameBoard" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 500px; width: 100%;">
-                            <!-- Moles will be inserted here -->
-                        </div>
+                <div style="display: flex; justify-content: center; padding: 40px;">
+                    <div id="gameBoard" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 500px; width: 100%;">
+                        <!-- Moles will be inserted here -->
                     </div>
-                </section>
+                </div>
             </div>
 
             <!-- Start Screen -->
@@ -73,9 +71,6 @@
                     <button id="playAgainBtn" style="padding: 12px 28px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
                         Main Semula
                     </button>
-                    <a href="/games" style="padding: 12px 28px; background: var(--border); color: var(--text); border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;">
-                        Kembali ke Permainan
-                    </a>
                 </div>
             </div>
         </div>
