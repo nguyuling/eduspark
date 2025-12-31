@@ -3,29 +3,30 @@
 @section('content')
 <div class="app">
     <main class="main">
-        <div id="gameContainer" style="padding: 20px;">
-            <!-- Game Header -->
-            <div id="gameHeader" class="header">
-                <div>
-                    <div class="title">Whack-a-Mole</div>
-                    <div class="sub">Tumbuk tikus secepat mungkin untuk mendapat markah tertinggi!</div>
-                </div>
-                <div style="display: flex; gap: 60px; align-items: center;">
-                    <div style="display: flex; gap: 20px; align-items: center;">
-                        <div style="text-align: center;">
-                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Skor</div>
-                            <div id="scoreDisplay" style="font-size: 32px; font-weight: 700; color: var(--accent);">0</div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Masa</div>
-                            <div id="timerDisplay" style="font-size: 32px; font-weight: 700; color: #ef4444;">30</div>
-                        </div>
-                    </div>
-                    <a href="{{ route('games.index') }}" class="btn-kembali">
-                        <i class="bi bi-arrow-left"></i>Kembali
-                    </a>
-                </div>
+        <!-- Game Header -->
+        <div id="gameHeader" class="header">
+            <div>
+                <div class="title">Whack-a-Mole</div>
+                <div class="sub">Tumbuk tikus secepat mungkin untuk mendapat markah tertinggi!</div>
             </div>
+            <div style="display: flex; gap: 60px; align-items: center;">
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <div style="text-align: center;">
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Skor</div>
+                        <div id="scoreDisplay" style="font-size: 32px; font-weight: 700; color: var(--accent);">0</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Masa</div>
+                        <div id="timerDisplay" style="font-size: 32px; font-weight: 700; color: #ef4444;">30</div>
+                    </div>
+                </div>
+                <a href="{{ route('games.index') }}" class="btn-kembali">
+                    <i class="bi bi-arrow-left"></i>Kembali
+                </a>
+            </div>
+        </div>
+
+        <div id="gameContainer" style="padding: 20px;">
 
             <!-- Game Area -->
             <div id="gameContent" style="display: none;">
@@ -39,19 +40,21 @@
             </div>
 
             <!-- Start Screen -->
-            <div id="startScreen" style="text-align: center; padding: 80px 40px;">
-                <div style="font-size: 80px; margin-bottom: 20px;">🔨</div>
-                <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Whack-a-Mole</h2>
-                <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px; max-width: 500px; margin-left: auto; margin-right: auto;">
-                    Tumbuk tikus yang muncul sebanyak mungkin dalam 30 saat! Setiap tumbukan yang tepat memberikan 10 poin.
-                </p>
-                <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
-                    Mula Bermain ▶
-                </button>
+            <div id="startScreen" style="text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <section class="panel" style="max-width: 500px; padding: 40px;">
+                    <div style="font-size: 80px; margin-bottom: 20px;">🔨</div>
+                    <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Whack-a-Mole</h2>
+                    <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px;">
+                        Tumbuk tikus yang muncul sebanyak mungkin dalam 30 saat! Setiap tumbukan yang tepat memberikan 10 poin.
+                    </p>
+                    <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
+                        Mula
+                    </button>
+                </section>
             </div>
 
             <!-- Game Over Screen -->
-            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px;">
+            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                 <div style="font-size: 80px; margin-bottom: 20px;">🎉</div>
                 <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 32px;">Permainan Tamat!</h2>
                 <section class="panel" style="max-width: 450px; margin: 0 auto 40px;">
