@@ -33,7 +33,7 @@
 
             <!-- Start Screen -->
             <div id="startScreen" style="text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <section class="panel" style="max-width: 500px; padding: 40px;">
+                <section class="panel" style="width: 100%; max-width: 500px; padding: 40px;">
                     <div style="font-size: 80px; margin-bottom: 20px;">🎴</div>
                     <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Memory Match</h2>
                     <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px;">

@@ -61,19 +61,13 @@
 
             <!-- Start Screen -->
             <div id="startScreen" style="text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <section class="panel" style="max-width: 600px; padding: 40px;">
+                <section class="panel" style="width: 100%; max-width: 500px; padding: 40px;">
                     <div style="font-size: 80px; margin-bottom: 20px;">🌳</div>
                     <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 20px;">Taman Labirin Java</h2>
-                    <div style="background: #dbeafe; border: 4px solid #3b82f6; border-radius: 16px; padding: 30px; margin-bottom: 30px;">
-                        <p style="font-size: 18px; color: #1e3a8a; margin-bottom: 15px; font-weight: 700;">📚 Cara Bermain:</p>
-                        <ul style="text-align: left; color: #1e40af; font-size: 16px; line-height: 2; font-weight: 600;">
-                            <li>🌺 Kumpulkan 15 bunga di taman labirin</li>
-                            <li>❓ Setiap bunga dikumpul = 1 soalan Java</li>
-                            <li>✅ Jawapan betul = +100 mata</li>
-                            <li>❌ Jawapan salah = Tiada mata</li>
-                            <li>⚡ Masa lebih pantas = Skor lebih tinggi!</li>
-                        </ul>
-                    </div>
+                    <ul style="text-align: left; color: #1e40af; font-size: 16px; line-height: 2; font-weight: 600;">
+                        <li>🌺 Kumpulkan 15 bunga di taman labirin</li>
+                        <li>❓ Setiap bunga dikumpul = 1 soalan Java</li>
+                    </ul>
                     <button id="startBtn" style="padding: 16px 40px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 16px rgba(0,0,0,0.2); transition: transform 0.2s;">
                         Mula
                     </button>
