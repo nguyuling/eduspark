@@ -46,7 +46,7 @@
             </div>
 
             <!-- Game Over Screen -->
-            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px; min-height: 500px; flex-direction: column; align-items: center; justify-content: center;">
                 <div style="font-size: 80px; margin-bottom: 20px;">☠️</div>
                 <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 32px;">Permainan Tamat!</h2>
                 <section class="panel" style="max-width: 450px; margin: 0 auto 40px;">
@@ -224,26 +224,33 @@
         const gameEndTime = Date.now();
         const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
         
-        // Submit score to server
+        // Show game over screen
+        document.getElementById('gameOverScreen').style.display = 'flex';
+        document.getElementById('gameCanvas').style.display = 'none';
+        document.getElementById('finalScore').textContent = score;
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('playAgainBtn').addEventListener('click', () => {
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '{{ route("games.storeResult", 1) }}'; // Game ID 1 for Cosmic Defender
+        form.action = '{{ route("games.storeResult", 1) }}';
         
-        // CSRF token
         const csrfInput = document.createElement('input');
         csrfInput.type = 'hidden';
         csrfInput.name = '_token';
         csrfInput.value = '{{ csrf_token() }}';
         form.appendChild(csrfInput);
         
-        // Score
         const scoreInput = document.createElement('input');
         scoreInput.type = 'hidden';
         scoreInput.name = 'score';
         scoreInput.value = score;
         form.appendChild(scoreInput);
         
-        // Time
         const timeInput = document.createElement('input');
         timeInput.type = 'hidden';
         timeInput.name = 'time_taken';
@@ -252,12 +259,6 @@
         
         document.body.appendChild(form);
         form.submit();
-    }
-
-    document.getElementById('startBtn').addEventListener('click', startGame);
-    document.getElementById('playAgainBtn').addEventListener('click', () => {
-        document.getElementById('gameOverScreen').style.display = 'none';
-        document.getElementById('startScreen').style.display = 'flex';
     });
 
     window.addEventListener('resize', resizeCanvas);

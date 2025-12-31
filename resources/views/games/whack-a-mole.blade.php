@@ -54,7 +54,7 @@
             </div>
 
             <!-- Game Over Screen -->
-            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px; min-height: 500px; flex-direction: column; align-items: center; justify-content: center;">
                 <div style="font-size: 80px; margin-bottom: 20px;">🎉</div>
                 <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 32px;">Permainan Tamat!</h2>
                 <section class="panel" style="max-width: 450px; margin: 0 auto 40px;">
@@ -155,7 +155,35 @@
 
     // Event Listeners
     elements.startBtn.addEventListener('click', startGame);
-    elements.playAgainBtn.addEventListener('click', resetGame);
+    elements.playAgainBtn.addEventListener('click', () => {
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("games.storeResult", 2) }}';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
+        
+        const scoreInput = document.createElement('input');
+        scoreInput.type = 'hidden';
+        scoreInput.name = 'score';
+        scoreInput.value = score;
+        form.appendChild(scoreInput);
+        
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 'time_taken';
+        timeInput.value = timeInSeconds;
+        form.appendChild(timeInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    });
 
     function startGame() {
         gameStarted = true;
@@ -250,30 +278,10 @@
         const gameEndTime = Date.now();
         const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
         
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{{ route("games.storeResult", 2) }}';
-        
-        const csrfInput = document.createElement('input');
-        csrfInput.type = 'hidden';
-        csrfInput.name = '_token';
-        csrfInput.value = '{{ csrf_token() }}';
-        form.appendChild(csrfInput);
-        
-        const scoreInput = document.createElement('input');
-        scoreInput.type = 'hidden';
-        scoreInput.name = 'score';
-        scoreInput.value = score;
-        form.appendChild(scoreInput);
-        
-        const timeInput = document.createElement('input');
-        timeInput.type = 'hidden';
-        timeInput.name = 'time_taken';
-        timeInput.value = timeInSeconds;
-        form.appendChild(timeInput);
-        
-        document.body.appendChild(form);
-        form.submit();
+        document.getElementById('gameOverScreen').style.display = 'flex';
+        document.getElementById('gameContent').style.display = 'none';
+        document.getElementById('finalScore').textContent = score;
+        document.getElementById('moleHits').textContent = moleHitCount;
     }
 
     function resetGame() {
