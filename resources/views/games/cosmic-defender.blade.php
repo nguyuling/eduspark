@@ -6,33 +6,35 @@
 </style>
 <div class="app" style="height: 100vh; display: flex; flex-direction: column;">
     <main class="main" style="overflow: hidden; margin: 0; padding: 0; flex: 1; display: flex; flex-direction: column; width: 100%; max-width: 100%;">
-        <div id="gameContainer" style="padding: 0; width: 100%; flex: 1; display: flex; flex-direction: column; background: #000;">
+        <div id="gameContainer" style="padding: 0; width: 100%; flex: 1; display: flex; flex-direction: column;">
             <!-- Game Header -->
-            <div id="gameHeader" class="header" style="padding: 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10;">
-                <div style="color: white;">
+            <div id="gameHeader" class="header" style="padding: 20px; z-index: 10;">
+                <div>
                     <div class="title">Cosmic Defender</div>
                 </div>
-                <div style="display: flex; gap: 20px; align-items: center;">
-                    <div style="text-align: center; color: white;">
-                        <div style="color: rgba(255,255,255,0.7); font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Skor</div>
-                        <div id="scoreDisplay" style="font-size: 24px; font-weight: 700; color: #22c55e;">0</div>
+                <div style="display: flex; gap: 40px; align-items: center;">
+                    <div style="display: flex; gap: 20px; align-items: center;">
+                        <div style="text-align: center;">
+                            <div style="color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Skor</div>
+                            <div id="scoreDisplay" style="font-size: 24px; font-weight: 700; color: #22c55e;">0</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Nyawa</div>
+                            <div id="livesDisplay" style="font-size: 24px; font-weight: 700; color: #ef4444;">3</div>
+                        </div>
                     </div>
-                    <div style="text-align: center; color: white;">
-                        <div style="color: rgba(255,255,255,0.7); font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Nyawa</div>
-                        <div id="livesDisplay" style="font-size: 24px; font-weight: 700; color: #ef4444;">3</div>
-                    </div>
+                    <a href="{{ route('games.index') }}" class="btn-kembali">
+                        <i class="bi bi-arrow-left"></i>Kembali
+                    </a>
                 </div>
             </div>
 
-            <!-- Game Canvas -->
-            <canvas id="gameCanvas" style="flex: 1; display: block !important; width: 100%; height: 100%; background: linear-gradient(to bottom, #000428, #004e92); cursor: none;"></canvas>
-
             <!-- Start Screen -->
-            <div id="startScreen" style="display: flex; align-items: center; justify-content: center; flex: 1; text-align: center; color: white;">
+            <div id="startScreen" style="display: flex; align-items: center; justify-content: center; flex: 1; text-align: center;">
                 <div style="max-width: 500px;">
                     <div style="font-size: 80px; margin-bottom: 20px;">🚀</div>
                     <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Cosmic Defender</h2>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 16px; margin-bottom: 30px;">
+                    <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px;">
                         Pertahankan planet anda dari musuh kosmik! Gunakan panah kiri/kanan untuk bergerak dan SPACE untuk menembak.
                     </p>
                     <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, #1D5DCD, #E63946); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
@@ -42,21 +44,21 @@
             </div>
 
             <!-- Game Over Screen -->
-            <div id="gameOverScreen" style="display: none; flex: 1; align-items: center; justify-content: center; text-align: center; color: white; background: rgba(0,0,0,0.9);">
+            <div id="gameOverScreen" style="display: none; flex: 1; align-items: center; justify-content: center; text-align: center;">
                 <div style="max-width: 400px;">
                     <div style="font-size: 64px; margin-bottom: 20px;">☠️</div>
                     <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 20px;">Permainan Tamat!</h2>
-                    <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 30px; margin-bottom: 30px;">
+                    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 30px; margin-bottom: 30px;">
                         <div style="margin-bottom: 15px;">
-                            <div style="color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Skor Akhir</div>
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Skor Akhir</div>
                             <div id="finalScore" style="font-size: 40px; font-weight: 700; color: #22c55e;">0</div>
                         </div>
                     </div>
                     <div style="display: flex; gap: 12px; justify-content: center;">
-                        <button id="playAgainBtn" style="padding: 12px 30px; background: #1D5DCD; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
+                        <button id="playAgainBtn" style="padding: 12px 30px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
                             Main Semula
                         </button>
-                        <a href="/games" style="padding: 12px 30px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;">
+                        <a href="/games" style="padding: 12px 30px; background: var(--border); color: var(--text); border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;">
                             Kembali
                         </a>
                     </div>

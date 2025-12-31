@@ -10,11 +10,14 @@
                     <div class="title">Memory Match</div>
                     <div class="sub">Padankan kad yang sama untuk menang!</div>
                 </div>
-                <div style="display: flex; gap: 20px; align-items: center;">
+                <div style="display: flex; gap: 40px; align-items: center;">
                     <div style="text-align: center;">
                         <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Pergerakan</div>
                         <div id="moveCount" style="font-size: 32px; font-weight: 700; color: var(--accent);">0</div>
                     </div>
+                    <a href="{{ route('games.index') }}" class="btn-kembali">
+                        <i class="bi bi-arrow-left"></i>Kembali
+                    </a>
                 </div>
             </div>
 
