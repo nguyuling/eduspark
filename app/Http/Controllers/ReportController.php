@@ -1102,17 +1102,29 @@ class ReportController extends Controller
                 }
                 $processedClasses[] = $cls;
                 
-                $classAttempts = $attempts;
+                $classAttempts = collect();
+                
+                // Filter attempts to only include students from this class
                 if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
                     $classroom = DB::table('classrooms')->where('name', $cls)->first();
                     if ($classroom) {
                         $studentIds = DB::table('students')->where('classroom_id', $classroom->id)->pluck('user_id');
                         $classAttempts = $attempts->whereIn('student_id', $studentIds->toArray());
                     }
+                } elseif (Schema::hasTable('students')) {
+                    $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
+                    foreach ($possible as $col) {
+                        if (Schema::hasColumn('students', $col)) {
+                            $studentIds = DB::table('students')->where($col, $cls)->pluck('user_id');
+                            $classAttempts = $attempts->whereIn('student_id', $studentIds->toArray());
+                            break;
+                        }
+                    }
                 }
 
                 $classScores = $classAttempts->pluck('score')->filter(function($v) { return is_numeric($v); })->map(function($v) { return (float)$v; });
                 
+                // Only include class if it has attempts
                 if ($classScores->count() > 0) {
                     // Get lowest and highest quiz attempts (by score percentage)
                     $lowestQuiz = $classAttempts->sortBy('score')->first();
