@@ -453,7 +453,7 @@
         document.getElementById('finalCorrect').textContent = `${correctAnswers}/15`;
     }
     
-    function submitGameResult() {}
+    function submitGameResult() {
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '{{ route("games.storeResult", 4) }}';
