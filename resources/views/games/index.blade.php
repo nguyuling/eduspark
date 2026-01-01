@@ -104,6 +104,9 @@
                     <a href="{{ route('teacher.games.edit', $game->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Kemaskini">
                       <i class="bi bi-pencil-square"></i>
                     </a>
+                    <a href="{{ route('games.leaderboard', $game->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:#22c55e; padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Papan Keputusan">
+                      <i class="bi bi-bar-chart"></i>
+                    </a>
                     <button type="button" onclick="showDeleteConfirm({{ $game->id }}, '{{ $game->title }}')" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; box-shadow:none; color:var(--danger); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Buang">
                       <i class="bi bi-trash"></i>
                     </button>

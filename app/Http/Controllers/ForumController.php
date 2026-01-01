@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\ForumPost;
 use App\Models\ForumReply;
+use App\Models\DirectMessage;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -138,8 +140,18 @@ class ForumController extends Controller
      */
     public function getConversation($userId)
     {
-        // This is a placeholder - implement actual message retrieval
-        return response()->json([]);
+        $currentUserId = Auth::id();
+        
+        $messages = DirectMessage::where(function($query) use ($currentUserId, $userId) {
+            $query->where('sender_id', $currentUserId)
+                  ->where('receiver_id', $userId);
+        })->orWhere(function($query) use ($currentUserId, $userId) {
+            $query->where('sender_id', $userId)
+                  ->where('receiver_id', $currentUserId);
+        })->orderBy('created_at', 'asc')
+        ->get(['sender_id', 'receiver_id', 'message', 'created_at']);
+        
+        return response()->json($messages);
     }
 
     /**
@@ -147,7 +159,17 @@ class ForumController extends Controller
      */
     public function sendMessage(Request $request)
     {
-        // This is a placeholder - implement actual message sending
-        return response()->json(['success' => true]);
+        $validated = $request->validate([
+            'receiver_id' => 'required|exists:users,id',
+            'message' => 'required|string|max:1000',
+        ]);
+        
+        $message = DirectMessage::create([
+            'sender_id' => Auth::id(),
+            'receiver_id' => $validated['receiver_id'],
+            'message' => $validated['message'],
+        ]);
+        
+        return response()->json($message);
     }
 }
