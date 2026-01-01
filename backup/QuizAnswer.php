@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class QuizAnswer extends Model
+{
+    protected $table = 'student_answers';
+    
+    protected $fillable = [
+    'attempt_id', 
+    'question_id', 
+    'is_correct', 
+    'score_gained', 
+    'submitted_text',
+    'submitted_code',
+    'code_output',
+    'code_compiled',
+    'compilation_error'
+];
+
+    public function attempt(): BelongsTo
+    {
+        return $this->belongsTo(QuizAttempt::class, 'attempt_id');
+    }
+
+    public function question(): BelongsTo
+    {
+        return $this->belongsTo(QuizQuestion::class);
+    }
+
+    public function selectedOption(): BelongsTo
+    {
+        return $this->belongsTo(QuizOption::class, 'selected_option_id');
+    }
+
+    public function options(): BelongsToMany
+    {
+        return $this->belongsToMany(QuizOption::class, 'student_answer_options', 'student_answer_id', 'option_id');
+    }
+}
