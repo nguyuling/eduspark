@@ -48,7 +48,7 @@
       </div>
     @endif
 
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('login') }}" novalidate>
       @csrf
 
       <div class="auth-form-group">
@@ -60,7 +60,11 @@
           required 
           placeholder="anda@contoh.com"
           value="{{ old('email') }}"
+          autocomplete="email"
         />
+        @error('email')
+          <span style="color: red; font-size: 12px;">{{ $message }}</span>
+        @enderror
       </div>
 
       <div class="auth-form-group">
@@ -72,10 +76,14 @@
           required 
           minlength="6"
           placeholder="••••••••"
+          autocomplete="current-password"
         />
+        @error('password')
+          <span style="color: red; font-size: 12px;">{{ $message }}</span>
+        @enderror
       </div>
 
-      <button type="submit" id="submit-btn" class="auth-btn" disabled>Log Masuk</button>
+      <button type="submit" id="submit-btn" class="auth-btn">Log Masuk</button>
     </form>
     </div>
 

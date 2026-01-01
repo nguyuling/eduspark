@@ -28,7 +28,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home', absolute: false));
+        // Redirect based on user role
+        $user = auth()->user();
+        if ($user && ($user->role ?? null) === 'teacher') {
+            return redirect()->intended(route('reports.index', absolute: false));
+        }
+
+        return redirect()->intended(route('performance', absolute: false));
     }
 
     /**
