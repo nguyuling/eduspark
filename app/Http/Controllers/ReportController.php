@@ -985,17 +985,23 @@ class ReportController extends Controller
         $fromDate = now()->startOfDay();
         switch ($dateRange) {
             case 'week':
-                $fromDate = now()->subDays(7)->startOfDay();
+                // This week - from Monday to now
+                $fromDate = now()->startOfWeek()->startOfDay();
                 break;
             case 'quarter':
-                $fromDate = now()->subMonths(3)->startOfDay();
+                // This quarter
+                $currentMonth = now()->month;
+                $quarterMonth = (floor(($currentMonth - 1) / 3) * 3) + 1;
+                $fromDate = now()->setMonth($quarterMonth)->startOfMonth()->startOfDay();
                 break;
             case 'all':
+                // All data - from 10 years ago
                 $fromDate = now()->subYears(10)->startOfDay();
                 break;
             case 'month':
             default:
-                $fromDate = now()->subMonth()->startOfDay();
+                // This month - from the 1st of this month
+                $fromDate = now()->startOfMonth()->startOfDay();
         }
 
         $attempts = collect();
