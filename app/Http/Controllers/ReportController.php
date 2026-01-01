@@ -1225,8 +1225,8 @@ class ReportController extends Controller
                 'scores' => $topicData->pluck('score')->toArray()
             ],
             'trendData' => [
-                'dates' => $trendDates->toArray(),
-                'scores' => $trendData->toArray()
+                'dates' => is_array($trendDates) ? $trendDates : $trendDates->toArray(),
+                'scores' => is_array($trendData) ? $trendData : $trendData->toArray()
             ],
             'classStats' => $classStats
         ]);
