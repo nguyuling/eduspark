@@ -310,16 +310,22 @@ let statsChart = null;
 let trendChart = null;
 
 async function loadStatistics() {
-    let selectedClass = document.getElementById('stats-class-select').value;
+    const selectedClass = document.getElementById('stats-class-select').value;
     const dateRange = document.getElementById('stats-date-range').value;
     
-    // If no class selected, default to 'semua' (all classes)
+    // If no class selected, don't load
     if (!selectedClass) {
-        selectedClass = 'semua';
-        document.getElementById('stats-class-select').value = 'semua';
+        const tbody = document.getElementById('stats-tbody');
+        tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Sila pilih kelas untuk melihat data.</td></tr>';
+        document.getElementById('stats-table-container').style.display = 'none';
+        if (typeof Chart !== 'undefined') {
+            if (statsChart) statsChart.destroy();
+            if (trendChart) trendChart.destroy();
+        }
+        return;
     }
     
-    // Show table container if 'Semua Kelas' is selected
+    // Show table container only if 'Semua Kelas' is selected
     const tableContainer = document.getElementById('stats-table-container');
     if (selectedClass === 'semua') {
         tableContainer.style.display = 'block';

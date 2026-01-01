@@ -1003,7 +1003,8 @@ class ReportController extends Controller
             $query = DB::table('quiz_attempts as qa')
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id');
             
-            if ($selectedClass && $selectedClass !== '') {
+            // Only filter by class if NOT "semua" (all classes)
+            if ($selectedClass && $selectedClass !== 'semua' && $selectedClass !== '') {
                 // Filter by class if specified
                 if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
                     $classroom = DB::table('classrooms')->where('name', $selectedClass)->first();
