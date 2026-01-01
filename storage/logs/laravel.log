@@ -704,3 +704,10 @@
 #51 C:\\Users\\fyqaz\\Desktop\\eduspark\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('C:\\\\Users\\\\fyqaz\\\\...')
 #52 {main}
 "} 
+[2026-01-01 01:40:36] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2026-01-01 01:41:00] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2026-01-01 01:41:09] local.INFO: studentsByClass: Found 11 rows for class: 5 Bestari  
+[2026-01-01 01:41:24] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2026-01-01 01:43:27] local.INFO: studentsByClass: Found 11 rows for class: 5 Bestari  
+[2026-01-01 01:43:35] local.INFO: studentsByClass: Found 12 rows for class: 5 Arif  
+[2026-01-01 01:43:49] local.INFO: studentsByClass: Found 11 rows for class: 4 Arif  
