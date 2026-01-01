@@ -1114,18 +1114,22 @@ class ReportController extends Controller
                 $classScores = $classAttempts->pluck('score')->filter(function($v) { return is_numeric($v); })->map(function($v) { return (float)$v; });
                 
                 if ($classScores->count() > 0) {
-                    // Get lowest and highest quiz titles
+                    // Get lowest and highest quiz attempts (by score percentage)
                     $lowestQuiz = $classAttempts->sortBy('score')->first();
                     $highestQuiz = $classAttempts->sortByDesc('score')->first();
                     
                     $lowestQuizTitle = $lowestQuiz ? ($lowestQuiz->title ?? 'Unknown') : 'N/A';
                     $highestQuizTitle = $highestQuiz ? ($highestQuiz->title ?? 'Unknown') : 'N/A';
                     
+                    // Get actual highest and lowest percentage scores
+                    $maxPercentage = round($classScores->max(), 2);
+                    $minPercentage = round($classScores->min(), 2);
+                    
                     $classStats[] = [
                         'name' => $cls,
                         'avgScore' => round($classScores->avg(), 2) . '%',
-                        'maxScore' => round($classScores->max(), 2) . '%',
-                        'minScore' => round($classScores->min(), 2) . '%',
+                        'maxScore' => $maxPercentage . '%',
+                        'minScore' => $minPercentage . '%',
                         'lowestQuiz' => $lowestQuizTitle,
                         'highestQuiz' => $highestQuizTitle
                     ];
