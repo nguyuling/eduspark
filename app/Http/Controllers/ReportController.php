@@ -1095,6 +1095,7 @@ class ReportController extends Controller
             // For each class, create a trend line
             foreach ($classes as $cls) {
                 $classAttempts = collect();
+                $studentIds = collect();
                 
                 // Filter attempts to only include students from this class
                 if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
@@ -1116,6 +1117,10 @@ class ReportController extends Controller
                 
                 // Only include class if it has attempts
                 if ($classAttempts->count() > 0) {
+                    // Count unique students in this class who have attempts
+                    $uniqueStudentsWithAttempts = $classAttempts->pluck('student_id')->unique()->count();
+                    $classLabel = $cls . ' (' . $uniqueStudentsWithAttempts . ' ' . ($uniqueStudentsWithAttempts == 1 ? 'student' : 'students') . ')';
+                    
                     $classScores = [];
                     foreach ($allDates as $date) {
                         $dayAttempts = $classAttempts->filter(function($item) use ($date) {
@@ -1124,7 +1129,7 @@ class ReportController extends Controller
                         $scores = $dayAttempts->pluck('score')->filter(function($v) { return is_numeric($v); });
                         $classScores[] = round($scores->count() > 0 ? $scores->avg() : 0, 2);
                     }
-                    $trendDataByClass[$cls] = $classScores;
+                    $trendDataByClass[$classLabel] = $classScores;
                 }
             }
             
