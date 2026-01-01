@@ -492,24 +492,36 @@
     }
 
     function startGame() {
-        gameStarted = true;
-        gameActive = true;
-        score = 0;
-        correctAnswers = 0;
-        flowersCollected = 0;
-        currentTime = 0;
-        gameStartTime = Date.now();
+        try {
+            console.log('Starting game...');
+            gameStarted = true;
+            gameActive = true;
+            score = 0;
+            correctAnswers = 0;
+            flowersCollected = 0;
+            currentTime = 0;
+            gameStartTime = Date.now();
 
-        document.getElementById('startScreen').style.display = 'none';
-        document.getElementById('gameContent').style.display = 'block';
-        document.getElementById('scoreDisplay').textContent = '0';
-        document.getElementById('correctDisplay').textContent = '0';
-        document.getElementById('timerDisplay').textContent = '0';
-        
-        maze.initialize();
-        updateFlowerCount();
-        startTimer();
-        maze.draw();
+            console.log('Hiding start screen...');
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameContent').style.display = 'block';
+            document.getElementById('scoreDisplay').textContent = '0';
+            document.getElementById('correctDisplay').textContent = '0';
+            document.getElementById('timerDisplay').textContent = '0';
+            
+            console.log('Initializing maze...');
+            maze.initialize();
+            console.log('Maze initialized, updating flower count...');
+            updateFlowerCount();
+            console.log('Starting timer...');
+            startTimer();
+            console.log('Drawing maze...');
+            maze.draw();
+            console.log('Game started successfully!');
+        } catch (error) {
+            console.error('Error starting game:', error);
+            alert('Error starting game: ' + error.message);
+        }
     }
 
     document.getElementById('startBtn').addEventListener('click', startGame);
