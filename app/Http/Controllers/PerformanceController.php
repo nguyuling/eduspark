@@ -243,9 +243,8 @@ class PerformanceController extends Controller
 
         return view('performance.index', [
             'avgQuizScore' => round($avgQuizScore ?? 0, 2),
-            'avgGameScore' => round($avgGameScore ?? 0, 2),
-            'totalQuizzes' => $totalQuizzes,
             'totalGames' => $totalGames,
+            'totalQuizzes' => $totalQuizzes,
             'weakTopic' => $weakTopic ?? 'N/A',
             'bestGame' => $bestGame ?? 'N/A',
             'labels' => $labels,
