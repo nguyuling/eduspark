@@ -134,10 +134,6 @@
   @else
     <div class="no-data">Tiada data tren tersedia.</div>
   @endif
-    </table>
-  @else
-    <div class="no-data">Tiada data tren tersedia.</div>
-  @endif
 
   <div style="margin-top:30px; padding-top:15px; border-top:1px solid #ddd; font-size:10px; color:#999; text-align:center;">
     <p>Laporan ini dihasilkan secara automatik. Untuk maklumat lebih lanjut, sila hubungi pentadbir sistem.</p>
