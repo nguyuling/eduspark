@@ -63,7 +63,6 @@
       <div class="panel-header">
         <div>
           <h3>Trend Prestasi</h3>
-          <div class="subtitle">Kuiz & permainan terkini</div>
         </div>
       </div>
       <canvas id="trendChart"></canvas>

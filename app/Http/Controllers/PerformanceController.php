@@ -130,6 +130,7 @@ class PerformanceController extends Controller
                     ? round(($r->score / $maxScore) * 100, 2)
                     : (float) $r->score;
                 $recentCollection->push((object)[
+                    'type' => 'quiz',
                     'title' => $shortTitle,
                     'title_full' => $fullTitle,
                     'score' => (float) $scorePercent,
@@ -194,6 +195,7 @@ class PerformanceController extends Controller
 
                 foreach ($recentGameRows as $r) {
                     $recentCollection->push((object)[
+                        'type' => 'game',
                         'title' => Str::limit($r->title ?? ('Game #' . $r->game_id), 18, '…'),
                         'title_full' => $r->title ?? ('Game #' . $r->game_id),
                         'score' => (float) $r->score,
@@ -210,6 +212,7 @@ class PerformanceController extends Controller
 
                 foreach ($recentGameRows as $r) {
                     $recentCollection->push((object)[
+                        'type' => 'game',
                         'title' => Str::limit(isset($r->game_id) ? 'Game #' . $r->game_id : 'Game', 18, '…'),
                         'title_full' => isset($r->game_id) ? 'Game #' . $r->game_id : 'Game',
                         'score' => (float) $r->score,
@@ -220,9 +223,12 @@ class PerformanceController extends Controller
         }
 
         //
-        // --- Combine & sort recent data: keep oldest 6 chronologically (nulls go last)
+        // --- Combine & sort recent data: keep only quizzes, oldest 6 chronologically (nulls go last)
         //
         $recentData = $recentCollection
+            ->filter(function($row) {
+                return $row->type === 'quiz';
+            })
             ->sortBy(function ($row) {
                 // normalized key: if completed_at null, return very old timestamp so nulls go last
                 return $row->completed_at ? strtotime($row->completed_at) : 0;
