@@ -453,19 +453,39 @@ function updateTrendChart(data) {
     
     if (trendChart) trendChart.destroy();
     
+    // Handle both single class (object with class name key) and multiple classes (object with multiple keys)
+    const datasets = [];
+    const colors = [
+        'rgba(102, 126, 234, 1)',
+        'rgba(255, 159, 64, 1)',
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(231, 233, 237, 1)'
+    ];
+    
+    let colorIndex = 0;
+    for (const [className, scores] of Object.entries(data.scores || {})) {
+        const color = colors[colorIndex % colors.length];
+        datasets.push({
+            label: className,
+            data: scores || [],
+            borderColor: color,
+            backgroundColor: color.replace('1)', '0.1)'),
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+        });
+        colorIndex++;
+    }
+    
     trendChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: data.dates || [],
-            datasets: [{
-                label: 'Prestasi Purata',
-                data: data.scores || [],
-                borderColor: 'rgba(102, 126, 234, 1)',
-                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4
-            }]
+            datasets: datasets
         },
         options: {
             responsive: true,

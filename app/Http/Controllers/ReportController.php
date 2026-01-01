@@ -1065,18 +1065,84 @@ class ReportController extends Controller
             ->take(10)
             ->values();
 
-        // Trend data (by date)
-        $trendDataGrouped = $attempts->groupBy(function($item) {
-            return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
-        })
-        ->map(function($group) {
-            $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
-            return round($scores->count() > 0 ? $scores->avg() : 0, 2);
-        })
-        ->sortKeys(); // Sort by date keys, not by values
+        // Trend data (by date and class for "semua", or just by date for specific class)
+        $trendDates = [];
+        $trendData = [];
+        
+        if (!$selectedClass || $selectedClass === 'semua' || $selectedClass === '') {
+            // Get all classes for trend lines
+            $classes = [];
+            if (Schema::hasTable('classrooms')) {
+                $classes = DB::table('classrooms')->select('name')->distinct()->orderBy('name')->pluck('name')->toArray();
+            } elseif (Schema::hasTable('students')) {
+                $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
+                foreach ($possible as $col) {
+                    if (Schema::hasColumn('students', $col)) {
+                        $classes = DB::table('students')->select($col)->distinct()->orderBy($col)->pluck($col)->toArray();
+                        break;
+                    }
+                }
+            }
+            
+            // Collect all unique dates first
+            $allDates = $attempts->map(function($item) {
+                return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
+            })->unique()->sort()->values();
+            
+            $trendDates = $allDates->toArray();
+            $trendDataByClass = [];
+            
+            // For each class, create a trend line
+            foreach ($classes as $cls) {
+                $classAttempts = collect();
+                
+                // Filter attempts to only include students from this class
+                if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
+                    $classroom = DB::table('classrooms')->where('name', $cls)->first();
+                    if ($classroom) {
+                        $studentIds = DB::table('students')->where('classroom_id', $classroom->id)->pluck('user_id');
+                        $classAttempts = $attempts->whereIn('student_id', $studentIds->toArray());
+                    }
+                } elseif (Schema::hasTable('students')) {
+                    $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
+                    foreach ($possible as $col) {
+                        if (Schema::hasColumn('students', $col)) {
+                            $studentIds = DB::table('students')->where($col, $cls)->pluck('user_id');
+                            $classAttempts = $attempts->whereIn('student_id', $studentIds->toArray());
+                            break;
+                        }
+                    }
+                }
+                
+                // Only include class if it has attempts
+                if ($classAttempts->count() > 0) {
+                    $classScores = [];
+                    foreach ($allDates as $date) {
+                        $dayAttempts = $classAttempts->filter(function($item) use ($date) {
+                            return $item->created_at && date('Y-m-d', strtotime($item->created_at)) === $date;
+                        });
+                        $scores = $dayAttempts->pluck('score')->filter(function($v) { return is_numeric($v); });
+                        $classScores[] = round($scores->count() > 0 ? $scores->avg() : 0, 2);
+                    }
+                    $trendDataByClass[$cls] = $classScores;
+                }
+            }
+            
+            $trendData = $trendDataByClass;
+        } else {
+            // For specific class, show single trend line by date
+            $trendDataGrouped = $attempts->groupBy(function($item) {
+                return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
+            })
+            ->map(function($group) {
+                $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
+                return round($scores->count() > 0 ? $scores->avg() : 0, 2);
+            })
+            ->sortKeys();
 
-        $trendDates = $trendDataGrouped->keys()->values();
-        $trendData = $trendDataGrouped->values();
+            $trendDates = $trendDataGrouped->keys()->values()->toArray();
+            $trendData = [$selectedClass => $trendDataGrouped->values()->toArray()];
+        }
 
         // Class comparison - only include if no specific class filter applied
         $classStats = [];
