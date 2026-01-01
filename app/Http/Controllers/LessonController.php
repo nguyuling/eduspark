@@ -38,12 +38,10 @@ class LessonController extends Controller
 
         $lessons = $query->get();
 
-        // Get limit from request (default 10, increments by 10)
         $limit = (int) $request->get('limit', 10);
         if ($limit < 10) $limit = 10;
         if ($limit > 1000) $limit = 1000; // Safety limit
         
-        // Get lessons with the specified limit
         $allLessons = $lessons;
         $lessons = $allLessons->take($limit);
         $hasMore = count($allLessons) > $limit;
