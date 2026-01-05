@@ -227,6 +227,19 @@ class AIChatController extends Controller
     }
 
     /**
+     * Generate a general response for any topic (simple placeholder)
+     */
+    private function generateGeneralResponse($message, $isMalay)
+    {
+        // For now, just echo the question back, or provide a generic message
+        if ($isMalay) {
+            return "(Maaf, saya hanya AI asas. Jawapan saya mungkin terhad. Anda bertanya: '" . $message . "')";
+        } else {
+            return "(Sorry, I'm a basic AI. My answer may be limited. You asked: '" . $message . "')";
+        }
+    }
+
+    /**
      * Detect if message is in Malay (simple keyword-based)
      */
     private function isMalay($message)
