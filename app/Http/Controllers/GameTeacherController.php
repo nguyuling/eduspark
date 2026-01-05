@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class GameTeacherController extends Controller
@@ -38,6 +39,7 @@ class GameTeacherController extends Controller
             'slug' => 'nullable|string|max:255',
             'game_type' => 'nullable|string|max:100',
             'topic' => 'nullable|string|max:100',
+            'game_file' => 'nullable|file|mimes:zip,html,js,php|max:10240', // 10MB max
         ]);
 
         $validated['teacher_id'] = auth()->id();
@@ -45,6 +47,14 @@ class GameTeacherController extends Controller
 
         if (!isset($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['title']);
+        }
+
+        // Handle file upload
+        if ($request->hasFile('game_file')) {
+            $file = $request->file('game_file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('games', $filename, 'public');
+            $validated['game_file'] = $path;
         }
 
         Game::create($validated);
@@ -77,12 +87,26 @@ class GameTeacherController extends Controller
             'slug' => 'nullable|string|max:255',
             'game_type' => 'nullable|string|max:100',
             'topic' => 'nullable|string|max:100',
+            'game_file' => 'nullable|file|mimes:zip,html,js,php|max:10240', // 10MB max
         ]);
 
         $validated['is_published'] = $request->has('is_published');
         
         if (!isset($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['title']);
+        }
+
+        // Handle file upload
+        if ($request->hasFile('game_file')) {
+            // Delete old file if exists
+            if ($game->game_file && \Storage::disk('public')->exists($game->game_file)) {
+                \Storage::disk('public')->delete($game->game_file);
+            }
+            
+            $file = $request->file('game_file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('games', $filename, 'public');
+            $validated['game_file'] = $path;
         }
 
         $game->update($validated);

@@ -20,6 +20,7 @@ class Game extends Model
         'is_published',
         'game_type',
         'topic',
+        'game_file',
     ];
 
     protected $casts = [
@@ -43,5 +44,13 @@ class Game extends Model
     public function scores()
     {
         return $this->hasMany(GameScore::class);
+    }
+
+    /**
+     * Get all rewards for this game
+     */
+    public function rewards()
+    {
+        return $this->hasMany(Reward::class);
     }
 }
