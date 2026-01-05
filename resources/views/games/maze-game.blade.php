@@ -67,7 +67,7 @@
                     <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px;">
                         Kumpulkan 15 bunga di taman labirin sambil menjawab soalan Java. Setiap bunga yang dikumpul memberikan satu soalan dan 100 mata untuk jawapan yang betul.
                     </p>
-                    <button id="startBtn" style="padding: 16px 40px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 16px rgba(0,0,0,0.2); transition: transform 0.2s;">
+                    <button id="startBtn" style="padding: 16px 40px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 16px rgba(0,0,0,0.2); transition: transform 0.2s; position: relative; z-index: 1;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                         Mula
                     </button>
                 </section>
@@ -453,7 +453,7 @@
         document.getElementById('finalCorrect').textContent = `${correctAnswers}/15`;
     }
     
-    function submitGameResult() {}
+    function submitGameResult() {
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '{{ route("games.storeResult", 4) }}';
@@ -492,27 +492,46 @@
     }
 
     function startGame() {
-        gameStarted = true;
-        gameActive = true;
-        score = 0;
-        correctAnswers = 0;
-        flowersCollected = 0;
-        currentTime = 0;
-        gameStartTime = Date.now();
+        try {
+            console.log('Starting game...');
+            gameStarted = true;
+            gameActive = true;
+            score = 0;
+            correctAnswers = 0;
+            flowersCollected = 0;
+            currentTime = 0;
+            gameStartTime = Date.now();
 
-        document.getElementById('startScreen').style.display = 'none';
-        document.getElementById('gameContent').style.display = 'block';
-        document.getElementById('scoreDisplay').textContent = '0';
-        document.getElementById('correctDisplay').textContent = '0';
-        document.getElementById('timerDisplay').textContent = '0';
-        
-        maze.initialize();
-        updateFlowerCount();
-        startTimer();
-        maze.draw();
+            console.log('Hiding start screen...');
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameContent').style.display = 'block';
+            document.getElementById('scoreDisplay').textContent = '0';
+            document.getElementById('correctDisplay').textContent = '0';
+            document.getElementById('timerDisplay').textContent = '0';
+            
+            console.log('Initializing maze...');
+            maze.initialize();
+            console.log('Maze initialized, updating flower count...');
+            updateFlowerCount();
+            console.log('Starting timer...');
+            startTimer();
+            console.log('Drawing maze...');
+            maze.draw();
+            console.log('Game started successfully!');
+        } catch (error) {
+            console.error('Error starting game:', error);
+            alert('Error starting game: ' + error.message);
+        }
     }
 
     document.getElementById('startBtn').addEventListener('click', startGame);
+    // Fallback handler - also add onclick attribute
+    document.getElementById('startBtn').onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        startGame();
+        return false;
+    };
     
     document.getElementById('mulaBeramainBtn').addEventListener('click', submitGameResult);
 </script>

@@ -1,3 +1,8 @@
+{{-- 
+    Forum Module
+    Purpose: Handles forum post listing and user interaction
+--}}
+
 @extends('layouts.app')
 
 @section('content')
@@ -197,6 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let activeUserId = null;
     let pollingInterval = null;
     let allUsers = []; // store all users for search filter
+    const currentUserId = {{ auth()->id() }}; // Store current user ID
 
     // Toggle chat box
     toggleBtn.onclick = () => chatBox.style.display = chatBox.style.display === 'block' ? 'none' : 'block';
@@ -253,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 chatMessages.innerHTML='';
                 messages.forEach(m=>{
                     const div = document.createElement('div');
-                    div.textContent = (m.sender_id === {{ auth()->id() }} ? 'You: ' : 'Them: ') + m.message;
+                    div.textContent = (m.sender_id === currentUserId ? 'You: ' : 'Them: ') + m.message;
                     div.style.marginBottom='6px';
                     chatMessages.appendChild(div);
                 });
