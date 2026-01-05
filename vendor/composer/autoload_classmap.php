@@ -1747,7 +1747,6 @@ return array(
     'Illuminate\\Database\\Events\\DatabaseRefreshed' => $vendorDir . '/laravel/framework/src/Illuminate/Database/Events/DatabaseRefreshed.php',
     'Illuminate\\Database\\Events\\MigrationEnded' => $vendorDir . '/laravel/framework/src/Illuminate/Database/Events/MigrationEnded.php',
     'Illuminate\\Database\\Events\\MigrationEvent' => $vendorDir . '/laravel/framework/src/Illuminate/Database/Events/MigrationEvent.php',
-    'Illuminate\\Database\\Events\\MigrationSkipped' => $vendorDir . '/laravel/framework/src/Illuminate/Database/Events/MigrationSkipped.php',
     'Illuminate\\Database\\Events\\MigrationStarted' => $vendorDir . '/laravel/framework/src/Illuminate/Database/Events/MigrationStarted.php',
     'Illuminate\\Database\\Events\\MigrationsEnded' => $vendorDir . '/laravel/framework/src/Illuminate/Database/Events/MigrationsEnded.php',
     'Illuminate\\Database\\Events\\MigrationsEvent' => $vendorDir . '/laravel/framework/src/Illuminate/Database/Events/MigrationsEvent.php',

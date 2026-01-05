@@ -126,6 +126,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/games/{id}/restore', [GameController::class, 'restore'])->name('games.restore');
     Route::get('/games/{id}/leaderboard', [GameController::class, 'leaderboard'])->name('games.leaderboard');
     
+    // Rewards routes
+    Route::get('/rewards', [GameController::class, 'myRewards'])->name('rewards.index');
+    Route::post('/rewards/{id}/claim', [GameController::class, 'claimReward'])->name('rewards.claim');
+    
     // Teacher games routes
     Route::get('/teacher/games/create', [GameTeacherController::class, 'create'])->name('teacher.games.create');
     Route::post('/teacher/games', [GameTeacherController::class, 'store'])->name('teacher.games.store');
@@ -145,6 +149,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/forum/{id}', [ForumController::class, 'destroy'])->name('forum.destroy');
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
 });
+
+// OLD LEGACY ROUTES REMOVED - All games now go through GameController@play
+// This ensures the game summary and leaderboard flow works properly
 
 // Messages routes for chat functionality
 Route::middleware('auth')->group(function () {

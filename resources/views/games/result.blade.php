@@ -98,35 +98,39 @@
                 <span style="margin-right: 16px; font-size: 48px;">🎁</span> 
                 <span style="color: #78350f !important;">Ganjaran Diperoleh</span>
             </h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px;">
-                <div style="background: #ffffff; border-radius: 14px; padding: 25px; text-align: center; border: 2px solid #f59e0b; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18);">
-                    <div style="font-size: 56px; margin-bottom: 12px;">🏅</div>
-                    <div style="font-size: 14px; color: #000000 !important; font-weight: 900; margin-bottom: 8px;">Mata XP</div>
-                    <div style="font-size: 36px; font-weight: 900; color: #f59e0b !important;">+{{ round($result['score'] / 10) }}</div>
+
+            @if($rewardRecords->count() === 0)
+                <p style="color:#78350f; font-weight:700; font-size:14px;">Tiada ganjaran untuk permainan ini.</p>
+            @else
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 10px;">
+                @foreach($rewardRecords as $reward)
+                <div style="background:#fff; border-radius:12px; border:2px solid {{ $reward->is_claimed ? '#22c55e' : '#f59e0b' }}; padding:16px; box-shadow:0 2px 8px rgba(2,6,23,0.12); display:flex; flex-direction:column; gap:8px;">
+                    <div style="font-size:32px;">{{ $reward->badge_icon ?? '🎖️' }}</div>
+                    <div style="font-size:14px; font-weight:800; color:#111827;">{{ $reward->reward_name }}</div>
+                    <div style="font-size:12px; color:#6b7280;">{{ $reward->reward_description }}</div>
+                    <div style="font-size:12px; font-weight:700; color:#92400e;">+{{ $reward->points_awarded }} mata</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:12px; font-weight:700; color: {{ $reward->is_claimed ? '#16a34a' : '#b45309' }};">
+                            {{ $reward->is_claimed ? 'Sudah dituntut' : 'Belum dituntut' }}
+                        </span>
+                        @if(!$reward->is_claimed)
+                        <form method="POST" action="{{ route('rewards.claim', $reward->id) }}" style="margin:0;">
+                            @csrf
+                            <button type="submit" style="padding:8px 12px; background:linear-gradient(90deg,#f59e0b,#d97706); color:#fff; border:none; border-radius:8px; font-weight:700; font-size:12px; cursor:pointer;">
+                                Tuntut
+                            </button>
+                        </form>
+                        @else
+                        <span style="font-size:12px; color:#16a34a; font-weight:700;">✅</span>
+                        @endif
+                    </div>
                 </div>
-                <div style="background: #ffffff; border-radius: 14px; padding: 25px; text-align: center; border: 2px solid #f59e0b; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18);">
-                    <div style="font-size: 56px; margin-bottom: 12px;">💰</div>
-                    <div style="font-size: 14px; color: #000000 !important; font-weight: 900; margin-bottom: 8px;">Syiling</div>
-                    <div style="font-size: 36px; font-weight: 900; color: #f59e0b !important;">+{{ round($result['score'] / 20) }}</div>
-                </div>
-                @if($result['score'] >= 500)
-                <div style="background: #ffffff; border-radius: 14px; padding: 25px; text-align: center; border: 2px solid #f59e0b; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18);">
-                    <div style="font-size: 56px; margin-bottom: 12px;">⭐</div>
-                    <div style="font-size: 14px; color: #000000 !important; font-weight: 900; margin-bottom: 8px;">Pencapaian</div>
-                    <div style="font-size: 16px; font-weight: 900; color: #f59e0b !important;">Skor Tinggi!</div>
-                </div>
-                @endif
-                @if($result['time_taken'] <= 60)
-                <div style="background: #ffffff; border-radius: 14px; padding: 25px; text-align: center; border: 2px solid #f59e0b; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18);">
-                    <div style="font-size: 56px; margin-bottom: 12px;">⚡</div>
-                    <div style="font-size: 14px; color: #000000 !important; font-weight: 900; margin-bottom: 8px;">Bonus Kelajuan</div>
-                    <div style="font-size: 16px; font-weight: 900; color: #f59e0b !important;">Pantas Selesai!</div>
-                </div>
-                @endif
+                @endforeach
             </div>
-            <button onclick="claimRewards()" style="width: 100%; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff !important; font-weight: 900; padding: 25px; border-radius: 14px; font-size: 24px; border: 2px solid #b45309; cursor: pointer; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); transition: transform 0.2s;">
-                🎁 Tuntut Semua Ganjaran
-            </button>
+            @endif
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <a href="{{ route('rewards.index') }}" style="padding:10px 14px; background:#111827; color:#fff; border-radius:8px; font-weight:700; text-decoration:none; font-size:12px;">Lihat semua ganjaran</a>
+            </div>
         </div>
 
         <!-- Action Buttons -->
@@ -172,26 +176,4 @@
     </div>
 </div>
 
-<!-- Reward Notification Popup -->
-<div id="rewardNotification" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; padding: 25px; border-radius: 14px; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); z-index: 9999; text-align: center; border: 2px solid #34d399; min-width: 400px;">
-    <div style="font-size: 120px; margin-bottom: 24px; animation: bounce 1s infinite;">🎉</div>
-    <h2 style="font-size: 42px; font-weight: 900; margin-bottom: 16px; color: #ffffff !important;">Ganjaran Dituntut!</h2>
-    <p style="font-size: 24px; margin-bottom: 32px; color: #ffffff !important; font-weight: 700;">+{{ round($result['score'] / 10) }} XP & +{{ round($result['score'] / 20) }} Syiling</p>
-    <button onclick="closeNotification()" style="background: #ffffff; color: #059669 !important; font-weight: 900; padding: 16px 48px; border-radius: 10px; font-size: 20px; border: 2px solid #059669; cursor: pointer; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); transition: transform 0.2s;">
-        Hebat! 🎊
-    </button>
-</div>
-<div id="rewardOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9998;" onclick="closeNotification()"></div>
-
-<script>
-function claimRewards() {
-    document.getElementById('rewardNotification').style.display = 'block';
-    document.getElementById('rewardOverlay').style.display = 'block';
-}
-
-function closeNotification() {
-    document.getElementById('rewardNotification').style.display = 'none';
-    document.getElementById('rewardOverlay').style.display = 'none';
-}
-</script>
 @endsection
