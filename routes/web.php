@@ -152,3 +152,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/messages/conversation/{userId}', [ForumController::class, 'getConversation'])->name('messages.conversation');
     Route::post('/messages/send', [ForumController::class, 'sendMessage'])->name('messages.send');
 });
+
+// AI Assistant Chat routes (isolated)
+Route::middleware('auth')->group(function () {
+    Route::post('/api/ai-chat/send', [\App\Http\Controllers\AIChatController::class, 'sendMessage'])->name('ai.chat.send');
+});
