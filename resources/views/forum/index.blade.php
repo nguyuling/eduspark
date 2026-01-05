@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // AI Assistant User Object
     const AI_ASSISTANT = {
         id: 'ai-assistant',
-        name: 'EduSpark AI Assistant 🤖',
+        name: 'Pembantu EduSpark AI 🤖',
         is_ai: true
     };
 
