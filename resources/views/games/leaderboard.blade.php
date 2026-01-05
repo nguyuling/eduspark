@@ -12,6 +12,24 @@
         </a>
         <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $game->title }} - Leaderboard</h1>
         <p class="text-gray-700 dark:text-gray-300 text-base">Class performance analytics</p>
+        @if(isset($classes) && $classes->count() > 0)
+        <div class="mt-4">
+            <form method="GET" action="{{ route('games.leaderboard', $game->id) }}" class="flex flex-wrap items-center gap-3">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Filter by class:</label>
+                <select name="class" class="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100">
+                    <option value="">All Classes</option>
+                    @foreach($classes as $class)
+                        <option value="{{ $class }}" {{ ($classFilter ?? '') === $class ? 'selected' : '' }}>{{ $class }}</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700">Apply</button>
+                @if(!empty($classFilter))
+                    <a href="{{ route('games.leaderboard', $game->id) }}" class="px-3 py-2 bg-gray-600 text-white rounded-lg text-sm font-semibold hover:bg-gray-700">Clear</a>
+                    <span class="text-xs text-gray-600 dark:text-gray-300">Showing class: <strong>{{ $classFilter }}</strong></span>
+                @endif
+            </form>
+        </div>
+        @endif
     </div>
 
     @if($scores->count() > 0)

@@ -224,19 +224,33 @@ class GameController extends Controller
     /**
      * Get leaderboard for a game
      */
-    public function leaderboard($id)
+    public function leaderboard(Request $request, $id)
     {
         $game = Game::findOrFail($id);
         $scores = collect();
         $currentUser = auth()->user();
         $highlightedUserIndex = -1;
+        $classFilter = $request->query('class');
+        $classes = collect();
         
         // First, try to get from existing leaderboard table if it exists
         if (Schema::hasTable('leaderboard')) {
-            $leaderboardEntries = Leaderboard::where('game_id', $game->slug)
+            $classQuery = Leaderboard::where('game_id', $game->slug);
+
+            if (!empty($classFilter)) {
+                $classQuery->where('class', $classFilter);
+            }
+
+            $leaderboardEntries = $classQuery
                 ->orderBy('score', 'desc')
                 ->orderBy('timestamp', 'desc')
                 ->get();
+            
+            // Available classes for filter dropdown
+            $classes = Leaderboard::where('game_id', $game->slug)
+                ->distinct()
+                ->pluck('class')
+                ->filter();
             
             if ($leaderboardEntries->isNotEmpty()) {
                 // Transform leaderboard data to match our view structure
@@ -282,7 +296,7 @@ class GameController extends Controller
             }
         }
         
-        return view('games.leaderboard', compact('game', 'scores', 'currentUser', 'highlightedUserIndex'));
+        return view('games.leaderboard', compact('game', 'scores', 'currentUser', 'highlightedUserIndex', 'classes', 'classFilter'));
     }
 
     /**
