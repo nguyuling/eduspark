@@ -1,3 +1,8 @@
+{{-- 
+    Forum Module
+    Purpose: Handles forum post listing and user interaction
+--}}
+
 @extends('layouts.app')
 
 @section('content')
