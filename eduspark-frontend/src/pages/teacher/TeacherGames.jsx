@@ -1,30 +1,66 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const TeacherGames = () => {
-  const [games, setGames] = useState([
-    { id: 1, title: 'Cosmic Defender', category: 'Action', difficulty: 'Medium', status: 'active', score: 150 },
-    { id: 2, title: 'Whack-a-Mole', category: 'Casual', difficulty: 'Easy', status: 'active', score: 200 },
-    { id: 3, title: 'Memory Match', category: 'Puzzle', difficulty: 'Easy', status: 'draft', score: 180 },
-  ]);
-
+  const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [editingGame, setEditingGame] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  useEffect(() => {
+    fetchTeacherGames();
+  }, []);
+
+  const fetchTeacherGames = async () => {
+    try {
+      const response = await axios.get('/api/teacher/games', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      });
+      setGames(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching games:', error);
+      setLoading(false);
+    }
+  };
 
   const handleEdit = (game) => {
     setEditingGame(game);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this game?')) {
-      setGames(games.filter(game => game.id !== id));
+      try {
+        await axios.delete(`/api/teacher/games/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          }
+        });
+        setGames(games.filter(game => game.id !== id));
+      } catch (error) {
+        console.error('Error deleting game:', error);
+        alert('Failed to delete game');
+      }
     }
   };
 
-  const handleSave = (updatedGame) => {
-    setGames(games.map(game => 
-      game.id === updatedGame.id ? updatedGame : game
-    ));
-    setEditingGame(null);
+  const handleSave = async (updatedGame) => {
+    try {
+      await axios.put(`/api/teacher/games/${updatedGame.id}`, updatedGame, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      });
+      setGames(games.map(game => 
+        game.id === updatedGame.id ? updatedGame : game
+      ));
+      setEditingGame(null);
+    } catch (error) {
+      console.error('Error saving game:', error);
+      alert('Failed to save game');
+    }
   };
 
   return (

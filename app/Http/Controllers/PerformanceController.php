@@ -37,18 +37,6 @@ class PerformanceController extends Controller
             $quizTable = Schema::hasTable('quiz_attempts') ? 'quiz_attempts' : 'quiz_attempt';
             $quizUserCol = Schema::hasColumn($quizTable, 'student_id') ? 'student_id' : (Schema::hasColumn($quizTable, 'user_id') ? 'user_id' : 'user_id');
 
-            // Pull all attempts for this user to compute percentage based on per-quiz max scores
-            $allQuizAttempts = DB::table($quizTable)
-                ->where($quizUserCol, $studentId)
-                ->select('quiz_id', 'score')
-                ->get();
-
-            // Max score per quiz across all users (best available proxy for full marks)
-            $maxScoreByQuiz = DB::table($quizTable)
-                ->select('quiz_id', DB::raw('MAX(score) as max_score'))
-                ->groupBy('quiz_id')
-                ->pluck('max_score', 'quiz_id');
-
             // Map quiz titles and max_points if available
             $quizMetaTable = Schema::hasTable('quizzes') ? 'quizzes' : (Schema::hasTable('quiz') ? 'quiz' : null);
             $quizData = $quizMetaTable 
@@ -56,11 +44,20 @@ class PerformanceController extends Controller
                 : collect();
             $quizTitles = $quizData->pluck('title', 'id');
 
+            // Pull all attempts for this user with quiz data
+            $allQuizAttempts = DB::table($quizTable . ' as qa')
+                ->when($quizMetaTable, function ($q) use ($quizMetaTable) {
+                    return $q->join($quizMetaTable . ' as q', 'qa.quiz_id', '=', 'q.id')
+                        ->select('qa.quiz_id', 'qa.score', 'q.max_points');
+                })
+                ->where("qa.$quizUserCol", $studentId)
+                ->get();
+
             $normalizedQuizScores = [];
             $quizAggregates = [];
             foreach ($allQuizAttempts as $a) {
-                // Use max_points from quizzes table, fallback to global max
-                $maxScore = $quizData[$a->quiz_id]->max_points ?? $maxScoreByQuiz[$a->quiz_id] ?? null;
+                // Use max_points from quizzes table
+                $maxScore = $a->max_points ?? 0;
                 if ($maxScore && $maxScore > 0) {
                     $normalizedQuizScores[] = ($a->score / $maxScore) * 100;
                 } else {
@@ -92,9 +89,7 @@ class PerformanceController extends Controller
                     continue;
                 }
                 $avgPercent = round((($agg['sum'] / $agg['count']) / $maxScore) * 100, 2);
-                if ($avgPercent >= 100) {
-                    continue; // ignore perfect scores
-                }
+                // Include all scores, not just below 100%
                 if (is_null($weakTopicScore) || $avgPercent < $weakTopicScore) {
                     $weakTopicScore = $avgPercent;
                     $weakTopic = ($quizTitles[$quizId] ?? ('Kuiz #' . $quizId));
@@ -110,39 +105,37 @@ class PerformanceController extends Controller
                 }
             }
 
-            // Fetch recent quiz rows (only requested columns that exist)
-            $quizSelect = ['a.score', 'a.quiz_id'];
-            if ($quizTimestampCol) {
-                $quizSelect[] = 'a.' . $quizTimestampCol . ' as completed_at';
-            }
-            if ($quizMetaTable) {
-                $quizSelect[] = 'q.title as quiz_title';
-            }
-
+            // Fetch recent quiz rows with max_points
             $recentQuizRows = DB::table($quizTable . ' as a')
-                ->when($quizMetaTable, function ($q) use ($quizMetaTable) {
-                    return $q->leftJoin($quizMetaTable . ' as q', 'a.quiz_id', '=', 'q.id');
-                })
+                ->join($quizMetaTable . ' as q', 'a.quiz_id', '=', 'q.id')
                 ->where("a.$quizUserCol", $studentId)
                 ->orderBy('a.' . ($quizTimestampCol ?? 'id'), 'asc') // chronological order (oldest first)
                 ->limit(6)
-                ->get($quizSelect);
+                ->select([
+                    'a.score', 
+                    'a.quiz_id',
+                    'q.title as quiz_title',
+                    'q.max_points',
+                    $quizTimestampCol ? 'a.' . $quizTimestampCol . ' as completed_at' : DB::raw('NULL as completed_at')
+                ])
+                ->get();
 
             // normalize and push into recentCollection with a standard completed_at
             foreach ($recentQuizRows as $r) {
                 $completedAt = property_exists($r, 'completed_at') ? $r->completed_at : null;
                 $fullTitle = $r->quiz_title ?? ($r->quiz_id ? 'Kuiz #' . $r->quiz_id : 'Kuiz');
                 $shortTitle = Str::limit($fullTitle, 18, '…');
-                $maxScore = $quizData[$r->quiz_id]->max_points ?? $maxScoreByQuiz[$r->quiz_id] ?? null;
+                $maxScore = $r->max_points ?? 0;
                 $scorePercent = ($maxScore && $maxScore > 0)
                     ? round(($r->score / $maxScore) * 100, 2)
                     : (float) $r->score;
                 $recentCollection->push((object)[
+                    'type' => 'quiz',
                     'title' => $shortTitle,
                     'title_full' => $fullTitle,
                     'score' => (float) $scorePercent,
-                    'raw_score' => $r->score,
-                    'max_score' => $maxScore,
+                    'raw_score' => (float) $r->score,
+                    'max_score' => (float) $maxScore,
                     'completed_at' => $completedAt,
                 ]);
             }
@@ -172,7 +165,7 @@ class PerformanceController extends Controller
                     ->where("s.$gameUserCol", $studentId)
                     ->orderBy('s.score', 'desc')
                     ->limit(1)
-                    ->value('g.name') ?? 'N/A';
+                    ->value('g.title') ?? 'N/A';
             }
 
             // Determine timestamp column for games (created_at, updated_at, etc.)
@@ -197,11 +190,12 @@ class PerformanceController extends Controller
                     ->where("s.$gameUserCol", $studentId)
                     ->orderBy('s.' . ($gameTimestampCol ?? 'id'), 'asc')
                     ->limit(6)
-                    ->select(array_merge(['g.name as title', 's.score'], ($gameTimestampCol ? ['s.' . $gameTimestampCol . ' as completed_at'] : [])))
+                    ->select(array_merge(['g.title as title', 's.score'], ($gameTimestampCol ? ['s.' . $gameTimestampCol . ' as completed_at'] : [])))
                     ->get();
 
                 foreach ($recentGameRows as $r) {
                     $recentCollection->push((object)[
+                        'type' => 'game',
                         'title' => Str::limit($r->title ?? ('Game #' . $r->game_id), 18, '…'),
                         'title_full' => $r->title ?? ('Game #' . $r->game_id),
                         'score' => (float) $r->score,
@@ -218,6 +212,7 @@ class PerformanceController extends Controller
 
                 foreach ($recentGameRows as $r) {
                     $recentCollection->push((object)[
+                        'type' => 'game',
                         'title' => Str::limit(isset($r->game_id) ? 'Game #' . $r->game_id : 'Game', 18, '…'),
                         'title_full' => isset($r->game_id) ? 'Game #' . $r->game_id : 'Game',
                         'score' => (float) $r->score,
@@ -228,9 +223,12 @@ class PerformanceController extends Controller
         }
 
         //
-        // --- Combine & sort recent data: keep oldest 6 chronologically (nulls go last)
+        // --- Combine & sort recent data: keep only quizzes, oldest 6 chronologically (nulls go last)
         //
         $recentData = $recentCollection
+            ->filter(function($row) {
+                return $row->type === 'quiz';
+            })
             ->sortBy(function ($row) {
                 // normalized key: if completed_at null, return very old timestamp so nulls go last
                 return $row->completed_at ? strtotime($row->completed_at) : 0;
@@ -251,9 +249,8 @@ class PerformanceController extends Controller
 
         return view('performance.index', [
             'avgQuizScore' => round($avgQuizScore ?? 0, 2),
-            'avgGameScore' => round($avgGameScore ?? 0, 2),
-            'totalQuizzes' => $totalQuizzes,
             'totalGames' => $totalGames,
+            'totalQuizzes' => $totalQuizzes,
             'weakTopic' => $weakTopic ?? 'N/A',
             'bestGame' => $bestGame ?? 'N/A',
             'labels' => $labels,

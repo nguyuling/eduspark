@@ -31,9 +31,18 @@ const WhackAMole = () => {
   const [tunjukRingkasan, setTunjukRingkasan] = useState(false);
   const [tunjukLeaderboard, setTunjukLeaderboard] = useState(false);
   const [tikusDitumpaskan, setTikusDitumpaskan] = useState(0);
+  const [ringkasanData, setRingkasanData] = useState(null);
+  const [leaderboardData, setLeaderboardData] = useState(null);
+  const [sedangMemuatRingkasan, setSedangMemuatRingkasan] = useState(false);
   
   const papanRef = useRef(null);
   const permulaanMasaRef = useRef(null);
+
+  // Get CSRF Token from Laravel
+  const dapatkanTokenCsrf = () => {
+    const metaTag = document.querySelector('meta[name="csrf-token"]');
+    return metaTag ? metaTag.content : '';
+  };
 
   const munculkanTikusRawak = useCallback(() => {
     if (permainanTamcat) return;
@@ -142,7 +151,7 @@ const WhackAMole = () => {
     }
   }, [permainanDimulakan]);
 
-  // Save score to database
+  // ========== NEW: Save score to Laravel ==========
   const simpanMarkahKeDatabase = async (markahAkhir, status) => {
     try {
       let idPemain = localStorage.getItem('tukulGamePlayerId');
@@ -154,11 +163,18 @@ const WhackAMole = () => {
       const gameId = 2; // Whack-a-Mole Game ID
       const masaDiambil = permulaanMasaRef.current ? Math.floor((Date.now() - permulaanMasaRef.current) / 1000) : 0;
       
-      const response = await fetch('/api/save-game-score', {
+      console.log('Menyimpan markah ke pangkalan data...', {
+        user_id: idPemain,
+        game_id: gameId,
+        score: markahAkhir
+      });
+      
+      // ✅ CORRECT ENDPOINT: Use Laravel API route
+      const response = await fetch('/api/games/' + gameId + '/score', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'X-CSRF-TOKEN': dapatkanTokenCsrf()
         },
         body: JSON.stringify({
           user_id: idPemain,
@@ -175,17 +191,275 @@ const WhackAMole = () => {
         })
       });
       
+      console.log('Status respons simpan:', response.status);
+      
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Gagal menyimpan markah:', errorText);
-        return null;
+        
+        // Try fallback endpoint
+        console.log('Mencuba endpoint sandaran...');
+        return await cubaSimpanSandaran(gameId, idPemain, markahAkhir, masaDiambil, status);
       }
+      
       const result = await response.json();
-      console.log('Markah disimpan:', result);
+      console.log('Markah berjaya disimpan:', result);
       return result;
+      
     } catch (error) {
       console.error('Ralat menyimpan markah:', error);
-      return null;
+      return { success: false, message: error.message };
+    }
+  };
+
+  // Fallback save method
+  const cubaSimpanSandaran = async (gameId, idPemain, markahAkhir, masaDiambil, status) => {
+    try {
+      const response = await fetch('/save-game-score', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: idPemain,
+          game_id: gameId,
+          score: markahAkhir,
+          time_taken: masaDiambil,
+          game_stats: {
+            status: status,
+            tikus_ditumpaskan: tikusDitumpaskan,
+            kombo_tertinggi: komboTertinggi,
+            kelajuan_minimum: kelajuan,
+            powerups_dikumpul: (kuasa ? 1 : 0)
+          }
+        })
+      });
+      
+      const result = await response.json();
+      console.log('Keputusan simpan sandaran:', result);
+      return result;
+    } catch (error) {
+      console.error('Simpan sandaran juga gagal:', error);
+      return { success: false, message: 'Kedua-dua kaedah simpan gagal' };
+    }
+  };
+
+  // ========== NEW: Get game summary from Laravel API ==========
+  const muatRingkasanPermainan = async () => {
+    setSedangMemuatRingkasan(true);
+    try {
+      // First save the score
+      const keputusanSimpan = await simpanMarkahKeDatabase(markah, 'selesai');
+      
+      if (!keputusanSimpan || !keputusanSimpan.success) {
+        console.warn('Simpan markah mungkin gagal, tetapi diteruskan...');
+      }
+      
+      // Then get game summary
+      const gameId = 2;
+      let idPemain = localStorage.getItem('tukulGamePlayerId');
+      if (!idPemain) {
+        idPemain = 'player_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('tukulGamePlayerId', idPemain);
+      }
+      
+      console.log('Memuat ringkasan permainan untuk:', { gameId, idPemain });
+      
+      // ✅ CORRECT ENDPOINT: Use the API route from web.php
+      const url = `/api/game-summary/${gameId}?user_id=${idPemain}`;
+      console.log('Mengambil dari:', url);
+      
+      const response = await fetch(url, {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      console.log('Status respons ringkasan:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+      
+      const data = await response.json();
+      console.log('Data ringkasan permainan diterima:', data);
+      
+      if (data.success) {
+        setRingkasanData(data.summary);
+      } else {
+        console.warn('API mengembalikan success:false', data.message);
+        // Create local summary as fallback
+        buatRingkasanTempatan();
+      }
+    } catch (error) {
+      console.error('Ralat memuat ringkasan permainan:', error);
+      // Create local summary as fallback
+      buatRingkasanTempatan();
+    } finally {
+      setSedangMemuatRingkasan(false);
+    }
+  };
+
+  // Create local summary when API fails
+  const buatRingkasanTempatan = () => {
+    const masaDiambil = permulaanMasaRef.current ? Math.floor((Date.now() - permulaanMasaRef.current) / 1000) : 0;
+    const xpDiperolehi = Math.floor(markah / 10);
+    const koinDiperolehi = Math.floor(markah / 100);
+    const ketepatan = Math.min(100, Math.floor((tikusDitumpaskan / ((30 - masaTinggal) * 2)) * 100)) || 75;
+    
+    const ganjaran = [
+      {
+        type: 'xp',
+        name: 'Mata Pengalaman',
+        description: 'Pengalaman asas bermain',
+        amount: xpDiperolehi,
+        icon: '⭐'
+      }
+    ];
+    
+    if (koinDiperolehi > 0) {
+      ganjaran.push({
+        type: 'coins',
+        name: 'Koin',
+        description: 'Mata wang dalam permainan',
+        amount: koinDiperolehi,
+        icon: '🪙'
+      });
+    }
+    
+    if (komboTertinggi >= 5) {
+      ganjaran.push({
+        type: 'achievement',
+        name: 'Raja Kombo',
+        description: 'Mencapai kombo x5 atau lebih',
+        badge: 'combo',
+        icon: '🔥'
+      });
+    }
+    
+    if (tikusDitumpaskan >= 20) {
+      ganjaran.push({
+        type: 'achievement',
+        name: 'Pemburu Tikus',
+        description: 'Menumpaskan 20 tikus atau lebih',
+        badge: 'hunter',
+        icon: '🎯'
+      });
+    }
+    
+    if (markah >= 500) {
+      ganjaran.push({
+        type: 'achievement',
+        name: 'Tukul Master',
+        description: 'Mencapai 500 mata',
+        badge: 'master',
+        icon: '🏆'
+      });
+    }
+    
+    setRingkasanData({
+      score: markah,
+      time_taken: masaDiambil,
+      rank: 1,
+      total_players: 1,
+      accuracy: ketepatan,
+      rewards: ganjaran,
+      game_title: 'Tumbuk Tikus',
+      game_id: 2,
+      user_name: 'Pemain',
+      xp_earned: xpDiperolehi,
+      coins_earned: koinDiperolehi
+    });
+  };
+
+  // ========== NEW: Load leaderboard data ==========
+  const muatLeaderboard = async () => {
+    try {
+      const gameId = 2;
+      console.log('Memuat leaderboard untuk permainan:', gameId);
+      
+      // ✅ CORRECT ENDPOINT
+      const response = await fetch(`/api/leaderboard/${gameId}`, {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      console.log('Status respons leaderboard:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Data leaderboard diterima:', data);
+      
+      if (data.success) {
+        setLeaderboardData(data);
+      }
+    } catch (error) {
+      console.error('Ralat memuat leaderboard:', error);
+      // Create mock leaderboard for testing
+      setLeaderboardData({
+        success: true,
+        leaderboard: [
+          { rank: 1, user_name: 'Ali', score: 850, time_taken: 30, is_current_user: false },
+          { rank: 2, user_name: 'Siti', score: 720, time_taken: 30, is_current_user: false },
+          { rank: 3, user_name: 'Ahmad', score: 680, time_taken: 30, is_current_user: false },
+          { rank: 4, user_name: 'Pemain', score: markah, time_taken: 30, is_current_user: true },
+          { rank: 5, user_name: 'Muthu', score: 550, time_taken: 30, is_current_user: false }
+        ],
+        user_rank: 4,
+        user_score: markah,
+        user_time: 30,
+        total_players: 5,
+        game_id: 2,
+        game_title: 'Tumbuk Tikus'
+      });
+    }
+  };
+
+  // ========== NEW: Collect rewards via Laravel API ==========
+  const kumpulGanjaran = async () => {
+    try {
+      const response = await fetch('/api/rewards/collect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': dapatkanTokenCsrf()
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          game_id: 2,
+          score: markah,
+          score_id: ringkasanData?.score_id || Date.now()
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Respons pengumpulan ganjaran:', data);
+      
+      if (data.success) {
+        alert('🎉 Ganjaran berjaya dikumpul!');
+        if (ringkasanData) {
+          setRingkasanData(prev => ({
+            ...prev,
+            rewards: []
+          }));
+        }
+      } else {
+        alert('Tiada ganjaran untuk dikumpul.');
+      }
+    } catch (error) {
+      console.error('Ralat mengumpul ganjaran:', error);
+      alert('Gagal mengumpul ganjaran. Ganjaran anda masih selamat.');
     }
   };
 
@@ -215,7 +489,7 @@ const WhackAMole = () => {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': `Bearer ${pengguna.token || ''}`
+          'X-CSRF-TOKEN': dapatkanTokenCsrf()
         },
         body: JSON.stringify({
           user_id: pengguna.id,
@@ -282,21 +556,28 @@ const WhackAMole = () => {
     }, 300);
   };
 
+  // ========== UPDATED: Game over effect ==========
   useEffect(() => {
     if (permainanTamcat) {
-      // Save score and submit to leaderboard
-      simpanMarkahKeDatabase(markah, 'selesai');
-      hantarKeLeaderboard(markah);
+      console.log('Permainan tamat! Memulakan urutan selepas permainan...');
       
-      // Save progress
-      simpanKemajuanPermainan();
+      // Save score and load summary
+      const urutanSelepasPermainan = async () => {
+        await simpanMarkahKeDatabase(markah, 'selesai');
+        await hantarKeLeaderboard(markah);
+        await simpanKemajuanPermainan();
+        await muatRingkasanPermainan();
+        await muatLeaderboard();
+        
+        // Show summary after a short delay
+        setTimeout(() => {
+          setTunjukRingkasan(true);
+        }, 800);
+      };
       
-      // Show summary after a short delay
-      setTimeout(() => {
-        setTunjukRingkasan(true);
-      }, 500);
+      urutanSelepasPermainan();
     }
-  }, [permainanTamcat, markah]);
+  }, [permainanTamcat]);
 
   const simpanKemajuanPermainan = async () => {
     try {
@@ -378,6 +659,8 @@ const WhackAMole = () => {
     setTunjukRingkasan(false);
     setGanjaranDibuka([]);
     setTunjukLeaderboard(false);
+    setRingkasanData(null);
+    setLeaderboardData(null);
     permulaanMasaRef.current = Date.now();
   };
 
@@ -389,6 +672,483 @@ const WhackAMole = () => {
   const kembaliKeLamanUtama = () => {
     setPermainanDimulakan(false);
     setPermainanTamcat(false);
+  };
+
+  // ========== NEW: Custom Game Summary Modal ==========
+  const ModalRingkasanPermainan = () => {
+    if (!ringkasanData || !tunjukRingkasan) return null;
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: '#0f3460',
+        padding: '30px',
+        borderRadius: '16px',
+        border: '3px solid #4ecca3',
+        maxWidth: '600px',
+        width: '95%',
+        zIndex: 2000,
+        boxShadow: '0 0 30px rgba(78, 204, 163, 0.7)',
+        color: 'white'
+      }}>
+        <h2 style={{ 
+          fontSize: '2.2rem', 
+          color: '#4ecca3',
+          textAlign: 'center',
+          marginBottom: '25px',
+          textShadow: '0 0 8px rgba(78, 204, 163, 0.8)'
+        }}>🎯 Permainan Tamat!</h2>
+        
+        {sedangMemuatRingkasan ? (
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <div style={{
+              width: '50px',
+              height: '50px',
+              border: '4px solid #4ecca3',
+              borderTop: '4px solid transparent',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto'
+            }} />
+            <p style={{ fontSize: '1.2rem', marginTop: '20px' }}>Memuatkan ringkasan permainan...</p>
+          </div>
+        ) : (
+          <>
+            {/* Score Display */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center',
+              marginBottom: '25px'
+            }}>
+              <div style={{
+                width: '180px',
+                height: '180px',
+                borderRadius: '50%',
+                background: 'white',
+                color: '#333',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                boxShadow: '0 15px 35px rgba(0,0,0,0.3)'
+              }}>
+                <span style={{ 
+                  fontSize: '64px', 
+                  fontWeight: 'bold',
+                  color: '#4a5568'
+                }}>
+                  {ringkasanData.score}
+                </span>
+                <span style={{ 
+                  fontSize: '16px', 
+                  color: '#718096',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px'
+                }}>
+                  MATA
+                </span>
+              </div>
+            </div>
+            
+            {/* Score Details */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '15px',
+              margin: '25px 0'
+            }}>
+              <div style={{
+                textAlign: 'center',
+                padding: '15px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '10px',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <div style={{ fontSize: '14px', opacity: '0.9', marginBottom: '5px' }}>
+                  Kedudukan
+                </div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#FFD700' }}>
+                  #{ringkasanData.rank}
+                </div>
+              </div>
+              
+              <div style={{
+                textAlign: 'center',
+                padding: '15px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '10px',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <div style={{ fontSize: '14px', opacity: '0.9', marginBottom: '5px' }}>
+                  Kombo Tertinggi
+                </div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#4ecca3' }}>
+                  x{komboTertinggi}
+                </div>
+              </div>
+              
+              <div style={{
+                textAlign: 'center',
+                padding: '15px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '10px',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <div style={{ fontSize: '14px', opacity: '0.9', marginBottom: '5px' }}>
+                  Ketepatan
+                </div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#2196F3' }}>
+                  {ringkasanData.accuracy}%
+                </div>
+              </div>
+              
+              <div style={{
+                textAlign: 'center',
+                padding: '15px',
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '10px',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <div style={{ fontSize: '14px', opacity: '0.9', marginBottom: '5px' }}>
+                  Tikus Ditumpaskan
+                </div>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#9C27B0' }}>
+                  {tikusDitumpaskan}
+                </div>
+              </div>
+            </div>
+            
+            {/* Rewards Section */}
+            {ringkasanData.rewards && ringkasanData.rewards.length > 0 && (
+              <div style={{ marginTop: '25px' }}>
+                <h3 style={{ 
+                  fontSize: '1.5rem', 
+                  color: '#FFD700',
+                  textAlign: 'center',
+                  marginBottom: '15px'
+                }}>
+                  🎁 Ganjaran Diperolehi!
+                </h3>
+                
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                  gap: '15px',
+                  marginBottom: '20px'
+                }}>
+                  {ringkasanData.rewards.map((ganjaran, index) => (
+                    <div 
+                      key={index}
+                      style={{
+                        background: 'rgba(255,255,255,0.15)',
+                        borderRadius: '12px',
+                        padding: '15px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '15px',
+                        transition: 'transform 0.3s'
+                      }}
+                    >
+                      <div style={{ fontSize: '30px' }}>{ganjaran.icon}</div>
+                      <div style={{ textAlign: 'left', flex: 1 }}>
+                        <h4 style={{ margin: '0 0 5px 0', fontSize: '16px' }}>{ganjaran.name}</h4>
+                        <p style={{ margin: '0 0 8px 0', fontSize: '14px', opacity: '0.9' }}>
+                          {ganjaran.description}
+                        </p>
+                        {ganjaran.amount && (
+                          <span style={{ color: '#FFD700', fontWeight: 'bold' }}>
+                            +{ganjaran.amount} {ganjaran.type === 'xp' ? 'XP' : ganjaran.type === 'coins' ? 'Koin' : ''}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {ringkasanData.rewards.length > 0 && (
+                  <button 
+                    onClick={kumpulGanjaran}
+                    style={{
+                      width: '100%',
+                      padding: '15px',
+                      background: 'linear-gradient(to right, #FF9800, #F57C00)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '10px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                      fontSize: '1.1rem',
+                      marginTop: '10px',
+                      transition: 'all 0.3s'
+                    }}
+                  >
+                    Kumpul Semua Ganjaran
+                  </button>
+                )}
+              </div>
+            )}
+            
+            {/* XP & Coins Earned */}
+            {(ringkasanData.xp_earned > 0 || ringkasanData.coins_earned > 0) && (
+              <div style={{
+                marginTop: '20px',
+                padding: '15px',
+                background: 'rgba(78, 204, 163, 0.1)',
+                borderRadius: '10px',
+                border: '1px solid rgba(78, 204, 163, 0.3)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                  {ringkasanData.xp_earned > 0 && (
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '24px', color: '#4ecca3' }}>+{ringkasanData.xp_earned}</div>
+                      <div style={{ fontSize: '14px', color: '#aaa' }}>XP</div>
+                    </div>
+                  )}
+                  {ringkasanData.coins_earned > 0 && (
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '24px', color: '#FFD700' }}>+{ringkasanData.coins_earned}</div>
+                      <div style={{ fontSize: '14px', color: '#aaa' }}>Koin</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Action Buttons */}
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '12px', 
+              marginTop: '30px' 
+            }}>
+              <button 
+                style={{
+                  padding: '15px 25px',
+                  background: 'linear-gradient(to right, #4CAF50, #45a049)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s'
+                }}
+                onClick={() => {
+                  setSemulaPermainan();
+                  setTunjukRingkasan(false);
+                }}
+              >
+                🔄 Main Semula
+              </button>
+              
+              <button 
+                style={{
+                  padding: '15px 25px',
+                  background: 'linear-gradient(to right, #2196F3, #1976D2)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s'
+                }}
+                onClick={() => {
+                  setTunjukRingkasan(false);
+                  setTunjukLeaderboard(true);
+                }}
+              >
+                🏆 Papan Pemimpin
+              </button>
+              
+              <button 
+                style={{
+                  padding: '15px 25px',
+                  background: 'linear-gradient(to right, #9C27B0, #7B1FA2)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s'
+                }}
+                onClick={kembaliKeLamanUtama}
+              >
+                ← Kembali ke Menu
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  // ========== NEW: Custom Leaderboard Modal ==========
+  const ModalLeaderboard = () => {
+    if (!tunjukLeaderboard) return null;
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 2000,
+        padding: '20px'
+      }}>
+        <div style={{ 
+          width: '95%', 
+          maxWidth: '800px',
+          maxHeight: '85vh',
+          overflowY: 'auto',
+          borderRadius: '16px',
+          backgroundColor: '#0f3460',
+          border: '3px solid #4ecca3',
+          padding: '25px',
+          color: 'white'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            marginBottom: '20px'
+          }}>
+            <h2 style={{ 
+              fontSize: '2rem', 
+              color: '#4ecca3',
+              margin: 0
+            }}>
+              🏆 Papan Pemimpin Tumbuk Tikus
+            </h2>
+            <button 
+              onClick={() => setTunjukLeaderboard(false)}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#f44336',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              ✕ Tutup
+            </button>
+          </div>
+          
+          {leaderboardData ? (
+            <>
+              {leaderboardData.user_rank && leaderboardData.user_rank > 10 && (
+                <div style={{
+                  background: '#e3f2fd',
+                  padding: '15px',
+                  borderRadius: '10px',
+                  marginBottom: '20px',
+                  textAlign: 'center',
+                  color: '#1976D2'
+                }}>
+                  <h3 style={{ margin: '0 0 5px 0' }}>Kedudukan Anda: #{leaderboardData.user_rank}</h3>
+                  <p style={{ margin: '0', fontSize: '0.9rem' }}>
+                    Skor: {leaderboardData.user_score} mata
+                  </p>
+                </div>
+              )}
+              
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  borderRadius: '8px',
+                  overflow: 'hidden'
+                }}>
+                  <thead>
+                    <tr style={{ background: 'rgba(78, 204, 163, 0.2)' }}>
+                      <th style={{ padding: '15px', textAlign: 'left', borderBottom: '2px solid #4ecca3' }}>
+                        Kedudukan
+                      </th>
+                      <th style={{ padding: '15px', textAlign: 'left', borderBottom: '2px solid #4ecca3' }}>
+                        Nama
+                      </th>
+                      <th style={{ padding: '15px', textAlign: 'left', borderBottom: '2px solid #4ecca3' }}>
+                        Skor
+                      </th>
+                      <th style={{ padding: '15px', textAlign: 'left', borderBottom: '2px solid #4ecca3' }}>
+                        Masa
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leaderboardData.leaderboard && leaderboardData.leaderboard.length > 0 ? (
+                      leaderboardData.leaderboard.map((entry, index) => (
+                        <tr 
+                          key={index}
+                          style={{
+                            background: entry.is_current_user ? 'rgba(255, 215, 0, 0.15)' : 'transparent',
+                            borderBottom: '1px solid rgba(255,255,255,0.1)'
+                          }}
+                        >
+                          <td style={{ padding: '15px' }}>
+                            <strong style={{ 
+                              color: entry.rank <= 3 ? 
+                                ['#FFD700', '#C0C0C0', '#CD7F32'][entry.rank-1] : '#666' 
+                            }}>
+                              {entry.rank <= 3 ? ['🥇', '🥈', '🥉'][entry.rank-1] : ''} #{entry.rank}
+                            </strong>
+                          </td>
+                          <td style={{ padding: '15px' }}>
+                            {entry.user_name} {entry.is_current_user ? ' (Anda)' : ''}
+                          </td>
+                          <td style={{ padding: '15px', fontWeight: 'bold' }}>
+                            {entry.score}
+                          </td>
+                          <td style={{ padding: '15px' }}>
+                            {entry.time_taken}s
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" style={{ padding: '30px', textAlign: 'center', color: '#aaa' }}>
+                          Tiada data papan pemimpin untuk permainan ini.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div style={{ marginTop: '20px', textAlign: 'center', color: '#aaa', fontSize: '0.9rem' }}>
+                Jumlah Pemain: {leaderboardData.total_players || 0}
+              </div>
+            </>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '40px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                border: '3px solid #4ecca3',
+                borderTop: '3px solid transparent',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 20px'
+              }} />
+              <p>Memuatkan data papan pemimpin...</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   const peratusanMasa = (masaTinggal / 30) * 100;
@@ -763,7 +1523,7 @@ const WhackAMole = () => {
               )}
             </div>
 
-            {permainanTamcat && (
+            {permainanTamcat && !tunjukRingkasan && (
               <div style={{
                 position: 'fixed',
                 top: 0,
@@ -792,79 +1552,28 @@ const WhackAMole = () => {
                   <p style={{ fontSize: '1.2rem', marginBottom: '12px' }}>Tikus Ditumpaskan: <strong>{tikusDitumpaskan}</strong></p>
                   <p style={{ fontSize: '1.2rem', marginBottom: '20px' }}>Markah Tertinggi: <strong>{markahTertinggi}</strong></p>
                   
-                  {tunjukRingkasan && (
-                    <>
-                      <GameSummary progress={kemajuanPermainan} game={{ name: 'Tumbuk Tikus' }} />
-                      
-                      {ganjaranDibuka.length > 0 && (
-                        <RewardsDisplay 
-                          rewards={ganjaranDibuka}
-                          onClaim={(ganjaran) => console.log('Ganjaran dituntut:', ganjaran)}
-                        />
-                      )}
-                      
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '25px', flexWrap: 'wrap' }}>
-                        <button 
-                          style={{
-                            padding: '12px 25px',
-                            backgroundColor: '#4CAF50',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            fontSize: '1.1rem',
-                            transition: 'all 0.2s',
-                            boxShadow: '0 2px 6px rgba(76, 175, 80, 0.4)'
-                          }}
-                          onClick={() => {
-                            setSemulaPermainan();
-                            setTunjukRingkasan(false);
-                            setGanjaranDibuka([]);
-                          }}
-                        >
-                          🔄 Main Semula
-                        </button>
-                        <button 
-                          style={{
-                            padding: '12px 25px',
-                            backgroundColor: '#FF9800',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            fontSize: '1.1rem',
-                            transition: 'all 0.2s',
-                            boxShadow: '0 2px 6px rgba(255, 152, 0, 0.4)'
-                          }}
-                          onClick={() => setTunjukLeaderboard(true)}
-                        >
-                          📊 Lihat Kedudukan
-                        </button>
-                        <button 
-                          style={{
-                            padding: '12px 25px',
-                            backgroundColor: '#9C27B0',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            fontSize: '1.1rem',
-                            transition: 'all 0.2s',
-                            boxShadow: '0 2px 6px rgba(156, 39, 176, 0.4)'
-                          }}
-                          onClick={kembaliKeLamanUtama}
-                        >
-                          🏠 Laman Utama
-                        </button>
-                      </div>
-                    </>
+                  {sedangMemuatRingkasan && (
+                    <div style={{ margin: '20px 0' }}>
+                      <div style={{
+                        width: '40px',
+                        height: '40px',
+                        border: '3px solid #4ecca3',
+                        borderTop: '3px solid transparent',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                        margin: '0 auto'
+                      }} />
+                    </div>
                   )}
                 </div>
               </div>
             )}
+
+            {/* NEW: Custom Game Summary Modal */}
+            <ModalRingkasanPermainan />
+            
+            {/* NEW: Custom Leaderboard Modal */}
+            <ModalLeaderboard />
 
             {!permainanTamcat && (
               <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginTop: '20px' }}>
@@ -888,36 +1597,6 @@ const WhackAMole = () => {
             )}
           </div>
         </>
-      )}
-
-      {/* Leaderboard Modal */}
-      {tunjukLeaderboard && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(0, 0, 0, 0.95)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 2000,
-          padding: '20px'
-        }}>
-          <div style={{ 
-            width: '95%', 
-            maxWidth: '900px',
-            maxHeight: '85vh',
-            overflowY: 'auto',
-            borderRadius: '16px'
-          }}>
-            <Leaderboard 
-              gameId="game2" 
-              onClose={() => setTunjukLeaderboard(false)} 
-            />
-          </div>
-        </div>
       )}
 
       <style>{`
@@ -944,6 +1623,11 @@ const WhackAMole = () => {
           0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
           50% { transform: translate(-50%, -50%) scale(1.2) rotate(-10deg); }
           100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
         
         button:hover {

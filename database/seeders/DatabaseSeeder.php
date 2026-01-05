@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             QuizSeeder::class, // Depends on UserSeeder
             ForumSeeder::class, // Depends on UserSeeder
             LessonSeeder::class, // Depends on UserSeeder
+            GameSeeder::class, // Seed games
         ]);
     }
 }
