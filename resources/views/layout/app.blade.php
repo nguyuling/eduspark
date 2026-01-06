@@ -9,7 +9,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-/* ✅ Your original CSS pasted cleanly */
 :root{
   --bg-light:#f5f7ff;
   --bg-dark:#071026;
@@ -29,14 +28,15 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 body.light{background:var(--bg-light);color:#0b1220;}
 body.dark{background:var(--bg-dark);color:#e6eef8;}
 
-.app{display:flex;min-height:100vh;gap:28px;padding:28px;}
+.app{display:flex;min-height:100vh;padding:28px 0;}
 
 .sidebar{
-  width:240px;border-radius:16px;padding:18px;display:flex;
+  width:268px;border-radius:16px;display:flex;
   flex-direction:column;gap:12px;align-items:center;
   backdrop-filter:blur(8px) saturate(120%);
   -webkit-backdrop-filter:blur(8px);
 }
+
 body.light .sidebar{
   background:linear-gradient(180deg,rgba(255,255,255,0.70),rgba(255,255,255,0.65));
   border:1px solid rgba(13,18,25,0.05);
@@ -104,15 +104,18 @@ body.dark .sidebar{
         </div>
 
         <nav class="nav">
-            <a href="#" class="active"><span class="dot"></span> Dashboard</a>
+            <a href="{{ route('home') }}" class="@if(Route::current()->getName() === 'home') active @endif"><span class="dot"></span> Dashboard</a>
             <a href="#"><span class="dot"></span> Materials</a>
             <a href="#"><span class="dot"></span> Assessments</a>
             <a href="#"><span class="dot"></span> Forum</a>
-            <a href="#"><span class="dot"></span> Games</a>
+            <a href="{{ route('games.index') }}" class="@if(Route::current()->getName() === 'games.index') active @endif"><span class="dot"></span> Games</a>
         </nav>
 
         <div class="logout">
-            <a href="#" style="color:#ff8b94;font-weight:700;text-decoration:none;">🚪 Logout</a>
+            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                @csrf
+                <button type="submit" style="color:#ff8b94;font-weight:700;text-decoration:none;border:none;background:none;cursor:pointer;">🚪 Logout</button>
+            </form>
         </div>
     </aside>
 

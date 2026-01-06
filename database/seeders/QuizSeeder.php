@@ -30,14 +30,15 @@ class QuizSeeder extends Seeder
 
         foreach ($quizzes_data as $quiz_data) {
             $questions = $quiz_data['questions'] ?? [];
+            $quiz_teacher_id = $quiz_data['teacher_id'] ?? $teacher_id;
             unset($quiz_data['questions']);
 
-            // Create quiz with unique code, using the actual teacher ID
+            // Create quiz with unique code, using the teacher ID from data or fallback
             $quiz = Quiz::create([
-                'user_id' => $teacher_id,
+                'user_id' => $quiz_teacher_id,
                 'title' => $quiz_data['title'],
                 'description' => $quiz_data['description'],
-                'teacher_id' => $teacher_id,
+                'teacher_id' => $quiz_teacher_id,
                 'max_attempts' => $quiz_data['max_attempts'],
                 'due_at' => $quiz_data['due_at'],
                 'is_published' => $quiz_data['is_published'],
@@ -61,6 +62,7 @@ class QuizSeeder extends Seeder
 
                 $question = QuizQuestion::create([
                     'quiz_id' => $quiz->id,
+                    'teacher_id' => $quiz_teacher_id,
                     'question_text' => $question_data['text'],
                     'type' => $question_data['type'],
                     'points' => $question_data['points'],

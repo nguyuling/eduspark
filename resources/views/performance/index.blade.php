@@ -26,11 +26,11 @@
 
       <div class="card" style="text-align:center;">
         <div class="panel-header" style="justify-content:center;">
-            <h3>Purata Skor Permainan</h3>
+            <h3>Permainan Dimainkan</h3>
         </div>
         <div class="value" style="margin-top:-10px;">
           <span class="badge-pill" style="background:linear-gradient(90deg,var(--yellow),var(--accent)); font-size:14px; padding:6px 12px;">
-            {{ $avgGameScore }}%
+            {{ $totalGames ?? 0 }}
           </span>
         </div>
       </div>
@@ -63,7 +63,6 @@
       <div class="panel-header">
         <div>
           <h3>Trend Prestasi</h3>
-          <div class="subtitle">Kuiz & permainan terkini</div>
         </div>
       </div>
       <canvas id="trendChart"></canvas>
@@ -112,8 +111,10 @@ new Chart(ctx,{
             const idx = ctx.dataIndex;
             const percent = ctx.parsed.y;
             const raw = rawScores[idx];
-            if (raw && raw.raw !== null && raw.max !== null) {
+            if (raw && raw.raw !== null && raw.max !== null && raw.max > 0) {
               return [`Skor: ${percent}%`, `(${raw.raw}/${raw.max})`];
+            } else if (raw && raw.raw !== null) {
+              return `Skor: ${raw.raw}`;
             }
             return `Skor: ${percent}%`;
           }
