@@ -985,17 +985,23 @@ class ReportController extends Controller
         $fromDate = now()->startOfDay();
         switch ($dateRange) {
             case 'week':
-                $fromDate = now()->subDays(7)->startOfDay();
+                // This week - from Monday to now
+                $fromDate = now()->startOfWeek()->startOfDay();
                 break;
             case 'quarter':
-                $fromDate = now()->subMonths(3)->startOfDay();
+                // This quarter
+                $currentMonth = now()->month;
+                $quarterMonth = (floor(($currentMonth - 1) / 3) * 3) + 1;
+                $fromDate = now()->setMonth($quarterMonth)->startOfMonth()->startOfDay();
                 break;
             case 'all':
+                // All data - from 10 years ago
                 $fromDate = now()->subYears(10)->startOfDay();
                 break;
             case 'month':
             default:
-                $fromDate = now()->subMonth()->startOfDay();
+                // This month - from the 1st of this month
+                $fromDate = now()->startOfMonth()->startOfDay();
         }
 
         $attempts = collect();
@@ -1003,7 +1009,8 @@ class ReportController extends Controller
             $query = DB::table('quiz_attempts as qa')
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id');
             
-            if ($selectedClass && $selectedClass !== '') {
+            // Only filter by class if NOT "semua" (all classes)
+            if ($selectedClass && $selectedClass !== 'semua' && $selectedClass !== '') {
                 // Filter by class if specified
                 if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
                     $classroom = DB::table('classrooms')->where('name', $selectedClass)->first();
@@ -1064,18 +1071,89 @@ class ReportController extends Controller
             ->take(10)
             ->values();
 
-        // Trend data (by date)
-        $trendDataGrouped = $attempts->groupBy(function($item) {
-            return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
-        })
-        ->map(function($group) {
-            $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
-            return round($scores->count() > 0 ? $scores->avg() : 0, 2);
-        })
-        ->sortKeys(); // Sort by date keys, not by values
+        // Trend data (by date and class for "semua", or just by date for specific class)
+        $trendDates = [];
+        $trendData = [];
+        
+        if (!$selectedClass || $selectedClass === 'semua' || $selectedClass === '') {
+            // Get all classes for trend lines
+            $classes = [];
+            if (Schema::hasTable('classrooms')) {
+                $classes = DB::table('classrooms')->select('name')->distinct()->orderBy('name')->pluck('name')->toArray();
+            } elseif (Schema::hasTable('students')) {
+                $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
+                foreach ($possible as $col) {
+                    if (Schema::hasColumn('students', $col)) {
+                        $classes = DB::table('students')->select($col)->distinct()->orderBy($col)->pluck($col)->toArray();
+                        break;
+                    }
+                }
+            }
+            
+            // Collect all unique dates first
+            $allDates = $attempts->map(function($item) {
+                return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
+            })->unique()->sort()->values();
+            
+            $trendDates = $allDates->toArray();
+            $trendDataByClass = [];
+            
+            // For each class, create a trend line
+            foreach ($classes as $cls) {
+                $classAttempts = collect();
+                $studentIds = collect();
+                
+                // Filter attempts to only include students from this class
+                if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
+                    $classroom = DB::table('classrooms')->where('name', $cls)->first();
+                    if ($classroom) {
+                        $studentIds = DB::table('students')->where('classroom_id', $classroom->id)->pluck('user_id');
+                        $classAttempts = $attempts->whereIn('student_id', $studentIds->toArray());
+                    }
+                } elseif (Schema::hasTable('students')) {
+                    $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
+                    foreach ($possible as $col) {
+                        if (Schema::hasColumn('students', $col)) {
+                            $studentIds = DB::table('students')->where($col, $cls)->pluck('user_id');
+                            $classAttempts = $attempts->whereIn('student_id', $studentIds->toArray());
+                            break;
+                        }
+                    }
+                }
+                
+                // Only include class if it has attempts
+                if ($classAttempts->count() > 0) {
+                    // Count unique students in this class who have attempts
+                    $uniqueStudentsWithAttempts = $classAttempts->pluck('student_id')->unique()->count();
+                    $classLabel = $cls . ' (' . $uniqueStudentsWithAttempts . ' ' . ($uniqueStudentsWithAttempts == 1 ? 'student' : 'students') . ')';
+                    
+                    $classScores = [];
+                    foreach ($allDates as $date) {
+                        $dayAttempts = $classAttempts->filter(function($item) use ($date) {
+                            return $item->created_at && date('Y-m-d', strtotime($item->created_at)) === $date;
+                        });
+                        $scores = $dayAttempts->pluck('score')->filter(function($v) { return is_numeric($v); });
+                        $classScores[] = round($scores->count() > 0 ? $scores->avg() : 0, 2);
+                    }
+                    $trendDataByClass[$classLabel] = $classScores;
+                }
+            }
+            
+            $trendData = $trendDataByClass;
+        } else {
+            // For specific class, show single trend line by date
+            $trendDataGrouped = $attempts->groupBy(function($item) {
+                return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
+            })
+            ->map(function($group) {
+                $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
+                return round($scores->count() > 0 ? $scores->avg() : 0, 2);
+            })
+            ->sortKeys();
 
-        $trendDates = $trendDataGrouped->keys()->values();
-        $trendData = $trendDataGrouped->values();
+            $trendDates = $trendDataGrouped->keys()->values()->toArray();
+            $trendData = [$selectedClass => $trendDataGrouped->values()->toArray()];
+        }
 
         // Class comparison - only include if no specific class filter applied
         $classStats = [];
@@ -1101,30 +1179,46 @@ class ReportController extends Controller
                 }
                 $processedClasses[] = $cls;
                 
-                $classAttempts = $attempts;
+                $classAttempts = collect();
+                
+                // Filter attempts to only include students from this class
                 if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
                     $classroom = DB::table('classrooms')->where('name', $cls)->first();
                     if ($classroom) {
                         $studentIds = DB::table('students')->where('classroom_id', $classroom->id)->pluck('user_id');
                         $classAttempts = $attempts->whereIn('student_id', $studentIds->toArray());
                     }
+                } elseif (Schema::hasTable('students')) {
+                    $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
+                    foreach ($possible as $col) {
+                        if (Schema::hasColumn('students', $col)) {
+                            $studentIds = DB::table('students')->where($col, $cls)->pluck('user_id');
+                            $classAttempts = $attempts->whereIn('student_id', $studentIds->toArray());
+                            break;
+                        }
+                    }
                 }
 
                 $classScores = $classAttempts->pluck('score')->filter(function($v) { return is_numeric($v); })->map(function($v) { return (float)$v; });
                 
+                // Only include class if it has attempts
                 if ($classScores->count() > 0) {
-                    // Get lowest and highest quiz titles
+                    // Get lowest and highest quiz attempts (by score percentage)
                     $lowestQuiz = $classAttempts->sortBy('score')->first();
                     $highestQuiz = $classAttempts->sortByDesc('score')->first();
                     
                     $lowestQuizTitle = $lowestQuiz ? ($lowestQuiz->title ?? 'Unknown') : 'N/A';
                     $highestQuizTitle = $highestQuiz ? ($highestQuiz->title ?? 'Unknown') : 'N/A';
                     
+                    // Get actual highest and lowest percentage scores
+                    $maxPercentage = round($classScores->max(), 2);
+                    $minPercentage = round($classScores->min(), 2);
+                    
                     $classStats[] = [
                         'name' => $cls,
                         'avgScore' => round($classScores->avg(), 2) . '%',
-                        'maxScore' => round($classScores->max(), 2) . '%',
-                        'minScore' => round($classScores->min(), 2) . '%',
+                        'maxScore' => $maxPercentage . '%',
+                        'minScore' => $minPercentage . '%',
                         'lowestQuiz' => $lowestQuizTitle,
                         'highestQuiz' => $highestQuizTitle
                     ];
@@ -1142,8 +1236,8 @@ class ReportController extends Controller
                 'scores' => $topicData->pluck('score')->toArray()
             ],
             'trendData' => [
-                'dates' => $trendDates->toArray(),
-                'scores' => $trendData->toArray()
+                'dates' => is_array($trendDates) ? $trendDates : $trendDates->toArray(),
+                'scores' => is_array($trendData) ? $trendData : $trendData->toArray()
             ],
             'classStats' => $classStats
         ]);

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('topic')->nullable();
             $table->unsignedBigInteger('teacher_id');
             $table->boolean('is_published')->default(false);
+            $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('teacher_id')->references('id')->on('users')->onDelete('cascade');

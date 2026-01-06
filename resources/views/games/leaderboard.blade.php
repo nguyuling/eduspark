@@ -12,9 +12,50 @@
         </a>
         <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $game->title }} - Leaderboard</h1>
         <p class="text-gray-700 dark:text-gray-300 text-base">Class performance analytics</p>
+        @if(isset($classes) && $classes->count() > 0)
+        <div class="mt-4">
+            <form method="GET" action="{{ route('games.leaderboard', $game->id) }}" class="flex flex-wrap items-center gap-3">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Filter by class:</label>
+                <select name="class" class="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100">
+                    <option value="">All Classes</option>
+                    @foreach($classes as $class)
+                        <option value="{{ $class }}" {{ ($classFilter ?? '') === $class ? 'selected' : '' }}>{{ $class }}</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700">Apply</button>
+                @if(!empty($classFilter))
+                    <a href="{{ route('games.leaderboard', $game->id) }}" class="px-3 py-2 bg-gray-600 text-white rounded-lg text-sm font-semibold hover:bg-gray-700">Clear</a>
+                    <span class="text-xs text-gray-600 dark:text-gray-300">Showing class: <strong>{{ $classFilter }}</strong></span>
+                @endif
+            </form>
+        </div>
+        @endif
     </div>
 
     @if($scores->count() > 0)
+        <!-- Student Ranking Banner (Only for students) -->
+        @if(auth()->user()->role !== 'teacher' && $highlightedUserIndex !== -1)
+        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900 dark:to-orange-900 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg p-6 mb-8 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-bold text-yellow-800 dark:text-yellow-200 mb-2 flex items-center">
+                        <span class="text-3xl mr-3">🌟</span> Your Ranking
+                    </h3>
+                    <p class="text-yellow-700 dark:text-yellow-300 text-lg">
+                        You are ranked <span class="font-bold text-2xl text-yellow-600 dark:text-yellow-400">{{ $highlightedUserIndex + 1 }}</span> out of <span class="font-bold">{{ $scores->count() }}</span> players
+                    </p>
+                </div>
+                <div class="text-6xl">
+                    @if($highlightedUserIndex === 0) 🥇
+                    @elseif($highlightedUserIndex === 1) 🥈
+                    @elseif($highlightedUserIndex === 2) 🥉
+                    @else 🎮
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- Statistics Cards - White background for light mode, Dark for dark mode -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="bg-white dark:bg-gray-800 rounded-lg p-5 border border-gray-300 dark:border-gray-700 shadow">
@@ -53,7 +94,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-300 dark:divide-gray-700">
                         @foreach($scores as $index => $score)
-                        <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                        <tr class="@if(auth()->user()->role !== 'teacher' && isset($currentUser) && $score->user_id === $currentUser->id) bg-yellow-100 dark:bg-yellow-900 font-bold border-2 border-yellow-400 dark:border-yellow-600 @else bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 @endif transition-colors duration-150">
                             <!-- Rank Column -->
                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap border-r border-gray-300 dark:border-gray-700">
                                 @if($index === 0)
@@ -81,6 +122,9 @@
                                 <div class="flex flex-col">
                                     <span class="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">
                                         {{ $score->user->name }}
+                                        @if(auth()->user()->role !== 'teacher' && isset($currentUser) && $score->user_id === $currentUser->id)
+                                        <span class="ml-2 text-yellow-600 dark:text-yellow-400 text-lg">👈 You</span>
+                                        @endif
                                     </span>
                                     <span class="text-xs text-gray-700 dark:text-gray-400 mt-1">
                                         {{ $score->user->class ?? 'No Class' }}

@@ -16,7 +16,6 @@ class LessonController extends Controller
     {
         $query = Lesson::query();
 
-        // Search by title or description
         if ($request->has('q') && $request->q) {
             $q = $request->q;
             $query->where(function ($q_builder) use ($q) {
@@ -25,13 +24,11 @@ class LessonController extends Controller
             });
         }
 
-        // Filter by file type
         if ($request->has('file_type') && $request->file_type) {
             $ext = strtolower($request->file_type);
             $query->where('file_ext', '=', $ext);
         }
 
-        // Filter by date range
         if ($request->has('date_from') && $request->date_from) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }

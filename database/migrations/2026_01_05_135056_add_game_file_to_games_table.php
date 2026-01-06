@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('questions', function (Blueprint $table) {
-            $table->text('correct_answer')->nullable()->after('hidden_line_numbers');
+        Schema::table('games', function (Blueprint $table) {
+            $table->string('game_file')->nullable()->after('topic');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('questions', function (Blueprint $table) {
-            $table->dropColumn('correct_answer');
+        Schema::table('games', function (Blueprint $table) {
+            $table->dropColumn('game_file');
         });
     }
 };

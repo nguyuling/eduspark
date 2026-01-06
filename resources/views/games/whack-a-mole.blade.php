@@ -3,67 +3,74 @@
 @section('content')
 <div class="app">
     <main class="main">
-        <div id="gameContainer" style="padding: 20px;">
-            <!-- Game Header -->
-            <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                <div>
-                    <h1 style="margin: 0; font-size: 28px; font-weight: 700;">🔨 Whack-a-Mole</h1>
-                    <p style="color: var(--muted); margin-top: 8px;">Tumbuk tikus secepat mungkin untuk mendapat markah tertinggi!</p>
-                </div>
+        <!-- Game Header -->
+        <div id="gameHeader" class="header">
+            <div>
+                <div class="title">Whack-a-Mole</div>
+                <div class="sub">Tumbuk tikus secepat mungkin untuk mendapat markah tertinggi!</div>
+            </div>
+            <div style="display: flex; gap: 60px; align-items: center;">
                 <div style="display: flex; gap: 20px; align-items: center;">
                     <div style="text-align: center;">
-                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Skor</div>
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Skor</div>
                         <div id="scoreDisplay" style="font-size: 32px; font-weight: 700; color: var(--accent);">0</div>
                     </div>
                     <div style="text-align: center;">
-                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Masa</div>
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Masa</div>
                         <div id="timerDisplay" style="font-size: 32px; font-weight: 700; color: #ef4444;">30</div>
                     </div>
                 </div>
+                <a href="{{ route('games.index') }}" class="btn-kembali">
+                    <i class="bi bi-arrow-left"></i>Kembali
+                </a>
             </div>
+        </div>
+
+        <div id="gameContainer" style="padding: 20px;">
 
             <!-- Game Area -->
             <div id="gameContent" style="display: none;">
-                <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 40px; max-width: 600px; margin: 0 auto;">
-                    <div id="gameBoard" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 400px; margin: 0 auto;">
+                <div style="display: flex; justify-content: center; padding: 40px;">
+                    <div id="gameBoard" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 500px; width: 100%;">
                         <!-- Moles will be inserted here -->
                     </div>
                 </div>
             </div>
 
             <!-- Start Screen -->
-            <div id="startScreen" style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">🔨</div>
-                <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Whack-a-Mole</h2>
-                <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px; max-width: 500px; margin-left: auto; margin-right: auto;">
-                    Tumbuk tikus yang muncul sebanyak mungkin dalam 30 saat! Setiap tumbukan yang tepat memberikan 10 poin.
-                </p>
-                <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, var(--accent), #9d4edd); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
-                    Mula Bermain ▶
-                </button>
+            <div id="startScreen" style="text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <section class="panel" style="width: 100%; max-width: 500px; padding: 40px;">
+                    <div style="font-size: 80px; margin-bottom: 20px;">🔨</div>
+                    <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Whack-a-Mole</h2>
+                    <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px;">
+                        Tumbuk tikus yang muncul sebanyak mungkin dalam 30 saat! Setiap tumbukan yang tepat memberikan 10 poin.
+                    </p>
+                    <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
+                        Mula
+                    </button>
+                </section>
             </div>
 
             <!-- Game Over Screen -->
-            <div id="gameOverScreen" style="display: none; text-align: center; padding: 60px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">🎉</div>
-                <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Permainan Tamat!</h2>
-                <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 40px; max-width: 400px; margin: 20px auto; margin-bottom: 30px;">
-                    <div style="margin-bottom: 20px;">
-                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Skor Akhir</div>
-                        <div id="finalScore" style="font-size: 48px; font-weight: 700; color: var(--accent);">0</div>
+            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px; min-height: 500px; flex-direction: column; align-items: center; justify-content: center;">
+                <div style="font-size: 80px; margin-bottom: 20px;">🎉</div>
+                <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 32px;">Permainan Tamat!</h2>
+                <section class="panel" style="max-width: 450px; margin: 0 auto 40px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 32px;">
+                        <div>
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Skor Akhir</div>
+                            <div id="finalScore" style="font-size: 48px; font-weight: 700; color: var(--accent);">0</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Tumbukan Tepat</div>
+                            <div id="moleHits" style="font-size: 48px; font-weight: 700; color: #22c55e;">0</div>
+                        </div>
                     </div>
-                    <div>
-                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Tumbukan Tepat</div>
-                        <div id="moleHits" style="font-size: 28px; font-weight: 700; color: #22c55e;">0</div>
-                    </div>
-                </div>
+                </section>
                 <div style="display: flex; gap: 12px; justify-content: center;">
-                    <button id="playAgainBtn" style="padding: 12px 30px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
+                    <button id="playAgainBtn" style="padding: 12px 28px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
                         Main Semula
                     </button>
-                    <a href="/games" style="padding: 12px 30px; background: var(--border); color: var(--text); border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;">
-                        Kembali ke Permainan
-                    </a>
                 </div>
             </div>
         </div>
@@ -82,13 +89,15 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 40px;
+        font-size: 48px;
         transition: all 0.1s ease;
         user-select: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .mole-hole:hover:not(.empty) {
-        transform: scale(1.05);
+        transform: scale(1.08);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
     }
 
     .mole-hole.empty {
@@ -105,11 +114,11 @@
         100% { transform: scale(1); }
     }
 
-    #startBtn:hover {
-        transform: scale(1.05);
+    #startBtn:active {
+        transform: scale(0.95) !important;
     }
 
-    #startBtn:active {
+    #playAgainBtn:active {
         transform: scale(0.95);
     }
 </style>
@@ -122,6 +131,7 @@
     let gameActive = false;
     let moleHitCount = 0;
     let activeMole = null;
+    let gameStartTime = 0;
 
     const elements = {
         gameContainer: document.getElementById('gameContainer'),
@@ -140,7 +150,35 @@
 
     // Event Listeners
     elements.startBtn.addEventListener('click', startGame);
-    elements.playAgainBtn.addEventListener('click', resetGame);
+    elements.playAgainBtn.addEventListener('click', () => {
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("games.storeResult", 2) }}';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
+        
+        const scoreInput = document.createElement('input');
+        scoreInput.type = 'hidden';
+        scoreInput.name = 'score';
+        scoreInput.value = score;
+        form.appendChild(scoreInput);
+        
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 'time_taken';
+        timeInput.value = timeInSeconds;
+        form.appendChild(timeInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    });
 
     function startGame() {
         gameStarted = true;
@@ -148,6 +186,7 @@
         score = 0;
         timeLeft = 30;
         moleHitCount = 0;
+        gameStartTime = Date.now();
 
         elements.startScreen.style.display = 'none';
         elements.gameContent.style.display = 'block';
@@ -230,16 +269,14 @@
     function endGame() {
         gameStarted = false;
         gameActive = false;
-        elements.gameContent.style.display = 'none';
-        elements.gameHeader.style.display = 'none';
-        elements.gameOverScreen.style.display = 'block';
-        elements.finalScore.textContent = score;
-        elements.moleHits.textContent = moleHitCount;
-
-        if (activeMole) {
-            activeMole.textContent = '';
-            activeMole.classList.add('empty');
-        }
+        
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
+        document.getElementById('gameOverScreen').style.display = 'flex';
+        document.getElementById('gameContent').style.display = 'none';
+        document.getElementById('finalScore').textContent = score;
+        document.getElementById('moleHits').textContent = moleHitCount;
     }
 
     function resetGame() {

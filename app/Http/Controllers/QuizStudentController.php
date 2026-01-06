@@ -207,9 +207,12 @@ class QuizStudentController extends Controller
                 }
 
             } elseif ($question->type === 'short_answer') {
-                // Short answer logic: Compare student answer with correct_answer column
+                // Short answer logic: Compare student answer with is_correct option
                 $submittedText = $studentAnswer['text'] ?? '';
-                $correctText = strtolower(trim($question->correct_answer ?? ''));
+                
+                // Get the correct answer from options table
+                $correctOption = $question->options->where('is_correct', true)->first();
+                $correctText = $correctOption ? strtolower(trim($correctOption->option_text)) : '';
 
                 if (strtolower(trim($submittedText)) === $correctText && $submittedText !== '') {
                     $isCorrect = true;

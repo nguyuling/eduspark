@@ -25,6 +25,87 @@
     @if (session('error'))
       <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
     @endif
+
+    <!-- Search and Filter Section -->
+    <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+      <form method="GET" action="{{ route('games.index') }}" style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap:12px; align-items:end;">
+        
+        <!-- Search by Name -->
+        <div>
+          <label style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:var(--text);">Cari Permainan</label>
+          <input 
+            type="text" 
+            name="search" 
+            value="{{ request('search') }}"
+            placeholder="Cari nama permainan..."
+            style="width:100%; padding:10px 14px; border-radius:8px; border:2px solid #d1d5db; background:transparent; color:inherit; font-size:14px; outline:none; transition:border-color 0.2s ease;"
+            onfocus="this.style.borderColor='var(--accent)'"
+            onblur="this.style.borderColor='#d1d5db'"
+          >
+        </div>
+
+        <!-- Filter by Category -->
+        <div>
+          <label style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:var(--text);">Kategori</label>
+          <select 
+            name="category"
+            style="width:100%; padding:10px 14px; border-radius:8px; border:2px solid #d1d5db; background:transparent; color:inherit; font-size:14px; outline:none; cursor:pointer; transition:border-color 0.2s ease;"
+            onfocus="this.style.borderColor='var(--accent)'"
+            onblur="this.style.borderColor='#d1d5db'"
+          >
+            <option value="">Semua Kategori</option>
+            @foreach($categories as $cat)
+              <option value="{{ $cat }}" {{ request('category') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
+            @endforeach
+          </select>
+        </div>
+
+        <!-- Filter by Difficulty -->
+        <div>
+          <label style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:var(--text);">Kesukaran</label>
+          <select 
+            name="difficulty"
+            style="width:100%; padding:10px 14px; border-radius:8px; border:2px solid #d1d5db; background:transparent; color:inherit; font-size:14px; outline:none; cursor:pointer; transition:border-color 0.2s ease;"
+            onfocus="this.style.borderColor='var(--accent)'"
+            onblur="this.style.borderColor='#d1d5db'"
+          >
+            <option value="">Semua Tahap</option>
+            <option value="easy" {{ request('difficulty') == 'easy' ? 'selected' : '' }}>Mudah</option>
+            <option value="medium" {{ request('difficulty') == 'medium' ? 'selected' : '' }}>Sederhana</option>
+            <option value="hard" {{ request('difficulty') == 'hard' ? 'selected' : '' }}>Sukar</option>
+          </select>
+        </div>
+
+        <!-- Filter by Game Type -->
+        <div>
+          <label style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:var(--text);">Jenis</label>
+          <select 
+            name="game_type"
+            style="width:100%; padding:10px 14px; border-radius:8px; border:2px solid #d1d5db; background:transparent; color:inherit; font-size:14px; outline:none; cursor:pointer; transition:border-color 0.2s ease;"
+            onfocus="this.style.borderColor='var(--accent)'"
+            onblur="this.style.borderColor='#d1d5db'"
+          >
+            <option value="">Semua Jenis</option>
+            @foreach($gameTypes as $type)
+              <option value="{{ $type }}" {{ request('game_type') == $type ? 'selected' : '' }}>{{ $type }}</option>
+            @endforeach
+          </select>
+        </div>
+
+        <!-- Search Button -->
+        <div style="display:flex; gap:8px;">
+          <button type="submit" style="padding:10px 20px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:none; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer; transition:all 0.2s ease; box-shadow:0 2px 8px rgba(106,77,247,0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(106,77,247,0.3)'">
+            <i class="bi bi-search"></i> Cari
+          </button>
+          @if(request()->hasAny(['search', 'category', 'difficulty', 'game_type']))
+            <a href="{{ route('games.index') }}" style="padding:10px 20px; background:#6b7280; color:#fff; border:none; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; transition:all 0.2s ease;" onmouseover="this.style.background='#4b5563'" onmouseout="this.style.background='#6b7280'">
+              <i class="bi bi-x-lg"></i> Reset
+            </a>
+          @endif
+        </div>
+      </form>
+    </section>
+
     @if(auth()->user()->role === 'teacher')
       {{-- TEACHER VIEW --}}
       <!-- Games Stats -->
@@ -103,6 +184,9 @@
                   <div style="display:flex; gap:20px; justify-content:center;">
                     <a href="{{ route('teacher.games.edit', $game->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Kemaskini">
                       <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <a href="{{ route('games.leaderboard', $game->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:#22c55e; padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Papan Keputusan">
+                      <i class="bi bi-bar-chart"></i>
                     </a>
                     <button type="button" onclick="showDeleteConfirm({{ $game->id }}, '{{ $game->title }}')" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; box-shadow:none; color:var(--danger); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Buang">
                       <i class="bi bi-trash"></i>

@@ -34,7 +34,7 @@
     @endif
 
     <!-- Start Main Form -->
-    <form method="POST" action="{{ route('teacher.games.store') }}" id="game-form">
+    <form method="POST" action="{{ route('teacher.games.store') }}" id="game-form" enctype="multipart/form-data">
       @csrf
 
       <!-- Game Format Section -->
@@ -149,10 +149,35 @@
         </div>
       </section>
 
+      <!-- Game File Upload Section -->
+      <section class="panel" style="margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">
+          <h2 style="margin:0; font-size:18px; font-weight:700;">Fail Permainan</h2>
+        </div>
+
+        <!-- Game File Upload -->
+        <div style="margin-bottom: 20px;">
+          <label for="game_file" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px;">Muat Naik Fail Kod Permainan (Pilihan)</label>
+          <input 
+            type="file" 
+            id="game_file" 
+            name="game_file"
+            accept=".zip,.html,.js,.php"
+            style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; transition: border-color 0.2s ease, background 0.2s ease; box-sizing: border-box; cursor: pointer;" 
+            onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+            onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
+            onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+          >
+          <small style="color: var(--muted); font-size: 12px; margin-top: 6px; display: block;">Format disokong: .zip, .html, .js, .php (Maksimum: 10MB)</small>
+          @error('game_file')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
+        </div>
+      </section>
+
       <!-- Action Buttons Row -->
       <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0;">
         <button type="submit" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
-          <i class="bi bi-plus-lg"></i>Cipta Permainan
+          <i class="bi bi-check-lg"></i>Simpan Permainan
         </button>
       </div>
     </form>
