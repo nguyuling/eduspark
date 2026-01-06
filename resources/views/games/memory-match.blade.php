@@ -248,9 +248,24 @@
         const gameEndTime = Date.now();
         const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
         
-        document.getElementById('gameOverScreen').style.display = 'flex';
-        document.getElementById('gameContent').style.display = 'none';
-        document.getElementById('finalMoves').textContent = moves;
+        // Calculate score based on moves (fewer moves = higher score)
+        const calculatedScore = Math.max(0, 1000 - (moves * 50));
+        
+        // Check if score overlay exists (play wrapper mode)
+        const scoreOverlay = document.getElementById('score-overlay');
+        if (scoreOverlay) {
+            // Play wrapper mode - populate and show the overlay
+            document.getElementById('final-score').textContent = calculatedScore;
+            document.getElementById('final-time').textContent = timeInSeconds;
+            document.getElementById('score-input').value = calculatedScore;
+            document.getElementById('time-input').value = timeInSeconds;
+            scoreOverlay.style.display = 'flex';
+        } else {
+            // Standalone mode - show game over screen
+            document.getElementById('gameOverScreen').style.display = 'flex';
+            document.getElementById('gameContent').style.display = 'none';
+            document.getElementById('finalMoves').textContent = moves;
+        }
     }
 
     function resetGame() {
