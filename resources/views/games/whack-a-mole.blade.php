@@ -69,7 +69,7 @@
                 </section>
                 <div style="display: flex; gap: 12px; justify-content: center;">
                     <button id="playAgainBtn" style="padding: 12px 28px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
-                        Main Semula
+                        Lihat Skor & Ganjaran
                     </button>
                 </div>
             </div>
@@ -273,6 +273,13 @@
         const gameEndTime = Date.now();
         const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
         
+        // If wrapped in play mode, submit to game summary
+        if (window.isPlayWrapperMode && window.submitGameScore) {
+            window.submitGameScore(score, timeInSeconds);
+            return;
+        }
+        
+        // Standalone mode - show game over screen
         document.getElementById('gameOverScreen').style.display = 'flex';
         document.getElementById('gameContent').style.display = 'none';
         document.getElementById('finalScore').textContent = score;

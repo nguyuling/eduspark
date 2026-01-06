@@ -70,7 +70,7 @@
                 </div>
                 <div style="display: flex; gap: 12px; justify-content: center;">
                     <button id="playAgainBtn" style="padding: 12px 30px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
-                        Main Semula
+                        Lihat Skor & Ganjaran
                     </button>
                     <a href="/games" style="padding: 12px 30px; background: var(--border); color: var(--text); border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;">
                         Kembali ke Permainan
@@ -301,6 +301,13 @@
         const gameEndTime = Date.now();
         const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
         
+        // If wrapped in play mode, submit to game summary
+        if (window.isPlayWrapperMode && window.submitGameScore) {
+            window.submitGameScore(score, timeInSeconds);
+            return;
+        }
+        
+        // Standalone mode - submit form directly
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '{{ isset($game) ? route("games.storeResult", $game->id) : route("games.storeResult", 5) }}';

@@ -447,6 +447,15 @@
         clearInterval(timerInterval);
         gameActive = false;
         
+        const timeInSeconds = 300 - timeLeft; // Total time taken
+        
+        // If wrapped in play mode, submit to game summary
+        if (window.isPlayWrapperMode && window.submitGameScore) {
+            window.submitGameScore(score, timeInSeconds);
+            return;
+        }
+        
+        // Standalone mode - show game over screen
         document.getElementById('gameContent').style.display = 'none';
         document.getElementById('gameOverScreen').style.display = 'flex';
         document.getElementById('finalScore').textContent = score;
