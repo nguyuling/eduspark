@@ -13,8 +13,20 @@
     </div>
 
     @if(session('success'))
-        <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-4 rounded-lg">
-            {{ session('success') }}
+        <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-4 rounded-lg flex justify-between items-center">
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+
+    @if(session('success_undo') && session('undo_game_id'))
+        <div class="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-4 rounded-lg flex justify-between items-center">
+            <span>{{ session('success_undo') }}</span>
+            <form action="{{ route('games.restore', session('undo_game_id')) }}" method="POST" class="inline">
+                @csrf
+                <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-1 px-4 rounded-lg text-sm">
+                    ↶ Undo Delete
+                </button>
+            </form>
         </div>
     @endif
 

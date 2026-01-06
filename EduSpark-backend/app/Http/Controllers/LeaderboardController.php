@@ -41,6 +41,7 @@ class LeaderboardController extends Controller
                 'class',
                 'game_id',
                 'score',
+                'time_taken',
                 'timestamp',
                 DB::raw('RANK() OVER (ORDER BY score DESC, timestamp ASC) as rank')
             );
@@ -77,7 +78,7 @@ class LeaderboardController extends Controller
      * Store a new score.
      *
      * POST /api/leaderboard
-     * Body: { user_id, username, class, game_id, score }
+     * Body: { user_id, username, class, game_id, score, time_taken }
      */
     public function store(Request $request)
     {
@@ -87,6 +88,7 @@ class LeaderboardController extends Controller
             'class' => 'required|string|max:20',
             'game_id' => 'required|string|max:50',
             'score' => 'required|integer|min:0',
+            'time_taken' => 'nullable|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -97,7 +99,7 @@ class LeaderboardController extends Controller
         }
 
         try {
-            $data = $request->only(['user_id', 'username', 'class', 'game_id', 'score']);
+            $data = $request->only(['user_id', 'username', 'class', 'game_id', 'score', 'time_taken']);
             $data['timestamp'] = now();
 
             DB::table('leaderboard')->insert($data);

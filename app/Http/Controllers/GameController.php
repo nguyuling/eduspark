@@ -144,10 +144,19 @@ class GameController extends Controller
 
         // Also save to leaderboard table if it exists
         if (Schema::hasTable('leaderboard')) {
+            // Get student class from students table
+            $studentClass = 'Unknown';
+            if ($user->role === 'student') {
+                $student = \App\Models\Student::where('user_id', $user->id)->first();
+                if ($student && $student->class) {
+                    $studentClass = $student->class;
+                }
+            }
+            
             Leaderboard::create([
                 'user_id' => $user->id,
                 'username' => $user->name,
-                'class' => $user->meta['class'] ?? 'Unknown', // Assuming class is in user meta
+                'class' => $studentClass,
                 'game_id' => $game->slug,
                 'score' => $validated['score'],
                 'time_taken' => $validated['time_taken'],
