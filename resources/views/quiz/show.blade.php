@@ -101,7 +101,14 @@
             @if($question->type === 'short_answer')
               <div>
                 <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color:var(--success);">Jawapan Betul</label>
-                <div style="font-size: 14px; font-weight: 600; padding:12px; background:rgba(42, 157, 143, 0.08); border-radius:8px; border-left:3px solid var(--success);">{{ $question->correct_answer }}</div>
+                @php
+                  $correctOption = $question->options->where('is_correct', true)->first();
+                @endphp
+                @if($correctOption)
+                  <div style="font-size: 14px; font-weight: 600; padding:12px; background:rgba(42, 157, 143, 0.08); border-radius:8px; border-left:3px solid var(--success);">{{ $correctOption->option_text }}</div>
+                @else
+                  <div style="font-size: 14px; font-weight: 600; padding:12px; background:rgba(200, 200, 200, 0.08); border-radius:8px; border-left:3px solid var(--muted); color:var(--muted);">(Tiada jawapan betul ditetapkan)</div>
+                @endif
               </div>
 
             @elseif($question->type === 'coding')
