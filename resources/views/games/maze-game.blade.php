@@ -17,7 +17,7 @@
         <!-- Game Header -->
         <div id="gameHeader" class="header">
             <div>
-                <div class="title">Taman Labirin Java</div>
+                <div class="title">Maze Quest</div>
                 <div class="sub">Navigasi taman sambil menjawab soalan Java!</div>
             </div>
             <div style="display: flex; gap: 60px; align-items: center;">
@@ -63,7 +63,7 @@
             <div id="startScreen" style="text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                 <section class="panel" style="width: 100%; max-width: 500px; padding: 40px;">
                     <div style="font-size: 80px; margin-bottom: 20px;">🌳</div>
-                    <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Taman Labirin Java</h2>
+                    <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Maze Quest</h2>
                     <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px;">
                         Kumpulkan 15 bunga di taman labirin sambil menjawab soalan Java. Setiap bunga yang dikumpul memberikan satu soalan dan 100 mata untuk jawapan yang betul.
                     </p>
