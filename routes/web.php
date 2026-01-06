@@ -131,6 +131,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/rewards/{id}/claim', [GameController::class, 'claimReward'])->name('rewards.claim');
     
     // Teacher games routes
+    Route::get('/teacher/games', [GameTeacherController::class, 'index'])->name('teacher.games.index');
     Route::get('/teacher/games/create', [GameTeacherController::class, 'create'])->name('teacher.games.create');
     Route::post('/teacher/games', [GameTeacherController::class, 'store'])->name('teacher.games.store');
     Route::get('/teacher/games/{id}/edit', [GameTeacherController::class, 'edit'])->name('teacher.games.edit');

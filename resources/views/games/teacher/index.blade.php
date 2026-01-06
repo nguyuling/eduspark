@@ -13,13 +13,18 @@
     </div>
 
     @if(session('success'))
-        <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-4 rounded-lg flex justify-between items-center">
-            <span>{{ session('success') }}</span>
+        <div class="mb-6 bg-green-50 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-100 px-4 py-4 rounded-lg flex justify-between items-center shadow-md">
+            <div>
+                <span class="font-semibold">✓ {{ session('success') }}</span>
+                @if(session('undo_available') && session('undo_game_id'))
+                    <p class="text-sm mt-1">You can undo this action below.</p>
+                @endif
+            </div>
             @if(session('undo_available') && session('undo_game_id'))
                 <form action="{{ route('teacher.games.restore', session('undo_game_id')) }}" method="POST" class="inline">
                     @csrf
-                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-4 rounded-lg text-sm ml-4">
-                        ↶ Undo
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg text-sm ml-4 transition whitespace-nowrap">
+                        ↶ Undo Delete
                     </button>
                 </form>
             @endif
@@ -80,11 +85,7 @@
                         <td class="px-6 py-4 text-sm">
                             <div class="flex gap-2">
                                 <a href="{{ route('teacher.games.edit', $game->id) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">Edit</a>
-                                <form action="{{ route('teacher.games.destroy', $game->id) }}" method="POST" class="inline" onsubmit="return confirm('Delete this game?\n\nYou can undo this action on the next page if needed.');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">Delete</button>
-                                </form>
+                                <button type="button" onclick="showDeleteModal({{ $game->id }}, '{{ addslashes($game->title) }}')" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">Delete</button>
                             </div>
                         </td>
                     </tr>
@@ -102,3 +103,77 @@
     @endif
 </div>
 @endsection
+
+<script>
+let deleteModalData = null;
+
+function showDeleteModal(gameId, gameTitle) {
+    deleteModalData = { gameId, gameTitle };
+    const modal = document.getElementById('deleteModal');
+    document.getElementById('gameTitle').textContent = gameTitle;
+    modal.classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+    deleteModalData = null;
+}
+
+function confirmDelete() {
+    if (!deleteModalData) return;
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/teacher/games/${deleteModalData.gameId}`;
+    form.innerHTML = `
+        @csrf
+        @method('DELETE')
+    `;
+    document.body.appendChild(form);
+    form.submit();
+    closeDeleteModal();
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('deleteModal');
+    if (event.target === modal) {
+        closeDeleteModal();
+    }
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeDeleteModal();
+    }
+});
+</script>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-sm w-full mx-4">
+        <div class="p-6">
+            <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 dark:bg-red-900 rounded-full mb-4">
+                <svg class="w-6 h-6 text-red-600 dark:text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white text-center mb-2">Delete Game</h3>
+            <p class="text-gray-600 dark:text-gray-400 text-center mb-4">
+                Are you sure you want to delete <strong id="gameTitle"></strong>?
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-500 text-center mb-6">
+                <span class="text-green-600 dark:text-green-400 font-semibold">✓ Don't worry!</span> You can undo this action from the success message.
+            </p>
+            <div class="flex gap-3">
+                <button type="button" onclick="closeDeleteModal()" class="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-medium transition">
+                    Cancel
+                </button>
+                <button type="button" onclick="confirmDelete()" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

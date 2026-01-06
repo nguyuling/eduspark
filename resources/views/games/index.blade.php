@@ -18,6 +18,22 @@
       @endif
     </div>
 
+      @if (session('success_undo'))
+        <div id="undo-banner" style="background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.35); color:#166534; padding:14px 16px; border-radius:12px; margin:0 40px 16px 40px; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <div>
+            <div style="font-weight:700; font-size:14px;">{{ session('success_undo') }}</div>
+            <div style="font-size:13px; color:#166534; opacity:0.8;">Undo available for 20 seconds.</div>
+          </div>
+          @if(session('undo_game_id'))
+            <form action="{{ route('games.restore', session('undo_game_id')) }}" method="POST" style="display:flex; gap:10px; align-items:center;">
+              @csrf
+              <button type="submit" style="padding:10px 16px; background:#16a34a; color:#fff; border:none; border-radius:10px; font-weight:700; cursor:pointer;">↶ Undo Delete</button>
+              <button type="button" aria-label="Close" onclick="document.getElementById('undo-banner').style.display='none';" style="background:none; border:none; color:#166534; font-size:18px; cursor:pointer; line-height:1;">×</button>
+            </form>
+          @endif
+        </div>
+      @endif
+
     @if (session('success'))
       <div class="alert-success">{{ session('success') }}</div>
     @endif
@@ -276,20 +292,77 @@
         return difficultyMap[difficulty.toLowerCase()] || 'Mudah';
     }
 
+    let deleteModalState = null;
+
     function showDeleteConfirm(gameId, gameTitle) {
-        if (confirm(`Adakah anda pasti ingin menghapus permainan ini? Tindakan ini tidak boleh dibatalkan!`)) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/games/${gameId}`;
-            form.innerHTML = `
-                @csrf
-                @method('DELETE')
-            `;
-            document.body.appendChild(form);
-            form.submit();
-        }
+      deleteModalState = { gameId, gameTitle };
+      const modal = document.getElementById('deleteModal');
+      document.getElementById('deleteGameTitle').textContent = gameTitle;
+      modal.style.display = 'flex';
     }
+
+    function closeDeleteModal() {
+      const modal = document.getElementById('deleteModal');
+      modal.style.display = 'none';
+      deleteModalState = null;
+    }
+
+    function confirmDelete() {
+      if (!deleteModalState) return;
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = `/games/${deleteModalState.gameId}`;
+      form.innerHTML = `
+        @csrf
+        @method('DELETE')
+      `;
+      document.body.appendChild(form);
+      form.submit();
+      closeDeleteModal();
+    }
+
+    // Close modal on backdrop or Escape
+    document.addEventListener('click', function(event) {
+      const modal = document.getElementById('deleteModal');
+      if (event.target === modal) {
+        closeDeleteModal();
+      }
+    });
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeDeleteModal();
+      }
+    });
+
+    // Auto-hide undo banner after 20s
+    window.addEventListener('DOMContentLoaded', function() {
+      const banner = document.getElementById('undo-banner');
+      if (banner) {
+        setTimeout(() => {
+          if (banner) banner.style.display = 'none';
+        }, 20000);
+      }
+    });
 </script>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:50;">
+    <div style="background:#fff; color:#0f172a; border-radius:14px; max-width:420px; width:90%; box-shadow:0 18px 45px rgba(15,23,42,0.18); overflow:hidden;">
+      <div style="padding:20px 24px; text-align:center;">
+        <div style="width:56px; height:56px; border-radius:50%; background:rgba(239,68,68,0.12); display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto; color:#ef4444;">
+          <i class="bi bi-trash" style="font-size:22px;"></i>
+        </div>
+        <h3 style="margin:0 0 8px 0; font-size:18px; font-weight:700;">Padam Permainan?</h3>
+        <p style="margin:0 0 16px 0; color:#475569; font-size:14px;">Anda akan memadam <strong id="deleteGameTitle"></strong>. Tindakan ini boleh diundur selepas dipadam.</p>
+        <div style="display:flex; gap:10px; margin-top:14px;">
+          <button type="button" onclick="closeDeleteModal()" style="flex:1; padding:10px 14px; background:#e2e8f0; color:#0f172a; border:none; border-radius:10px; font-weight:700; cursor:pointer;">Batal</button>
+          <button type="button" onclick="confirmDelete()" style="flex:1; padding:10px 14px; background:#ef4444; color:#fff; border:none; border-radius:10px; font-weight:700; cursor:pointer;">Padam</button>
+        </div>
+        <div style="margin-top:10px; font-size:12px; color:#0f172a; opacity:0.7;">Anda akan melihat butang Undo selepas dipadam.</div>
+      </div>
+    </div>
+  </div>
 
 <style>
     /* Force High Contrast */
