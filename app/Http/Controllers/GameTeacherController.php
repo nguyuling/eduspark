@@ -120,11 +120,14 @@ class GameTeacherController extends Controller
      */
     public function destroy($id)
     {
-        $game = Game::findOrFail($id);
+        $game = Game::where('teacher_id', auth()->id())->findOrFail($id);
+        $gameTitle = $game->title;
         $game->delete();
 
-        return back()
-            ->with('success', 'Game deleted successfully! You can undo this action.');
+        return redirect()->route('games.index')
+            ->with('success', "Game '{$gameTitle}' deleted successfully!")
+            ->with('undo_available', true)
+            ->with('undo_game_id', $id);
     }
 
     /**
@@ -132,10 +135,11 @@ class GameTeacherController extends Controller
      */
     public function restore($id)
     {
-        $game = Game::withTrashed()->findOrFail($id);
+        $game = Game::withTrashed()->where('teacher_id', auth()->id())->findOrFail($id);
+        $gameTitle = $game->title;
         $game->restore();
 
-        return back()
-            ->with('success', 'Game restored successfully!');
+        return redirect()->route('games.index')
+            ->with('success', "Game '{$gameTitle}' restored successfully!");
     }
 }

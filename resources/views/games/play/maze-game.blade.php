@@ -19,8 +19,10 @@
                 // Flag to indicate we're in play wrapper mode
                 window.isPlayWrapperMode = true;
                 window.submitGameScore = function(score, timeInSeconds) {
+                    console.log('submitGameScore called with:', score, timeInSeconds);
                     document.getElementById('score-input').value = score;
                     document.getElementById('time-input').value = timeInSeconds;
+                    console.log('About to submit form');
                     document.getElementById('submit-score-form').submit();
                 };
             </script>

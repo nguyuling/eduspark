@@ -136,6 +136,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/teacher/games/{id}/edit', [GameTeacherController::class, 'edit'])->name('teacher.games.edit');
     Route::put('/teacher/games/{id}', [GameTeacherController::class, 'update'])->name('teacher.games.update');
     Route::delete('/teacher/games/{id}', [GameTeacherController::class, 'destroy'])->name('teacher.games.destroy');
+    Route::post('/teacher/games/{id}/restore', [GameTeacherController::class, 'restore'])->name('teacher.games.restore');
 });
 
 // Forum routes

@@ -74,7 +74,7 @@
             </div>
 
             <!-- Game Over Screen -->
-            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px; min-height: 500px; flex-direction: column; align-items: center; justify-content: center;">
                 <div>
                     <div style="font-size: 100px; margin-bottom: 30px;">🎉</div>
                     <h2 style="font-size: 48px; font-weight: 900; margin-bottom: 20px; color: #1f2937;">Tahniah!</h2>
@@ -89,7 +89,7 @@
                         </div>
                     </div>
                     <button id="mulaBeramainBtn" style="padding: 20px 60px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 12px; font-size: 20px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 16px rgba(0,0,0,0.2); transition: transform 0.2s;">
-                        🎮 Mula Bermain
+                        � Lihat Skor & Ganjaran
                     </button>
                 </div>
             </div>
@@ -447,14 +447,27 @@
         clearInterval(timerInterval);
         gameActive = false;
         
-        const timeInSeconds = 300 - timeLeft; // Total time taken
+        const timeInSeconds = currentTime; // Total time taken
+        
+        console.log('endGame called, isPlayWrapperMode:', window.isPlayWrapperMode);
         
         // If wrapped in play mode, submit to game summary
         if (window.isPlayWrapperMode && window.submitGameScore) {
+            console.log('Calling submitGameScore with:', score, timeInSeconds);
+            // Hide all game elements
+            const gameContent = document.getElementById('gameContent');
+            const gameOverScreen = document.getElementById('gameOverScreen');
+            const gameHeader = document.getElementById('gameHeader');
+            
+            if (gameContent) gameContent.style.display = 'none';
+            if (gameOverScreen) gameOverScreen.style.display = 'none';
+            if (gameHeader) gameHeader.style.display = 'none';
+            
             window.submitGameScore(score, timeInSeconds);
             return;
         }
         
+        console.log('Showing game over screen (standalone mode)');
         // Standalone mode - show game over screen
         document.getElementById('gameContent').style.display = 'none';
         document.getElementById('gameOverScreen').style.display = 'flex';

@@ -275,6 +275,15 @@
         
         // If wrapped in play mode, submit to game summary
         if (window.isPlayWrapperMode && window.submitGameScore) {
+            // Hide all game elements
+            const gameContent = document.getElementById('gameContent');
+            const gameOverScreen = document.getElementById('gameOverScreen');
+            const gameHeader = document.getElementById('gameHeader');
+            
+            if (gameContent) gameContent.style.display = 'none';
+            if (gameOverScreen) gameOverScreen.style.display = 'none';
+            if (gameHeader) gameHeader.style.display = 'none';
+            
             window.submitGameScore(score, timeInSeconds);
             return;
         }
