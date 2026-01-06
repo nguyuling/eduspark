@@ -17,11 +17,13 @@ class Leaderboard extends Model
         'class',
         'game_id',
         'score',
+        'time_taken',
         'timestamp',
     ];
 
     protected $casts = [
         'timestamp' => 'datetime',
+        'time_taken' => 'integer',
     ];
 
     public function user()

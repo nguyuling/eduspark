@@ -7,6 +7,7 @@ use App\Models\GameScore;
 use App\Models\Leaderboard;
 use App\Models\Reward;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
@@ -241,6 +242,7 @@ class GameController extends Controller
         $highlightedUserIndex = -1;
         $classFilter = $request->query('class');
         $classes = collect();
+        $studentClasses = DB::table('students')->pluck('class', 'user_id');
         
         // First, try to get from existing leaderboard table if it exists
         if (Schema::hasTable('leaderboard')) {
@@ -268,11 +270,11 @@ class GameController extends Controller
                     $score = (object)[
                         'user_id' => $entry->user_id,
                         'score' => $entry->score,
-                        'time_taken' => $entry->time_taken,
+                        'time_taken' => $entry->time_taken ?? 0,
                         'completed_at' => $entry->timestamp,
                         'user' => (object)[
                             'name' => $entry->username,
-                            'email' => $entry->class,
+                            'class' => $entry->class ?? ($studentClasses[$entry->user_id] ?? 'Unknown'),
                         ],
                     ];
                     $scores->push($score);
@@ -293,7 +295,15 @@ class GameController extends Controller
                 ->orderBy('score', 'desc')
                 ->orderBy('completed_at', 'desc')
                 ->get();
-            
+
+            // Attach class info from students table for fallback path
+            foreach ($scores as $score) {
+                $score->time_taken = $score->time_taken ?? 0;
+                if ($score->user) {
+                    $score->user->class = $studentClasses[$score->user_id] ?? 'Unknown';
+                }
+            }
+
             // Track current user's index in fallback
             $index = 0;
             foreach ($scores as $score) {
@@ -303,6 +313,14 @@ class GameController extends Controller
                 }
                 $index++;
             }
+        }
+
+        // Ensure leaderboard entries also carry class info (if main path was used)
+        foreach ($scores as $score) {
+            if (isset($score->user) && !isset($score->user->class)) {
+                $score->user->class = $studentClasses[$score->user_id] ?? 'Unknown';
+            }
+            $score->time_taken = $score->time_taken ?? 0;
         }
         
         return view('games.leaderboard', compact('game', 'scores', 'currentUser', 'highlightedUserIndex', 'classes', 'classFilter'));

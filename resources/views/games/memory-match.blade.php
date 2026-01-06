@@ -59,7 +59,7 @@
                 </section>
                 <div style="display: flex; gap: 12px; justify-content: center;">
                     <button id="playAgainBtn" style="padding: 12px 30px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
-                        Main Semula
+                        Lihat Skor & Ganjaran
                     </button>
                 </div>
             </div>
@@ -142,7 +142,7 @@
         
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '{{ route("games.storeResult", 3) }}';
+        form.action = '{{ isset($game) ? route("games.storeResult", $game->id) : route("games.storeResult", 3) }}';
         
         const csrfInput = document.createElement('input');
         csrfInput.type = 'hidden';
@@ -248,6 +248,16 @@
         const gameEndTime = Date.now();
         const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
         
+        // Calculate score based on moves (fewer moves = higher score)
+        const calculatedScore = Math.max(0, 1000 - (moves * 50));
+        
+        // If wrapped in play mode, submit to game summary
+        if (window.isPlayWrapperMode && window.submitGameScore) {
+            window.submitGameScore(calculatedScore, timeInSeconds);
+            return;
+        }
+        
+        // Standalone mode - show game over screen
         document.getElementById('gameOverScreen').style.display = 'flex';
         document.getElementById('gameContent').style.display = 'none';
         document.getElementById('finalMoves').textContent = moves;
