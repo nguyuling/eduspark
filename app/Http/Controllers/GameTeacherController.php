@@ -14,7 +14,14 @@ class GameTeacherController extends Controller
      */
     public function index()
     {
-        $games = Game::where('teacher_id', auth()->id())->get();
+        $games = Game::where('teacher_id', auth()->id())
+            ->whereNull('deleted_at')
+            ->get();
+
+        if (request()->wantsJson()) {
+            return response()->json($games);
+        }
+
         return view('games.teacher.index', compact('games'));
     }
 
@@ -59,7 +66,13 @@ class GameTeacherController extends Controller
 
         Game::create($validated);
 
-        return redirect()->route('games.index')
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Game created successfully!',
+            ], 201);
+        }
+
+        return redirect()->route('teacher.games.index')
             ->with('success', 'Game created successfully!');
     }
 
@@ -111,7 +124,13 @@ class GameTeacherController extends Controller
 
         $game->update($validated);
 
-        return redirect()->route('games.index')
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Game updated successfully!',
+            ]);
+        }
+
+        return redirect()->route('teacher.games.index')
             ->with('success', 'Game updated successfully!');
     }
 
@@ -120,11 +139,21 @@ class GameTeacherController extends Controller
      */
     public function destroy($id)
     {
-        $game = Game::findOrFail($id);
+        $game = Game::where('teacher_id', auth()->id())->findOrFail($id);
+        $gameTitle = $game->title;
         $game->delete();
 
-        return back()
-            ->with('success', 'Game deleted successfully! You can undo this action.');
+        if (request()->wantsJson()) {
+            return response()->json([
+                'message' => "Game '{$gameTitle}' deleted successfully!",
+                'undo_game_id' => $id,
+            ]);
+        }
+
+        return redirect()->route('teacher.games.index')
+            ->with('success', "Game '{$gameTitle}' deleted successfully!")
+            ->with('undo_available', true)
+            ->with('undo_game_id', $id);
     }
 
     /**
@@ -132,10 +161,17 @@ class GameTeacherController extends Controller
      */
     public function restore($id)
     {
-        $game = Game::withTrashed()->findOrFail($id);
+        $game = Game::withTrashed()->where('teacher_id', auth()->id())->findOrFail($id);
+        $gameTitle = $game->title;
         $game->restore();
 
-        return back()
-            ->with('success', 'Game restored successfully!');
+        if (request()->wantsJson()) {
+            return response()->json([
+                'message' => "Game '{$gameTitle}' restored successfully!",
+            ]);
+        }
+
+        return redirect()->route('teacher.games.index')
+            ->with('success', "Game '{$gameTitle}' restored successfully!");
     }
 }

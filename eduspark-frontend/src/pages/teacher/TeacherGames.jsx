@@ -6,6 +6,7 @@ const TeacherGames = () => {
   const [loading, setLoading] = useState(true);
   const [editingGame, setEditingGame] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [undoToast, setUndoToast] = useState(null); // {id, title}
 
   useEffect(() => {
     fetchTeacherGames();
@@ -31,18 +32,45 @@ const TeacherGames = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this game?')) {
+    const target = games.find(g => g.id === id);
+    if (!target) return;
+
+    if (window.confirm(`Delete "${target.title}"? You can undo right after.`)) {
       try {
         await axios.delete(`/api/teacher/games/${id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
           }
         });
-        setGames(games.filter(game => game.id !== id));
+
+        // Optimistic remove
+        setGames(prev => prev.filter(game => game.id !== id));
+        setUndoToast({ id, title: target.title });
+
+        // Auto-hide undo after 8s
+        setTimeout(() => setUndoToast(null), 8000);
       } catch (error) {
         console.error('Error deleting game:', error);
         alert('Failed to delete game');
       }
+    }
+  };
+
+  const handleUndo = async () => {
+    if (!undoToast) return;
+    try {
+      await axios.post(`/api/teacher/games/${undoToast.id}/restore`, {}, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      });
+
+      // Reload list to ensure state is accurate
+      await fetchTeacherGames();
+      setUndoToast(null);
+    } catch (error) {
+      console.error('Error restoring game:', error);
+      alert('Failed to undo delete');
     }
   };
 
@@ -71,6 +99,54 @@ const TeacherGames = () => {
       backgroundColor: 'var(--background)',
       color: 'var(--text)'
     }}>
+      {undoToast && (
+        <div style={{
+          marginBottom: '16px',
+          padding: '14px 16px',
+          backgroundColor: 'rgba(46, 204, 113, 0.12)',
+          border: '1px solid rgba(46, 204, 113, 0.25)',
+          borderRadius: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px'
+        }}>
+          <div>
+            <div style={{ fontWeight: 700, color: '#27ae60' }}>Deleted "{undoToast.title}"</div>
+            <div style={{ color: 'var(--muted)', fontSize: '14px' }}>You can undo this action.</div>
+          </div>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <button
+              onClick={handleUndo}
+              style={{
+                padding: '10px 16px',
+                backgroundColor: '#27ae60',
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              Undo
+            </button>
+            <button
+              onClick={() => setUndoToast(null)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--muted)',
+                cursor: 'pointer',
+                fontSize: '18px',
+                lineHeight: 1
+              }}
+              aria-label="Close undo banner"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: '700', margin: '0' }}>Manage Games</h1>
