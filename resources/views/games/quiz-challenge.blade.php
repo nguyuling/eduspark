@@ -303,7 +303,7 @@
         
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '{{ route("games.storeResult", 5) }}';
+        form.action = '{{ isset($game) ? route("games.storeResult", $game->id) : route("games.storeResult", 5) }}';
         
         const csrfInput = document.createElement('input');
         csrfInput.type = 'hidden';
