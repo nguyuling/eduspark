@@ -1,48 +1,78 @@
-*.log
-.DS_Store
+# ============================================================================
+# Environment Variables
+# ============================================================================
 .env
 .env.backup
 .env.production
-.phpactor.json
-.phpunit.result.cache
-/database.sqlite
-/.fleet
+.env.testing
+
+# ============================================================================
+# IDE and Editor Files
+# ============================================================================
+/.vscode
 /.idea
 /.nova
-/.phpunit.cache
-/.vscode
+/.fleet
 /.zed
-/auth.json
-/database/database.sqlite
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/logs/laravel.log
-/storage/pail
-/vendor
-/vendor/composer/InstalledVersions.php
-/vendor/composer/autoload_classmap.php
-/vendor/composer/autoload_static.php
-bootstrap/cache/*.php
-Homestead.json
-Homestead.yaml
+.phpactor.json
+
+# ============================================================================
+# OS Files
+# ============================================================================
+.DS_Store
 Thumbs.db
 .git.zip
 
-# Environment testing
-.env.testing
-
-# Package managers
-package-lock.json
-yarn.lock
-
-# Editor temporary files
+# ============================================================================
+# Editor Temporary Files
+# ============================================================================
 *.swp
 *.swo
 *~
 
-# Build artifacts
+# ============================================================================
+# Dependencies
+# ============================================================================
+/vendor
+/node_modules
+package-lock.json
+yarn.lock
+
+# ============================================================================
+# Composer Auto-Generated Files
+# ============================================================================
+/vendor/composer/InstalledVersions.php
+/vendor/composer/autoload_classmap.php
+/vendor/composer/autoload_static.php
+
+# ============================================================================
+# Laravel Framework Specific
+# ============================================================================
+/auth.json
+.phpunit.result.cache
+/.phpunit.cache
+bootstrap/cache/*.php
+/storage/*.key
+/storage/pail
+/storage/logs/laravel.log
+
+# ============================================================================
+# Database
+# ============================================================================
+/database.sqlite
+/database/database.sqlite
+
+# ============================================================================
+# Build Artifacts
+# ============================================================================
+/public/build
+/public/hot
+/public/storage
 /public/js/*.min.js
 /public/css/*.min.css
+
+# ============================================================================
+# Deployment
+# ============================================================================
+Homestead.json
+Homestead.yaml
