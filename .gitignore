@@ -22,8 +22,27 @@
 /storage/logs/laravel.log
 /storage/pail
 /vendor
+/vendor/composer/InstalledVersions.php
+/vendor/composer/autoload_classmap.php
+/vendor/composer/autoload_static.php
 bootstrap/cache/*.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
 .git.zip
+
+# Environment testing
+.env.testing
+
+# Package managers
+package-lock.json
+yarn.lock
+
+# Editor temporary files
+*.swp
+*.swo
+*~
+
+# Build artifacts
+/public/js/*.min.js
+/public/css/*.min.css
