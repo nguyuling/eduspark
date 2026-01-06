@@ -147,7 +147,7 @@ class GameController extends Controller
             // Get student class from students table
             $studentClass = 'Unknown';
             if ($user->role === 'student') {
-                $student = \App\Models\Student::where('user_id', $user->id)->first();
+                $student = DB::table('students')->where('user_id', $user->id)->first();
                 if ($student && $student->class) {
                     $studentClass = $student->class;
                 }
