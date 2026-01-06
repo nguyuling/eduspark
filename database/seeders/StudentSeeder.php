@@ -59,6 +59,8 @@ class StudentSeeder extends Seeder
             $payload = [
                 'id' => $u->id,
                 'name' => $u->name,
+                'email' => $u->email,
+                'student_id' => 'STU' . str_pad($u->id, 5, '0', STR_PAD_LEFT),
                 'created_at' => now(),
                 'updated_at' => now(),
             ];

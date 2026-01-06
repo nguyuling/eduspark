@@ -84,10 +84,10 @@
               $attemptsUsed = $completedAttempts->count();
               $isFutureDue = !$quiz->due_at || $quiz->due_at->isFuture();
               $canAttempt = ($attemptsUsed < $quiz->max_attempts) && $isFutureDue;
-              $latestAttempt = $completedAttempts->sortByDesc('submitted_at')->first();
+              $highestAttempt = $completedAttempts->sortByDesc('score')->first();
               $statusBadge = 'New';
               $badgeStyle = 'background:rgba(106,77,247,0.1); color:inherit;';
-              if ($latestAttempt) {
+              if ($highestAttempt) {
                 $statusBadge = 'Completed';
                 $badgeStyle = 'background:#6A4DF7; color:#fff;';
               } elseif ($quiz->due_at && $quiz->due_at->isPast()) {
@@ -117,11 +117,11 @@
                 <div style="font-weight:600; font-size:12px; margin-bottom:4px; padding:4px 8px; border-radius:6px; display:inline-block; {{ $badgeStyle }}">{{ $statusBadge }}</div>
                 <div style="font-size:12px; margin-top:4px;">
                   <div style="margin-bottom:2px;">{{ $attemptsUsed }}/{{ $quiz->max_attempts }} percubaan</div>
-                  @if ($latestAttempt)
+                  @if ($highestAttempt)
                     @php
                       $totalMarks = $quiz->questions->sum('points') ?? 0;
                     @endphp
-                    <div style="font-weight:700;">Markah: {{ $latestAttempt->score }}/{{ $totalMarks }}</div>
+                    <div style="font-weight:700;">Markah: {{ $highestAttempt->score }}/{{ $totalMarks }}</div>
                   @endif
                 </div>
               </td>
@@ -131,8 +131,8 @@
                     <a href="{{ route('student.quizzes.start', $quiz->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="{{ $attemptsUsed > 0 ? 'Cuba Semula' : 'Mula Kuiz' }}">
                       <i class="bi bi-arrow-right-circle-fill"></i>
                     </a>
-                  @elseif ($latestAttempt)
-                    <a href="{{ route('student.quizzes.result', $latestAttempt->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--success); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Lihat Keputusan">
+                  @elseif ($highestAttempt)
+                    <a href="{{ route('student.quizzes.result', $highestAttempt->id) }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--success); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Lihat Keputusan">
                       <i class="bi bi-bar-chart"></i>
                     </a>
                   @else
