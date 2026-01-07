@@ -24,6 +24,80 @@
       <div style="background:var(--danger);color:#fff;padding:12px 14px;border-radius:var(--card-radius);margin-bottom:20px;margin-left:40px;margin-right:40px;font-size:14px;">{{ session('error') }}</div>
     @endif
 
+    <!-- Search and Filter Section -->
+    <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+      <form method="GET" action="{{ route('teacher.quizzes.index') }}" style="display:grid; grid-template-columns: 2fr 1fr 1fr auto; gap:12px; align-items:end;">
+        
+        <!-- Search by Title -->
+        <div>
+          <label style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:var(--text);">Cari Kuiz</label>
+          <input 
+            type="text" 
+            name="title" 
+            value="{{ request('title') }}"
+            placeholder="Cari tajuk kuiz..."
+            style="width:100%; padding:10px 14px; border-radius:8px; border:2px solid #d1d5db; background:transparent; color:inherit; font-size:14px; outline:none; transition:border-color 0.2s ease;"
+            onfocus="this.style.borderColor='var(--accent)'"
+            onblur="this.style.borderColor='#d1d5db'"
+          >
+        </div>
+
+        <!-- Search by Unique ID -->
+        <div>
+          <label style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:var(--text);">Kuiz ID</label>
+          <input 
+            type="text" 
+            name="unique_id" 
+            value="{{ request('unique_id') }}"
+            placeholder="Cari ID unik..."
+            style="width:100%; padding:10px 14px; border-radius:8px; border:2px solid #d1d5db; background:transparent; color:inherit; font-size:14px; outline:none; transition:border-color 0.2s ease;"
+            onfocus="this.style.borderColor='var(--accent)'"
+            onblur="this.style.borderColor='#d1d5db'"
+          >
+        </div>
+
+        <!-- Filter by Publish Date -->
+        <div>
+          <label style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:var(--text);">Tarikh Diterbitkan</label>
+          <select 
+            name="publish_date_range"
+            style="width:100%; padding:10px 14px; border-radius:8px; border:2px solid #d1d5db; background:transparent; color:inherit; font-size:14px; outline:none; cursor:pointer; transition:border-color 0.2s ease;"
+            onfocus="this.style.borderColor='var(--accent)'"
+            onblur="this.style.borderColor='#d1d5db'"
+          >
+            <option value="">Semua Masa</option>
+            <option value="today" {{ request('publish_date_range') == 'today' ? 'selected' : '' }}>Hari Ini</option>
+            <option value="month" {{ request('publish_date_range') == 'month' ? 'selected' : '' }}>Bulan Ini</option>
+            <option value="3months" {{ request('publish_date_range') == '3months' ? 'selected' : '' }}>3 Bulan Terakhir</option>
+            <option value="year" {{ request('publish_date_range') == 'year' ? 'selected' : '' }}>Tahun Ini</option>
+          </select>
+        </div>
+
+        <!-- Search Button -->
+        <div style="display:flex; gap:8px;">
+          <button type="submit" class="btn-cari">
+            <i class="bi bi-search"></i> Cari
+          </button>
+          @if(request()->hasAny(['title', 'unique_id', 'publish_date_range', 'scope']))
+            <a href="{{ route('teacher.quizzes.index') }}" class="btn-semula">
+              <i class="bi bi-x-lg"></i> Semula
+            </a>
+          @endif
+        </div>
+      </form>
+
+      <!-- Created by Me Filter -->
+      <div style="margin-top:15px; display:flex; align-items:center; gap:6px;">
+        <form method="GET" action="{{ route('teacher.quizzes.index') }}" style="display:flex; align-items:center; gap:6px;">
+          <input type="hidden" name="title" value="{{ request('title') }}">
+          <input type="hidden" name="unique_id" value="{{ request('unique_id') }}">
+          <input type="hidden" name="publish_date_range" value="{{ request('publish_date_range') }}">
+          <input type="checkbox" id="created_by_me" name="scope" value="mine" onchange="this.form.submit()" {{ request('scope') == 'mine' ? 'checked' : '' }} style="width:18px; height:18px; cursor:pointer;">
+          <label for="created_by_me" style="margin-bottom:0; font-size:13px; cursor:pointer; font-weight:600;">Hanya tunjukkan kuiz yang saya cipta</label>
+        </form>
+      </div>
+    </section>
+
     <!-- Quiz List Table -->
     <section class="panel" style="margin-bottom:20px; margin-top:10px;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
@@ -33,47 +107,6 @@
             {{ count($quizzes) }}
           </span>
         </div>
-        <button type="button" onclick="toggleFilterPanel()" style="background:transparent; border:2px solid var(--accent); color:var(--accent); padding:8px 12px; border-radius:6px; cursor:pointer; font-size:16px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';" title="Tunjukkan/Sembunyikan Penapis">
-          <i class="bi bi-funnel"></i>
-        </button>
-      </div>
-      <!-- Filter Panel (Collapsible) -->
-      <div id="filter-panel" style="display:{{ !empty(array_filter(['unique_id' => request('unique_id'), 'title' => request('title'), 'creator_email' => request('creator_email'), 'publish_date_range' => request('publish_date_range'), 'scope' => request('scope')])) ? 'block' : 'none' }}; margin-bottom:20px; padding-bottom:20px;">
-        <form method="GET" action="{{ route('teacher.quizzes.index') }}" id="filter-form">
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:15px;">
-            <div>
-              <label style="font-size:12px;">ID Unik</label>
-              <input type="text" name="unique_id" value="{{ request('unique_id') ?? '' }}" placeholder="A1b2C3d4" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" onkeyup="autoSubmitForm()">
-            </div>
-            <div>
-              <label style="font-size:12px;">Tajuk</label>
-              <input type="text" name="title" value="{{ request('title') ?? '' }}" placeholder="Sains Komputer" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" onkeyup="autoSubmitForm()">
-            </div>
-            <div>
-              <label style="font-size:12px;">Email Pencipta</label>
-              <input type="email" name="creator_email" value="{{ request('creator_email') ?? '' }}" placeholder="guru@email.com" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" onkeyup="autoSubmitForm()">
-            </div>
-            <div style="display:flex; flex-direction:column;">
-              <label style="font-size:12px;">Tarikh Diterbitkan</label>
-              <div style="display:flex; gap:8px; align-items:flex-start; height:40px;">
-                <select name="publish_date_range" onchange="autoSubmitForm()" style="height:100%; flex:1; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
-                  <option value="">Semua Masa</option>
-                  <option value="today" @if (request('publish_date_range') === 'today') selected @endif>Hari Ini</option>
-                  <option value="month" @if (request('publish_date_range') === 'month') selected @endif>Bulan Ini</option>
-                  <option value="3months" @if (request('publish_date_range') === '3months') selected @endif>3 Bulan Terakhir</option>
-                  <option value="year" @if (request('publish_date_range') === 'year') selected @endif>Tahun Ini</option>
-                </select>
-                <a href="{{ route('teacher.quizzes.index') }}" onclick="keepFilterPanelOpen(); return true;" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:8px; cursor:pointer; font-size:24px; transition:all .2s ease; text-decoration:none; white-space:nowrap; height:40px; width:40px;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Ulang Penapis">
-                  <i class="bi bi-arrow-repeat"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div style="display:flex; align-items:center; gap:6px;">
-            <input type="checkbox" id="created_by_me" name="scope" value="mine" onchange="autoSubmitForm()" @if (request('scope') === 'mine') checked @endif style="width:18px; height:18px; cursor:pointer;">
-            <label for="created_by_me" style="margin-bottom:0; font-size:12px; cursor:pointer;">Hanya tunjukkan kuiz yang saya cipta</label>
-          </div>
-        </form>
       </div>      
       <table>
         <thead>
@@ -191,44 +224,6 @@ function deleteQuiz(quizId) {
     deleteForm.submit();
   }
 }
-
-function toggleFilterPanel() {
-  const filterPanel = document.getElementById('filter-panel');
-  if (filterPanel.style.display === 'none') {
-    filterPanel.style.display = 'block';
-  } else {
-    filterPanel.style.display = 'none';
-  }
-}
-
-function keepFilterPanelOpen() {
-  sessionStorage.setItem('keepFilterOpen', 'true');
-}
-
-function autoSubmitForm() {
-  // Clear any existing timeout
-  if (window.filterTimeout) clearTimeout(window.filterTimeout);
-  // Debounce: submit form after 500ms of no input
-  window.filterTimeout = setTimeout(() => {
-    console.log('Submitting filter form with values:', {
-      unique_id: document.querySelector('input[name="unique_id"]').value,
-      title: document.querySelector('input[name="title"]').value,
-      creator_email: document.querySelector('input[name="creator_email"]').value,
-      publish_date_range: document.querySelector('select[name="publish_date_range"]').value,
-      scope: document.querySelector('input[name="scope"]').checked ? 'mine' : ''
-    });
-    document.getElementById('filter-form').submit();
-  }, 500);
-}
-
-// Keep filter panel open if flag is set
-document.addEventListener('DOMContentLoaded', function() {
-  if (sessionStorage.getItem('keepFilterOpen') === 'true') {
-    const filterPanel = document.getElementById('filter-panel');
-    filterPanel.style.display = 'block';
-    sessionStorage.removeItem('keepFilterOpen');
-  }
-});
 </script>
 
 @endsection
