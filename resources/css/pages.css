@@ -1158,27 +1158,27 @@ label {
 }
 
 .btn-semula {
-  padding: 10px 15px !important;
-  background: #6b7280 !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 8px !important;
-  font-weight: 600 !important;
-  font-size: 14px !important;
-  cursor: pointer !important;
-  text-decoration: none !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  transition: all 0.2s ease !important;
+  padding: 10px 15px;
+  background: #6b7280;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
 }
 
 .btn-semula:hover {
-  background: #4b5563 !important;
-  text-decoration: none !important;
-  opacity: 1 !important;
+  background: #4b5563;
+  text-decoration: none;
+  opacity: 1;
 }
 
 .btn-semula:active {
-  background: #3d4452 !important;
+  background: #3d4452;
 }
