@@ -13,6 +13,33 @@ use Illuminate\Support\Str;
 class ReportController extends Controller
 {
     /**
+     * Convert score to letter grade
+     * A+ = 90-100%, A = 80-89%, A- = 70-79%, B+ = 65-69%, B = 60-64%
+     * C+ = 55-59%, C = 50-54%, D = 45-49%, E = 40-44%, F = 0-39% (Fail)
+     */
+    private function getGrade($score)
+    {
+        if ($score >= 90) return 'A+';
+        if ($score >= 80) return 'A';
+        if ($score >= 70) return 'A-';
+        if ($score >= 65) return 'B+';
+        if ($score >= 60) return 'B';
+        if ($score >= 55) return 'C+';
+        if ($score >= 50) return 'C';
+        if ($score >= 45) return 'D';
+        if ($score >= 40) return 'E';
+        return 'F'; // Below 40 is F (fail)
+    }
+
+    /**
+     * Check if score passes (E grade or higher = 40% or above)
+     */
+    private function isPassing($score)
+    {
+        return $score >= 40;
+    }
+
+    /**
      * Reports landing page.
      */
     public function index()
@@ -367,7 +394,7 @@ class ReportController extends Controller
             fputcsv($out, []); // blank
 
             // Table header
-            fputcsv($out, ['Tarikh','Jenis','Topik','Skor']);
+            fputcsv($out, ['Tarikh','Jenis','Topik','Skor','Gred']);
 
             // Rows
             foreach ($attemptsQuery as $r) {
@@ -377,11 +404,25 @@ class ReportController extends Controller
                 $percentage = ($score / $maxPoints) * 100;
                 $scoreDisplay = round($score, 2) . '/' . (int)$maxPoints . ' (' . round($percentage, 2) . '%)';
                 
+                // Calculate grade
+                $grade = 'N/A';
+                if ($percentage >= 90) $grade = 'A+';
+                elseif ($percentage >= 80) $grade = 'A';
+                elseif ($percentage >= 70) $grade = 'A-';
+                elseif ($percentage >= 65) $grade = 'B+';
+                elseif ($percentage >= 60) $grade = 'B';
+                elseif ($percentage >= 55) $grade = 'C+';
+                elseif ($percentage >= 50) $grade = 'C';
+                elseif ($percentage >= 45) $grade = 'D';
+                elseif ($percentage >= 40) $grade = 'E';
+                else $grade = 'F';
+                
                 fputcsv($out, [
                     $dateStr,
                     $r->type ?? '',
                     $r->topic ?? 'N/A',
-                    $scoreDisplay
+                    $scoreDisplay,
+                    $grade
                 ]);
             }
 
@@ -720,9 +761,10 @@ class ReportController extends Controller
                     
                     $avgPercentage = array_sum($scores) / count($scores);
                     $avgScore = round($avgPercentage, 2) . '%';
+                    $avgGrade = $this->getGrade($avgPercentage);
                     
-                    // Calculate success rate (attempts with score >= 70%)
-                    $successCount = count(array_filter($scores, fn($s) => $s >= 70));
+                    // Calculate success rate (attempts with grade E or higher = 40% or above)
+                    $successCount = count(array_filter($scores, fn($s) => $this->isPassing($s)));
                     $successRate = round(($successCount / count($scores)) * 100, 2) . '%';
                 }
             }
@@ -740,6 +782,7 @@ class ReportController extends Controller
             $classStats = [
                 'student_count' => count($students),
                 'avg_score' => $avgScore,
+                'avg_grade' => $avgGrade,
                 'total_attempts' => $totalAttempts,
                 'success_rate' => $successRate,
                 'weakest_subject' => $weakestTopic
@@ -1003,8 +1046,8 @@ class ReportController extends Controller
             $query = DB::table('quiz_attempts as qa')
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id');
             
-            if ($selectedClass && $selectedClass !== '') {
-                // Filter by class if specified
+            if ($selectedClass && $selectedClass !== '' && $selectedClass !== 'semua') {
+                // Filter by class if specified (but not for 'semua' which means all classes)
                 if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
                     $classroom = DB::table('classrooms')->where('name', $selectedClass)->first();
                     if ($classroom) {
@@ -1047,9 +1090,10 @@ class ReportController extends Controller
         // Calculate statistics
         $scores = $attempts->pluck('score')->filter(function($v) { return is_numeric($v); })->map(function($v) { return (float)$v; });
         $avgScore = $scores->count() > 0 ? round($scores->avg(), 2) : 0;
+        $avgGrade = $this->getGrade($avgScore);
         $totalAttempts = $attempts->count();
         $activeStudents = $attempts->pluck('student_id')->unique()->count();
-        $successRate = $scores->count() > 0 ? round(($scores->filter(function($v) { return $v >= 70; })->count() / $scores->count()) * 100, 2) : 0;
+        $successRate = $scores->count() > 0 ? round(($scores->filter(function($v) { return $this->isPassing($v); })->count() / $scores->count()) * 100, 2) : 0;
 
         // Topic performance
         $topicData = $attempts->groupBy('title')
@@ -1134,6 +1178,7 @@ class ReportController extends Controller
 
         return response()->json([
             'avgScore' => $avgScore,
+            'avgGrade' => $avgGrade,
             'totalAttempts' => $totalAttempts,
             'activeStudents' => $activeStudents,
             'successRate' => $successRate,

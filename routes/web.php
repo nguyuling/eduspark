@@ -7,6 +7,9 @@ use App\Http\Controllers\QuizStudentController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AIChatController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\DirectMessageController;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
@@ -146,4 +149,21 @@ Route::middleware('auth')->group(function () {
     Route::put('/forum/{id}', [ForumController::class, 'update'])->name('forum.update');
     Route::delete('/forum/{id}', [ForumController::class, 'destroy'])->name('forum.destroy');
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
+});
+
+// AI Chat routes
+Route::middleware('auth')->group(function () {
+    Route::post('/api/ai-chat/send', [AIChatController::class, 'sendMessage'])->name('ai.chat.send');
+});
+
+// Messages routes
+Route::middleware('auth')->group(function () {
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages/send', [MessageController::class, 'send'])->name('messages.send');
+    Route::get('/messages/{user}', [MessageController::class, 'conversation'])->name('messages.conversation');
+    
+    // Direct messages
+    Route::get('/direct-messages', [DirectMessageController::class, 'index'])->name('direct-messages.index');
+    Route::post('/direct-messages/{user}', [DirectMessageController::class, 'store'])->name('direct-messages.store');
+    Route::get('/direct-messages/{user}', [DirectMessageController::class, 'show'])->name('direct-messages.show');
 });

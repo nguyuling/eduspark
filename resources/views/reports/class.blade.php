@@ -21,13 +21,23 @@
         </div>
 
         <div class="card" style="min-width:180px;">
+          <div class="label">Gred Purata</div>
+          <div class="value">{{ $classStats['avg_grade'] ?? 'N/A' }}</div>
+        </div>
+
+        <div class="card" style="min-width:180px;">
+          <div class="label">Kadar Kejayaan</div>
+          <div class="value">{{ $classStats['success_rate'] ?? 'N/A' }}</div>
+        </div>
+
+        <div class="card" style="min-width:180px;">
           <div class="label">Topik Paling Lemah</div>
           <div class="value">{{ $classStats['weakest_subject'] ?? 'N/A' }}</div>
         </div>
 
       </div>
 
-      <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;">
+      <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;">
         <a href="{{ route('reports.class.csv', $selectedClass) }}" class="btn" 
            style="padding:8px 12px;border-radius:8px;background:#f4f4f6;border:1px solid rgba(0,0,0,0.08);">
            Muat Turun CSV

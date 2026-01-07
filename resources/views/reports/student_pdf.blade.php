@@ -24,25 +24,41 @@
   <table>
     <thead>
       <tr>
-        <th style="width:140px;">Tarikh</th>
-        <th style="width:110px;">Jenis</th>
+        <th style="width:120px;">Tarikh</th>
+        <th style="width:100px;">Jenis</th>
         <th>Topik</th>
-        <th style="width:120px;">Skor</th>
+        <th style="width:100px;">Skor</th>
+        <th style="width:60px;">Gred</th>
       </tr>
     </thead>
     <tbody>
       @if(!empty($attempts))
         @foreach($attempts as $a)
+          @php
+            $percent = isset($a['percentage']) ? floatval(str_replace('%', '', $a['percentage'])) : 0;
+            $grade = 'N/A';
+            if ($percent >= 90) $grade = 'A+';
+            elseif ($percent >= 80) $grade = 'A';
+            elseif ($percent >= 70) $grade = 'A-';
+            elseif ($percent >= 65) $grade = 'B+';
+            elseif ($percent >= 60) $grade = 'B';
+            elseif ($percent >= 55) $grade = 'C+';
+            elseif ($percent >= 50) $grade = 'C';
+            elseif ($percent >= 45) $grade = 'D';
+            elseif ($percent >= 40) $grade = 'E';
+            else $grade = 'F';
+          @endphp
           <tr>
             <td>{{ $a['date'] }}</td>
             <td>{{ $a['type'] }}</td>
             <td>{{ $a['topic'] }}</td>
             <td>{{ isset($a['raw_score']) && isset($a['max_points']) ? $a['raw_score'] . '/' . $a['max_points'] : '' }} ({{ isset($a['percentage']) ? $a['percentage'] . '%' : '' }})</td>
+            <td style="text-align:center;font-weight:700;">{{ $grade }}</td>
           </tr>
         @endforeach
       @else
         <tr>
-          <td colspan="4" style="text-align:center;color:#666;">Tiada rekod percubaan.</td>
+          <td colspan="5" style="text-align:center;color:#666;">Tiada rekod percubaan.</td>
         </tr>
       @endif
     </tbody>

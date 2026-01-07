@@ -56,16 +56,16 @@
             <div id="stat-avg-score" style="font-size:28px;font-weight:700;">0</div>
         </div>
         <div style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);border-radius:8px;padding:16px;color:#fff;">
+            <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Gred Purata</div>
+            <div id="stat-avg-grade" style="font-size:28px;font-weight:700;">N/A</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);border-radius:8px;padding:16px;color:#fff;">
             <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Jumlah Percubaan</div>
             <div id="stat-total-attempts" style="font-size:28px;font-weight:700;">0</div>
         </div>
-        <div style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);border-radius:8px;padding:16px;color:#fff;">
+        <div style="background:linear-gradient(135deg,#fa709a 0%,#fee140 100%);border-radius:8px;padding:16px;color:#fff;">
             <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Pelajar Aktif</div>
             <div id="stat-active-students" style="font-size:28px;font-weight:700;">0</div>
-        </div>
-        <div style="background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%);border-radius:8px;padding:16px;color:#fff;">
-            <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Kadar Kejayaan</div>
-            <div id="stat-success-rate" style="font-size:28px;font-weight:700;">0%</div>
         </div>
     </div>
 
@@ -361,9 +361,9 @@ async function loadStatistics() {
 
         // Update stat cards with default values
         document.getElementById('stat-avg-score').textContent = data.avgScore !== undefined ? data.avgScore : '0';
+        document.getElementById('stat-avg-grade').textContent = data.avgGrade !== undefined ? data.avgGrade : 'N/A';
         document.getElementById('stat-total-attempts').textContent = data.totalAttempts !== undefined ? data.totalAttempts : '0';
         document.getElementById('stat-active-students').textContent = data.activeStudents !== undefined ? data.activeStudents : '0';
-        document.getElementById('stat-success-rate').textContent = (data.successRate !== undefined ? data.successRate : '0') + '%';
 
         // Only draw charts if Chart.js is available
         if (typeof Chart !== 'undefined') {
