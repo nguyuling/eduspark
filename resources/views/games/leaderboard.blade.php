@@ -6,7 +6,7 @@
     <!-- Header -->
     <div class="header">
       <div>
-        <div class="title">{{ $game->title }} - Papan Mata</div>
+        <div class="title">Papan Mata: {{ $game->title }}</div>
         <div class="sub">Analitik prestasi kelas</div>
       </div>
       <a href="{{ route('games.index') }}" class="btn-kembali">
