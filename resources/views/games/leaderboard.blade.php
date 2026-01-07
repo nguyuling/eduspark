@@ -17,7 +17,7 @@
     <!-- Filter Section -->
     @if(isset($classes) && $classes->count() > 0)
     <section class="panel" style="margin-bottom:20px; margin-top:10px;">
-      <form method="GET" action="{{ route('games.leaderboard', $game->id) }}" style="display:grid; grid-template-columns: 2fr 1fr auto; gap:12px; align-items:end;">
+      <form method="GET" action="{{ route('games.leaderboard', $game->id) }}" style="display:grid; grid-template-columns: 1fr auto; gap:12px; align-items:end;">
         <div>
           <label style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:var(--text);">Tapis Mengikut Kelas</label>
           <select name="class" style="width:100%; padding:10px 14px; border-radius:8px; border:2px solid #d1d5db; background:transparent; color:inherit; font-size:14px; outline:none; transition:border-color 0.2s ease; cursor:pointer;"
@@ -29,7 +29,7 @@
             @endforeach
           </select>
         </div>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex; gap:8px; justify-content:flex-end;">
           <button type="submit" class="btn-cari">
             <i class="bi bi-search"></i> Tapis
           </button>
