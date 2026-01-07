@@ -12,73 +12,56 @@
       </div>
     </div>
 
-    <!-- Search and Filter Section -->
+    <!-- Lessons Panel -->
     <section class="panel" style="margin-bottom:20px; margin-top:10px;">
-      <form method="GET" action="{{ route('lesson.index') }}" style="display:grid; grid-template-columns: 2fr 1fr 1fr auto; gap:12px; align-items:end;">
-          
-          <!-- Search by Title -->
-          <div>
-            <label style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:var(--text);">Cari Bahan</label>
-            <input 
-              type="text" 
-              name="q" 
-              value="{{ $filters['q'] ?? '' }}"
-              placeholder="Cari tajuk bahan..."
-              style="width:100%; padding:10px 14px; border-radius:8px; border:2px solid #d1d5db; background:transparent; color:inherit; font-size:14px; outline:none; transition:border-color 0.2s ease;"
-              onfocus="this.style.borderColor='var(--accent)'"
-              onblur="this.style.borderColor='#d1d5db'"
-            >
-          </div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <h2 style="margin:0; padding:0; font-size:18px; font-weight:700; line-height:1;">Bahan Tersedia</h2>
+          <span class="badge-pill" style="background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px;">
+            {{ count($lessons ?? []) }}
+          </span>
+        </div>
+        <button type="button" onclick="toggleFilterPanel()" style="background:transparent; border:2px solid var(--accent); color:var(--accent); padding:8px 12px; border-radius:6px; cursor:pointer; font-size:16px; transition:all .2s ease;" onmouseover="this.style.background='rgba(106,77,247,0.1)';" onmouseout="this.style.background='transparent';" title="Tunjukkan/Sembunyikan Penapis">
+          <i class="bi bi-funnel"></i>
+        </button>
+      </div>
 
-          <!-- Filter by File Type -->
-          <div>
-            <label style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:var(--text);">Jenis Fail</label>
-            <select 
-              name="file_type"
-              style="width:100%; padding:10px 14px; border-radius:8px; border:2px solid #d1d5db; background:transparent; color:inherit; font-size:14px; outline:none; cursor:pointer; transition:border-color 0.2s ease;"
-              onfocus="this.style.borderColor='var(--accent)'"
-              onblur="this.style.borderColor='#d1d5db'"
-            >
-              <option value="">Semua</option>
-              <option value="pdf" @if (isset($filters['file_type']) && $filters['file_type'] == 'pdf') selected @endif>PDF</option>
-              <option value="docx" @if (isset($filters['file_type']) && $filters['file_type'] == 'docx') selected @endif>DOCX</option>
-              <option value="pptx" @if (isset($filters['file_type']) && $filters['file_type'] == 'pptx') selected @endif>PPTX</option>
-              <option value="jpg" @if (isset($filters['file_type']) && $filters['file_type'] == 'jpg') selected @endif>JPG</option>
-              <option value="png" @if (isset($filters['file_type']) && $filters['file_type'] == 'png') selected @endif>PNG</option>
-            </select>
-          </div>
-
-          <!-- Filter by Date Range -->
-          <div>
-            <label style="display:block; font-weight:600; font-size:13px; margin-bottom:6px; color:var(--text);">Tarikh Cipta</label>
-            <input 
-              type="date" 
-              name="date_from" 
-              value="{{ $filters['date_from'] ?? '' }}"
-              style="width:100%; padding:10px 14px; border-radius:8px; border:2px solid #d1d5db; background:transparent; color:inherit; font-size:14px; outline:none; transition:border-color 0.2s ease;"
-              onfocus="this.style.borderColor='var(--accent)'"
-              onblur="this.style.borderColor='#d1d5db'"
-            >
-          </div>
-
-          <!-- Search Button -->
-          <div style="display:flex; gap:8px;">
-            <button type="submit" class="btn-cari">
-              <i class="bi bi-search"></i> Cari
-            </button>
-            @if(request()->hasAny(['q', 'file_type', 'date_from', 'date_to']))
-              <a href="{{ route('lesson.index') }}" class="btn-semula">
-                <i class="bi bi-x-lg"></i> Semula
-              </a>
-            @endif
+      <!-- Filter Panel (Collapsible) -->
+      <div id="filter-panel" style="display:{{ !empty(array_filter(['q' => request('q'), 'file_type' => request('file_type'), 'date_from' => request('date_from'), 'date_to' => request('date_to')])) ? 'block' : 'none' }}; margin-bottom:20px; padding-bottom:0;">
+        <form method="GET" action="{{ route('lesson.index') }}" id="filter-form">
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:0;">
+            <div>
+              <label style="font-size:12px;">Cari</label>
+              <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Tajuk atau penerangan" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:12px;">Jenis Fail</label>
+              <select name="file_type" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+                <option value="">Semua</option>
+                <option value="pdf" @if (isset($filters['file_type']) && $filters['file_type'] == 'pdf') selected @endif>PDF</option>
+                <option value="docx" @if (isset($filters['file_type']) && $filters['file_type'] == 'docx') selected @endif>DOCX</option>
+                <option value="pptx" @if (isset($filters['file_type']) && $filters['file_type'] == 'pptx') selected @endif>PPTX</option>
+                <option value="jpg" @if (isset($filters['file_type']) && $filters['file_type'] == 'jpg') selected @endif>JPG</option>
+                <option value="png" @if (isset($filters['file_type']) && $filters['file_type'] == 'png') selected @endif>PNG</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;">Dari</label>
+              <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+            </div>
+            <div style="display:flex; flex-direction:column;">
+              <label style="font-size:12px;">Hingga</label>
+              <div style="display:flex; gap:8px; align-items:flex-start; height:40px;">
+                <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" onchange="autoSubmitForm()" style="height:100%; flex:1; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+                <a href="{{ route('lesson.index') }}" onclick="keepFilterPanelOpen(); return true;" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:8px; cursor:pointer; font-size:24px; transition:all .2s ease; text-decoration:none; white-space:nowrap; height:40px; width:40px;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Ulang Penapis">
+                  <i class="bi bi-arrow-repeat"></i>
+                </a>
+              </div>
+            </div>
           </div>
         </form>
-      </section>
-
-    <section class="panel" style="margin-bottom:20px;">
-      <div style="margin-bottom:20px;">
-        <span class="badge-pill">Jumlah: {{ $lessons->count() }}</span>
       </div>
+      
       <table>
         <thead>
           <tr>
@@ -148,5 +131,33 @@
     </section>
   </main>
 </div>
+
+<script>
+function toggleFilterPanel() {
+  const filterPanel = document.getElementById('filter-panel');
+  if (filterPanel.style.display === 'none') {
+    filterPanel.style.display = 'block';
+  } else {
+    filterPanel.style.display = 'none';
+  }
+}
+
+function keepFilterPanelOpen() {
+  sessionStorage.setItem('keepFilterOpen', 'true');
+}
+
+function autoSubmitForm() {
+  document.getElementById('filter-form').submit();
+}
+
+// Keep filter panel open if flag is set
+document.addEventListener('DOMContentLoaded', function() {
+  if (sessionStorage.getItem('keepFilterOpen') === 'true') {
+    const filterPanel = document.getElementById('filter-panel');
+    filterPanel.style.display = 'block';
+    sessionStorage.removeItem('keepFilterOpen');
+  }
+});
+</script>
 
 @endsection

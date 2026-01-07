@@ -6,7 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Log Masuk — EduSpark</title>
   <link href="https://fonts.bunny.net/css?family=Inter" rel="stylesheet">
-  @vite(['resources/css/app.css', 'resources/js/app.js'])
+  <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
   <style>
     * {
       margin: 0;
