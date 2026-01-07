@@ -28,6 +28,7 @@
         <th style="width:80px;">student_id</th>
         <th>nama</th>
         <th style="width:100px;">Purata Skor</th>
+        <th style="width:60px;">Gred</th>
       </tr>
     </thead>
     <tbody>
@@ -38,11 +39,12 @@
             <td>{{ $s['id'] }}</td>
             <td>{{ $s['name'] }}</td>
             <td>{{ isset($s['avg_score']) ? $s['avg_score'] . '%' : 'N/A' }}</td>
+            <td style="text-align:center;font-weight:700;">{{ $s['grade'] ?? 'N/A' }}</td>
           </tr>
         @endforeach
       @else
         <tr>
-          <td colspan="4" style="text-align:center;color:#666;">Tiada rekod pelajar.</td>
+          <td colspan="5" style="text-align:center;color:#666;">Tiada rekod pelajar.</td>
         </tr>
       @endif
     </tbody>

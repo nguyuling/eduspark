@@ -8,31 +8,26 @@
   <h3 style="margin-top:0;">Laporan Kelas: {{ $selectedClass ?? '—' }}</h3>
 
   @if($selectedClass)
-      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;">
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px;">
         
-        <div class="card" style="min-width:180px;">
-          <div class="label">Bilangan Pelajar</div>
-          <div class="value">{{ $classStats['student_count'] ?? 0 }}</div>
+        <div style="flex:1;min-width:220px;padding:28px 24px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:12px;box-shadow:0 4px 15px rgba(102,126,234,0.3);">
+          <div style="color:rgba(255,255,255,0.85);font-size:13px;margin-bottom:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Bilangan Pelajar</div>
+          <div style="color:#fff;font-size:32px;font-weight:700;">{{ $classStats['student_count'] ?? 0 }}</div>
         </div>
 
-        <div class="card" style="min-width:180px;">
-          <div class="label">Purata Skor</div>
-          <div class="value">{{ $classStats['avg_score'] ?? 'N/A' }}</div>
+        <div style="flex:1;min-width:220px;padding:28px 24px;background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);border-radius:12px;box-shadow:0 4px 15px rgba(245,87,108,0.3);">
+          <div style="color:rgba(255,255,255,0.85);font-size:13px;margin-bottom:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Purata Skor</div>
+          <div style="color:#fff;font-size:32px;font-weight:700;">{{ $classStats['avg_score'] ?? 'N/A' }}</div>
         </div>
 
-        <div class="card" style="min-width:180px;">
-          <div class="label">Gred Purata</div>
-          <div class="value">{{ $classStats['avg_grade'] ?? 'N/A' }}</div>
+        <div style="flex:1;min-width:220px;padding:28px 24px;background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);border-radius:12px;box-shadow:0 4px 15px rgba(79,172,254,0.3);">
+          <div style="color:rgba(255,255,255,0.85);font-size:13px;margin-bottom:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Jumlah Percubaan</div>
+          <div style="color:#fff;font-size:32px;font-weight:700;">{{ $classStats['total_attempts'] ?? 0 }}</div>
         </div>
 
-        <div class="card" style="min-width:180px;">
-          <div class="label">Kadar Kejayaan</div>
-          <div class="value">{{ $classStats['success_rate'] ?? 'N/A' }}</div>
-        </div>
-
-        <div class="card" style="min-width:180px;">
-          <div class="label">Topik Paling Lemah</div>
-          <div class="value">{{ $classStats['weakest_subject'] ?? 'N/A' }}</div>
+        <div style="flex:1;min-width:220px;padding:28px 24px;background:linear-gradient(135deg,#fa709a 0%,#fee140 100%);border-radius:12px;box-shadow:0 4px 15px rgba(250,112,154,0.3);">
+          <div style="color:rgba(255,255,255,0.85);font-size:13px;margin-bottom:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Gred Purata</div>
+          <div style="color:#fff;font-size:32px;font-weight:700;">{{ $classStats['avg_grade'] ?? 'N/A' }}</div>
         </div>
 
       </div>

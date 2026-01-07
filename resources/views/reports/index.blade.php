@@ -27,7 +27,7 @@
 
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
         <label style="font-weight:700;color:var(--muted);font-size:13px;">Filter Kelas:</label>
-        <select id="stats-class-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:160px;border:2px solid #ddd;background:#f9f9f9;">
+        <select id="stats-class-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:160px;border:2px solid #ddd;background:#f9f9f9;" required>
             <option value="">-- Sila Pilih --</option>
             <option value="semua">Semua Kelas</option>
             @foreach($classes as $c)
@@ -36,7 +36,7 @@
         </select>
 
         <label style="font-weight:700;color:var(--muted);font-size:13px;margin-left:16px;">Jangka Masa:</label>
-        <select id="stats-date-range" class="select" style="padding:8px 12px;border-radius:8px;min-width:140px;border:2px solid #ddd;background:#f9f9f9;">
+        <select id="stats-date-range" class="select" style="padding:8px 12px;border-radius:8px;min-width:140px;border:2px solid #ddd;background:#f9f9f9;" required>
             <option value="">-- Sila Pilih --</option>
             <option value="week">Minggu Ini</option>
             <option value="month">Bulan Ini</option>
@@ -115,22 +115,26 @@
 <div class="panel" style="padding:18px;border-radius:12px;">
     <h3 style="margin-top:0;font-weight:700;">Laporan Pelajar</h3>
 
-    <div style="display:flex;gap:0;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
-        <label style="font-weight:700;color:var(--muted);margin-right:8px;">Kelas</label>
-        <select id="class-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:160px;border:2px solid #ddd;background:#f9f9f9;margin-right:20px;">
-            <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
-            @foreach($classes as $c)
-                <option value="{{ $c }}">{{ $c }}</option>
-            @endforeach
-        </select>
+    <div style="display:flex;gap:0;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+            <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Kelas</label>
+            <select id="class-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:160px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
+                <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
+                @foreach($classes as $c)
+                    <option value="{{ $c }}">{{ $c }}</option>
+                @endforeach
+            </select>
+        </div>
 
-        <label style="font-weight:700;color:var(--muted);margin-right:8px;">Pelajar</label>
-        <select id="student-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:280px;border:2px solid #ddd;background:#f9f9f9;margin-right:20px;">
-            <option value="">{{ $studentPlaceholder ?? '-- pilih pelajar --' }}</option>
-        </select>
+        <div style="flex:2;min-width:300px;margin-left:16px;">
+            <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Pelajar</label>
+            <select id="student-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:280px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
+                <option value="">{{ $studentPlaceholder ?? '-- pilih pelajar --' }}</option>
+            </select>
+        </div>
 
         <button id="open-student" class="btn"
-            style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:8px;">
+            style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:20px;margin-left:16px;cursor:pointer;">
             Buka
         </button>
     </div>
@@ -146,19 +150,20 @@
 <div class="panel" style="padding:18px;border-radius:12px;margin-top:16px;">
     <h3 style="margin-top:0;font-weight:700;">Laporan Kelas</h3>
 
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
-        <label style="font-weight:700;color:var(--muted);">Pilih kelas</label>
-
-        <select id="class-report-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:160px;border:2px solid #ddd;background:#f9f9f9;">
-            <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
-            @foreach($classes as $c)
-                <option value="{{ $c }}">{{ $c }}</option>
-            @endforeach
-        </select>
+    <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:220px;">
+            <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Pilih kelas</label>
+            <select id="class-report-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:160px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
+                <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
+                @foreach($classes as $c)
+                    <option value="{{ $c }}">{{ $c }}</option>
+                @endforeach
+            </select>
+        </div>
 
         <button id="open-class" class="btn"
-            style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;">
-            Buka Kelas
+            style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:20px;cursor:pointer;">
+            Buka
         </button>
     </div>
 
@@ -233,13 +238,22 @@ classSelect && classSelect.addEventListener('change', async function() {
     }
 });
 
-// NEW: load student panel in-place via AJAX (no redirect)
+// Load student panel in-place via AJAX (no redirect)
 openStudentBtn.addEventListener('click', async () => {
-    const id = studentSelect.value;
-    if (!id) return alert('Sila pilih pelajar.');
+    const classValue = classSelect.value;
+    const studentValue = studentSelect.value;
+
+    // Trigger HTML5 native validation
+    if (!classSelect.reportValidity()) {
+        return;
+    }
+    
+    if (!studentSelect.reportValidity()) {
+        return;
+    }
 
     try {
-        const res = await fetch(`/reports/student/${encodeURIComponent(id)}`, {
+        const res = await fetch(`/reports/student/${encodeURIComponent(studentValue)}`, {
             method: 'GET',
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
@@ -289,7 +303,11 @@ function setClassDownloadLinks(cls) {
 
 openClassBtn.addEventListener('click', async function () {
     const cls = classReportSelect.value;
-    if (!cls) return alert('Sila pilih kelas.');
+
+    // Trigger HTML5 native validation
+    if (!classReportSelect.reportValidity()) {
+        return;
+    }
 
     try {
         const res = await fetch(`/reports/class?class=${encodeURIComponent(cls)}`, {
@@ -310,13 +328,22 @@ let statsChart = null;
 let trendChart = null;
 
 async function loadStatistics() {
-    const selectedClass = document.getElementById('stats-class-select').value;
-    const dateRange = document.getElementById('stats-date-range').value;
+    const statsClassSelect = document.getElementById('stats-class-select');
+    const statsDateRangeSelect = document.getElementById('stats-date-range');
+    const selectedClass = statsClassSelect.value;
+    const dateRange = statsDateRangeSelect.value;
     
-    // If no class selected, don't load
-    if (!selectedClass) {
+    // Check if both class and date range are selected
+    if (!selectedClass || !dateRange) {
+        // Show validation error on the empty field
+        if (!selectedClass) {
+            statsClassSelect.reportValidity();
+        } else {
+            statsDateRangeSelect.reportValidity();
+        }
+        
         const tbody = document.getElementById('stats-tbody');
-        tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Sila pilih kelas untuk melihat data.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Sila pilih kelas dan jangka masa untuk melihat data.</td></tr>';
         document.getElementById('stats-table-container').style.display = 'none';
         if (typeof Chart !== 'undefined') {
             if (statsChart) statsChart.destroy();
@@ -450,28 +477,80 @@ function updateTopicChart(data) {
 
 function updateTrendChart(data) {
     const ctx = document.getElementById('trendChart').getContext('2d');
+    const selectedClass = document.getElementById('stats-class-select').value;
     
     if (trendChart) trendChart.destroy();
+    
+    let datasets = [];
+    let counts = null;
+    
+    // If "semua" is selected and we have per-class data, create multiple lines
+    if (selectedClass === 'semua' && data.byClass && Object.keys(data.byClass).length > 0) {
+        const colors = [
+            { border: 'rgba(102, 126, 234, 1)', bg: 'rgba(102, 126, 234, 0.1)' },
+            { border: 'rgba(244, 67, 54, 1)', bg: 'rgba(244, 67, 54, 0.1)' },
+            { border: 'rgba(76, 175, 80, 1)', bg: 'rgba(76, 175, 80, 0.1)' },
+            { border: 'rgba(255, 152, 0, 1)', bg: 'rgba(255, 152, 0, 0.1)' },
+            { border: 'rgba(0, 150, 136, 1)', bg: 'rgba(0, 150, 136, 0.1)' }
+        ];
+        
+        let colorIndex = 0;
+        for (const [className, scores] of Object.entries(data.byClass)) {
+            const color = colors[colorIndex % colors.length];
+            datasets.push({
+                label: className,
+                data: scores || [],
+                borderColor: color.border,
+                backgroundColor: color.bg,
+                borderWidth: 2,
+                fill: false,
+                tension: 0.4
+            });
+            colorIndex++;
+        }
+        // Get counts for tooltips
+        counts = data.countsByClass;
+    } else {
+        // Single line for overall or specific class
+        datasets.push({
+            label: 'Prestasi Purata',
+            data: data.scores || [],
+            borderColor: 'rgba(102, 126, 234, 1)',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+        });
+        // Get counts for tooltips
+        counts = { 'Prestasi Purata': data.counts || [] };
+    }
     
     trendChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: data.dates || [],
-            datasets: [{
-                label: 'Prestasi Purata',
-                data: data.scores || [],
-                borderColor: 'rgba(102, 126, 234, 1)',
-                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4
-            }]
+            datasets: datasets
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: { display: true }
+                legend: { display: true },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            if (!counts) return '';
+                            const datasetLabel = context.dataset.label;
+                            const dataIndex = context.dataIndex;
+                            
+                            if (counts[datasetLabel] && counts[datasetLabel][dataIndex] !== undefined) {
+                                const studentCount = counts[datasetLabel][dataIndex];
+                                return 'Pelajar: ' + studentCount;
+                            }
+                            return '';
+                        }
+                    }
+                }
             },
             scales: {
                 y: { beginAtZero: true, max: 100 }
@@ -510,12 +589,21 @@ document.getElementById('stats-date-range').addEventListener('change', loadStati
 
 // Export statistics
 document.getElementById('export-stats-btn').addEventListener('click', function() {
-    const selectedClass = document.getElementById('stats-class-select').value;
+    const statsClassSelect = document.getElementById('stats-class-select');
+    const statsDateRangeSelect = document.getElementById('stats-date-range');
+    const selectedClass = statsClassSelect.value;
+    const dateRange = statsDateRangeSelect.value;
+    
+    // Check if both are selected
     if (!selectedClass) {
-        alert('Sila pilih kelas terlebih dahulu.');
+        statsClassSelect.reportValidity();
         return;
     }
-    const dateRange = document.getElementById('stats-date-range').value;
+    if (!dateRange) {
+        statsDateRangeSelect.reportValidity();
+        return;
+    }
+    
     window.location.href = `/reports/export-statistics?class=${encodeURIComponent(selectedClass)}&range=${dateRange}`;
 });
 

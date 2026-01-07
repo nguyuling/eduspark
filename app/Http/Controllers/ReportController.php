@@ -32,6 +32,14 @@ class ReportController extends Controller
     }
 
     /**
+     * Public method to get grade (accessible from views)
+     */
+    public function getGradePublic($score)
+    {
+        return $this->getGrade($score);
+    }
+
+    /**
      * Check if score passes (E grade or higher = 40% or above)
      */
     private function isPassing($score)
@@ -728,6 +736,7 @@ class ReportController extends Controller
             }
 
             $avgScore = 'N/A';
+            $avgGrade = 'N/A';
             $totalAttempts = 0;
             $successRate = 'N/A';
             $topicStats = [];
@@ -796,8 +805,40 @@ class ReportController extends Controller
                 $u = DB::table('users')->where('id', $s->user_id)->first();
                 $name = $u->name ?? null;
             }
-            $studentsForView->push((object)['id' => $s->id, 'name' => $name ?? 'N/A']);
+            
+            // Calculate average score for this student
+            $avgScore = 0;
+            $avgGrade = 'N/A';
+            if (isset($s->user_id) && Schema::hasTable('quiz_attempts')) {
+                $attempts = DB::table('quiz_attempts')
+                    ->leftJoin('quizzes', 'quiz_attempts.quiz_id', '=', 'quizzes.id')
+                    ->select('quiz_attempts.score', 'quizzes.max_points')
+                    ->where('quiz_attempts.student_id', $s->user_id)
+                    ->get();
+                
+                if ($attempts->count() > 0) {
+                    $scores = [];
+                    foreach ($attempts as $att) {
+                        $score = isset($att->score) ? (float)$att->score : 0;
+                        $maxPoints = isset($att->max_points) && (float)$att->max_points > 0 ? (float)$att->max_points : 100;
+                        $percentage = ($score / $maxPoints) * 100;
+                        $scores[] = $percentage;
+                    }
+                    $avgScore = round(array_sum($scores) / count($scores), 2);
+                    $avgGrade = $this->getGrade($avgScore);
+                }
+            }
+            
+            $studentsForView->push((object)[
+                'id' => $s->id, 
+                'name' => $name ?? 'N/A',
+                'avg_score' => $avgScore,
+                'avg_grade' => $avgGrade
+            ]);
         }
+
+        // Sort students by average score (highest first)
+        $studentsForView = $studentsForView->sortByDesc('avg_score')->values();
 
         // If AJAX request (X-Requested-With), return only the panel partial HTML as JSON
         if ($request->ajax()) {
@@ -825,7 +866,11 @@ class ReportController extends Controller
         if (Schema::hasTable('classrooms')) {
             $classroom = DB::table('classrooms')->where('name', $class)->first();
             if ($classroom) {
-                $students = DB::table('students')->where('classroom_id', $classroom->id)->get();
+                if (Schema::hasColumn('students', 'classroom_id')) {
+                    $students = DB::table('students')->where('classroom_id', $classroom->id)->get();
+                } else {
+                    $students = DB::table('students')->where('classroom', $class)->get();
+                }
             }
         } elseif (Schema::hasTable('students')) {
             $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
@@ -834,10 +879,8 @@ class ReportController extends Controller
             if ($classCol) $students = DB::table('students')->where($classCol, $class)->get();
         }
 
-        // Calculate average score for each student
+        // Calculate average score for each student using same logic as classIndex
         $studentData = [];
-        $classAverageTotal = 0;
-        $classAttemptCount = 0;
         
         foreach ($students as $s) {
             $name = $s->name ?? null;
@@ -846,34 +889,34 @@ class ReportController extends Controller
                 $name = $u->name ?? null;
             }
             
-            $studentId = $s->user_id ?? $s->id;
             $avgScore = 0;
+            $avgGrade = 'N/A';
             
-            if (Schema::hasTable('quiz_attempts')) {
-                $attempts = DB::table('quiz_attempts as qa')
-                    ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
-                    ->select('qa.score', 'q.max_points')
-                    ->where('qa.student_id', $studentId)
+            if (isset($s->user_id) && Schema::hasTable('quiz_attempts')) {
+                $attempts = DB::table('quiz_attempts')
+                    ->leftJoin('quizzes', 'quiz_attempts.quiz_id', '=', 'quizzes.id')
+                    ->select('quiz_attempts.score', 'quizzes.max_points')
+                    ->where('quiz_attempts.student_id', $s->user_id)
                     ->get();
                 
                 if ($attempts->count() > 0) {
                     $scores = [];
-                    foreach ($attempts as $a) {
-                        $score = isset($a->score) ? (float)$a->score : 0;
-                        $maxPoints = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
+                    foreach ($attempts as $att) {
+                        $score = isset($att->score) ? (float)$att->score : 0;
+                        $maxPoints = isset($att->max_points) && (float)$att->max_points > 0 ? (float)$att->max_points : 100;
                         $percentage = ($score / $maxPoints) * 100;
                         $scores[] = $percentage;
-                        $classAverageTotal += $percentage;
-                        $classAttemptCount++;
                     }
-                    $avgScore = array_sum($scores) / count($scores);
+                    $avgScore = round(array_sum($scores) / count($scores), 2);
+                    $avgGrade = $this->getGrade($avgScore);
                 }
             }
             
             $studentData[] = [
                 'id' => $s->id ?? '',
                 'name' => $name ?? 'N/A',
-                'avg_score' => round($avgScore, 2)
+                'avg_score' => $avgScore,
+                'grade' => $avgGrade
             ];
         }
         
@@ -881,22 +924,18 @@ class ReportController extends Controller
         usort($studentData, function($a, $b) {
             return $b['avg_score'] <=> $a['avg_score'];
         });
-        
-        // Calculate class average
-        $classAverage = $classAttemptCount > 0 ? round($classAverageTotal / $classAttemptCount, 2) : 0;
 
         $filename = 'class_' . Str::slug($class) . '_report.csv';
-        $response = new StreamedResponse(function() use ($studentData, $class, $classAverage) {
+        $response = new StreamedResponse(function() use ($studentData, $class) {
             $out = fopen('php://output','w');
             // header
             fputcsv($out, ['Class:', $class]);
-            fputcsv($out, ['Purata Skor Kelas:', $classAverage . '%']);
             fputcsv($out, []);
-            fputcsv($out, ['Kedudukan','student_id','nama','Purata Skor']);
+            fputcsv($out, ['Kedudukan','student_id','nama','Purata Skor','Gred']);
             
             $rank = 1;
             foreach ($studentData as $s) {
-                fputcsv($out, [$rank, $s['id'], $s['name'], $s['avg_score'] . '%']);
+                fputcsv($out, [$rank, $s['id'], $s['name'], $s['avg_score'] . '%', $s['grade']]);
                 $rank++;
             }
             fclose($out);
@@ -912,7 +951,13 @@ class ReportController extends Controller
         $students = collect();
         if (Schema::hasTable('classrooms')) {
             $classroom = DB::table('classrooms')->where('name', $class)->first();
-            if ($classroom) $students = DB::table('students')->where('classroom_id', $classroom->id)->get();
+            if ($classroom) {
+                if (Schema::hasColumn('students', 'classroom_id')) {
+                    $students = DB::table('students')->where('classroom_id', $classroom->id)->get();
+                } else {
+                    $students = DB::table('students')->where('classroom', $class)->get();
+                }
+            }
         } elseif (Schema::hasTable('students')) {
             $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
             $classCol = null;
@@ -920,10 +965,8 @@ class ReportController extends Controller
             if ($classCol) $students = DB::table('students')->where($classCol, $class)->get();
         }
 
-        // Calculate average score for each student
+        // Calculate average score for each student using same logic as classIndex
         $studentRows = [];
-        $classAverageTotal = 0;
-        $classAttemptCount = 0;
         
         foreach ($students as $s) {
             $name = $s->name ?? null;
@@ -932,34 +975,34 @@ class ReportController extends Controller
                 $name = $u->name ?? null;
             }
             
-            $studentId = $s->user_id ?? $s->id;
             $avgScore = 0;
+            $avgGrade = 'N/A';
             
-            if (Schema::hasTable('quiz_attempts')) {
-                $attempts = DB::table('quiz_attempts as qa')
-                    ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
-                    ->select('qa.score', 'q.max_points')
-                    ->where('qa.student_id', $studentId)
+            if (isset($s->user_id) && Schema::hasTable('quiz_attempts')) {
+                $attempts = DB::table('quiz_attempts')
+                    ->leftJoin('quizzes', 'quiz_attempts.quiz_id', '=', 'quizzes.id')
+                    ->select('quiz_attempts.score', 'quizzes.max_points')
+                    ->where('quiz_attempts.student_id', $s->user_id)
                     ->get();
                 
                 if ($attempts->count() > 0) {
                     $scores = [];
-                    foreach ($attempts as $a) {
-                        $score = isset($a->score) ? (float)$a->score : 0;
-                        $maxPoints = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
+                    foreach ($attempts as $att) {
+                        $score = isset($att->score) ? (float)$att->score : 0;
+                        $maxPoints = isset($att->max_points) && (float)$att->max_points > 0 ? (float)$att->max_points : 100;
                         $percentage = ($score / $maxPoints) * 100;
                         $scores[] = $percentage;
-                        $classAverageTotal += $percentage;
-                        $classAttemptCount++;
                     }
-                    $avgScore = array_sum($scores) / count($scores);
+                    $avgScore = round(array_sum($scores) / count($scores), 2);
+                    $avgGrade = $this->getGrade($avgScore);
                 }
             }
             
             $studentRows[] = [
                 'id' => $s->id ?? '',
                 'name' => $name ?? 'N/A',
-                'avg_score' => round($avgScore, 2)
+                'avg_score' => $avgScore,
+                'grade' => $avgGrade
             ];
         }
         
@@ -967,14 +1010,10 @@ class ReportController extends Controller
         usort($studentRows, function($a, $b) {
             return $b['avg_score'] <=> $a['avg_score'];
         });
-        
-        // Calculate class average
-        $classAverage = $classAttemptCount > 0 ? round($classAverageTotal / $classAttemptCount, 2) : 0;
 
         $pdf = Pdf::loadView('reports.class_pdf', [
             'class' => $class,
             'students' => $studentRows,
-            'classAverage' => $classAverage . '%',
             'title' => 'LAPORAN PRESTASI KELAS'
         ])->setPaper('a4','portrait');
 
@@ -1108,22 +1147,105 @@ class ReportController extends Controller
             ->take(10)
             ->values();
 
-        // Trend data (by date)
+        // Trend data (by date) - include student count
         $trendDataGrouped = $attempts->groupBy(function($item) {
             return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
         })
         ->map(function($group) {
             $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
-            return round($scores->count() > 0 ? $scores->avg() : 0, 2);
+            return [
+                'avg' => round($scores->count() > 0 ? $scores->avg() : 0, 2),
+                'count' => $scores->count()
+            ];
         })
         ->sortKeys(); // Sort by date keys, not by values
 
         $trendDates = $trendDataGrouped->keys()->values();
-        $trendData = $trendDataGrouped->values();
+        $trendData = $trendDataGrouped->map(function($item) { return $item['avg']; })->values();
+        $trendCounts = $trendDataGrouped->map(function($item) { return $item['count']; })->values();
 
-        // Class comparison - only include if no specific class filter applied
+        // Trend data per class (when showing all classes)
+        $trendDataByClass = [];
+        $trendCountsByClass = [];
+        if (!$selectedClass || $selectedClass === 'semua' || $selectedClass === '') {
+            $classes = [];
+            if (Schema::hasTable('classrooms')) {
+                $classes = DB::table('classrooms')->select('name')->distinct()->orderBy('name')->pluck('name')->toArray();
+            } elseif (Schema::hasTable('students')) {
+                $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
+                foreach ($possible as $col) {
+                    if (Schema::hasColumn('students', $col)) {
+                        $classes = DB::table('students')->select($col)->distinct()->orderBy($col)->pluck($col)->toArray();
+                        break;
+                    }
+                }
+            }
+
+            // Get trend data for each class
+            foreach ($classes as $cls) {
+                if (!$cls) continue;
+                
+                $classQuery = DB::table('quiz_attempts as qa')
+                    ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id');
+                
+                if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
+                    $classroom = DB::table('classrooms')->where('name', $cls)->first();
+                    if ($classroom) {
+                        $studentIds = DB::table('students')->where('classroom_id', $classroom->id)->pluck('user_id');
+                        $classQuery = $classQuery->whereIn('qa.student_id', $studentIds);
+                    }
+                } elseif (Schema::hasTable('students')) {
+                    $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
+                    foreach ($possible as $col) {
+                        if (Schema::hasColumn('students', $col)) {
+                            $studentIds = DB::table('students')->where($col, $cls)->pluck('user_id');
+                            $classQuery = $classQuery->whereIn('qa.student_id', $studentIds);
+                            break;
+                        }
+                    }
+                }
+                
+                $classAttemptsData = $classQuery->where('qa.created_at', '>=', $fromDate)
+                    ->select('qa.created_at', 'qa.score', 'q.max_points')
+                    ->get();
+                
+                // Convert to percentages
+                $classAttemptsList = [];
+                foreach ($classAttemptsData as $a) {
+                    $score = isset($a->score) ? (float)$a->score : 0;
+                    $maxPoints = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
+                    $percentage = ($score / $maxPoints) * 100;
+                    
+                    $classAttemptsList[] = (object)[
+                        'created_at' => $a->created_at,
+                        'score' => round($percentage, 2)
+                    ];
+                }
+                
+                // Group by date for this class
+                $classTrendGrouped = collect($classAttemptsList)->groupBy(function($item) {
+                    return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
+                })
+                ->map(function($group) {
+                    $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
+                    return [
+                        'avg' => round($scores->count() > 0 ? $scores->avg() : 0, 2),
+                        'count' => $scores->count()
+                    ];
+                })
+                ->sortKeys();
+                
+                if ($classTrendGrouped->count() > 0) {
+                    // Extract just the averages for the chart data
+                    $trendDataByClass[$cls] = $classTrendGrouped->map(function($item) { return $item['avg']; })->values()->toArray();
+                    // Store counts separately for tooltip
+                    $trendCountsByClass[$cls] = $classTrendGrouped->map(function($item) { return $item['count']; })->values()->toArray();
+                }
+            }
+        }
+
+        // Class comparison - calculate stats for each class separately
         $classStats = [];
-        $processedClasses = [];
         if (!$selectedClass || $selectedClass === 'semua' || $selectedClass === '') {
             $classes = [];
             if (Schema::hasTable('classrooms')) {
@@ -1139,27 +1261,54 @@ class ReportController extends Controller
             }
 
             foreach ($classes as $cls) {
-                // Skip if already processed (avoid duplicates)
-                if (in_array($cls, $processedClasses)) {
-                    continue;
-                }
-                $processedClasses[] = $cls;
+                if (!$cls) continue; // Skip empty class names
                 
-                $classAttempts = $attempts;
+                // Get all quiz attempts for this specific class
+                $classQuery = DB::table('quiz_attempts as qa')
+                    ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id');
+                
                 if (Schema::hasTable('classrooms') && Schema::hasColumn('students', 'classroom_id')) {
                     $classroom = DB::table('classrooms')->where('name', $cls)->first();
                     if ($classroom) {
                         $studentIds = DB::table('students')->where('classroom_id', $classroom->id)->pluck('user_id');
-                        $classAttempts = $attempts->whereIn('student_id', $studentIds->toArray());
+                        $classQuery = $classQuery->whereIn('qa.student_id', $studentIds);
+                    }
+                } elseif (Schema::hasTable('students')) {
+                    $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
+                    foreach ($possible as $col) {
+                        if (Schema::hasColumn('students', $col)) {
+                            $studentIds = DB::table('students')->where($col, $cls)->pluck('user_id');
+                            $classQuery = $classQuery->whereIn('qa.student_id', $studentIds);
+                            break;
+                        }
                     }
                 }
-
-                $classScores = $classAttempts->pluck('score')->filter(function($v) { return is_numeric($v); })->map(function($v) { return (float)$v; });
+                
+                // Filter by date range for this class
+                $classAttempts = $classQuery->where('qa.created_at', '>=', $fromDate)
+                    ->select('qa.created_at', 'qa.score', 'q.title', 'qa.student_id', 'q.max_points')
+                    ->get();
+                
+                // Convert to percentages
+                $classAttemptsList = [];
+                foreach ($classAttempts as $a) {
+                    $score = isset($a->score) ? (float)$a->score : 0;
+                    $maxPoints = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
+                    $percentage = ($score / $maxPoints) * 100;
+                    
+                    $classAttemptsList[] = (object)[
+                        'score' => round($percentage, 2),
+                        'title' => $a->title
+                    ];
+                }
+                
+                $classScores = collect($classAttemptsList)->pluck('score')->filter(function($v) { return is_numeric($v); });
                 
                 if ($classScores->count() > 0) {
-                    // Get lowest and highest quiz titles
-                    $lowestQuiz = $classAttempts->sortBy('score')->first();
-                    $highestQuiz = $classAttempts->sortByDesc('score')->first();
+                    // Get lowest and highest quiz titles from this class's attempts only
+                    $sortedByScore = collect($classAttemptsList)->sortBy('score');
+                    $lowestQuiz = $sortedByScore->first();
+                    $highestQuiz = collect($classAttemptsList)->sortByDesc('score')->first();
                     
                     $lowestQuizTitle = $lowestQuiz ? ($lowestQuiz->title ?? 'Unknown') : 'N/A';
                     $highestQuizTitle = $highestQuiz ? ($highestQuiz->title ?? 'Unknown') : 'N/A';
@@ -1188,7 +1337,10 @@ class ReportController extends Controller
             ],
             'trendData' => [
                 'dates' => $trendDates->toArray(),
-                'scores' => $trendData->toArray()
+                'scores' => $trendData->toArray(),
+                'counts' => $trendCounts->toArray(),
+                'byClass' => $trendDataByClass,
+                'countsByClass' => $trendCountsByClass
             ],
             'classStats' => $classStats
         ]);
