@@ -159,9 +159,6 @@
         <div style="font-size:48px; margin-bottom:16px;">📊</div>
         <h3 style="font-size:16px; font-weight:700; margin-bottom:8px;">Tiada skor lagi</h3>
         <p style="font-size:14px; color:var(--muted); margin-bottom:20px;">Jadilah yang pertama memainkan permainan ini!</p>
-        <a href="{{ route('games.index') }}" class="btn-kembali">
-          <i class="bi bi-arrow-left"></i> Kembali ke Permainan
-        </a>
       </section>
     @endif
   </main>
