@@ -1011,9 +1011,17 @@ class ReportController extends Controller
             return $b['avg_score'] <=> $a['avg_score'];
         });
 
+        // Calculate class average from all students
+        $classAverage = 0;
+        if (!empty($studentRows)) {
+            $totalScore = array_sum(array_column($studentRows, 'avg_score'));
+            $classAverage = round($totalScore / count($studentRows), 2);
+        }
+
         $pdf = Pdf::loadView('reports.class_pdf', [
             'class' => $class,
             'students' => $studentRows,
+            'classAverage' => $classAverage,
             'title' => 'LAPORAN PRESTASI KELAS'
         ])->setPaper('a4','portrait');
 
@@ -1129,7 +1137,7 @@ class ReportController extends Controller
         // Calculate statistics
         $scores = $attempts->pluck('score')->filter(function($v) { return is_numeric($v); })->map(function($v) { return (float)$v; });
         $avgScore = $scores->count() > 0 ? round($scores->avg(), 2) : 0;
-        $avgGrade = $this->getGrade($avgScore);
+        $avgGrade = $scores->count() > 0 ? $this->getGrade($avgScore) : 'N/A';
         $totalAttempts = $attempts->count();
         $activeStudents = $attempts->pluck('student_id')->unique()->count();
         $successRate = $scores->count() > 0 ? round(($scores->filter(function($v) { return $this->isPassing($v); })->count() / $scores->count()) * 100, 2) : 0;
