@@ -137,16 +137,16 @@
                     Mesej
                     <span id="chat-close" style="float:right; cursor:pointer;">✖</span>
                 </div>
-                <div style="padding:8px; border-bottom:1px solid #ccc;">
-    <input type="text" id="chat-search" placeholder="Search user..." 
-           style="width:100%; padding:6px 8px; border:1px solid #ddd; border-radius:6px;">
-</div>
+                  <div style="padding:8px; border-bottom:1px solid #ccc;">
+            <input type="text" id="chat-search" placeholder="Cari" 
+                style="width:100%; padding:6px 8px; border:1px solid #ddd; border-radius:6px;">
+        </div>
 <div id="chat-users" style="max-height:130px; overflow-y:auto;"></div>
 
                 <div id="chat-messages" style="padding:10px; max-height:200px; overflow-y:auto;"></div>
                 <div style="display:flex; border-top:1px solid #ccc;">
-                    <input type="text" id="chat-input" placeholder="Type a message..." style="flex:1; padding:8px; border:none;">
-                    <button id="chat-send" style="background:#6a4df7; color:white; border:none; padding:0 12px;">Send</button>
+                    <input type="text" id="chat-input" placeholder="Hantar mesej" style="flex:1; padding:8px; border:none;">
+                    <button id="chat-send" style="background:#6a4df7; color:white; border:none; padding:0 12px;">Hantar mesej</button>
                 </div>
             </div>
         </div>
@@ -156,7 +156,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // User name menu
     document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('user-name')) {
+            if (e.target.classList.contains('user-name')) {
             const userId = e.target.dataset.userId;
             const menu = document.createElement('div');
             menu.style.position = 'absolute';
@@ -165,19 +165,31 @@ document.addEventListener('DOMContentLoaded', function() {
             menu.style.borderRadius = '6px';
             menu.style.padding = '8px';
             menu.style.zIndex = 9999;
+            // use a relative path so the link uses the current host and port
+            const profileBase = '/users';
             menu.innerHTML = `
-                <a href="/users/${userId}" style="display:block;margin-bottom:6px;">Lihat Profil</a>
+                <a href="${profileBase}/${userId}" style="display:block;margin-bottom:6px;">Lihat Profil</a>
                 <a href="#" class="direct-message-link" data-user-id="${userId}">Hantar Mesej Peribadi</a>
             `;
             document.body.appendChild(menu);
             menu.style.top = e.pageY + 'px';
             menu.style.left = e.pageX + 'px';
-            setTimeout(() => menu.remove(), 3000);
+
+            // Remove menu when clicking outside
+            const closeMenu = function(ev) {
+                if (!menu.contains(ev.target)) {
+                    menu.remove();
+                    document.removeEventListener('click', closeMenu);
+                }
+            };
+            setTimeout(() => document.addEventListener('click', closeMenu), 0);
 
             // Direct message click
             menu.querySelector('.direct-message-link').addEventListener('click', function(ev) {
                 ev.preventDefault();
+                ev.stopPropagation();
                 const uid = this.dataset.userId;
+                menu.remove();
                 openChat(uid);
             });
         }

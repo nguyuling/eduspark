@@ -33,6 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
     Route::get('/profile/edit-password', [UserController::class, 'editPassword'])->name('profile.password.edit');
     Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password.update');
+    // Public user profile by id
+    Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
 });
 
 // Lesson routes (authenticated only)
