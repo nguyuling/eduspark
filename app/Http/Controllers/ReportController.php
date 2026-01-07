@@ -1011,11 +1011,16 @@ class ReportController extends Controller
             return $b['avg_score'] <=> $a['avg_score'];
         });
 
-        // Calculate class average from all students
+        // Calculate class average from students who have attempts only
         $classAverage = 0;
         if (!empty($studentRows)) {
-            $totalScore = array_sum(array_column($studentRows, 'avg_score'));
-            $classAverage = round($totalScore / count($studentRows), 2);
+            $studentsWithAttempts = array_filter($studentRows, function($s) {
+                return $s['avg_score'] > 0;
+            });
+            if (!empty($studentsWithAttempts)) {
+                $totalScore = array_sum(array_column($studentsWithAttempts, 'avg_score'));
+                $classAverage = round($totalScore / count($studentsWithAttempts), 2);
+            }
         }
 
         $pdf = Pdf::loadView('reports.class_pdf', [
