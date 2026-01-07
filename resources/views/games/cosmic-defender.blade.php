@@ -63,7 +63,7 @@
                 </section>
                 <div style="display: flex; gap: 12px; justify-content: center;\">
                     <button id="playAgainBtn" style="padding: 12px 30px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
-                        Main Semula
+                        Lihat Skor & Ganjaran
                     </button>
                     <a href="/games" style="padding: 12px 30px; background: var(--border); color: var(--text); border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;\">
                         Kembali
@@ -240,7 +240,22 @@
         const gameEndTime = Date.now();
         const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
         
-        // Show game over screen
+        // If wrapped in play mode, submit to game summary
+        if (window.isPlayWrapperMode && window.submitGameScore) {
+            // Hide all game elements
+            const gameOverScreen = document.getElementById('gameOverScreen');
+            const gameCanvasWrapper = document.getElementById('gameCanvasWrapper');
+            const gameHeader = document.getElementById('gameHeader');
+            
+            if (gameOverScreen) gameOverScreen.style.display = 'none';
+            if (gameCanvasWrapper) gameCanvasWrapper.style.display = 'none';
+            if (gameHeader) gameHeader.style.display = 'none';
+            
+            window.submitGameScore(score, timeInSeconds);
+            return;
+        }
+        
+        // Standalone mode - show game over screen
         document.getElementById('gameOverScreen').style.display = 'flex';
         document.getElementById('gameCanvasWrapper').style.display = 'none';
         document.getElementById('finalScore').textContent = score;
@@ -253,7 +268,7 @@
         
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '{{ route("games.storeResult", 1) }}';
+        form.action = '{{ isset($game) ? route("games.storeResult", $game->id) : route("games.storeResult", 1) }}';
         
         const csrfInput = document.createElement('input');
         csrfInput.type = 'hidden';
