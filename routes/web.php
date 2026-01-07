@@ -7,8 +7,9 @@ use App\Http\Controllers\QuizStudentController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\GameController;
-use App\Http\Controllers\GameTeacherController;
+use App\Http\Controllers\AIChatController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\DirectMessageController;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
@@ -40,8 +41,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/lesson', [LessonController::class, 'index'])->name('lesson.index');
     Route::get('/lesson/create', [LessonController::class, 'create'])->name('lesson.create');
     Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
-    Route::get('/lesson/{id}', [LessonController::class, 'show'])->name('lesson.show');
-    Route::get('/lesson/{id}/edit', [LessonController::class, 'edit'])->name('lesson.edit');
     Route::post('/lesson', [LessonController::class, 'store'])->name('lesson.store');
     Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
     Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');
@@ -152,17 +151,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
 });
 
-// OLD LEGACY ROUTES REMOVED - All games now go through GameController@play
-// This ensures the game summary and leaderboard flow works properly
-
-// Messages routes for chat functionality
+// AI Chat routes
 Route::middleware('auth')->group(function () {
-    Route::get('/messages', [ForumController::class, 'getMessages'])->name('messages.index');
-    Route::get('/messages/conversation/{userId}', [ForumController::class, 'getConversation'])->name('messages.conversation');
-    Route::post('/messages/send', [ForumController::class, 'sendMessage'])->name('messages.send');
+    Route::post('/api/ai-chat/send', [AIChatController::class, 'sendMessage'])->name('ai.chat.send');
 });
 
-// AI Assistant Chat routes (isolated)
+// Messages routes
 Route::middleware('auth')->group(function () {
-    Route::post('/api/ai-chat/send', [\App\Http\Controllers\AIChatController::class, 'sendMessage'])->name('ai.chat.send');
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages/send', [MessageController::class, 'send'])->name('messages.send');
+    Route::get('/messages/{user}', [MessageController::class, 'conversation'])->name('messages.conversation');
+    
+    // Direct messages
+    Route::get('/direct-messages', [DirectMessageController::class, 'index'])->name('direct-messages.index');
+    Route::post('/direct-messages/{user}', [DirectMessageController::class, 'store'])->name('direct-messages.store');
+    Route::get('/direct-messages/{user}', [DirectMessageController::class, 'show'])->name('direct-messages.show');
 });

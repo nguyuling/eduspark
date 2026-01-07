@@ -81,56 +81,24 @@
     $trendDates = $statsData['trendData']['dates'] ?? [];
     $trendScores = $statsData['trendData']['scores'] ?? [];
     $hasTrendData = !empty($trendDates) && !empty($trendScores) && count($trendDates) > 0;
-    
-    // Check if trendScores is multi-class (array of arrays) or single (array of numbers)
-    $isMultiClass = false;
-    if (is_array($trendScores) && count($trendScores) > 0) {
-        $firstValue = reset($trendScores);
-        $isMultiClass = is_array($firstValue);
-    }
   @endphp
   @if($hasTrendData)
-    @if($isMultiClass)
-      {{-- Multi-class trend table --}}
-      <table>
-        <thead>
+    <table>
+      <thead>
+        <tr>
+          <th>Tarikh</th>
+          <th style="width:100px;" class="text-right">Purata Skor (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($trendDates as $index => $date)
           <tr>
-            <th>Tarikh</th>
-            @foreach(array_keys($trendScores) as $className)
-              <th style="width:80px;" class="text-right">{{ $className }}</th>
-            @endforeach
+            <td>{{ $date ?? 'N/A' }}</td>
+            <td class="text-right">{{ number_format($trendScores[$index] ?? 0, 2) }}%</td>
           </tr>
-        </thead>
-        <tbody>
-          @foreach($trendDates as $dateIndex => $date)
-            <tr>
-              <td>{{ $date ?? 'N/A' }}</td>
-              @foreach($trendScores as $className => $scores)
-                <td class="text-right">{{ number_format($scores[$dateIndex] ?? 0, 2) }}%</td>
-              @endforeach
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
-    @else
-      {{-- Single trend table --}}
-      <table>
-        <thead>
-          <tr>
-            <th>Tarikh</th>
-            <th style="width:100px;" class="text-right">Purata Skor (%)</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach($trendDates as $index => $date)
-            <tr>
-              <td>{{ $date ?? 'N/A' }}</td>
-              <td class="text-right">{{ number_format($trendScores[$index] ?? 0, 2) }}%</td>
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
-    @endif
+        @endforeach
+      </tbody>
+    </table>
   @else
     <div class="no-data">Tiada data tren tersedia.</div>
   @endif

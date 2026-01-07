@@ -1,10 +1,14 @@
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\GameTeacherController;
 use Illuminate\Http\Request;
 
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
+
+// Statistics API (publicly accessible since reports page is protected)
+Route::get('/statistics', [ReportController::class, 'getStatistics']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
