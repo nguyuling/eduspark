@@ -40,7 +40,6 @@
             <option value="">-- Sila Pilih --</option>
             <option value="week">Minggu Ini</option>
             <option value="month">Bulan Ini</option>
-            <option value="quarter">Suku Tahun</option>
             <option value="all">Semua Masa</option>
         </select>
 
