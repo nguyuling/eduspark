@@ -5,17 +5,26 @@
 <div class="app">
   <!-- Main -->
   <main class="main">
-    <div class="header">
+    <div class="header" style="display: flex; justify-content: space-between; align-items: flex-start;">
       <div>
         <div class="title">Permainan</div>
         <div class="sub">Mainkan permainan edukatif untuk meningkatkan prestasi anda</div>
       </div>
-      @if(auth()->user()->role === 'teacher')
-        <a href="{{ route('teacher.games.create') }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer; margin-top:15px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-          <i class="bi bi-plus-lg"></i>
-          Cipta Permainan
+      <div style="display: flex; gap: 16px; align-items: flex-start;">
+        <a href="{{ url('/rewards') }}" 
+           style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,#7c3aed,#a78bfa); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer; margin-top:15px;"
+           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';;"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+          <i class="bi bi-gift"></i>
+          Lihat Ganjaran
         </a>
-      @endif
+        @if(auth()->user()->role === 'teacher')
+          <a href="{{ route('teacher.games.create') }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer; margin-top:15px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+            <i class="bi bi-plus-lg"></i>
+            Cipta Permainan
+          </a>
+        @endif
+      </div>
     </div>
 
       @if (session('success_undo'))
