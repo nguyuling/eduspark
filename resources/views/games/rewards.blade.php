@@ -36,23 +36,32 @@
     }
 
     /* Game Shelf Styles */
+    .shelves-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 32px;
+        margin-bottom: 32px;
+    }
     .game-shelf {
+        flex: 1 1 0;
+        min-width: 380px;
+        max-width: 48%;
         display: flex;
         align-items: stretch;
         gap: 0;
         padding: 0;
         border-radius: 16px;
         overflow: hidden;
-        margin-bottom: 32px;
         background: #fff;
-        border: none;
-        box-shadow: 0 2px 8px rgba(2, 6, 23, 0.12);
+        border: 3px solid #7c3aed;
+        box-shadow: 0 8px 24px rgba(2, 6, 23, 0.12);
+        margin-bottom: 0;
     }
 
     .game-cover-cell {
-        width: 220px;
-        min-width: 300px;
-        max-width: 300px;
+        width: 180px;
+        min-width: 250px;
+        max-width: 250px;
         background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
         position: relative;
         display: flex;
@@ -75,11 +84,11 @@
     .game-cover-overlay {
         position: relative;
         z-index: 2;
-        padding: 24px 20px;
+        padding: 18px 14px;
         width: 100%;
     }
     .game-cover-title {
-        font-size: 20px;
+        font-size: 36px;
         font-weight: 800;
         color: #fff;
         margin-bottom: 8px;
@@ -87,7 +96,7 @@
         line-height: 1.2;
     }
     .game-cover-desc {
-        font-size: 13px;
+        font-size: 18px;
         color: #ffffff;
         text-shadow: 0 1px 4px rgba(44,0,80,0.12);
         margin-bottom: 0;
@@ -96,10 +105,12 @@
 
     .rewards-shelf {
         display: flex;
-        gap: 16px;
-        align-items: center;
-        padding: 32px 24px;
-        background: #fff;
+        flex-direction: column;
+        gap: 24px;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 24px 20px;
+        background: linear-gradient(135deg, #f5f0ffff 0%, #ffffffff 100%);
         flex: 1;
         min-width: 0;
         overflow-x: auto;
@@ -108,15 +119,17 @@
     .reward-slot {
         position: relative;
         flex-shrink: 0;
-        width: 100px;
-        height: 120px;
+        width: 70px;
+        height: 70px;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         background: #f9fafb;
         border: 2px dashed #e5e7eb;
         border-radius: 10px;
         transition: all 0.3s ease;
+        padding-left: 0;
+        padding-right: 0;
     }
     .reward-slot:hover {
         border-color: #6A4DF7;
@@ -127,24 +140,27 @@
         border: none;
     }
     .reward-slot .icon {
-        font-size: 48px;
+        font-size: 38px;
+        margin-right: 0;
     }
     .reward-slot .badge {
-        position: absolute;
-        top: -8px;
-        right: -8px;
-        background: linear-gradient(135deg, #8674e2ff 0%, #6A4DF7 100%);
-        color: #fff;
-        font-size: 12px;
+        position: relative;
+        left: 8px;
+        top: 0;
+        background: none;
+        color: #7c3aed;
+        font-size: 20px;
         font-weight: 700;
-        padding: 4px 8px;
-        border-radius: 12px;
-        border: 2px solid #ccccccff;
-        box-shadow: 0 2px 6px rgba(2, 6, 23, 0.15);
+        padding: 0;
+        border: none;
+        box-shadow: none;
+        display: inline-block;
+        vertical-align: middle;
     }
     .reward-slot.empty-state {
         border-style: solid;
         color: #d1d5db;
+        background: #f3f4f6;
     }
 
     .empty-shelf {
@@ -218,7 +234,6 @@
     .reward-intro-card {
         flex-shrink: 0;
         width: 300px;
-        background: #ffffff;
         border: 2px solid #e5e7eb;
         border-radius: 16px;
         padding: 25px;
@@ -238,6 +253,17 @@
         opacity: 0.5;
         margin: 0 -30px; /* squeeze side cards */
         z-index: 1;
+    }
+
+    /* Gradient backgrounds for each reward card */
+    .reward-intro-card.game-completed {
+        background: linear-gradient(135deg, #f2fff0ff 0%, #ffffffff 100%);
+    }
+    .reward-intro-card.speed-demon {
+        background: linear-gradient(135deg, #fffff0ff 0%, #ffffffff 100%);
+    }
+    .reward-intro-card.great-player {
+        background: linear-gradient(135deg, #fff0f0ff 0%, #ffffffff 100%);
     }
 
     .reward-intro-card.highlighted {
@@ -396,73 +422,71 @@
             @php
                 // Group rewards by game
                 $rewardsByGame = $rewards->groupBy('game_id');
+                // Fix: avoid using $gameId as both key and parameter
+                $gameShelves = $rewardsByGame->map(function($gameRewards, $gid) {
+                    return ['gameRewards' => $gameRewards, 'gameId' => $gid];
+                })->values();
             @endphp
 
-            @foreach($rewardsByGame as $gameId => $gameRewards)
-                @php
-                    $game = $gameRewards->first()->game;
-                    $rewardCounts = $gameRewards->groupBy('reward_name')->map->count();
-                    // Assign a unique image per game based on $gameId or $game->title
-                    $defaultImages = [
-                        1 => 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80', // Example Game 1
-                        2 => 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80', // Example Game 2
-                        3 => 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80', // Example Game 3
-                        2 => 'https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=400&q=80', // New Quiz Challenge image
-                    ];
-                    $gameImage = $game->image_url 
-                        ?? ($defaultImages[$gameId] ?? 'https://static.wixstatic.com/media/4700cf_6e10db7253d348f0a8f8e695e8815597~mv2.jpg');
-                @endphp
+            @for($i = 0; $i < $gameShelves->count(); $i += 2)
+                <div class="shelves-row">
+                    @for($j = $i; $j < min($i+2, $gameShelves->count()); $j++)
+                        @php
+                            $gameRewards = $gameShelves[$j]['gameRewards'];
+                            $gameId = $gameShelves[$j]['gameId'];
+                            $game = $gameRewards->first()->game;
+                            $rewardCounts = $gameRewards->groupBy('reward_name')->map->count();
+                            $defaultImages = [
+                                1 => 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
+                                2 => 'https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=400&q=80',
+                                3 => 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80',
+                            ];
+                            $gameImage = $game->image_url ?? ($defaultImages[$gameId] ?? 'https://static.wixstatic.com/media/4700cf_6e10db7253d348f0a8f8e695e8815597~mv2.jpg');
+                        @endphp
 
-                <div class="game-shelf">
-                    <div class="game-cover-cell">
-                        <img src="{{ $gameImage }}" alt="Game Cover" class="game-cover-img" />
-                        <div class="game-cover-overlay">
-                            <div class="game-cover-title">{{ $game->title ?? 'Unknown Game' }}</div>
-                            <div class="game-cover-desc">{{ Str::limit($game->description ?? 'No description', 60) }}</div>
-                        </div>
-                    </div>
-                    <div class="rewards-shelf">
-                        <!-- Game Completed Reward -->
-                        @php $completedCount = $rewardCounts['Game Completed'] ?? 0; @endphp
-                        <div class="reward-slot filled">
-                            <div style="text-align: center;">
-                                <i class="bi bi-check-circle icon" style="color: #20af29ff;"></i>
-                                @if($completedCount > 1)
-                                    <div class="badge">x{{ $completedCount }}</div>
-                                @endif
+                        <div class="game-shelf">
+                            <div class="game-cover-cell">
+                                <img src="{{ $gameImage }}" alt="Game Cover" class="game-cover-img" />
+                                <div class="game-cover-overlay">
+                                    <div class="game-cover-title">{{ $game->title ?? 'Unknown Game' }}</div>
+                                    <div class="game-cover-desc">{{ Str::limit($game->description ?? 'No description', 60) }}</div>
+                                </div>
+                            </div>
+                            <div class="rewards-shelf">
+                                @php $completedCount = $rewardCounts['Game Completed'] ?? 0; @endphp
+                                <div class="reward-slot filled">
+                                    <i class="bi bi-check-circle icon" style="color: #20af29ff;"></i>
+                                    @if($completedCount > 1)
+                                        <span class="badge">x     {{ $completedCount }}</span>
+                                    @endif
+                                </div>
+                                @php $speedCount = $rewardCounts['Speed Demon'] ?? 0; @endphp
+                                <div class="reward-slot {{ $speedCount > 0 ? 'filled' : '' }}">
+                                    @if($speedCount > 0)
+                                        <i class="bi bi-lightning icon" style="color: #f59e0b;"></i>
+                                        @if($speedCount > 1)
+                                            <span class="badge">x {{ $speedCount }}</span>
+                                        @endif
+                                    @else
+                                        <i class="bi bi-lightning empty-state"></i>
+                                    @endif
+                                </div>
+                                @php $playerCount = $rewardCounts['Great Player'] ?? 0; @endphp
+                                <div class="reward-slot {{ $playerCount > 0 ? 'filled' : '' }}">
+                                    @if($playerCount > 0)
+                                        <i class="bi bi-controller icon" style="color: #ef4444;"></i>
+                                        @if($playerCount > 1)
+                                            <span class="badge">x {{ $playerCount }}</span>
+                                        @endif
+                                    @else
+                                        <i class="bi bi-star empty-state"></i>
+                                    @endif
+                                </div>
                             </div>
                         </div>
-                        <!-- Speed Demon Reward -->
-                        @php $speedCount = $rewardCounts['Speed Demon'] ?? 0; @endphp
-                        <div class="reward-slot {{ $speedCount > 0 ? 'filled' : '' }}">
-                            @if($speedCount > 0)
-                                <div style="text-align: center;">
-                                    <i class="bi bi-lightning icon" style="color: #f59e0b;"></i>
-                                    @if($speedCount > 1)
-                                        <div class="badge">x{{ $speedCount }}</div>
-                                    @endif
-                                </div>
-                            @else
-                                <i class="bi bi-lightning empty-state"></i>
-                            @endif
-                        </div>
-                        <!-- Great Player Reward -->
-                        @php $playerCount = $rewardCounts['Great Player'] ?? 0; @endphp
-                        <div class="reward-slot {{ $playerCount > 0 ? 'filled' : '' }}">
-                            @if($playerCount > 0)
-                                <div style="text-align: center;">
-                                    <i class="bi bi-controller icon" style="color: #ef4444;"></i>
-                                    @if($playerCount > 1)
-                                        <div class="badge">x{{ $playerCount }}</div>
-                                    @endif
-                                </div>
-                            @else
-                                <i class="bi bi-star empty-state"></i>
-                            @endif
-                        </div>
-                    </div>
+                    @endfor
                 </div>
-            @endforeach
+            @endfor
         @endif
     </main>
 </div>
