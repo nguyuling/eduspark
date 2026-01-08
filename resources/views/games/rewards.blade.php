@@ -122,6 +122,7 @@
         width: 70px;
         height: 70px;
         display: flex;
+        flex-direction: row; /* side by side */
         align-items: center;
         justify-content: flex-start;
         background: #f9fafb;
@@ -140,22 +141,29 @@
         border: none;
     }
     .reward-slot .icon {
-        font-size: 38px;
-        margin-right: 0;
+        font-size: 50px;
+        margin-left: 40px;
+        margin-right: 15px;
+        display: block;
     }
     .reward-slot .badge {
         position: relative;
-        left: 8px;
+        left: 0;
         top: 0;
+        margin-top: 0;
+        margin-left: 2px;
         background: none;
         color: #7c3aed;
-        font-size: 20px;
+        font-size: 50px;
         font-weight: 700;
         padding: 0;
         border: none;
         box-shadow: none;
         display: inline-block;
         vertical-align: middle;
+        text-align: center;
+        /* Ensure no line break inside badge */
+        white-space: nowrap;
     }
     .reward-slot.empty-state {
         border-style: solid;
@@ -371,6 +379,7 @@
                 <div class="title">Ganjaran Saya</div>
                 <div class="sub">Lihat semua ganjaran yang anda peroleh daripada permainan.</div>
             </div>
+            <!-- Change the Kembali button to go back to the games index page -->
             <a href="{{ route('games.index') }}" class="btn-kembali">
                 <i class="bi bi-arrow-left"></i>Kembali
             </a>
@@ -435,7 +444,12 @@
                             $gameRewards = $gameShelves[$j]['gameRewards'];
                             $gameId = $gameShelves[$j]['gameId'];
                             $game = $gameRewards->first()->game;
-                            $rewardCounts = $gameRewards->groupBy('reward_name')->map->count();
+                            // Fix: Count actual rewards, not just unique names
+                            $rewardCounts = [
+                                'Game Completed' => $gameRewards->where('reward_name', 'Game Completed')->count(),
+                                'Speed Demon' => $gameRewards->where('reward_name', 'Speed Demon')->count(),
+                                'Great Player' => $gameRewards->where('reward_name', 'Great Player')->count(),
+                            ];
                             $defaultImages = [
                                 1 => 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
                                 2 => 'https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=400&q=80',
@@ -453,14 +467,20 @@
                                 </div>
                             </div>
                             <div class="rewards-shelf">
-                                @php $completedCount = $rewardCounts['Game Completed'] ?? 0; @endphp
-                                <div class="reward-slot filled">
-                                    <i class="bi bi-check-circle icon" style="color: #20af29ff;"></i>
-                                    @if($completedCount > 1)
-                                        <span class="badge">x     {{ $completedCount }}</span>
+                                {{-- Game Completed Reward --}}
+                                @php $completedCount = $rewardCounts['Game Completed']; @endphp
+                                <div class="reward-slot {{ $completedCount > 0 ? 'filled' : '' }}">
+                                    @if($completedCount > 0)
+                                        <i class="bi bi-check-circle icon" style="color: #20af29ff;"></i>
+                                        @if($completedCount > 1)
+                                            <span class="badge">x {{ $completedCount }}</span>
+                                        @endif
+                                    @else
+                                        <i class="bi bi-check-circle empty-state"></i>
                                     @endif
                                 </div>
-                                @php $speedCount = $rewardCounts['Speed Demon'] ?? 0; @endphp
+                                {{-- Speed Demon Reward --}}
+                                @php $speedCount = $rewardCounts['Speed Demon']; @endphp
                                 <div class="reward-slot {{ $speedCount > 0 ? 'filled' : '' }}">
                                     @if($speedCount > 0)
                                         <i class="bi bi-lightning icon" style="color: #f59e0b;"></i>
@@ -471,7 +491,8 @@
                                         <i class="bi bi-lightning empty-state"></i>
                                     @endif
                                 </div>
-                                @php $playerCount = $rewardCounts['Great Player'] ?? 0; @endphp
+                                {{-- Great Player Reward --}}
+                                @php $playerCount = $rewardCounts['Great Player']; @endphp
                                 <div class="reward-slot {{ $playerCount > 0 ? 'filled' : '' }}">
                                     @if($playerCount > 0)
                                         <i class="bi bi-controller icon" style="color: #ef4444;"></i>
@@ -479,7 +500,7 @@
                                             <span class="badge">x {{ $playerCount }}</span>
                                         @endif
                                     @else
-                                        <i class="bi bi-star empty-state"></i>
+                                        <i class="bi bi-controller empty-state"></i>
                                     @endif
                                 </div>
                             </div>
