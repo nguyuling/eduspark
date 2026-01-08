@@ -83,16 +83,6 @@
         line-height: 1.4;
     }
 
-    .game-status {
-        font-size: 12px;
-        font-weight: 600;
-        color: #9ca3af;
-    }
-
-    .game-status.not-attempted {
-        color: #d97706;
-    }
-
     .rewards-shelf {
         display: flex;
         gap: 16px;
@@ -424,9 +414,6 @@
                     <div class="game-info">
                         <h3>{{ $game->title ?? 'Unknown Game' }}</h3>
                         <p>{{ Str::limit($game->description ?? 'No description', 60) }}</p>
-                        <div class="game-status">
-                            <i class="bi bi-check-circle-fill"></i> Dimainkan
-                        </div>
                     </div>
                     
                     <div class="rewards-shelf">
