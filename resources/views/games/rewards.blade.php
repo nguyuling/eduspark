@@ -191,62 +191,110 @@
     }
 
     /* Reward Intro Cards */
+    .reward-stats-and-intro-row {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        gap: 40px;
+        max-width: 1200px;
+        margin: 0px auto 60px auto;
+    }
+
+    .reward-stats-col {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 220px;
+        max-width: 260px;
+        flex: 0 0 240px;
+        gap: 20px;
+    }
+
+    .reward-intro-col {
+        flex: 1 1 0;
+        min-width: 0;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
     .reward-intro-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 20px;
-        padding: 40px 80px;
-        overflow-x: auto;
+        gap: 0;
+        padding: 40px 0;
+        overflow-x: visible;
         -webkit-overflow-scrolling: touch;
-        margin-bottom: 20px;
-    }
-
-    .reward-intro-container::-webkit-scrollbar {
-        display: none;
+        margin-bottom: 0;
+        position: relative;
+        width: 100%;
     }
 
     .reward-intro-card {
         flex-shrink: 0;
-        width: 280px;
+        width: 220px;
         background: #ffffff;
         border: 2px solid #e5e7eb;
         border-radius: 16px;
         padding: 25px;
         text-align: center;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease-in-out;
+        transition: 
+            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+            opacity 0.3s,
+            margin 0.3s;
         cursor: pointer;
         position: relative;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        height: 220px; /* Fixed height for consistency */
-        transform: scale(0.9); /* Smaller by default */
-        opacity: 0.6; /* Duller by default */
+        height: 220px;
+        transform: scale(0.7);
+        opacity: 0.5;
+        margin: 0 -30px; /* squeeze side cards */
+        z-index: 1;
     }
 
     .reward-intro-card.highlighted {
-        transform: scale(1.05);
-        opacity: 1; /* Fully visible when highlighted */
+        transform: scale(1.25);
+        opacity: 1;
+        margin: 0 60px;
+        z-index: 2;
     }
 
-    /* Game Completed - Purple highlighted */
-    .reward-intro-card:nth-child(1).highlighted {
+    /* Remove nth-child based styles and use type-based classes instead */
+    .reward-intro-card.game-completed.highlighted {
         border-color: #a855f7;
         box-shadow: 0 8px 24px rgba(168, 85, 247, 0.25);
     }
-
-    /* Speed Demon - Yellow highlighted */
-    .reward-intro-card:nth-child(2).highlighted {
+    .reward-intro-card.speed-demon.highlighted {
         border-color: #f59e0b;
         box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
     }
-
-    /* Great Player - Red highlighted */
-    .reward-intro-card:nth-child(3).highlighted {
+    .reward-intro-card.great-player.highlighted {
         border-color: #ef4444;
         box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);
+    }
+
+    .reward-intro-card .points {
+        font-size: 16px;
+        font-weight: 700;
+        padding: 8px 15px;
+        border-radius: 8px;
+        display: inline-block;
+    }
+    .reward-intro-card.game-completed .points {
+        background: #a855f7;
+        color: #f3e8ff;
+    }
+    .reward-intro-card.speed-demon .points {
+        background: #f59e0b;
+        color: #fef3c7;
+    }
+    .reward-intro-card.great-player .points {
+        background: #ef4444;
+        color: #fee2e2;
     }
 
     /* Navigation arrows */
@@ -266,8 +314,8 @@
         transform: translateY(-50%) scale(1.1);
     }
 
-    .reward-nav-arrow.left { left: -50px; }
-    .reward-nav-arrow.right { right: -50px; }
+    .reward-nav-arrow.left { left: 170px; }
+    .reward-nav-arrow.right { right: 170px; }
 
     .reward-nav-arrow.disabled {
         color: #e5e7eb;
@@ -278,6 +326,17 @@
         font-size: 60px;
         margin-bottom: 15px;
         line-height: 1;
+    }
+
+    /* Icon color follows card type */
+    .reward-intro-card.game-completed .card-icon {
+        color: #a855f7;
+    }
+    .reward-intro-card.speed-demon .card-icon {
+        color: #f59e0b;
+    }
+    .reward-intro-card.great-player .card-icon {
+        color: #ef4444;
     }
 
     .reward-intro-card h4 {
@@ -293,39 +352,7 @@
         margin-bottom: 15px;
         flex-grow: 1;
     }
-
-    .reward-intro-card .points {
-        font-size: 16px;
-        font-weight: 700;
-        padding: 8px 15px;
-        border-radius: 8px;
-        display: inline-block;
-    }
-
-    /* Game Completed - Purple */
-    .reward-intro-card:nth-child(1) .points {
-        background: #a855f7;
-        color: #f3e8ff;
-    }
-
-    /* Speed Demon - Yellow/Orange */
-    .reward-intro-card:nth-child(2) .points {
-        background: #f59e0b;
-        color: #fef3c7;
-    }
-
-    /* Great Player - Red */
-    .reward-intro-card:nth-child(3) .points {
-        background: #ef4444;
-        color: #fee2e2;
-    }
-
-    /* Specific colors for icons */
-    .icon-controller { color: #a855f7; }
-    .icon-lightning { color: #f59e0b; }
-    .icon-star { color: #ef4444; }
 </style>
-
 <div class="app">
     <main class="main">
         <div class="header">
@@ -338,30 +365,41 @@
             </a>
         </div>
 
-<!-- Reward Introduction Section -->
-<div style="position: relative; max-width: 900px; margin: 40px auto; display: flex; align-items: center; justify-content: center;">
-    <i class="bi bi-chevron-left reward-nav-arrow left" id="prevReward"></i>
-    <div class="reward-intro-container">
-        <div class="reward-intro-card">
-            <i class="bi bi-controller card-icon icon-controller"></i>
-            <h4>Game Completed</h4>
-            <p>Complete any game to earn this badge.</p>
-            <span class="points">10 Points</span>
-        </div>
-        <div class="reward-intro-card">
-            <i class="bi bi-lightning card-icon icon-lightning"></i>
-            <h4>Speed Demon</h4>
-            <p>Finish games quickly to prove your speed.</p>
-            <span class="points">50 Points</span>
-        </div>
-        <div class="reward-intro-card">
-            <i class="bi bi-star card-icon icon-star"></i>
-            <h4>Great Player</h4>
-            <p>Achieve high scores and master challenges.</p>
-            <span class="points">25 Points</span>
-        </div>
-    </div>
-    <i class="bi bi-chevron-right reward-nav-arrow right" id="nextReward"></i>
+        <div class="reward-stats-and-intro-row">
+            <div class="reward-stats-col">
+                <div class="reward-stat-card">
+                    <div class="label">Jumlah Mata Dituntut</div>
+                    <div class="value">{{ $totalPoints }}</div>
+                </div>
+                <div class="reward-stat-card">
+                    <div class="label">Jumlah Ganjaran</div>
+                    <div class="value">{{ $rewards->count() }}</div>
+                </div>
+            </div>
+            <div class="reward-intro-col">
+                <i class="bi bi-chevron-left reward-nav-arrow left" id="prevReward"></i>
+                <div class="reward-intro-container">
+                    <div class="reward-intro-card game-completed">
+                        <i class="bi bi-controller card-icon icon-controller"></i>
+                        <h4>Game Completed</h4>
+                        <p>Complete any game to earn this badge.</p>
+                        <span class="points">10 Points</span>
+                    </div>
+                    <div class="reward-intro-card speed-demon">
+                        <i class="bi bi-lightning card-icon icon-lightning"></i>
+                        <h4>Speed Demon</h4>
+                        <p>Finish games quickly to prove your speed.</p>
+                        <span class="points">50 Points</span>
+                    </div>
+                    <div class="reward-intro-card great-player">
+                        <i class="bi bi-star card-icon icon-star"></i>
+                        <h4>Great Player</h4>
+                        <p>Achieve high scores and master challenges.</p>
+                        <span class="points">25 Points</span>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-right reward-nav-arrow right" id="nextReward"></i>
+            </div>
         </div>
 
         <!-- Game Shelves -->
@@ -436,29 +474,13 @@
                 </div>
             @endforeach
         @endif
-
-        <!-- Stats Cards -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px;">
-            <div class="reward-stat-card">
-                <div class="label">Jumlah Mata Dituntut</div>
-                <div class="value">{{ $totalPoints }}</div>
-            </div>
-            <div class="reward-stat-card">
-                <div class="label">Ganjaran Belum Dituntut</div>
-                <div class="value">{{ $unclaimedCount }}</div>
-            </div>
-            <div class="reward-stat-card">
-                <div class="label">Jumlah Ganjaran</div>
-                <div class="value">{{ $rewards->count() }}</div>
-            </div>
-        </div>
     </main>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const container = document.querySelector('.reward-intro-container');
-        const cards = Array.from(document.querySelectorAll('.reward-intro-card'));
+        let cards = Array.from(document.querySelectorAll('.reward-intro-card'));
         const prevBtn = document.getElementById('prevReward');
         const nextBtn = document.getElementById('nextReward');
 
@@ -475,7 +497,7 @@
             const cardWidth = cards[0].offsetWidth;
             const gap = 20;
             const scrollLeft = cards[0].offsetWidth + gap - (container.offsetWidth / 2) + (cardWidth / 2);
-            
+
             container.scrollTo({
                 left: scrollLeft,
                 behavior: 'smooth'
@@ -486,38 +508,24 @@
             // Shift right: move last card to beginning
             const lastCard = cards.pop();
             cards.unshift(lastCard);
-            
-            // Add transition to cards before reordering
+
+            // Reorder cards in DOM
             cards.forEach(card => {
-                card.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                container.appendChild(card);
             });
-            
-            // Reorder cards in DOM with slight delay
-            setTimeout(() => {
-                cards.forEach(card => {
-                    container.appendChild(card);
-                });
-                updateCardPositions();
-            }, 50);
+            updateCardPositions();
         });
 
         nextBtn.addEventListener('click', () => {
             // Shift left: move first card to end
             const firstCard = cards.shift();
             cards.push(firstCard);
-            
-            // Add transition to cards before reordering
+
+            // Reorder cards in DOM
             cards.forEach(card => {
-                card.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                container.appendChild(card);
             });
-            
-            // Reorder cards in DOM with slight delay
-            setTimeout(() => {
-                cards.forEach(card => {
-                    container.appendChild(card);
-                });
-                updateCardPositions();
-            }, 50);
+            updateCardPositions();
         });
 
         // Initial setup
