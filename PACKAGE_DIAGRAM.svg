@@ -1,0 +1,199 @@
+<svg viewBox="0 0 1600 1100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .subsystem-box { fill: #ffffff; stroke: #333; stroke-width: 2; }
+      .subsystem-title { fill: #333; font-weight: bold; font-size: 14px; font-family: Arial; }
+      .item-box { fill: #ffffff; stroke: #333; stroke-width: 1; }
+      .item-text { fill: #333; font-size: 11px; font-family: Arial; }
+      .dependency-line { stroke: #333; stroke-width: 2; fill: none; stroke-dasharray: 5,5; }
+      .inheritance-line { stroke: #333; stroke-width: 2; fill: none; }
+      .arrow { fill: #333; }
+      .title-text { fill: #000; font-weight: bold; font-size: 20px; font-family: Arial; }
+    </style>
+    <marker id="triangle" markerWidth="10" markerHeight="10" refX="8" refY="1.5" orient="auto">
+      <polygon points="0 0, 10 1.5, 0 3" fill="#333"/>
+    </marker>
+  </defs>
+
+  <!-- Main Title -->
+  <text x="800" y="30" text-anchor="middle" class="title-text">EduSpark Web Application - Package Diagram</text>
+
+  <!-- USER SUBSYSTEM (Top) -->
+  <rect x="600" y="60" width="400" height="160" class="subsystem-box" rx="8"/>
+  <rect x="610" y="65" width="380" height="28" fill="#e8e8e8" stroke="#333" stroke-width="1"/>
+  <text x="800" y="85" text-anchor="middle" class="subsystem-title">User Subsystem</text>
+  
+  <!-- User Items -->
+  <rect x="650" y="110" width="70" height="35" class="item-box" rx="3"/>
+  <text x="685" y="132" text-anchor="middle" class="item-text">User</text>
+  
+  <rect x="750" y="110" width="70" height="35" class="item-box" rx="3"/>
+  <text x="785" y="132" text-anchor="middle" class="item-text">Student</text>
+  
+  <rect x="850" y="110" width="70" height="35" class="item-box" rx="3"/>
+  <text x="885" y="132" text-anchor="middle" class="item-text">Teacher</text>
+
+  <rect x="700" y="160" width="200" height="35" class="item-box" rx="3"/>
+  <text x="800" y="182" text-anchor="middle" class="item-text">UserController</text>
+
+  <!-- Inheritance arrows for Student and Teacher -->
+  <line x1="785" y1="145" x2="685" y2="110" class="inheritance-line" marker-end="url(#triangle)"/>
+  <line x1="885" y1="145" x2="685" y2="110" class="inheritance-line" marker-end="url(#triangle)"/>
+
+  <!-- LESSON SUBSYSTEM (Left) -->
+  <rect x="50" y="300" width="350" height="220" class="subsystem-box" rx="8"/>
+  <rect x="60" y="305" width="330" height="28" fill="#e8e8e8" stroke="#333" stroke-width="1"/>
+  <text x="225" y="325" text-anchor="middle" class="subsystem-title">Lesson Subsystem</text>
+  
+  <rect x="100" y="360" width="80" height="35" class="item-box" rx="3"/>
+  <text x="140" y="382" text-anchor="middle" class="item-text">Lesson</text>
+
+  <rect x="210" y="360" width="120" height="35" class="item-box" rx="3"/>
+  <text x="270" y="382" text-anchor="middle" class="item-text">LessonMaterial</text>
+
+  <rect x="100" y="420" width="120" height="35" class="item-box" rx="3"/>
+  <text x="160" y="442" text-anchor="middle" class="item-text">Attendance</text>
+
+  <rect x="240" y="420" width="100" height="35" class="item-box" rx="3"/>
+  <text x="290" y="442" text-anchor="middle" class="item-text">AIChatHelper</text>
+
+  <rect x="100" y="480" width="240" height="35" class="item-box" rx="3"/>
+  <text x="220" y="502" text-anchor="middle" class="item-text">LessonController</text>
+
+  <!-- QUIZ SUBSYSTEM (Center-Left) -->
+  <rect x="450" y="300" width="400" height="220" class="subsystem-box" rx="8"/>
+  <rect x="460" y="305" width="380" height="28" fill="#e8e8e8" stroke="#333" stroke-width="1"/>
+  <text x="650" y="325" text-anchor="middle" class="subsystem-title">Quiz Subsystem</text>
+
+  <rect x="490" y="360" width="80" height="35" class="item-box" rx="3"/>
+  <text x="530" y="382" text-anchor="middle" class="item-text">Quiz</text>
+
+  <rect x="600" y="360" width="100" height="35" class="item-box" rx="3"/>
+  <text x="650" y="382" text-anchor="middle" class="item-text">QuizQuestion</text>
+
+  <rect x="730" y="360" width="90" height="35" class="item-box" rx="3"/>
+  <text x="775" y="382" text-anchor="middle" class="item-text">QuizOption</text>
+
+  <rect x="490" y="420" width="100" height="35" class="item-box" rx="3"/>
+  <text x="540" y="442" text-anchor="middle" class="item-text">QuizAttempt</text>
+
+  <rect x="620" y="420" width="100" height="35" class="item-box" rx="3"/>
+  <text x="670" y="442" text-anchor="middle" class="item-text">QuizAnswer</text>
+
+  <rect x="490" y="480" width="320" height="35" class="item-box" rx="3"/>
+  <text x="650" y="502" text-anchor="middle" class="item-text">QuizTeacherController / QuizStudentController</text>
+
+  <!-- GAME SUBSYSTEM (Right) -->
+  <rect x="900" y="300" width="380" height="220" class="subsystem-box" rx="8"/>
+  <rect x="910" y="305" width="360" height="28" fill="#e8e8e8" stroke="#333" stroke-width="1"/>
+  <text x="1090" y="325" text-anchor="middle" class="subsystem-title">Game Subsystem</text>
+
+  <rect x="940" y="360" width="70" height="35" class="item-box" rx="3"/>
+  <text x="975" y="382" text-anchor="middle" class="item-text">Game</text>
+
+  <rect x="1030" y="360" width="100" height="35" class="item-box" rx="3"/>
+  <text x="1080" y="382" text-anchor="middle" class="item-text">GameScore</text>
+
+  <rect x="1160" y="360" width="80" height="35" class="item-box" rx="3"/>
+  <text x="1200" y="382" text-anchor="middle" class="item-text">Reward</text>
+
+  <rect x="940" y="420" width="110" height="35" class="item-box" rx="3"/>
+  <text x="995" y="442" text-anchor="middle" class="item-text">Leaderboard</text>
+
+  <rect x="1070" y="420" width="90" height="35" class="item-box" rx="3"/>
+  <text x="1115" y="442" text-anchor="middle" class="item-text">GameLevel</text>
+
+  <rect x="940" y="480" width="300" height="35" class="item-box" rx="3"/>
+  <text x="1090" y="502" text-anchor="middle" class="item-text">GameController / GameTeacherController</text>
+
+  <!-- FORUM SUBSYSTEM (Bottom-Left) -->
+  <rect x="50" y="590" width="350" height="220" class="subsystem-box" rx="8"/>
+  <rect x="60" y="595" width="330" height="28" fill="#e8e8e8" stroke="#333" stroke-width="1"/>
+  <text x="225" y="615" text-anchor="middle" class="subsystem-title">Forum Subsystem</text>
+
+  <rect x="100" y="650" width="100" height="35" class="item-box" rx="3"/>
+  <text x="150" y="672" text-anchor="middle" class="item-text">ForumPost</text>
+
+  <rect x="230" y="650" width="100" height="35" class="item-box" rx="3"/>
+  <text x="280" y="672" text-anchor="middle" class="item-text">ForumReply</text>
+
+  <rect x="100" y="710" width="120" height="35" class="item-box" rx="3"/>
+  <text x="160" y="732" text-anchor="middle" class="item-text">DirectMessage</text>
+
+  <rect x="240" y="710" width="80" height="35" class="item-box" rx="3"/>
+  <text x="280" y="732" text-anchor="middle" class="item-text">Message</text>
+
+  <rect x="100" y="770" width="230" height="35" class="item-box" rx="3"/>
+  <text x="215" y="792" text-anchor="middle" class="item-text">ForumController / MessageController</text>
+
+  <!-- PERFORMANCE SUBSYSTEM (Center-Bottom) -->
+  <rect x="450" y="590" width="400" height="220" class="subsystem-box" rx="8"/>
+  <rect x="460" y="595" width="380" height="28" fill="#e8e8e8" stroke="#333" stroke-width="1"/>
+  <text x="650" y="615" text-anchor="middle" class="subsystem-title">Performance Subsystem</text>
+
+  <rect x="510" y="650" width="100" height="35" class="item-box" rx="3"/>
+  <text x="560" y="672" text-anchor="middle" class="item-text">Score</text>
+
+  <rect x="630" y="650" width="140" height="35" class="item-box" rx="3"/>
+  <text x="700" y="672" text-anchor="middle" class="item-text">PerformanceReport</text>
+
+  <rect x="510" y="710" width="260" height="35" class="item-box" rx="3"/>
+  <text x="640" y="732" text-anchor="middle" class="item-text">ReportController / PerformanceController</text>
+
+  <rect x="510" y="770" width="260" height="35" class="item-box" rx="3"/>
+  <text x="640" y="792" text-anchor="middle" class="item-text">Statistics &amp; Analytics</text>
+
+  <!-- AUTHENTICATION &amp; SECURITY SUBSYSTEM (Right-Bottom) -->
+  <rect x="900" y="590" width="380" height="220" class="subsystem-box" rx="8"/>
+  <rect x="910" y="595" width="360" height="28" fill="#e8e8e8" stroke="#333" stroke-width="1"/>
+  <text x="1090" y="615" text-anchor="middle" class="subsystem-title">Auth &amp; Security Subsystem</text>
+
+  <rect x="940" y="650" width="100" height="35" class="item-box" rx="3"/>
+  <text x="990" y="672" text-anchor="middle" class="item-text">Middleware</text>
+
+  <rect x="1060" y="650" width="100" height="35" class="item-box" rx="3"/>
+  <text x="1110" y="672" text-anchor="middle" class="item-text">Policies</text>
+
+  <rect x="1180" y="650" width="80" height="35" class="item-box" rx="3"/>
+  <text x="1220" y="672" text-anchor="middle" class="item-text">Guards</text>
+
+  <rect x="940" y="710" width="320" height="35" class="item-box" rx="3"/>
+  <text x="1100" y="732" text-anchor="middle" class="item-text">Laravel Breeze / Sanctum</text>
+
+  <rect x="940" y="770" width="320" height="35" class="item-box" rx="3"/>
+  <text x="1100" y="792" text-anchor="middle" class="item-text">Session Auth &amp; Token Auth</text>
+
+  <!-- DATABASE LAYER -->
+  <rect x="50" y="880" width="1230" height="100" class="subsystem-box" rx="8"/>
+  <rect x="60" y="885" width="1210" height="28" fill="#e8e8e8" stroke="#333" stroke-width="1"/>
+  <text x="665" y="905" text-anchor="middle" class="subsystem-title">SQLite Database Layer</text>
+
+  <text x="70" y="935" class="item-text">Tables: users | games | quizzes | quiz_questions | quiz_answers | quiz_attempts | lessons | forum_posts</text>
+  <text x="70" y="955" class="item-text">| scores | rewards | leaderboards | messages | direct_messages | attendance | game_scores</text>
+
+  <!-- Dependency Lines from subsystems to User Subsystem -->
+  <line x1="225" y1="520" x2="680" y2="220" class="dependency-line"/>
+  <line x1="650" y1="520" x2="750" y2="220" class="dependency-line"/>
+  <line x1="1090" y1="520" x2="850" y2="220" class="dependency-line"/>
+  <line x1="225" y1="810" x2="700" y2="220" class="dependency-line"/>
+  <line x1="650" y1="810" x2="800" y2="220" class="dependency-line"/>
+  <line x1="1090" y1="810" x2="920" y2="220" class="dependency-line"/>
+
+  <!-- Legend -->
+  <rect x="20" y="1000" width="1560" height="80" fill="none" stroke="#ccc" stroke-width="1" rx="5"/>
+  <text x="30" y="1020" class="item-text" font-weight="bold">Legend:</text>
+  
+  <rect x="30" y="1030" width="12" height="12" class="subsystem-box"/>
+  <text x="50" y="1038" class="item-text">Subsystem (Package)</text>
+  
+  <rect x="280" y="1030" width="12" height="12" class="item-box"/>
+  <text x="300" y="1038" class="item-text">Model / Controller / Class</text>
+  
+  <line x1="550" y1="1036" x2="580" y2="1036" class="inheritance-line" marker-end="url(#triangle)"/>
+  <text x="590" y="1038" class="item-text">Inheritance / Specialization</text>
+  
+  <line x1="850" y1="1036" x2="880" y2="1036" class="dependency-line"/>
+  <text x="890" y="1038" class="item-text">Dependencies / Uses</text>
+
+  <text x="30" y="1060" class="item-text">Architecture: MVC Pattern | ORM: Eloquent | Authentication: Session &amp; API Token | Database: SQLite with Migrations</text>
+</svg>
