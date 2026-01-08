@@ -255,8 +255,8 @@
 
     /* Remove nth-child based styles and use type-based classes instead */
     .reward-intro-card.game-completed.highlighted {
-        border-color: #a855f7;
-        box-shadow: 0 8px 24px rgba(168, 85, 247, 0.25);
+        border-color: #20af29ff;
+        box-shadow: 0 8px 24px rgba(90, 247, 85, 0.25);
     }
     .reward-intro-card.speed-demon.highlighted {
         border-color: #f59e0b;
@@ -275,16 +275,16 @@
         display: inline-block;
     }
     .reward-intro-card.game-completed .points {
-        background: #a855f7;
-        color: #f3e8ff;
+        background: #20af29ff;
+        color: #ffffff;
     }
     .reward-intro-card.speed-demon .points {
         background: #f59e0b;
-        color: #fef3c7;
+        color: #ffffff;
     }
     .reward-intro-card.great-player .points {
         background: #ef4444;
-        color: #fee2e2;
+        color: #ffffff;
     }
 
     /* Navigation arrows */
@@ -320,7 +320,7 @@
 
     /* Icon color follows card type */
     .reward-intro-card.game-completed .card-icon {
-        color: #a855f7;
+        color: #20af29ff;
     }
     .reward-intro-card.speed-demon .card-icon {
         color: #f59e0b;
@@ -421,7 +421,7 @@
                         @php $completedCount = $rewardCounts['Game Completed'] ?? 0; @endphp
                         <div class="reward-slot filled">
                             <div style="text-align: center;">
-                                <i class="bi bi-controller icon" style="color: #a855f7;"></i>
+                                <i class="bi bi-controller icon" style="color: #20af29ff;"></i>
                                 @if($completedCount > 1)
                                     <div class="badge">x{{ $completedCount }}</div>
                                 @endif
