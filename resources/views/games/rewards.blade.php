@@ -24,12 +24,6 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
     }
-
-    .reward-stat-card:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18);
-    }
-
     .reward-stat-card .label {
         font-size: 16px;
         font-weight: 700;
@@ -147,8 +141,9 @@
         padding-right: 0;
     }
     .reward-slot:hover {
-        border-color: #6A4DF7;
-        background: #f5f3ff;
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
     }
     .reward-slot.filled {
         background: none;
@@ -319,6 +314,12 @@
         filter: brightness(0.9);
     }
 
+    .reward-intro-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
+    }
+
     /* Gradient backgrounds for each reward card */
     .reward-intro-card.game-completed {
         background: linear-gradient(135deg, #f2fff0ff 0%, #ffffffff 100%);
@@ -348,6 +349,11 @@
         transform: scale(1);
         opacity: 1;
         filter: brightness(1);
+    }
+    .reward-intro-card:nth-child(2):hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
     }
 
     .reward-intro-card:nth-child(2).game-completed {
@@ -418,6 +424,25 @@
         color: #b1b1b1ff;
         cursor: not-allowed;
     }
+
+    /* Badge Image Styles */
+    .reward-badge-img {
+        width: 60px;
+        height: 60px;
+        margin-left: 2px;
+        margin-right: 4px;
+    }
+
+    .reward-badge-img.empty {
+        opacity: 0.3;
+    }
+
+    .intro-badge-img {
+        width: 180px;
+        height: 180px;
+        margin: 0 auto 10px auto;
+        display: block;
+    }
 </style>
 
 <div class="app">
@@ -454,17 +479,17 @@
                 <i class="bi bi-chevron-left reward-nav-arrow left" id="prevReward"></i>
                 <div class="reward-intro-container">
                     <div class="reward-intro-card game-completed">
-                        <img src="{{ asset('badges/game-completed.svg') }}" alt="Game Completed Badge" style="width:180px;height:180px;margin:0 auto 10px auto;display:block;" />
+                        <img src="{{ asset('badges/game-completed.svg') }}" alt="Game Completed Badge" class="intro-badge-img" />
                         <p>Selesaikan mana-mana permainan.</p>
                         <span class="points">10 Mata</span>
                     </div>
                     <div class="reward-intro-card speed-demon">
-                        <img src="{{ asset('badges/speed-demon.svg') }}" alt="Speed Demon Badge" style="width:180px;height:180px;margin:0 auto 10px auto;display:block;" />
+                        <img src="{{ asset('badges/speed-demon.svg') }}" alt="Speed Demon Badge" class="intro-badge-img" />
                         <p>Selesaikan permainan dengan cepat.</p>
                         <span class="points">50 Mata</span>
                     </div>
                     <div class="reward-intro-card great-player">
-                        <img src="{{ asset('badges/great-player.svg') }}" alt="Pemain Hebat Badge" style="width:180px;height:180px;margin:0 auto 10px auto;display:block;" />
+                        <img src="{{ asset('badges/great-player.svg') }}" alt="Pemain Hebat Badge" class="intro-badge-img" />
                         <p>Capai markah tinggi dan kuasai cabaran.</p>
                         <span class="points">25 Mata</span>
                     </div>
@@ -524,36 +549,36 @@
                                 @php $completedCount = $rewardCounts['Game Completed']; @endphp
                                 <div class="reward-slot {{ $completedCount > 0 ? 'filled' : '' }}">
                                     @if($completedCount > 0)
-                                        <i class="bi bi-check-circle icon" style="color: #20af29ff;"></i>
+                                        <img src="{{ asset('badges/game-completed.svg') }}" alt="Game Completed" class="reward-badge-img" />
                                         @if($completedCount > 1)
                                             <span class="badge">x {{ $completedCount }}</span>
                                         @endif
                                     @else
-                                        <i class="bi bi-check-circle empty-state"></i>
+                                        <img src="{{ asset('badges/game-completed.svg') }}" alt="Game Completed" class="reward-badge-img empty" />
                                     @endif
                                 </div>
                                 {{-- Speed Demon Reward --}}
                                 @php $speedCount = $rewardCounts['Speed Demon']; @endphp
                                 <div class="reward-slot {{ $speedCount > 0 ? 'filled' : '' }}">
                                     @if($speedCount > 0)
-                                        <i class="bi bi-lightning icon" style="color: #f59e0b;"></i>
+                                        <img src="{{ asset('badges/speed-demon.svg') }}" alt="Speed Demon" class="reward-badge-img" />
                                         @if($speedCount > 1)
                                             <span class="badge">x {{ $speedCount }}</span>
                                         @endif
                                     @else
-                                        <i class="bi bi-lightning empty-state"></i>
+                                        <img src="{{ asset('badges/speed-demon.svg') }}" alt="Speed Demon" class="reward-badge-img empty" />
                                     @endif
                                 </div>
                                 {{-- Great Player Reward --}}
                                 @php $playerCount = $rewardCounts['Great Player']; @endphp
                                 <div class="reward-slot {{ $playerCount > 0 ? 'filled' : '' }}">
                                     @if($playerCount > 0)
-                                        <i class="bi bi-controller icon" style="color: #ef4444;"></i>
+                                        <img src="{{ asset('badges/great-player.svg') }}" alt="Pemain Hebat" class="reward-badge-img" />
                                         @if($playerCount > 1)
                                             <span class="badge">x {{ $playerCount }}</span>
                                         @endif
                                     @else
-                                        <i class="bi bi-controller empty-state"></i>
+                                        <img src="{{ asset('badges/great-player.svg') }}" alt="Pemain Hebat" class="reward-badge-img empty" />
                                     @endif
                                 </div>
                             </div>
@@ -624,7 +649,7 @@
             }
         };
 
-        prevBtn.addEventListener('click', () => {
+        const handlePrevClick = () => {
             // Shift right: move last card to beginning
             const lastCard = cards.pop();
             cards.unshift(lastCard);
@@ -634,9 +659,9 @@
                 container.appendChild(card);
             });
             updateCardPositions();
-        });
+        };
 
-        nextBtn.addEventListener('click', () => {
+        const handleNextClick = () => {
             // Shift left: move first card to end
             const firstCard = cards.shift();
             cards.push(firstCard);
@@ -646,7 +671,27 @@
                 container.appendChild(card);
             });
             updateCardPositions();
-        });
+        };
+
+        prevBtn.addEventListener('click', handlePrevClick);
+        nextBtn.addEventListener('click', handleNextClick);
+
+        // Add click handlers to left and right cards
+        const updateCardClickHandlers = () => {
+            // Remove old listeners by cloning cards
+            const leftCard = cards[0];
+            const rightCard = cards[2];
+
+            // Left card click shifts right (same as prev button)
+            leftCard.style.cursor = 'pointer';
+            leftCard.addEventListener('click', handlePrevClick);
+
+            // Right card click shifts left (same as next button)
+            rightCard.style.cursor = 'pointer';
+            rightCard.addEventListener('click', handleNextClick);
+        };
+
+        updateCardClickHandlers();
 
         // Initial setup
         updateCardPositions();
