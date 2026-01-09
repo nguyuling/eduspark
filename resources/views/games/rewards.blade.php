@@ -2,6 +2,12 @@
 
 @section('content')
 <style>
+
+    h3 {
+        font-weight: 700;
+        font-size: 18px;
+        text-align: center;
+    }
     .reward-stat-card {
         background: linear-gradient(135deg, #f5f0ffff 0%, #ffffffff 100%);
         border: 2px solid #7c3aed;
@@ -40,18 +46,16 @@
     .shelves-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 16px;
+        gap: 20px; /* Changed from 16px to 20px */
         margin-bottom: 32px;
         width: 100%;
         box-sizing: border-box;
     }
     .game-shelf {
-        flex: 0 1 calc(33.333% - 11px);
+        flex: 0 1 calc(33.333% - 13.333px); /* Adjusted for 20px gap ( (100% - 2*20px) / 3 ) */
         min-width: 0;
         display: flex;
         align-items: stretch;
-        gap: 0;
-        padding: 0;
         border-radius: 16px;
         overflow: hidden;
         background: #fff;
@@ -115,7 +119,7 @@
     .rewards-shelf {
         display: flex;
         flex-direction: column;
-        gap: 12px; /* reduced gap */
+        gap: 20px; /* Increased gap */
         align-items: flex-start;
         justify-content: center;
         padding: 10px 12px;
@@ -128,8 +132,8 @@
     .reward-slot {
         position: relative;
         flex-shrink: 0;
-        width: 60px;   /* reduced width */
-        height: 60px;  /* reduced height */
+        width: 60px;  
+        height: 60px;
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -215,6 +219,7 @@
         box-sizing: border-box;
         flex-wrap: wrap;
     }
+
     @media (max-width: 900px) {
         .reward-stats-and-intro-row {
             flex-direction: column;
@@ -227,7 +232,7 @@
         width: calc(100% - 60px);
         height: 1px;
         background: #c3c3c3;
-        margin: 48px 0 48px 60px;
+        margin: 12px 0 36px 60px;
         box-sizing: border-box;
     }
 
@@ -246,9 +251,17 @@
         flex: 1 1 auto;
         min-width: 280px;
         position: relative;
-        display: flex;
-        align-items: center;
+        display: flex; /* Keep as flex */
+        flex-direction: column; /* Arrange children vertically */
+        align-items: center; /* Center horizontally for the title */
         box-sizing: border-box;
+    }
+
+    /* Style for the 'Jenis Ganjaran' heading inside reward-intro-col */
+    .reward-intro-col h3 {
+        margin-bottom: 20px; /* Space between title and container */
+        align-self: flex-start; /* Align title to the start of the column */
+        margin-left: 20px; /* Adjust to align with container padding */
     }
 
     .reward-intro-container {
@@ -306,7 +319,6 @@
         z-index: 2;
     }
 
-    /* Remove nth-child based styles and use type-based classes instead */
     .reward-intro-card.game-completed.highlighted {
         border: 2px solid #14aa1eff;
         box-shadow: 0 8px 24px rgba(90, 247, 85, 0.25);
@@ -326,7 +338,6 @@
         line-height: 1;
     }
 
-    /* Icon color follows card type */
     .reward-intro-card.game-completed .card-icon {
         color: #20af29ff;
     }
@@ -370,6 +381,28 @@
         background: #ef4444;
         color: #ffffff;
     }
+
+    /* Navigation arrows */
+    .reward-nav-arrow {
+        font-size: 40px;
+        color: #6f6f6fff;
+        cursor: pointer;
+        transition: color 0.2s ease, transform 0.2s ease;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+    }
+
+    .reward-nav-arrow:hover:not(.disabled) {
+        color: #6A4DF7;
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .reward-nav-arrow.disabled {
+        color: #b1b1b1ff;
+        cursor: not-allowed;
+    }
 </style>
 
 <div class="app">
@@ -387,6 +420,7 @@
 
         <div class="reward-stats-and-intro-row">
             <div class="reward-stats-col">
+                <h3>Statistik</h3>
                 <div class="reward-stat-card">
                     <div class="label">Jumlah Mata Dituntut</div>
                     <div class="value">{{ $totalPoints }}</div>
@@ -396,7 +430,9 @@
                     <div class="value">{{ $rewards->count() }}</div>
                 </div>
             </div>
+            <div class="stats-intro-vertical-separator"></div>
             <div class="reward-intro-col">
+                <h3>Jenis Ganjaran</h3> {{-- Placed here --}}
                 <i class="bi bi-chevron-left reward-nav-arrow left" id="prevReward"></i>
                 <div class="reward-intro-container">
                     <div class="reward-intro-card game-completed">
@@ -422,10 +458,9 @@
             </div>
         </div>
 
-        <!-- Separator line above shelves -->
-        <div class="shelves-top-separator"></div>
-
         <!-- Game Shelves -->
+        <h3>Rak Ganjaran</h3>
+        <div class="shelves-top-separator"></div>
         @if($rewards->isEmpty())
             <div class="empty-shelf">
                 <p>Tiada ganjaran lagi. Main permainan untuk dapatkan ganjaran!</p>
@@ -520,6 +555,7 @@
         let cards = Array.from(document.querySelectorAll('.reward-intro-card'));
         const prevBtn = document.getElementById('prevReward');
         const nextBtn = document.getElementById('nextReward');
+        const rewardIntroCol = document.querySelector('.reward-intro-col'); // Parent for arrows
 
         const updateCardPositions = () => {
             // Always highlight the middle card (index 1)
@@ -539,6 +575,38 @@
                 left: scrollLeft,
                 behavior: 'smooth'
             });
+
+            // Dynamically position arrows
+            const highlightedCard = cards[1];
+            if (highlightedCard) {
+                // Use the container for positioning arrows, as it's the closest positioned ancestor for absolute arrows
+                const containerRect = container.getBoundingClientRect();
+                const highlightedCardRect = highlightedCard.getBoundingClientRect();
+
+                // Calculate position relative to the intro-container's left edge
+                const cardLeftInContainer = highlightedCardRect.left - containerRect.left;
+                const cardRightInContainer = highlightedCardRect.right - containerRect.left;
+
+                const arrowMargin = 10; // Space between arrow and card
+                const arrowWidth = prevBtn.offsetWidth; // Assuming both arrows have same width
+
+                // Position left arrow: its right edge should be 'arrowMargin' pixels from the card's left edge
+                // Ensure left arrow doesn't go outside the parent element
+                prevBtn.style.left = `${cardLeftInContainer - arrowWidth - arrowMargin}px`;
+
+                // Position right arrow: its left edge should be 'arrowMargin' pixels from the card's right edge
+                // Ensure right arrow doesn't go outside the parent element
+                nextBtn.style.left = `${cardRightInContainer + arrowMargin}px`;
+
+                // Adjust positioning if arrows appear outside the reward-intro-col boundaries
+                const introColRect = rewardIntroCol.getBoundingClientRect();
+                if (prevBtn.getBoundingClientRect().left < introColRect.left) {
+                    prevBtn.style.left = '0px'; // Align with left edge of reward-intro-col
+                }
+                if (nextBtn.getBoundingClientRect().right > introColRect.right) {
+                    nextBtn.style.left = `${introColRect.width - nextBtn.offsetWidth}px`; // Align with right edge
+                }
+            }
         };
 
         prevBtn.addEventListener('click', () => {
