@@ -7,6 +7,7 @@
         font-weight: 700;
         font-size: 18px;
         text-align: center;
+        margin: 0;
     }
     .reward-stat-card {
         background: linear-gradient(135deg, #f5f0ffff 0%, #ffffffff 100%);
@@ -172,7 +173,6 @@
         display: inline-block;
         vertical-align: middle;
         text-align: center;
-        /* Ensure no line break inside badge */
         white-space: nowrap;
     }
     .reward-slot.empty-state {
@@ -210,69 +210,75 @@
 
     /* Reward Intro Cards */
     .reward-stats-and-intro-row {
-        display: flex;
-        justify-content: flex-start;
-        align-items: stretch;
-        gap: 20px;
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 0 60px;
+        row-gap: 20px;
         position: relative;
         width: 100%;
         box-sizing: border-box;
-        flex-wrap: wrap;
     }
 
     @media (max-width: 900px) {
         .reward-stats-and-intro-row {
-            flex-direction: column;
-            gap: 40px;
+            grid-template-columns: 1fr;
+            gap: 20px;
         }
     }
 
-    /* Separator line above shelves */
-    .shelves-top-separator {
-        width: calc(100% - 60px);
-        height: 1px;
-        background: #c3c3c3;
-        margin: 12px 0 36px 60px;
-        box-sizing: border-box;
+    /* Grid cell for titles */
+    .reward-stats-title {
+        grid-column: 1;
+        grid-row: 1;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+    }
+
+    .reward-intro-title {
+        grid-column: 2;
+        grid-row: 1;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+    }
+
+    /* Grid cell for content */
+    .reward-stats-content {
+        grid-column: 1;
+        grid-row: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        height: 350px;
+    }
+
+    .reward-intro-content {
+        grid-column: 2;
+        grid-row: 2;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        height: 280px;
+        position: relative;
     }
 
     .reward-stats-col {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        min-width: 220px;
-        max-width: 260px;
-        flex: 0 0 auto;
-        gap: 20px;
-        flex-shrink: 0;
+        display: contents;
     }
 
     .reward-intro-col {
-        flex: 1 1 auto;
-        min-width: 280px;
-        position: relative;
-        display: flex; /* Keep as flex */
-        flex-direction: column; /* Arrange children vertically */
-        align-items: center; /* Center horizontally for the title */
-        box-sizing: border-box;
-    }
-
-    /* Style for the 'Jenis Ganjaran' heading inside reward-intro-col */
-    .reward-intro-col h3 {
-        margin-bottom: 20px; /* Space between title and container */
-        align-self: flex-start; /* Align title to the start of the column */
-        margin-left: 20px; /* Adjust to align with container padding */
+        display: contents;
     }
 
     .reward-intro-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 0;
-        padding: 20px 10px;
+        gap: 20px;
         overflow-x: visible;
         -webkit-overflow-scrolling: touch;
-        margin-bottom: 40px;
         position: relative;
         width: 100%;
         box-sizing: border-box;
@@ -294,10 +300,10 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        height: 200px;
-        transform: scale(0.7);
-        opacity: 0.5;
-        margin: 0 -28px;
+        height: 280px;
+        transform: scale(1);
+        opacity: 1;
+        margin: 0 10px;
         z-index: 1;
     }
 
@@ -312,74 +318,51 @@
         background: linear-gradient(135deg, #fff0f0ff 0%, #ffffffff 100%);
     }
 
-    .reward-intro-card.highlighted {
-        transform: scale(1.1);
-        opacity: 1;
-        margin: 0 30px;
-        z-index: 2;
-    }
-
-    .reward-intro-card.game-completed.highlighted {
+    .reward-intro-card.game-completed {
         border: 2px solid #14aa1eff;
         box-shadow: 0 8px 24px rgba(90, 247, 85, 0.25);
     }
-    .reward-intro-card.speed-demon.highlighted {
+    .reward-intro-card.speed-demon {
         border: 2px solid #f59e0b;
         box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
     }
-    .reward-intro-card.great-player.highlighted {
+    .reward-intro-card.great-player {
         border: 2px solid #ef4444;
         box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);
-    }
-
-    .reward-intro-card .card-icon {
-        font-size: 56px;
-        margin-bottom: 14px;
-        line-height: 1;
-    }
-
-    .reward-intro-card.game-completed .card-icon {
-        color: #20af29ff;
-    }
-    .reward-intro-card.speed-demon .card-icon {
-        color: #f59e0b;
-    }
-    .reward-intro-card.great-player .card-icon {
-        color: #ef4444;
-    }
-
-    .reward-intro-card h4 {
-        font-size: 18px;
-        font-weight: 700;
-        color: #111827;
-        margin: 0 0 14px 0;
     }
 
     .reward-intro-card p {
         font-size: 13px;
         color: #6b7280;
         margin-bottom: 12px;
-        flex-grow: 1.;
+        flex-grow: 1;
     }
 
     .reward-intro-card .points {
+        position: absolute;
+        left: 50%;
+        bottom: -18px;
+        transform: translateX(-50%);
         font-size: 15px;
         font-weight: 700;
-        padding: 7px 0;
-        border-radius: 8px;
-        display: inline-block;
+        padding: 7px 24px;
+        border-radius: 18px;
+        color: #ffffff;
+        min-width: 120px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        z-index: 2;
+        border: none;
+        margin: 0;
     }
     .reward-intro-card.game-completed .points {
         background: #20af29ff;
-        color: #ffffff;
     }
     .reward-intro-card.speed-demon .points {
         background: #f59e0b;
-        color: #ffffff;
     }
     .reward-intro-card.great-player .points {
         background: #ef4444;
-        color: #ffffff;
     }
 
     /* Navigation arrows */
@@ -419,8 +402,13 @@
         </div>
 
         <div class="reward-stats-and-intro-row">
-            <div class="reward-stats-col">
-                <h3>Statistik</h3>
+            <div class="reward-stats-title">
+                <h3>Statistik Ganjaran</h3>
+            </div>
+            <div class="reward-intro-title">
+                <h3>Jenis Ganjaran</h3>
+            </div>
+            <div class="reward-stats-content">
                 <div class="reward-stat-card">
                     <div class="label">Jumlah Mata Dituntut</div>
                     <div class="value">{{ $totalPoints }}</div>
@@ -430,28 +418,23 @@
                     <div class="value">{{ $rewards->count() }}</div>
                 </div>
             </div>
-            <div class="stats-intro-vertical-separator"></div>
-            <div class="reward-intro-col">
-                <h3>Jenis Ganjaran</h3> {{-- Placed here --}}
+            <div class="reward-intro-content">
                 <i class="bi bi-chevron-left reward-nav-arrow left" id="prevReward"></i>
                 <div class="reward-intro-container">
                     <div class="reward-intro-card game-completed">
-                        <i class="bi bi-check-circle card-icon icon-check-circle"></i>
-                        <h4>Game Completed</h4>
-                        <p>Complete any game to earn this badge.</p>
-                        <span class="points">10 Points</span>
+                        <img src="{{ asset('badges/game-completed.svg') }}" alt="Game Completed Badge" style="width:120px;height:120px;margin:0 auto 10px auto;display:block;" />
+                        <p>Selesaikan mana-mana permainan.</p>
+                        <span class="points">10 Mata</span>
                     </div>
                     <div class="reward-intro-card speed-demon">
-                        <i class="bi bi-lightning card-icon icon-lightning"></i>
-                        <h4>Speed Demon</h4>
-                        <p>Finish games quickly to prove your speed.</p>
-                        <span class="points">50 Points</span>
+                        <img src="{{ asset('badges/speed-demon.svg') }}" alt="Speed Demon Badge" style="width:120px;height:120px;margin:0 auto 10px auto;display:block;" />
+                        <p>Selesaikan permainan dengan cepat.</p>
+                        <span class="points">50 Mata</span>
                     </div>
                     <div class="reward-intro-card great-player">
-                        <i class="bi bi-controller card-icon icon-controller"></i>
-                        <h4>Great Player</h4>
-                        <p>Achieve high scores and master challenges.</p>
-                        <span class="points">25 Points</span>
+                        <img src="{{ asset('badges/great-player.svg') }}" alt="Pemain Hebat Badge" style="width:120px;height:120px;margin:0 auto 10px auto;display:block;" />
+                        <p>Capai markah tinggi dan kuasai cabaran.</p>
+                        <span class="points">25 Mata</span>
                     </div>
                 </div>
                 <i class="bi bi-chevron-right reward-nav-arrow right" id="nextReward"></i>
@@ -459,7 +442,7 @@
         </div>
 
         <!-- Game Shelves -->
-        <h3>Rak Ganjaran</h3>
+        <h3 style="margin-top: 10px">Koleksi Ganjaran</h3>
         <div class="shelves-top-separator"></div>
         @if($rewards->isEmpty())
             <div class="empty-shelf">
@@ -501,7 +484,7 @@
                                 <img src="{{ $gameImage }}" alt="Game Cover" class="game-cover-img" />
                                 <div class="game-cover-overlay">
                                     <div class="game-cover-title">{{ $game->title ?? 'Unknown Game' }}</div>
-                                    <div class="game-cover-desc">{{ Str::limit($game->description ?? 'No description', 60) }}</div>
+                                    <div class="game-cover-desc">{{ Str::limit($game->description ?? 'Tiada keterangan', 60) }}</div>
                                 </div>
                             </div>
                             <div class="rewards-shelf">
