@@ -10,6 +10,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AIChatController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\DirectMessageController;
+use App\Http\Controllers\GameController;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
