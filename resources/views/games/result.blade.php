@@ -5,7 +5,7 @@
     .result-card {
         border-radius: 16px;
         padding: 24px;
-        border: 2px solid #e5e7eb;
+        border: 1px solid #e5e7eb;
         box-shadow: 0 2px 12px rgba(2, 6, 23, 0.12);
         background: linear-gradient(135deg, #f5f0ffff 0%, #ffffffff 100%);
         transition: transform 0.12s ease, box-shadow 0.12s ease;
@@ -26,35 +26,40 @@
     .result-card .label {
         font-size: 24px;
         font-weight: 800;
-        color: #7c3aed;
-        margin-bottom: 6px;
+        color: #111827;
     }
     .result-card .value {
         font-size: 36px;
         font-weight: 800;
-        color: #111827;
-        margin-bottom: 8px;
+        color: #7c3aed;
     }
     .result-card .unit {
         font-size: 18px;
         font-weight: 600;
         color: #6b7280;
-        margin-top: 4px;
     }
 
     .panel {
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 2px 12px rgba(2, 6, 23, 0.10);
-        margin-bottom: 32px;
+        border-radius: var(--card-radius);
         padding: 30px;
+        animation: fadeInUp 0.4s ease;
+        margin-bottom: 25px;
+        background: transparent;
+        border: 2px solid #d4c5f9;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18);
+        transition: border-color 0.2s ease, transform 0.12s ease, box-shadow 0.12s ease;
     }
 
     .panel-header h3 {
-        font-size: 20px;
+        /* font-size: 20px;
         font-weight: 800;
-        color: #000000;
-        margin-bottom: 6px;
+        color: #000000; */
+        font-weight: 800;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     .performance-metric-header {
@@ -69,7 +74,7 @@
         color: #000000;
     }
     .performance-metric-value {
-        font-size: 24px;
+        font-size: 20px;
         font-weight: 800;
         color: #7c3aed;
     }
@@ -94,23 +99,44 @@
         border-radius: 16px;
         padding: 24px;
         box-shadow: 0 2px 12px rgba(2, 6, 23, 0.12);
-        border: 2px solid #e5e7eb;
+        border: 1px solid #e5e7eb;
         align-items: center;
         text-align: center;
-        transition: transform 0.12s ease, box-shadow 0.12s ease;
+        transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.3s ease;
         cursor: pointer;
-    }
-    .result-card:hover {
-        border-color: var(--accent);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
+        position: relative;
     }
 
-    .reward-card-item:hover {
-        border-color: var(--accent);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
+    .reward-card-item.unclaimed::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.14);
+        border-radius: 16px;
+        z-index: 5;
+        pointer-events: none;
+        filter: blur(1px);
     }
+
+    .reward-card-item.game-completed:hover {
+        border-color: #14aa1eff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(86, 247, 77, 0.2);
+    }
+    .reward-card-item.speed-demon:hover {
+        border-color: #dc9a00;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(247, 233, 77, 0.2);
+    }
+    .reward-card-item.great-player:hover {
+        border-color: #ef4444;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(247, 77, 77, 0.2);
+    }
+
     .reward-card-item.game-completed {
         background: linear-gradient(135deg, #ebfee8ff 0%, #ffffffff 100%);
     }
@@ -122,12 +148,10 @@
     }
     .reward-card-item .icon {
         font-size: 60px;
-    }
-    .reward-card-item .name {
-        font-size: 24px;
-        font-weight: 800;
-        color: #111827;
-        margin: 12px 0px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
     }
     .reward-card-item .description {
         font-size: 18px;
@@ -172,6 +196,37 @@
         border-color: var(--accent);
         transform: translateY(-2px);
         box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
+    }
+
+    /* Reward Card Badge Image Styles */
+    .reward-card-badge-img {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .reward-card-bottom {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 8px;
+        width: 100%;
+    }
+
+    .reward-card-overlay-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 15;
+        filter: none;
+    }
+
+    .reward-card-overlay-btn .claim-btn {
+        font-size: 16px;
+        padding: 12px 32px;
+        opacity: 1;
     }
 
     /* Action Buttons */
@@ -227,18 +282,25 @@
         flex-shrink: 0;
     }
     .tips-list .text {
-        font-weight: 600;
         font-size: 18px;
-        color: #6e6e6eff;
+        font-weight: 600;
+        color: #6b7280;
     }
 
     /* Ensure both cards and rewards use the same gap */
     .cards,
     .reward-cards-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 32px;
         margin-bottom: 20px;
+    }
+
+    .cards {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    .reward-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 280px));
     }
 </style>
 
@@ -339,32 +401,35 @@
                         elseif (strtolower($reward->reward_name) === 'speed demon') $rewardTypeClass = 'speed-demon';
                         elseif (strtolower($reward->reward_name) === 'great player') $rewardTypeClass = 'great-player';
                     @endphp
-                    <div class="reward-card-item {{ $rewardTypeClass }}">
+                    <div class="reward-card-item {{ $rewardTypeClass }} {{ !$reward->is_claimed ? 'unclaimed' : '' }}">
+                        @if(!$reward->is_claimed)
+                            <div class="reward-card-overlay-btn">
+                                <form method="POST" action="{{ route('rewards.claim', $reward->id) }}">
+                                    @csrf
+                                    <button type="submit" class="claim-btn">
+                                        Tuntut
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
                         <div class="icon">
                             @if($rewardTypeClass === 'game-completed')
-                                <i class="bi bi-check-circle icon" style="color:#20af29ff;"></i>
+                                <img src="{{ asset('badges/game-completed.svg') }}" alt="Game Completed" class="reward-card-badge-img" />
                             @elseif($rewardTypeClass === 'speed-demon')
-                                <i class="bi bi-lightning icon" style="color:#f59e0b;"></i>
+                                <img src="{{ asset('badges/speed-demon.svg') }}" alt="Speed Demon" class="reward-card-badge-img" />
                             @elseif($rewardTypeClass === 'great-player')
-                                <i class="bi bi-controller icon" style="color:#ef4444;"></i>
+                                <img src="{{ asset('badges/great-player.svg') }}" alt="Pemain Hebat" class="reward-card-badge-img" />
                             @else
                                 {{ $reward->badge_icon ?? '🎖️' }}
                             @endif
                         </div>
-                        <div class="name">{{ $reward->reward_name }}</div>
                         <div class="description">{{ $reward->reward_description }}</div>
-                        <div class="points">+{{ $reward->points_awarded }} mata</div>
-                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; margin-top:8px; width:100%;">
-                            <span class="{{ $reward->is_claimed ? 'claimed' : 'not-claimed' }}">
-                                {{ $reward->is_claimed ? 'Sudah dituntut' : 'Belum dituntut' }}
-                            </span>
-                            @if(!$reward->is_claimed)
-                            <form method="POST" action="{{ route('rewards.claim', $reward->id) }}" style="margin:0;">
-                                @csrf
-                                <button type="submit" class="claim-btn">
-                                    Tuntut
-                                </button>
-                            </form>
+                        <div class="reward-card-bottom">
+                            @if($reward->is_claimed)
+                                <div class="reward-card-row">
+                                    <div class="points" style="margin-right:10px">+{{ $reward->points_awarded }} mata</div>
+                                    <span class="claimed">Sudah dituntut</span>
+                                </div>
                             @endif
                         </div>
                     </div>
