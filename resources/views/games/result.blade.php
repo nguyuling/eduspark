@@ -291,7 +291,7 @@
     .cards,
     .reward-cards-grid {
         display: grid;
-        gap: 32px;
+        gap: 20px;
         margin-bottom: 20px;
     }
 
