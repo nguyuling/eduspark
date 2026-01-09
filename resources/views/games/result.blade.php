@@ -2,178 +2,415 @@
 
 @section('content')
 <style>
-    .result-container * {
-        color: #000 !important;
+    .result-card {
+        border-radius: 16px;
+        padding: 24px;
+        border: 2px solid #e5e7eb;
+        box-shadow: 0 2px 12px rgba(2, 6, 23, 0.12);
+        background: linear-gradient(135deg, #f5f0ffff 0%, #ffffffff 100%);
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+        text-align: center;
+        cursor: pointer;
     }
-    .result-container .text-white {
-        color: #fff !important;
+    .result-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
     }
-    @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-20px); }
+    .result-card .icon {
+        font-size: 60px;
+        margin-bottom: 10px;
+        color: #7c3aed;
+        text-shadow: 0 2px 8px rgba(44,0,80,0.18);
+    }
+    .result-card .label {
+        font-size: 24px;
+        font-weight: 800;
+        color: #7c3aed;
+        margin-bottom: 6px;
+    }
+    .result-card .value {
+        font-size: 36px;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+    .result-card .unit {
+        font-size: 18px;
+        font-weight: 600;
+        color: #6b7280;
+        margin-top: 4px;
+    }
+
+    .panel {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(2, 6, 23, 0.10);
+        margin-bottom: 32px;
+        padding: 30px;
+    }
+
+    .panel-header h3 {
+        font-size: 20px;
+        font-weight: 800;
+        color: #000000;
+        margin-bottom: 6px;
+    }
+
+    .performance-metric-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 10px;
+        color: #7c3aed;
+    }
+    .performance-metric-label {
+        color: #000000;
+    }
+    .performance-metric-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #7c3aed;
+    }
+    .progress-bar {
+        width: 100%;
+        height: 24px;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+        background: #f3f4f6;
+        margin-top: 4px;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 8px;
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Reward Card Styles (from rewards.blade.php) */
+    .reward-card-item {
+        background: linear-gradient(135deg, #f5f0ffff 0%, #ffffffff 100%);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(2, 6, 23, 0.12);
+        border: 2px solid #e5e7eb;
+        align-items: center;
+        text-align: center;
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+        cursor: pointer;
+    }
+    .result-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
+    }
+
+    .reward-card-item:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
+    }
+    .reward-card-item.game-completed {
+        background: linear-gradient(135deg, #ebfee8ff 0%, #ffffffff 100%);
+    }
+    .reward-card-item.speed-demon {
+        background: linear-gradient(135deg, #f8f8deff 0%, #ffffffff 100%);
+    }
+    .reward-card-item.great-player {
+        background: linear-gradient(135deg, #fff0f0ff 0%, #ffffffff 100%);
+    }
+    .reward-card-item .icon {
+        font-size: 60px;
+    }
+    .reward-card-item .name {
+        font-size: 24px;
+        font-weight: 800;
+        color: #111827;
+        margin: 12px 0px;
+    }
+    .reward-card-item .description {
+        font-size: 18px;
+        font-weight: 600;
+        color: #6b7280;
+    }
+    .reward-card-item .points {
+        font-size: 15px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 8px;
+        margin: 8px 0px;
+        display: inline-block;
+    }
+    .reward-card-item .claimed {
+        font-size: 14px;
+        font-weight: 600;
+        color: #16a34a;
+    }
+    .reward-card-item .not-claimed {
+        font-size: 13px;
+        font-weight: 600;
+        color: #b45309;
+        margin-top: 8px;
+    }
+    .reward-card-item .claim-btn {
+        padding: 8px 16px;
+        background: linear-gradient(90deg, #f59e0b, #d97706);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 8px;
+        box-shadow: 0 2px 8px rgba(2, 6, 23, 0.12);
+    }
+    .reward-card-item .claim-btn:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
+    }
+
+    /* Action Buttons */
+    .result-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 14px;
+        box-shadow: 0 2px 12px rgba(2, 6, 23, 0.12);
+        color: #ffffff !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+        border: none;
+    }
+    .result-btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 20px rgba(2, 6, 23, 0.18);
+    }
+    .result-btn:active {
+        transform: translateY(-2px);
+    }
+    .result-btn .icon {
+        margin-right: 4px;
+        font-size: 20px;
+    }
+
+    /* Tips Card */
+    .tips-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .tips-list li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 8px;
+        font-size: 18px;
+    }
+    .tips-list li:last-child {
+        margin-bottom: 0;
+    }
+    .tips-list .checkmark {
+        color: #7c3aed !important;
+        margin-right: 15px;
+        font-weight: 800;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+    .tips-list .text {
+        font-weight: 600;
+        font-size: 18px;
+        color: #6e6e6eff;
+    }
+
+    /* Ensure both cards and rewards use the same gap */
+    .cards,
+    .reward-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 32px;
+        margin-bottom: 20px;
     }
 </style>
 
-<div class="result-container container mx-auto px-6 py-8" style="background: #f3f4f6; min-height: 100vh;">
-    <div class="max-w-4xl mx-auto">
-        <!-- Success Banner -->
-        <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 14px; padding: 25px; margin-bottom: 20px; text-align: center; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); border: 2px solid #34d399;">
-            <div style="font-size: 80px; margin-bottom: 16px; animation: bounce 1s infinite;">🎉</div>
-            <h1 style="font-size: 48px; font-weight: 900; margin-bottom: 12px; color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">Permainan Selesai!</h1>
-            <p style="font-size: 28px; font-weight: 700; color: #ffffff !important;">Tahniah {{ auth()->user()->name }}!</p>
+<div class="app">
+    <main class="main">
+        <div class="header">
+            <div>
+                <div class="title" style="font-size: 32px; font-weight: 800; color: #000000;">Permainan Selesai</div>
+                <div class="sub" style="font-size: 16px; color: #6b7280;">Tahniah {{ auth()->user()->name }}!</div>
+            </div>
+            <a href="{{ route('games.index') }}" class="btn-kembali" style="font-size: 14px; color: #7c3aed; font-weight: 700;">
+                <i class="bi bi-arrow-left"></i>Kembali
+            </a>
         </div>
 
-        <!-- Game Summary Card -->
-        <div style="background: #ffffff; border-radius: 14px; border: 2px solid #e5e7eb; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18);">
-            <h2 style="font-size: 36px; font-weight: 900; color: #000000 !important; margin-bottom: 32px; display: flex; align-items: center;">
-                <span style="margin-right: 16px; font-size: 48px;">📊</span> 
-                <span style="color: #000000 !important;">{{ $result['game_title'] }} - Ringkasan Permainan</span>
-            </h2>
-            
-            <!-- Main Stats Grid -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 48px;">
-                <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 14px; padding: 25px; text-align: center; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); border: 2px solid #3b82f6;">
-                    <div style="font-size: 64px; margin-bottom: 16px;">🏆</div>
-                    <div style="font-size: 16px; color: #1e40af !important; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px;">Skor Akhir</div>
-                    <div style="font-size: 72px; font-weight: 900; color: #1e3a8a !important; line-height: 1;">{{ number_format($result['score']) }}</div>
-                    <div style="font-size: 20px; color: #1e40af !important; margin-top: 12px; font-weight: 800;">mata</div>
-                </div>
-                
-                <div style="background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%); border-radius: 14px; padding: 25px; text-align: center; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); border: 2px solid #a855f7;">
-                    <div style="font-size: 64px; margin-bottom: 16px;">⏱️</div>
-                    <div style="font-size: 16px; color: #6b21a8 !important; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px;">Masa Diambil</div>
-                    <div style="font-size: 72px; font-weight: 900; color: #581c87 !important; line-height: 1;">{{ gmdate('i:s', $result['time_taken']) }}</div>
-                    <div style="font-size: 20px; color: #6b21a8 !important; margin-top: 12px; font-weight: 800;">minit</div>
-                </div>
+        <div style="margin: 0 auto;">
 
-                <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 14px; padding: 25px; text-align: center; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); border: 2px solid #f59e0b;">
-                    <div style="font-size: 64px; margin-bottom: 16px;">⭐</div>
-                    <div style="font-size: 16px; color: #92400e !important; font-weight: 900; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px;">Prestasi</div>
-                    <div style="font-size: 72px; font-weight: 900; color: #78350f !important; line-height: 1;">
-                        @if($result['score'] >= 800) A+
-                        @elseif($result['score'] >= 600) A
-                        @elseif($result['score'] >= 400) B
-                        @elseif($result['score'] >= 200) C
-                        @else D
-                        @endif
-                    </div>
-                    <div style="font-size: 20px; color: #92400e !important; margin-top: 12px; font-weight: 800;">Gred</div>
+            <!-- Game Summary Card -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Ringkasan Permainan</h3>
                 </div>
-            </div>
-
-            <!-- Performance Metrics -->
-            <div style="background: #f9fafb; border-radius: 14px; padding: 25px; margin-bottom: 20px; border: 2px solid #d1d5db;">
-                <h3 style="font-size: 24px; font-weight: 900; color: #000000 !important; margin-bottom: 24px;">📈 Pecahan Prestasi</h3>
-                <div style="margin-bottom: 24px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 12px;">
-                        <span style="color: #000000 !important; font-weight: 900;">Pencapaian Skor</span>
-                        <span style="color: #000000 !important; font-weight: 900; font-size: 24px;">{{ min(100, round(($result['score'] / 1000) * 100)) }}%</span>
+                <div class="cards" style="margin-bottom: 32px;">
+                    <div class="result-card">
+                        <div class="icon">🏆</div>
+                        <div class="label">Skor Akhir</div>
+                        <div class="value">{{ number_format($result['score']) }}</div>
+                        <div class="unit">Mata</div>
                     </div>
-                    <div style="width: 100%; background: #d1d5db; border-radius: 10px; height: 32px; border: 2px solid #9ca3af; overflow: hidden;">
-                        <div style="background: linear-gradient(90deg, #3b82f6, #2563eb); height: 100%; border-radius: 8px; transition: width 0.5s ease; width: {{ min(100, round(($result['score'] / 1000) * 100)) }}%;"></div>
+                    <div class="result-card">
+                        <div class="icon">⏱️</div>
+                        <div class="label">Masa Diambil</div>
+                        <div class="value">{{ gmdate('i:s', $result['time_taken']) }}</div>
+                        <div class="unit">Minit</div>
                     </div>
-                </div>
-                
-                <div>
-                    <div style="display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 12px;">
-                        <span style="color: #000000 !important; font-weight: 900;">Penarafan Kelajuan</span>
-                        <span style="color: #000000 !important; font-weight: 900; font-size: 24px;">
-                            @if($result['time_taken'] <= 60) Cemerlang
-                            @elseif($result['time_taken'] <= 120) Baik
-                            @elseif($result['time_taken'] <= 180) Sederhana
-                            @else Perlu Diperbaiki
+                    <div class="result-card">
+                        <div class="icon">⭐</div>
+                        <div class="label">Prestasi</div>
+                        <div class="value">
+                            @if($result['score'] >= 800) A+
+                            @elseif($result['score'] >= 600) A
+                            @elseif($result['score'] >= 400) B
+                            @elseif($result['score'] >= 200) C
+                            @else D
                             @endif
-                        </span>
+                        </div>
+                        <div class="unit">Gred</div>
                     </div>
-                    <div style="width: 100%; background: #d1d5db; border-radius: 10px; height: 32px; border: 2px solid #9ca3af; overflow: hidden;">
-                        <div style="background: linear-gradient(90deg, #a855f7, #9333ea); height: 100%; border-radius: 8px; transition: width 0.5s ease; width: {{ max(20, 100 - ($result['time_taken'] / 3)) }}%;"></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+                    <div class="performance-metric">
+                        <div class="performance-metric-header">
+                            <span class="performance-metric-label">
+                                Pencapaian Skor: 
+                                <span class="performance-metric-value">
+                                    {{ max(1, min(10, round($result['score'] / 100))) }}/10
+                                </span>
+                            </span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" style="background: linear-gradient(90deg, #7c3aed, #a78bfa); width: {{ min(100, ($result['score'] / 1000) * 100) }}%;"></div>
+                        </div>
+                    </div>
+                    <div class="performance-metric">
+                        <div class="performance-metric-header">
+                            <span class="performance-metric-label">Penarafan Kelajuan: <span class="performance-metric-value">
+                                @if($result['time_taken'] <= 60) Cemerlang
+                                @elseif($result['time_taken'] <= 120) Bagus
+                                @elseif($result['time_taken'] <= 180) Memuaskan
+                                @else Usaha Lagi
+                                @endif
+                            </span></span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" style="background: linear-gradient(90deg, #f59e0b, #a78bfa); width: {{ 
+                                $result['time_taken'] <= 60 ? 100 : 
+                                ($result['time_taken'] <= 120 ? 75 : 
+                                ($result['time_taken'] <= 180 ? 50 : 25))
+                            }}%;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Rewards Section -->
-        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 14px; border: 2px solid #f59e0b; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18);">
-            <h3 style="font-size: 32px; font-weight: 900; color: #78350f !important; margin-bottom: 24px; display: flex; align-items: center;">
-                <span style="margin-right: 16px; font-size: 48px;">🎁</span> 
-                <span style="color: #78350f !important;">Ganjaran Diperoleh</span>
-            </h3>
-
-            @if($rewardRecords->count() === 0)
-                <p style="color:#78350f; font-weight:700; font-size:14px;">Tiada ganjaran untuk permainan ini.</p>
-            @else
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 10px;">
-                @foreach($rewardRecords as $reward)
-                <div style="background:#fff; border-radius:12px; border:2px solid {{ $reward->is_claimed ? '#22c55e' : '#f59e0b' }}; padding:16px; box-shadow:0 2px 8px rgba(2,6,23,0.12); display:flex; flex-direction:column; gap:8px;">
-                    <div style="font-size:32px;">{{ $reward->badge_icon ?? '🎖️' }}</div>
-                    <div style="font-size:14px; font-weight:800; color:#111827;">{{ $reward->reward_name }}</div>
-                    <div style="font-size:12px; color:#6b7280;">{{ $reward->reward_description }}</div>
-                    <div style="font-size:12px; font-weight:700; color:#92400e;">+{{ $reward->points_awarded }} mata</div>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:12px; font-weight:700; color: {{ $reward->is_claimed ? '#16a34a' : '#b45309' }};">
-                            {{ $reward->is_claimed ? 'Sudah dituntut' : 'Belum dituntut' }}
-                        </span>
-                        @if(!$reward->is_claimed)
-                        <form method="POST" action="{{ route('rewards.claim', $reward->id) }}" style="margin:0;">
-                            @csrf
-                            <button type="submit" style="padding:8px 12px; background:linear-gradient(90deg,#f59e0b,#d97706); color:#fff; border:none; border-radius:8px; font-weight:700; font-size:12px; cursor:pointer;">
-                                Tuntut
-                            </button>
-                        </form>
-                        @else
-                        <span style="font-size:12px; color:#16a34a; font-weight:700;">✅</span>
-                        @endif
-                    </div>
+            <!-- Rewards Section -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Ganjaran Diperoleh</h3>
                 </div>
-                @endforeach
+                @if($rewardRecords->count() === 0)
+                    <p style="color:#78350f; font-weight:600; font-size:14px;">Tiada ganjaran untuk permainan ini.</p>
+                @else
+                <div class="reward-cards-grid">
+                    @foreach($rewardRecords as $reward)
+                    @php
+                        $rewardTypeClass = '';
+                        if (strtolower($reward->reward_name) === 'game completed') $rewardTypeClass = 'game-completed';
+                        elseif (strtolower($reward->reward_name) === 'speed demon') $rewardTypeClass = 'speed-demon';
+                        elseif (strtolower($reward->reward_name) === 'great player') $rewardTypeClass = 'great-player';
+                    @endphp
+                    <div class="reward-card-item {{ $rewardTypeClass }}">
+                        <div class="icon">
+                            @if($rewardTypeClass === 'game-completed')
+                                <i class="bi bi-check-circle icon" style="color:#20af29ff;"></i>
+                            @elseif($rewardTypeClass === 'speed-demon')
+                                <i class="bi bi-lightning icon" style="color:#f59e0b;"></i>
+                            @elseif($rewardTypeClass === 'great-player')
+                                <i class="bi bi-controller icon" style="color:#ef4444;"></i>
+                            @else
+                                {{ $reward->badge_icon ?? '🎖️' }}
+                            @endif
+                        </div>
+                        <div class="name">{{ $reward->reward_name }}</div>
+                        <div class="description">{{ $reward->reward_description }}</div>
+                        <div class="points">+{{ $reward->points_awarded }} mata</div>
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; margin-top:8px; width:100%;">
+                            <span class="{{ $reward->is_claimed ? 'claimed' : 'not-claimed' }}">
+                                {{ $reward->is_claimed ? 'Sudah dituntut' : 'Belum dituntut' }}
+                            </span>
+                            @if(!$reward->is_claimed)
+                            <form method="POST" action="{{ route('rewards.claim', $reward->id) }}" style="margin:0;">
+                                @csrf
+                                <button type="submit" class="claim-btn">
+                                    Tuntut
+                                </button>
+                            </form>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
             </div>
-            @endif
-            <div style="display:flex; justify-content:flex-end; gap:10px;">
-                <a href="{{ route('rewards.index') }}" style="padding:10px 14px; background:#111827; color:#fff; border-radius:8px; font-weight:700; text-decoration:none; font-size:12px;">Lihat semua ganjaran</a>
+            
+            <!-- Tips Card -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Petua untuk Meningkatkan Prestasi</h3>
+                </div>
+                <ul class="tips-list">
+                    <li>
+                        <span class="checkmark">✓</span>
+                        <span class="text">Berlatih secara kerap untuk meningkatkan refleks anda</span>
+                    </li>
+                    <li>
+                        <span class="checkmark">✓</span>
+                        <span class="text">Cuba untuk mengalahkan skor dan masa anda sebelum ini</span>
+                    </li>
+                    <li>
+                        <span class="checkmark">✓</span>
+                        <span class="text">Selesaikan permainan dengan lebih pantas untuk bonus kelajuan</span>
+                    </li>
+                    <li>
+                        <span class="checkmark">✓</span>
+                        <span class="text">Semak papan pendahulu untuk melihat strategi terbaik</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
+                <a href="{{ route('games.leaderboard', $result['game_id']) }}" class="result-btn" style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);">
+                    <i class="bi bi-bar-chart-fill icon" style="margin-right:4px;"></i>
+                    <span style="margin-left:4px;">Lihat Papan Pendahulu</span>
+                </a>
+                <a href="{{ route('rewards.index') }}" class="result-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #a78bfa 100%);">
+                    <i class="bi bi-gift icon" style="margin-right:4px;"></i>
+                    <span style="margin-left:4px;">Lihat Ganjaran Anda</span>
+                </a>
             </div>
         </div>
-
-        <!-- Action Buttons -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">
-            <a href="{{ route('games.leaderboard', $result['game_id']) }}" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff !important; font-weight: 900; padding: 25px; border-radius: 14px; text-align: center; font-size: 20px; border: 2px solid #1d4ed8; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                <span style="margin-right: 12px; font-size: 32px;">📊</span> 
-                <span style="color: #ffffff !important;">Lihat Papan Pendahulu</span>
-            </a>
-            <a href="{{ route('games.play', $result['game_id']) }}" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff !important; font-weight: 900; padding: 25px; border-radius: 14px; text-align: center; font-size: 20px; border: 2px solid #047857; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                <span style="margin-right: 12px; font-size: 32px;">🔄</span> 
-                <span style="color: #ffffff !important;">Main Semula</span>
-            </a>
-        </div>
-
-        <div style="margin-bottom: 20px;">
-            <a href="{{ route('games.index') }}" style="display: block; background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: #ffffff !important; font-weight: 900; padding: 25px; border-radius: 14px; text-align: center; font-size: 20px; border: 2px solid #374151; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18); text-decoration: none;">
-                ← Kembali ke Semua Permainan
-            </a>
-        </div>
-
-        <!-- Tips Card -->
-        <div style="background: #dbeafe; border-radius: 14px; border: 2px solid #3b82f6; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(2, 6, 23, 0.18);">
-            <h3 style="font-size: 24px; font-weight: 900; color: #1e3a8a !important; margin-bottom: 20px;">💡 Petua untuk Meningkatkan Prestasi</h3>
-            <ul style="list-style: none; padding: 0; margin: 0;">
-                <li style="display: flex; align-items: center; margin-bottom: 16px; font-size: 18px;">
-                    <span style="color: #10b981 !important; margin-right: 12px; font-size: 24px; font-weight: 900;">✓</span>
-                    <span style="color: #1e3a8a !important; font-weight: 700;">Berlatih secara kerap untuk meningkatkan refleks anda</span>
-                </li>
-                <li style="display: flex; align-items: center; margin-bottom: 16px; font-size: 18px;">
-                    <span style="color: #10b981 !important; margin-right: 12px; font-size: 24px; font-weight: 900;">✓</span>
-                    <span style="color: #1e3a8a !important; font-weight: 700;">Cuba untuk mengalahkan skor dan masa anda sebelum ini</span>
-                </li>
-                <li style="display: flex; align-items: center; margin-bottom: 16px; font-size: 18px;">
-                    <span style="color: #10b981 !important; margin-right: 12px; font-size: 24px; font-weight: 900;">✓</span>
-                    <span style="color: #1e3a8a !important; font-weight: 700;">Selesaikan permainan dengan lebih pantas untuk bonus kelajuan</span>
-                </li>
-                <li style="display: flex; align-items: center; font-size: 18px;">
-                    <span style="color: #10b981 !important; margin-right: 12px; font-size: 24px; font-weight: 900;">✓</span>
-                    <span style="color: #1e3a8a !important; font-weight: 700;">Semak papan pendahulu untuk melihat strategi terbaik</span>
-                </li>
-            </ul>
-        </div>
-    </div>
+    </main>
 </div>
 
 @endsection
