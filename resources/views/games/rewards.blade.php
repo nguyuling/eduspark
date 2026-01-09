@@ -269,9 +269,9 @@
         flex-direction: row;
         align-items: center;
         justify-content: center;
-        height: 280px;
+        height: 290px;
         position: relative;
-        overflow: hidden;
+        overflow: visible;
     }
 
     .reward-stats-col {
@@ -296,25 +296,27 @@
 
     .reward-intro-card {
         flex-shrink: 0;
-        width: 260px;
+        width: 220px;
         border-radius: 16px;
-        padding: 22px;
+        padding: 16px 16px 42px 16px;
         text-align: center;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         transition: 
             transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
             opacity 0.3s,
-            margin 0.3s;
+            margin 0.3s,
+            filter 0.3s;
         cursor: pointer;
         position: relative;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         height: 280px;
-        transform: scale(1);
-        opacity: 1;
+        transform: scale(0.85);
+        opacity: 0.6;
         margin: 0 10px;
         z-index: 1;
+        filter: brightness(0.9);
     }
 
     /* Gradient backgrounds for each reward card */
@@ -337,6 +339,26 @@
         box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
     }
     .reward-intro-card.great-player {
+        border: 2px solid #ef4444;
+        box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);
+    }
+
+    /* Highlight the center card */
+    .reward-intro-card:nth-child(2) {
+        transform: scale(1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+
+    .reward-intro-card:nth-child(2).game-completed {
+        border: 2px solid #14aa1eff;
+        box-shadow: 0 8px 24px rgba(90, 247, 85, 0.25);
+    }
+    .reward-intro-card:nth-child(2).speed-demon {
+        border: 2px solid #f59e0b;
+        box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
+    }
+    .reward-intro-card:nth-child(2).great-player {
         border: 2px solid #ef4444;
         box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);
     }
@@ -432,17 +454,17 @@
                 <i class="bi bi-chevron-left reward-nav-arrow left" id="prevReward"></i>
                 <div class="reward-intro-container">
                     <div class="reward-intro-card game-completed">
-                        <img src="{{ asset('badges/game-completed.svg') }}" alt="Game Completed Badge" style="width:120px;height:120px;margin:0 auto 10px auto;display:block;" />
+                        <img src="{{ asset('badges/game-completed.svg') }}" alt="Game Completed Badge" style="width:180px;height:180px;margin:0 auto 10px auto;display:block;" />
                         <p>Selesaikan mana-mana permainan.</p>
                         <span class="points">10 Mata</span>
                     </div>
                     <div class="reward-intro-card speed-demon">
-                        <img src="{{ asset('badges/speed-demon.svg') }}" alt="Speed Demon Badge" style="width:120px;height:120px;margin:0 auto 10px auto;display:block;" />
+                        <img src="{{ asset('badges/speed-demon.svg') }}" alt="Speed Demon Badge" style="width:180px;height:180px;margin:0 auto 10px auto;display:block;" />
                         <p>Selesaikan permainan dengan cepat.</p>
                         <span class="points">50 Mata</span>
                     </div>
                     <div class="reward-intro-card great-player">
-                        <img src="{{ asset('badges/great-player.svg') }}" alt="Pemain Hebat Badge" style="width:120px;height:120px;margin:0 auto 10px auto;display:block;" />
+                        <img src="{{ asset('badges/great-player.svg') }}" alt="Pemain Hebat Badge" style="width:180px;height:180px;margin:0 auto 10px auto;display:block;" />
                         <p>Capai markah tinggi dan kuasai cabaran.</p>
                         <span class="points">25 Mata</span>
                     </div>
@@ -452,8 +474,8 @@
         </div>
 
         <!-- Game Shelves -->
-        <h3 style="margin-top: 10px">Koleksi Ganjaran</h3>
-        <div class="shelves-top-separator"></div>
+        <h3>Koleksi Ganjaran</h3>
+        <div style="width: 90%; height: 1px; background-color: #c394f5ff; margin: 20px auto; display: block;"></div>
         @if($rewards->isEmpty())
             <div class="empty-shelf">
                 <p>Tiada ganjaran lagi. Main permainan untuk dapatkan ganjaran!</p>
