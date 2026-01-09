@@ -13,6 +13,7 @@
     }
 
     .reward-stat-card:hover {
+        border-color: var(--accent);
         transform: translateY(-2px);
         box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
     }
@@ -39,13 +40,14 @@
     .shelves-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 32px;
+        gap: 16px;
         margin-bottom: 32px;
+        width: 100%;
+        box-sizing: border-box;
     }
     .game-shelf {
-        flex: 1 1 0;
-        min-width: 380px;
-        max-width: 48%;
+        flex: 0 1 calc(33.333% - 11px);
+        min-width: 0;
         display: flex;
         align-items: stretch;
         gap: 0;
@@ -53,15 +55,22 @@
         border-radius: 16px;
         overflow: hidden;
         background: #fff;
-        border: 3px solid #7c3aed;
+        border: 2px solid #7c3aed;
         box-shadow: 0 8px 24px rgba(2, 6, 23, 0.12);
         margin-bottom: 0;
+        box-sizing: border-box;
     }
 
+    .game-shelf:hover{
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(106, 77, 247, 0.2);
+    }
+        
     .game-cover-cell {
-        width: 180px;
-        min-width: 250px;
-        max-width: 250px;
+        width: 200px;
+        /* min-width: 180px;
+        max-width: 250px; */
         background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
         position: relative;
         display: flex;
@@ -106,10 +115,10 @@
     .rewards-shelf {
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 12px; /* reduced gap */
         align-items: flex-start;
         justify-content: center;
-        padding: 24px 20px;
+        padding: 10px 12px;
         background: linear-gradient(135deg, #f5f0ffff 0%, #ffffffff 100%);
         flex: 1;
         min-width: 0;
@@ -119,10 +128,10 @@
     .reward-slot {
         position: relative;
         flex-shrink: 0;
-        width: 70px;
-        height: 70px;
+        width: 60px;   /* reduced width */
+        height: 60px;  /* reduced height */
         display: flex;
-        flex-direction: row; /* side by side */
+        flex-direction: row;
         align-items: center;
         justify-content: flex-start;
         background: #f9fafb;
@@ -141,20 +150,17 @@
         border: none;
     }
     .reward-slot .icon {
-        font-size: 50px;
-        margin-left: 40px;
-        margin-right: 15px;
+        font-size: 36px; /* reduced icon size */
+        margin-left: 10px;
+        margin-right: 4px;
         display: block;
     }
     .reward-slot .badge {
         position: relative;
-        left: 0;
-        top: 0;
-        margin-top: 0;
         margin-left: 2px;
         background: none;
         color: #7c3aed;
-        font-size: 50px;
+        font-size: 20px; /* reduced badge size */
         font-weight: 700;
         padding: 0;
         border: none;
@@ -201,11 +207,28 @@
     /* Reward Intro Cards */
     .reward-stats-and-intro-row {
         display: flex;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: stretch;
-        gap: 40px;
-        max-width: 1200px;
-        margin: 0px auto 60px auto;
+        gap: 20px;
+        position: relative;
+        width: 100%;
+        box-sizing: border-box;
+        flex-wrap: wrap;
+    }
+    @media (max-width: 900px) {
+        .reward-stats-and-intro-row {
+            flex-direction: column;
+            gap: 40px;
+        }
+    }
+
+    /* Separator line above shelves */
+    .shelves-top-separator {
+        width: calc(100% - 60px);
+        height: 1px;
+        background: #c3c3c3;
+        margin: 48px 0 48px 60px;
+        box-sizing: border-box;
     }
 
     .reward-stats-col {
@@ -214,16 +237,18 @@
         justify-content: center;
         min-width: 220px;
         max-width: 260px;
-        flex: 0 0 240px;
+        flex: 0 0 auto;
         gap: 20px;
+        flex-shrink: 0;
     }
 
     .reward-intro-col {
-        flex: 1 1 0;
-        min-width: 0;
+        flex: 1 1 auto;
+        min-width: 280px;
         position: relative;
         display: flex;
         align-items: center;
+        box-sizing: border-box;
     }
 
     .reward-intro-container {
@@ -237,14 +262,14 @@
         margin-bottom: 40px;
         position: relative;
         width: 100%;
+        box-sizing: border-box;
     }
 
     .reward-intro-card {
         flex-shrink: 0;
-        width: 300px;
-        border: 2px solid #e5e7eb;
+        width: 260px;
         border-radius: 16px;
-        padding: 25px;
+        padding: 22px;
         text-align: center;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         transition: 
@@ -256,10 +281,10 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        height: 220px;
+        height: 200px;
         transform: scale(0.7);
         opacity: 0.5;
-        margin: 0 -30px; /* squeeze side cards */
+        margin: 0 -28px;
         z-index: 1;
     }
 
@@ -275,74 +300,29 @@
     }
 
     .reward-intro-card.highlighted {
-        transform: scale(1.25);
+        transform: scale(1.1);
         opacity: 1;
-        margin: 0 60px;
+        margin: 0 30px;
         z-index: 2;
     }
 
     /* Remove nth-child based styles and use type-based classes instead */
     .reward-intro-card.game-completed.highlighted {
-        border-color: #14aa1eff;
+        border: 2px solid #14aa1eff;
         box-shadow: 0 8px 24px rgba(90, 247, 85, 0.25);
     }
     .reward-intro-card.speed-demon.highlighted {
-        border-color: #f59e0b;
+        border: 2px solid #f59e0b;
         box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
     }
     .reward-intro-card.great-player.highlighted {
-        border-color: #ef4444;
+        border: 2px solid #ef4444;
         box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);
     }
 
-    .reward-intro-card .points {
-        font-size: 16px;
-        font-weight: 700;
-        padding: 8px 15px;
-        border-radius: 8px;
-        display: inline-block;
-    }
-    .reward-intro-card.game-completed .points {
-        background: #20af29ff;
-        color: #ffffff;
-    }
-    .reward-intro-card.speed-demon .points {
-        background: #f59e0b;
-        color: #ffffff;
-    }
-    .reward-intro-card.great-player .points {
-        background: #ef4444;
-        color: #ffffff;
-    }
-
-    /* Navigation arrows */
-    .reward-nav-arrow {
-        font-size: 40px;
-        color: #6f6f6fff;
-        cursor: pointer;
-        transition: color 0.2s ease, transform 0.2s ease;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 10;
-    }
-
-    .reward-nav-arrow:hover:not(.disabled) {
-        color: #6A4DF7;
-        transform: translateY(-50%) scale(1.1);
-    }
-
-    .reward-nav-arrow.left { left: 200px; }
-    .reward-nav-arrow.right { right: 200px; }
-
-    .reward-nav-arrow.disabled {
-        color: #b1b1b1ff;
-        cursor: not-allowed;
-    }
-
     .reward-intro-card .card-icon {
-        font-size: 60px;
-        margin-bottom: 15px;
+        font-size: 56px;
+        margin-bottom: 14px;
         line-height: 1;
     }
 
@@ -358,17 +338,37 @@
     }
 
     .reward-intro-card h4 {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 700;
         color: #111827;
-        margin: 0 0 20px 0;
+        margin: 0 0 14px 0;
     }
 
     .reward-intro-card p {
-        font-size: 14px;
+        font-size: 13px;
         color: #6b7280;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
         flex-grow: 1.;
+    }
+
+    .reward-intro-card .points {
+        font-size: 15px;
+        font-weight: 700;
+        padding: 7px 0;
+        border-radius: 8px;
+        display: inline-block;
+    }
+    .reward-intro-card.game-completed .points {
+        background: #20af29ff;
+        color: #ffffff;
+    }
+    .reward-intro-card.speed-demon .points {
+        background: #f59e0b;
+        color: #ffffff;
+    }
+    .reward-intro-card.great-player .points {
+        background: #ef4444;
+        color: #ffffff;
     }
 </style>
 
@@ -422,6 +422,9 @@
             </div>
         </div>
 
+        <!-- Separator line above shelves -->
+        <div class="shelves-top-separator"></div>
+
         <!-- Game Shelves -->
         @if($rewards->isEmpty())
             <div class="empty-shelf">
@@ -437,9 +440,9 @@
                 })->values();
             @endphp
 
-            @for($i = 0; $i < $gameShelves->count(); $i += 2)
+            @for($i = 0; $i < $gameShelves->count(); $i += 3)
                 <div class="shelves-row">
-                    @for($j = $i; $j < min($i+2, $gameShelves->count()); $j++)
+                    @for($j = $i; $j < min($i+3, $gameShelves->count()); $j++)
                         @php
                             $gameRewards = $gameShelves[$j]['gameRewards'];
                             $gameId = $gameShelves[$j]['gameId'];
@@ -511,7 +514,6 @@
         @endif
     </main>
 </div>
-
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const container = document.querySelector('.reward-intro-container');
