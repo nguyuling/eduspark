@@ -211,18 +211,27 @@
     /* Reward Intro Cards */
     .reward-stats-and-intro-row {
         display: grid;
-        grid-template-columns: 220px 1fr;
-        gap: 0 60px;
+        grid-template-columns: 200px 1fr;
+        gap: 0 40px;
         row-gap: 20px;
         position: relative;
         width: 100%;
         box-sizing: border-box;
+        padding: 0 20px;
+    }
+
+    @media (max-width: 1200px) {
+        .reward-stats-and-intro-row {
+            grid-template-columns: 180px 1fr;
+            gap: 0 30px;
+        }
     }
 
     @media (max-width: 900px) {
         .reward-stats-and-intro-row {
             grid-template-columns: 1fr;
             gap: 20px;
+            padding: 0;
         }
     }
 
@@ -262,6 +271,7 @@
         justify-content: center;
         height: 280px;
         position: relative;
+        overflow: hidden;
     }
 
     .reward-stats-col {
