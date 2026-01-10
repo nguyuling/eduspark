@@ -190,7 +190,7 @@
     </div>
 
     <!-- Progress Bar -->
-    <div style="display:flex; justify-content:center; margin-top:60px; margin-bottom:40px;">
+    <div id="progress-bar-wrapper" style="display:none; position:fixed; bottom:70px; left:0; right:0; justify-content:center; z-index:100;">
       <div style="max-width:700px; width:100%; padding:0 20px;">
         <div style="background:#f0f0f0; height:25px; border-radius:10px; overflow:hidden; box-shadow:0 2px 4px rgba(0,0,0,0.1); position:relative;">
           <div id="progress-bar" style="background:linear-gradient(90deg, #A855F7, #9333EA); height:100%; border-radius:10px; width:0%; transition:width 0.3s ease; display:flex; align-items:center; justify-content:center;">
@@ -217,6 +217,7 @@ function startQuiz() {
     quizStarted = true;
     document.getElementById('quiz-start-screen').style.display = 'none';
     document.getElementById('quiz-questions-wrapper').style.display = 'block';
+    document.getElementById('progress-bar-wrapper').style.display = 'flex';
     showQuestion(0);
 }
 
@@ -307,6 +308,7 @@ function previousQuestion() {
         document.getElementById('quiz-questions-wrapper').style.display = 'none';
         document.getElementById('quiz-start-screen').style.display = 'block';
         document.getElementById('action-buttons').style.display = 'none';
+        document.getElementById('progress-bar-wrapper').style.display = 'none';
     }
 }
 
