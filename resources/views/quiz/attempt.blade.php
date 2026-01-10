@@ -191,10 +191,21 @@
 
     <!-- Progress Bar -->
     <div id="progress-bar-wrapper" style="display:none; margin-bottom:20px; width:100%; display:flex; justify-content:center; padding:0 20px; box-sizing:border-box;">
-      <div style="width:90%; max-width:900px; background:linear-gradient(90deg, rgba(168, 85, 247, 0.1), rgba(147, 51, 234, 0.1)); height:28px; border-radius:14px; overflow:hidden; box-shadow:0 4px 15px rgba(168, 85, 247, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.3); position:relative; border:1px solid rgba(168, 85, 247, 0.2);">
-        <div id="progress-bar" style="background:linear-gradient(90deg, #A855F7, #9333EA); height:100%; border-radius:14px; width:0%; transition:width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px rgba(168, 85, 247, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2); position:relative;">
-          <span id="progress-percentage" style="color:#fff; font-size:15px; font-weight:700; text-shadow:0 2px 4px rgba(0,0,0,0.3); position:relative; z-index:10;">0%</span>
+      <div style="display:flex; align-items:center; gap:40px; justify-content:center;">
+        <!-- Spacer for left arrow (50px + 40px gap) -->
+        <div style="width:90px; flex-shrink:0;"></div>
+        
+        <!-- Progress bar content -->
+        <div style="flex:1; max-width:700px;">
+          <div style="background:linear-gradient(90deg, rgba(168, 85, 247, 0.1), rgba(147, 51, 234, 0.1)); height:28px; border-radius:14px; overflow:hidden; box-shadow:0 4px 15px rgba(168, 85, 247, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.3); position:relative; border:1px solid rgba(168, 85, 247, 0.2);">
+            <div id="progress-bar" style="background:linear-gradient(90deg, #A855F7, #9333EA); height:100%; border-radius:14px; width:0%; transition:width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px rgba(168, 85, 247, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2); position:relative;">
+              <span id="progress-percentage" style="color:#fff; font-size:15px; font-weight:700; text-shadow:0 2px 4px rgba(0,0,0,0.3); position:relative; z-index:10;">0%</span>
+            </div>
+          </div>
         </div>
+        
+        <!-- Spacer for right arrow (50px + 40px gap) -->
+        <div style="width:90px; flex-shrink:0;"></div>
       </div>
     </div>
   </main>
