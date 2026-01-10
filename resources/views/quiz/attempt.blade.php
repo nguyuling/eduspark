@@ -15,49 +15,70 @@
         </a>
     </div>
 
-    <!-- Quiz Header Info -->
-    <section class="panel" style="margin-bottom:20px; margin-top:10px;">
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:0;">
-        <div>
-          <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:4px;">Description</div>
-          <div style="font-size:14px; line-height:1.5;">{{ $quiz->description }}</div>
-        </div>
-        <div>
-          <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:8px;">Quiz Details</div>
-          <div style="font-size:13px; display:flex; flex-direction:column; gap:6px;">
-            <div><strong>Pencipta:</strong> {{ $quiz->creator->name ?? 'N/A' }}</div>
-            <div><strong>ID:</strong> {{ $quiz->unique_code ?? 'N/A' }}</div>
-            <div><strong>Tarikh tutup:</strong> @if ($quiz->due_at) {{ $quiz->due_at->format('M d, Y h:i A') }} @else N/A @endif</div>
+    <!-- Quiz Start Screen -->
+    <div id="quiz-start-screen" style="display:block;">
+      <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:0;">
+          <div>
+            <div style="font-size:15px; color:var(--muted); font-weight:600; margin-bottom:4px;">Description</div>
+            <div style="font-size:14px; line-height:1.5;">{{ $quiz->description }}</div>
+          </div>
+          <div>
+            <div style="font-size:15px; color:var(--muted); font-weight:600; margin-bottom:8px;">Quiz Details</div>
+            <div style="font-size:14px; display:flex; flex-direction:column; gap:6px;">
+              <div><strong>Pencipta:</strong> {{ $quiz->creator->name ?? 'N/A' }}</div>
+              <div><strong>ID:</strong> {{ $quiz->unique_code ?? 'N/A' }}</div>
+              <div><strong>Tarikh tutup:</strong> @if ($quiz->due_at) {{ $quiz->due_at->format('M d, Y h:i A') }} @else N/A @endif</div>
+            </div>
           </div>
         </div>
+      </section>
+      <div style="text-align:center; margin-top:30px; margin-bottom:20px;">
+        <button type="button" onclick="startQuiz()" class="btn-start-quiz" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:16px 40px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:14px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
+          <i class="bi bi-play-fill"></i>Mulai Kuiz
+        </button>
       </div>
-    </section>
+    </div>
 
     <!-- Questions Section -->
-    <div id="quiz-questions-wrapper">
+    <div id="quiz-questions-wrapper" style="display:none;">
       <input type="hidden" id="_token" value="{{ csrf_token() }}">
 
       @if ($quiz->questions->isEmpty())
         <section class="panel" style="margin-bottom:20px;">
           <div style="text-align:center; padding:24px; color:var(--muted);">
-            <div style="font-size:14px;">This quiz has no questions available to attempt.</div>
+            <div style="font-size:15px;">This quiz has no questions available to attempt.</div>
           </div>
         </section>
       @else
-        @foreach ($quiz->questions as $key => $question)
-          <section class="panel" style="margin-bottom:20px;">
+        <!-- Question Navigation Counter -->
+        <div style="text-align:center; margin-bottom:20px; font-size:14px; color:var(--muted); font-weight:600;">
+          Question <span id="current-question-num">1</span> of {{ $quiz->questions->count() }}
+        </div>
+
+        <!-- Questions Container with Side Arrows -->
+        <div style="display:flex; align-items:center; gap:20px; margin-bottom:20px; justify-content:center;">
+          <!-- Previous Arrow Button -->
+          <button type="button" onclick="previousQuestion()" id="prev-arrow-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; width:50px !important; height:50px !important; background:transparent !important; color:#6a4df7 !important; border:none !important; border-radius:8px !important; font-weight:600 !important; font-size:28px !important; cursor:pointer !important; transition:all 0.2s ease !important; flex-shrink:0; box-shadow:0 4px 12px rgba(106,77,247,0.3) !important;" onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)'">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+
+          <!-- Questions Content -->
+          <div style="flex:1; max-width:700px; text-align:center;">
+            @foreach ($quiz->questions as $key => $question)
+              <section class="panel question-section" style="margin-bottom:0; display:{{ $key === 0 ? 'block' : 'none' }};" data-question-index="{{ $key }}">
             <div class="question-card" data-question-id="{{ $question->id }}">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <span style="font-weight:600;">Question {{ $key + 1 }}</span>
                 <span style="background:rgba(106,77,247,0.1); padding:4px 8px; border-radius:4px; font-size:12px; font-weight:600;">{{ $question->points }} Points</span>
               </div>
-              <div style="font-weight:700; margin-bottom:12px; font-size:14px;">{{ $question->question_text }}</div>
+              <div style="font-weight:700; margin-bottom:12px; font-size:18px;">{{ $question->question_text }}</div>
 
               {{-- Display Options based on Question Type --}}
               @if ($question->type === 'multiple_choice' || $question->type === 'true_false')
                 @foreach ($question->options as $option)
                   <div style="margin-bottom:8px;">
-                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:15px;">
                       <input class="quiz-answer-input" type="radio" 
                              name="answers[{{ $question->id }}]" 
                              value="{{ $option->id }}" 
@@ -70,7 +91,7 @@
               @elseif ($question->type === 'checkbox')
                 @foreach ($question->options as $option)
                   <div style="margin-bottom:8px;">
-                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:15px;">
                       <input class="quiz-answer-input" type="checkbox" 
                              name="answers[{{ $question->id }}][]"
                              value="{{ $option->id }}"
@@ -82,13 +103,13 @@
 
               @elseif ($question->type === 'short_answer')
                 <div style="margin-bottom:8px;">
-                  <label for="q{{ $question->id }}_text" style="display:block; font-size:12px; color:var(--muted); margin-bottom:4px;">Your Answer:</label>
+                  <label for="q{{ $question->id }}_text" style="display:block; font-size:15px; color:var(--muted); margin-bottom:4px;">Your Answer:</label>
                   <input type="text" class="quiz-answer-input" 
                          name="answers[{{ $question->id }}][text]" 
                          id="q{{ $question->id }}_text"
                          placeholder="Type your answer here..."
                          data-question-id="{{ $question->id }}"
-                         style="width:100%; padding:8px 12px; border-radius:6px; border:2px solid #d1d5db; box-sizing:border-box; font-size:13px;">
+                         style="width:100%; padding:8px 12px; border-radius:6px; border:2px solid #d1d5db; box-sizing:border-box; font-size:15px;">
                 </div>
 
               @elseif ($question->type === 'coding')
@@ -144,14 +165,21 @@
                   @endif
                 </div>
               @endif
-            </div>
-          </section>
-        @endforeach
+            </section>
+            @endforeach
+          </div>
+
+          <!-- Next Arrow Button -->
+          <button type="button" onclick="nextQuestion()" id="next-arrow-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; width:50px !important; height:50px !important; background:transparent !important; color:#6a4df7 !important; border:none !important; border-radius:8px !important; font-weight:600 !important; font-size:28px !important; cursor:pointer !important; transition:all 0.2s ease !important; flex-shrink:0; box-shadow:0 4px 12px rgba(106,77,247,0.3) !important;" onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)'">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
       @endif
     </div>
 
     <!-- Action Buttons -->
-    <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:20px; padding:0;">
+    <div id="action-buttons" style="display:none; gap:12px; justify-content:center; align-items:center; margin-top:40px; margin-bottom:20px; padding:0;">
+        <!-- Submit Button -->
         <button type="button" onclick="submitQuizData()" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
             <i class="bi bi-check-lg"></i>Hantar Kuiz
         </button>
@@ -166,6 +194,101 @@
 
 {{-- JavaScript --}}
 <script>
+let currentQuestionIndex = 0;
+const totalQuestions = {{ $quiz->questions->count() }};
+let quizStarted = false;
+
+function startQuiz() {
+    quizStarted = true;
+    document.getElementById('quiz-start-screen').style.display = 'none';
+    document.getElementById('quiz-questions-wrapper').style.display = 'block';
+    showQuestion(0);
+}
+
+// Initialize navigation buttons
+function updateNavigationButtons() {
+    const prevBtn = document.getElementById('prev-arrow-btn');
+    const nextBtn = document.getElementById('next-arrow-btn');
+    
+    // Disable previous button on first question
+    if (currentQuestionIndex === 0) {
+        prevBtn.style.opacity = '0.5';
+        prevBtn.style.cursor = 'not-allowed';
+        prevBtn.disabled = true;
+    } else {
+        prevBtn.style.opacity = '1';
+        prevBtn.style.cursor = 'pointer';
+        prevBtn.disabled = false;
+    }
+    
+    // Disable next button on last question
+    if (currentQuestionIndex === totalQuestions - 1) {
+        nextBtn.style.opacity = '0.5';
+        nextBtn.style.cursor = 'not-allowed';
+        nextBtn.disabled = true;
+    } else {
+        nextBtn.style.opacity = '1';
+        nextBtn.style.cursor = 'pointer';
+        nextBtn.disabled = false;
+    }
+}
+
+function showQuestion(index) {
+    if (index < 0 || index >= totalQuestions) return;
+    
+    // Hide all questions
+    document.querySelectorAll('.question-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    // Show the selected question
+    const questionSections = document.querySelectorAll('.question-section');
+    if (questionSections[index]) {
+        questionSections[index].style.display = 'block';
+    }
+    
+    // Update current question number
+    document.getElementById('current-question-num').textContent = index + 1;
+    
+    // Update button states
+    updateNavigationButtons();
+    
+    // Show/hide submit button based on question position
+    updateSubmitButtonVisibility();
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
+
+function updateSubmitButtonVisibility() {
+    const actionButtons = document.getElementById('action-buttons');
+    // Only show submit button on the last question
+    if (currentQuestionIndex === totalQuestions - 1) {
+        actionButtons.style.display = 'flex';
+    } else {
+        actionButtons.style.display = 'none';
+    }
+}
+
+function nextQuestion() {
+    if (currentQuestionIndex < totalQuestions - 1) {
+        currentQuestionIndex++;
+        showQuestion(currentQuestionIndex);
+    }
+}
+
+function previousQuestion() {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        showQuestion(currentQuestionIndex);
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateNavigationButtons();
+});
+
 // Tab key handler for coding line inputs
 document.addEventListener('keydown', function(e) {
     if (e.target.classList.contains('coding-line-input')) {
