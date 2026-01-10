@@ -36,8 +36,8 @@
             </div>
           </section>
           <div style="text-align:center; margin-top:30px; margin-bottom:20px;">
-            <button type="button" onclick="startQuiz()" class="btn-start-quiz" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:16px 40px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:14px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
-              <i class="bi bi-arrow-right"></i>Mulai Kuiz
+            <button type="button" onclick="startQuiz()" class="btn-start-quiz" id="start-quiz-btn" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:16px 40px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:14px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
+              <i class="bi bi-arrow-right"></i><span id="start-quiz-text">Mulai Kuiz</span>
             </button>
           </div>
         </div>
@@ -61,7 +61,7 @@
         </div>
 
         <!-- Questions Container with Side Arrows -->
-        <div style="display:flex; align-items:center; gap:20px; margin-bottom:20px; justify-content:center; margin-top:40px;">
+        <div style="display:flex; align-items:center; gap:40px; margin-bottom:20px; justify-content:center; margin-top:40px;">
           <!-- Previous Arrow Button -->
           <button type="button" onclick="previousQuestion()" id="prev-arrow-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; width:50px !important; height:50px !important; background:transparent !important; color:#6a4df7 !important; border:none !important; border-radius:8px !important; font-weight:600 !important; font-size:28px !important; cursor:pointer !important; transition:all 0.2s ease !important; flex-shrink:0; box-shadow:0 4px 12px rgba(106,77,247,0.3) !important;" onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)'">
             <i class="bi bi-chevron-left"></i>
@@ -190,20 +190,13 @@
     </div>
 
     <!-- Progress Bar -->
-    <div id="progress-bar-wrapper" style="display:none; position:fixed; bottom:70px; left:0; right:0; justify-content:center; z-index:100;">
-      <div style="max-width:700px; width:100%; padding:0 20px;">
-        <div style="background:#f0f0f0; height:25px; border-radius:10px; overflow:hidden; box-shadow:0 2px 4px rgba(0,0,0,0.1); position:relative;">
-          <div id="progress-bar" style="background:linear-gradient(90deg, #A855F7, #9333EA); height:100%; border-radius:10px; width:0%; transition:width 0.3s ease; display:flex; align-items:center; justify-content:center;">
-            <span id="progress-percentage" style="color:#fff; font-size:14px; font-weight:600; text-shadow:0 1px 2px rgba(0,0,0,0.2);">0%</span>
-          </div>
+    <div id="progress-bar-wrapper" style="display:none; margin-bottom:20px; width:100%; display:flex; justify-content:center; padding:0 20px; box-sizing:border-box;">
+      <div style="width:90%; max-width:900px; background:linear-gradient(90deg, rgba(168, 85, 247, 0.1), rgba(147, 51, 234, 0.1)); height:28px; border-radius:14px; overflow:hidden; box-shadow:0 4px 15px rgba(168, 85, 247, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.3); position:relative; border:1px solid rgba(168, 85, 247, 0.2);">
+        <div id="progress-bar" style="background:linear-gradient(90deg, #A855F7, #9333EA); height:100%; border-radius:14px; width:0%; transition:width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px rgba(168, 85, 247, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2); position:relative;">
+          <span id="progress-percentage" style="color:#fff; font-size:15px; font-weight:700; text-shadow:0 2px 4px rgba(0,0,0,0.3); position:relative; z-index:10;">0%</span>
         </div>
       </div>
     </div>
-    <!-- <button type="button" onclick="submitQuizData()" style="flex:1; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:14px; transition:all .2s ease; box-shadow:0 4px 12px rgba(106,77,247,0.3);"
-        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';"
-        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-        Submit Quiz
-    </button> -->
   </main>
 </div>
 
@@ -217,7 +210,7 @@ function startQuiz() {
     quizStarted = true;
     document.getElementById('quiz-start-screen').style.display = 'none';
     document.getElementById('quiz-questions-wrapper').style.display = 'block';
-    document.getElementById('progress-bar-wrapper').style.display = 'flex';
+    document.getElementById('progress-bar-wrapper').style.display = 'block';
     showQuestion(0);
 }
 
@@ -286,10 +279,58 @@ function updateSubmitButtonVisibility() {
 function updateProgressBar() {
     const progressBar = document.getElementById('progress-bar');
     const progressPercentage = document.getElementById('progress-percentage');
-    // Calculate progress: (currentQuestion + 1) / totalQuestions * 100
-    const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+    
+    // Count how many questions have been answered
+    let answeredCount = 0;
+    const questions = document.querySelectorAll('[data-question-id]');
+    
+    questions.forEach(questionCard => {
+        const questionId = questionCard.getAttribute('data-question-id');
+        const radios = questionCard.querySelectorAll('input[type="radio"][data-question-id]');
+        const checkboxes = questionCard.querySelectorAll('input[type="checkbox"][data-question-id]');
+        const textInputs = questionCard.querySelectorAll('input[type="text"]:not(.coding-line-input)[data-question-id]');
+        const codingLineInputs = questionCard.querySelectorAll('input.coding-line-input[data-question-id]');
+        
+        let isAnswered = false;
+        
+        // Check if any radio button is selected
+        if (radios.length > 0) {
+            const checkedRadio = Array.from(radios).find(r => r.checked);
+            if (checkedRadio) isAnswered = true;
+        }
+        
+        // Check if any checkbox is selected
+        if (checkboxes.length > 0 && !isAnswered) {
+            const checkedCheckbox = Array.from(checkboxes).find(c => c.checked);
+            if (checkedCheckbox) isAnswered = true;
+        }
+        
+        // Check if text input has value
+        if (textInputs.length > 0 && !isAnswered) {
+            const filledText = Array.from(textInputs).find(t => t.value.trim() !== '');
+            if (filledText) isAnswered = true;
+        }
+        
+        // Check if any coding line input has value
+        if (codingLineInputs.length > 0 && !isAnswered) {
+            const filledCodeLine = Array.from(codingLineInputs).find(c => c.value.trim() !== '');
+            if (filledCodeLine) isAnswered = true;
+        }
+        
+        if (isAnswered) answeredCount++;
+    });
+    
+    // Calculate progress based on answered questions
+    const progress = (answeredCount / totalQuestions) * 100;
     progressBar.style.width = progress + '%';
-    progressPercentage.textContent = Math.round(progress) + '%';
+    
+    // Hide percentage text if progress is 0%
+    if (progress === 0) {
+        progressPercentage.style.display = 'none';
+    } else {
+        progressPercentage.style.display = 'inline';
+        progressPercentage.textContent = Math.round(progress) + '%';
+    }
 }
 
 function nextQuestion() {
@@ -308,13 +349,17 @@ function previousQuestion() {
         document.getElementById('quiz-questions-wrapper').style.display = 'none';
         document.getElementById('quiz-start-screen').style.display = 'block';
         document.getElementById('action-buttons').style.display = 'none';
-        document.getElementById('progress-bar-wrapper').style.display = 'none';
+        document.getElementById('progress-bar-wrapper').style.display = 'block';
+        
+        // Update button text to "Sambung Kuiz"
+        document.getElementById('start-quiz-text').textContent = 'Sambung Kuiz';
     }
 }
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     updateNavigationButtons();
+    // Do NOT call updateProgressBar() on page load
 });
 
 // Tab key handler for coding line inputs
@@ -530,5 +575,18 @@ function confirmBackAction() {
     const confirmDialog = confirm('Jika anda keluar sekarang, percubaan kuiz anda TIDAK akan disimpan dan semua jawapan akan hilang.\n\nAdakah anda pasti ingin keluar?');
     return confirmDialog; // Return true to allow navigation, false to prevent it
 }
+
+// Add event listeners to update progress bar when answers change
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('quiz-answer-input')) {
+        updateProgressBar();
+    }
+});
+
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('quiz-answer-input')) {
+        updateProgressBar();
+    }
+});
 </script>
 @endsection
