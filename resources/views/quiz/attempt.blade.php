@@ -349,7 +349,7 @@ function previousQuestion() {
         document.getElementById('quiz-questions-wrapper').style.display = 'none';
         document.getElementById('quiz-start-screen').style.display = 'block';
         document.getElementById('action-buttons').style.display = 'none';
-        document.getElementById('progress-bar-wrapper').style.display = 'block';
+        document.getElementById('progress-bar-wrapper').style.display = 'none';
         
         // Update button text to "Sambung Kuiz"
         document.getElementById('start-quiz-text').textContent = 'Sambung Kuiz';
@@ -359,7 +359,9 @@ function previousQuestion() {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     updateNavigationButtons();
-    // Do NOT call updateProgressBar() on page load
+    // Explicitly hide progress bar on page load
+    document.getElementById('progress-bar-wrapper').style.display = 'none';
+    document.getElementById('progress-percentage').style.display = 'none';
 });
 
 // Tab key handler for coding line inputs
