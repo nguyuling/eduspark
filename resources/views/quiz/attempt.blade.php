@@ -2,6 +2,31 @@
 
 @section('content')
 
+<style>
+  /* Option div styling */
+  .option-div {
+    border: 2px solid rgba(106,77,247,0.3);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(106,77,247,0.02);
+  }
+  
+  .option-div:hover {
+    border-color: rgba(106,77,247,0.6);
+    background: rgba(106,77,247,0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(106,77,247,0.15);
+  }
+  
+  .option-div.selected {
+    border-color: rgba(106,77,247,0.8);
+    background: rgba(106,77,247,0.15);
+    box-shadow: 0 4px 12px rgba(106,77,247,0.25);
+  }
+</style>
+
 <div class="app">
   <!-- Main Content -->
   <main class="main">
@@ -83,7 +108,7 @@
                 @if ($question->type === 'multiple_choice' || $question->type === 'true_false')
                   <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; text-align:left;">
                     @foreach ($question->options as $option)
-                      <div style="border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; cursor:pointer; transition:all 0.2s ease; background:rgba(106,77,247,0.02);">
+                      <div class="option-div" data-option-id="{{ $option->id }}" onclick="updateOptionSelection(this, {{ $question->id }})">
                         <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-size:15px; margin:0;">
                           <input class="quiz-answer-input" type="radio" 
                                  name="answers[{{ $question->id }}]" 
@@ -99,7 +124,7 @@
                 @elseif ($question->type === 'checkbox')
                   <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:12px; text-align:left;">
                     @foreach ($question->options as $option)
-                      <div style="border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; cursor:pointer; transition:all 0.2s ease; background:rgba(106,77,247,0.02);">
+                      <div class="option-div" data-option-id="{{ $option->id }}" onclick="updateCheckboxSelection(this)">
                         <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-size:15px; margin:0;">
                           <input class="quiz-answer-input" type="checkbox" 
                                  name="answers[{{ $question->id }}][]"
@@ -378,6 +403,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Explicitly hide progress bar on page load
     document.getElementById('progress-bar-wrapper').style.display = 'none';
     document.getElementById('progress-percentage').style.display = 'none';
+    
+    // Set selected class for checked inputs
+    document.querySelectorAll('.option-div').forEach(optDiv => {
+        const input = optDiv.querySelector('input');
+        if (input && input.checked) {
+            optDiv.classList.add('selected');
+        }
+    });
 });
 
 // Tab key handler for coding line inputs
@@ -594,15 +627,34 @@ function confirmBackAction() {
     return confirmDialog; // Return true to allow navigation, false to prevent it
 }
 
-// Add event listeners to update progress bar when answers change
+// Add event listeners to update option selection display
 document.addEventListener('change', function(e) {
     if (e.target.classList.contains('quiz-answer-input')) {
-        updateProgressBar();
-    }
-});
-
-document.addEventListener('input', function(e) {
-    if (e.target.classList.contains('quiz-answer-input')) {
+        if (e.target.type === 'radio') {
+            // Update radio button visual feedback
+            const questionId = e.target.dataset.questionId;
+            const allOptions = document.querySelectorAll(`input[data-question-id="${questionId}"][type="radio"]`);
+            allOptions.forEach(radio => {
+                const optDiv = radio.closest('.option-div');
+                if (optDiv) {
+                    if (radio.checked) {
+                        optDiv.classList.add('selected');
+                    } else {
+                        optDiv.classList.remove('selected');
+                    }
+                }
+            });
+        } else if (e.target.type === 'checkbox') {
+            // Update checkbox visual feedback
+            const optDiv = e.target.closest('.option-div');
+            if (optDiv) {
+                if (e.target.checked) {
+                    optDiv.classList.add('selected');
+                } else {
+                    optDiv.classList.remove('selected');
+                }
+            }
+        }
         updateProgressBar();
     }
 });
