@@ -86,7 +86,8 @@
                       <input class="quiz-answer-input" type="radio" 
                              name="answers[{{ $question->id }}]" 
                              value="{{ $option->id }}" 
-                             data-question-id="{{ $question->id }}">
+                             data-question-id="{{ $question->id }}"
+                             style="width:20px; height:20px; cursor:pointer; accent-color:#6a4df7;">
                       <span>{{ $option->option_text }}</span>
                     </label>
                   </div>
