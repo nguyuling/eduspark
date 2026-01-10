@@ -71,62 +71,62 @@
           <div style="flex:1; max-width:700px; text-align:center;">
             @foreach ($quiz->questions as $key => $question)
               <section class="panel question-section" style="margin-bottom:0; display:{{ $key === 0 ? 'block' : 'none' }};" data-question-index="{{ $key }}">
-            <div class="question-card" data-question-id="{{ $question->id }}">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <span style="font-weight:600; color:#6a4df7;">Question {{ $key + 1 }}</span>
-                <span style="background:rgba(106,77,247,0.1); padding:4px 8px; border-radius:4px; font-size:12px; font-weight:600;">{{ $question->points }} Points</span>
-              </div>
-              <div style="font-weight:700; margin-bottom:12px; font-size:18px;">{{ $question->question_text }}</div>
-
-              {{-- Display Options based on Question Type --}}
-              @if ($question->type === 'multiple_choice' || $question->type === 'true_false')
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
-                  @foreach ($question->options as $option)
-                    <div style="border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; cursor:pointer; transition:all 0.2s ease; background:rgba(106,77,247,0.02);">
-                      <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-size:15px; margin:0;">
-                        <input class="quiz-answer-input" type="radio" 
-                               name="answers[{{ $question->id }}]" 
-                               value="{{ $option->id }}" 
-                               data-question-id="{{ $question->id }}"
-                               style="width:20px; height:20px; cursor:pointer; accent-color:#6a4df7; flex-shrink:0;">
-                        <span style="flex:1;">{{ $option->option_text }}</span>
-                      </label>
-                    </div>
-                  @endforeach
-                </div>
-              
-              @elseif ($question->type === 'checkbox')
-                <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:12px;">
-                  @foreach ($question->options as $option)
-                    <div style="border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; cursor:pointer; transition:all 0.2s ease; background:rgba(106,77,247,0.02);">
-                      <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-size:15px; margin:0;">
-                        <input class="quiz-answer-input" type="checkbox" 
-                               name="answers[{{ $question->id }}][]"
-                               value="{{ $option->id }}"
-                               data-question-id="{{ $question->id }}"
-                               style="width:20px; height:20px; cursor:pointer; accent-color:#6a4df7; flex-shrink:0;">
-                        <span style="flex:1;">{{ $option->option_text }}</span>
-                      </label>
-                    </div>
-                  @endforeach
+                <div class="question-card" data-question-id="{{ $question->id }}">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <span style="font-weight:600; color:#6a4df7;">Question {{ $key + 1 }}</span>
+                    <span style="background:rgba(106,77,247,0.1); padding:4px 8px; border-radius:4px; font-size:12px; font-weight:600;">{{ $question->points }} Points</span>
+                  </div>
+                  <div style="font-weight:700; margin-bottom:20px; font-size:18px;">{{ $question->question_text }}</div>
                 </div>
 
-              @elseif ($question->type === 'short_answer')
-                <div style="border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; background:rgba(106,77,247,0.02);">
-                  <label for="q{{ $question->id }}_text" style="display:block; font-size:15px; color:var(--muted); margin-bottom:8px; font-weight:600;">Your Answer:</label>
-                  <input type="text" class="quiz-answer-input" 
-                         name="answers[{{ $question->id }}][text]" 
-                         id="q{{ $question->id }}_text"
-                         placeholder="Type your answer here..."
-                         data-question-id="{{ $question->id }}"
-                         style="width:100%; padding:12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:15px;">
-                </div>
+                {{-- Display Options based on Question Type --}}
+                @if ($question->type === 'multiple_choice' || $question->type === 'true_false')
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; text-align:left;">
+                    @foreach ($question->options as $option)
+                      <div style="border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; cursor:pointer; transition:all 0.2s ease; background:rgba(106,77,247,0.02);">
+                        <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-size:15px; margin:0;">
+                          <input class="quiz-answer-input" type="radio" 
+                                 name="answers[{{ $question->id }}]" 
+                                 value="{{ $option->id }}" 
+                                 data-question-id="{{ $question->id }}"
+                                 style="width:20px; height:20px; cursor:pointer; accent-color:#6a4df7; flex-shrink:0;">
+                          <span style="flex:1;">{{ $option->option_text }}</span>
+                        </label>
+                      </div>
+                    @endforeach
+                  </div>
+                
+                @elseif ($question->type === 'checkbox')
+                  <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:12px; text-align:left;">
+                    @foreach ($question->options as $option)
+                      <div style="border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; cursor:pointer; transition:all 0.2s ease; background:rgba(106,77,247,0.02);">
+                        <label style="display:flex; align-items:center; gap:12px; cursor:pointer; font-size:15px; margin:0;">
+                          <input class="quiz-answer-input" type="checkbox" 
+                                 name="answers[{{ $question->id }}][]"
+                                 value="{{ $option->id }}"
+                                 data-question-id="{{ $question->id }}"
+                                 style="width:20px; height:20px; cursor:pointer; accent-color:#6a4df7; flex-shrink:0;">
+                          <span style="flex:1;">{{ $option->option_text }}</span>
+                        </label>
+                      </div>
+                    @endforeach
+                  </div>
 
-              @elseif ($question->type === 'coding')
-                <div style="margin-bottom:12px;">
+                @elseif ($question->type === 'short_answer')
+                  <div style="text-align:left;">
+                    <label for="q{{ $question->id }}_text" style="display:block; font-size:15px; color:var(--muted); margin-bottom:8px; font-weight:600;">Your Answer:</label>
+                    <input type="text" class="quiz-answer-input" 
+                           name="answers[{{ $question->id }}][text]" 
+                           id="q{{ $question->id }}_text"
+                           placeholder="Type your answer here..."
+                           data-question-id="{{ $question->id }}"
+                           style="width:100%; padding:12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:15px;">
+                  </div>
+
+                @elseif ($question->type === 'coding')
                   <!-- Code Template Display -->
                   @if ($question->coding_template)
-                    <div style="margin-bottom:20px; border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; background:rgba(106,77,247,0.02);">
+                    <div style="margin-bottom:20px; border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; background:rgba(106,77,247,0.02); text-align:left;">
                       <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:8px;">Template Kod:</div>
                       <div style="background:#f5f5f5; padding:12px; border-radius:8px; border:2px solid #d1d5db; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; white-space:pre; overflow-x:auto;">{{ $question->coding_template }}</div>
                     </div>
@@ -134,7 +134,7 @@
 
                   <!-- Pandangan Pelajar (Student View) -->
                   @if ($question->coding_full_code)
-                    <div style="border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; background:rgba(106,77,247,0.02);">
+                    <div style="border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; background:rgba(106,77,247,0.02); margin-bottom:12px; text-align:left;">
                       <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 12px;">Jawapan</label>
                       <div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:0; min-height:100px; display: flex;">
                         @php
@@ -173,9 +173,8 @@
                       </div>
                     </div>
                   @endif
-                </div>
-              @endif
-            </section>
+                @endif
+              </section>
             @endforeach
           </div>
 
