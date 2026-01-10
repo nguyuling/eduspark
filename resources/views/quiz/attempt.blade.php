@@ -550,7 +550,101 @@ function checkAllQuestionsAnswered() {
 }
 
 function submitQuizData() {
-    // ...existing code for submit logic...
+    // Check if all questions are answered
+    if (!checkAllQuestionsAnswered()) {
+        alert('Sila jawab semua soalan sebelum menghantar kuiz.');
+        return;
+    }
+
+    // Build the answers payload manually
+    const answers = {};
+    
+    // Get all answer inputs
+    const inputs = document.querySelectorAll('.quiz-answer-input');
+
+    inputs.forEach(input => {
+        const qId = input.dataset.questionId;
+        
+        // Handle Checkboxes (multiple answers per question)
+        if (input.type === 'checkbox' && input.checked) {
+            if (!answers[qId]) {
+                answers[qId] = [];
+            }
+            answers[qId].push(input.value);
+        } 
+        // Handle Radio Buttons (single answer per question)
+        else if (input.type === 'radio' && input.checked) {
+            answers[qId] = input.value;
+        }
+        // Handle Short Answer Text (but not coding line inputs)
+        else if (input.type === 'text' && input.value && !input.classList.contains('coding-line-input')) {
+            answers[qId] = { text: input.value };
+        }
+    });
+
+    // Handle coding line inputs separately
+    const codingLineInputs = document.querySelectorAll('.coding-line-input');
+    codingLineInputs.forEach(input => {
+        const qId = input.dataset.questionId;
+        const lineNum = input.dataset.lineNumber;
+        
+        if (!answers[qId]) {
+            answers[qId] = {};
+        }
+        
+        answers[qId][`line_${lineNum}`] = input.value;
+    });
+
+    // Prepare the final request payload
+    const payload = new URLSearchParams();
+    
+    // Add CSRF token
+    const token = document.getElementById('_token').value;
+    payload.append('_token', token);
+    
+    // Add answers to the payload
+    for (const [qId, answer] of Object.entries(answers)) {
+        if (Array.isArray(answer)) {
+            answer.forEach(val => payload.append(`answers[${qId}][]`, val));
+        } else if (typeof answer === 'object' && answer !== null && 'text' in answer) {
+            payload.append(`answers[${qId}][text]`, answer.text);
+        } else if (typeof answer === 'object' && answer !== null) {
+            // Handle coding line answers
+            for (const [lineKey, lineValue] of Object.entries(answer)) {
+                payload.append(`answers[${qId}][${lineKey}]`, lineValue);
+            }
+        } else {
+            payload.append(`answers[${qId}]`, answer);
+        }
+    }
+    
+    // Use Fetch API to send POST request
+    fetch('{{ route('student.quizzes.submit', $quiz->id) }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        redirect: 'follow',
+        body: payload
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.href = response.url;
+        } else if (response.status === 422) {
+            return response.json().then(data => {
+                alert('Validation error: ' + JSON.stringify(data.errors || data.message));
+            });
+        } else {
+            return response.text().then(text => {
+                alert('Error: ' + text || 'An error occurred.');
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Network error:', error);
+        alert('A network error occurred. Please check your connection and try again.');
+    });
 }
 
 function confirmBackAction() {
