@@ -17,26 +17,30 @@
 
     <!-- Quiz Start Screen -->
     <div id="quiz-start-screen" style="display:block;">
-      <section class="panel" style="margin-bottom:20px; margin-top:10px;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:0;">
-          <div>
-            <div style="font-size:15px; color:var(--muted); font-weight:600; margin-bottom:4px;">Description</div>
-            <div style="font-size:14px; line-height:1.5;">{{ $quiz->description }}</div>
-          </div>
-          <div>
-            <div style="font-size:15px; color:var(--muted); font-weight:600; margin-bottom:8px;">Quiz Details</div>
-            <div style="font-size:14px; display:flex; flex-direction:column; gap:6px;">
-              <div><strong>Pencipta:</strong> {{ $quiz->creator->name ?? 'N/A' }}</div>
-              <div><strong>ID:</strong> {{ $quiz->unique_code ?? 'N/A' }}</div>
-              <div><strong>Tarikh tutup:</strong> @if ($quiz->due_at) {{ $quiz->due_at->format('M d, Y h:i A') }} @else N/A @endif</div>
+      <div style="display:flex; justify-content:center;">
+        <div style="max-width:700px; width:100%;">
+          <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:0;">
+              <div>
+                <div style="font-size:15px; color:var(--muted); font-weight:600; margin-bottom:4px;">Description</div>
+                <div style="font-size:14px; line-height:1.5;">{{ $quiz->description }}</div>
+              </div>
+              <div>
+                <div style="font-size:15px; color:var(--muted); font-weight:600; margin-bottom:8px;">Quiz Details</div>
+                <div style="font-size:14px; display:flex; flex-direction:column; gap:6px;">
+                  <div><strong>Pencipta:</strong> {{ $quiz->creator->name ?? 'N/A' }}</div>
+                  <div><strong>ID:</strong> {{ $quiz->unique_code ?? 'N/A' }}</div>
+                  <div><strong>Tarikh tutup:</strong> @if ($quiz->due_at) {{ $quiz->due_at->format('M d, Y h:i A') }} @else N/A @endif</div>
+                </div>
+              </div>
             </div>
+          </section>
+          <div style="text-align:center; margin-top:30px; margin-bottom:20px;">
+            <button type="button" onclick="startQuiz()" class="btn-start-quiz" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:16px 40px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:14px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
+              <i class="bi bi-play-fill"></i>Mulai Kuiz
+            </button>
           </div>
         </div>
-      </section>
-      <div style="text-align:center; margin-top:30px; margin-bottom:20px;">
-        <button type="button" onclick="startQuiz()" class="btn-start-quiz" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:16px 40px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:14px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
-          <i class="bi bi-play-fill"></i>Mulai Kuiz
-        </button>
       </div>
     </div>
 
@@ -184,6 +188,15 @@
             <i class="bi bi-check-lg"></i>Hantar Kuiz
         </button>
     </div>
+
+    <!-- Progress Bar -->
+    <div style="display:flex; justify-content:center; margin-top:60px; margin-bottom:20px;">
+      <div style="max-width:700px; width:100%; padding:0 20px;">
+        <div style="background:#f0f0f0; height:8px; border-radius:10px; overflow:hidden; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+          <div id="progress-bar" style="background:linear-gradient(90deg, #A855F7, #9333EA); height:100%; border-radius:10px; width:0%; transition:width 0.3s ease;"></div>
+        </div>
+      </div>
+    </div>
     <!-- <button type="button" onclick="submitQuizData()" style="flex:1; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:14px; transition:all .2s ease; box-shadow:0 4px 12px rgba(106,77,247,0.3);"
         onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';"
         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
@@ -210,16 +223,10 @@ function updateNavigationButtons() {
     const prevBtn = document.getElementById('prev-arrow-btn');
     const nextBtn = document.getElementById('next-arrow-btn');
     
-    // Disable previous button on first question
-    if (currentQuestionIndex === 0) {
-        prevBtn.style.opacity = '0.5';
-        prevBtn.style.cursor = 'not-allowed';
-        prevBtn.disabled = true;
-    } else {
-        prevBtn.style.opacity = '1';
-        prevBtn.style.cursor = 'pointer';
-        prevBtn.disabled = false;
-    }
+    // Enable previous button even on first question to go back to start screen
+    prevBtn.style.opacity = '1';
+    prevBtn.style.cursor = 'pointer';
+    prevBtn.disabled = false;
     
     // Disable next button on last question
     if (currentQuestionIndex === totalQuestions - 1) {
@@ -256,6 +263,9 @@ function showQuestion(index) {
     // Show/hide submit button based on question position
     updateSubmitButtonVisibility();
     
+    // Update progress bar
+    updateProgressBar();
+    
     // Scroll to top
     window.scrollTo(0, 0);
 }
@@ -270,6 +280,13 @@ function updateSubmitButtonVisibility() {
     }
 }
 
+function updateProgressBar() {
+    const progressBar = document.getElementById('progress-bar');
+    // Calculate progress: (currentQuestion + 1) / totalQuestions * 100
+    const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+    progressBar.style.width = progress + '%';
+}
+
 function nextQuestion() {
     if (currentQuestionIndex < totalQuestions - 1) {
         currentQuestionIndex++;
@@ -281,6 +298,11 @@ function previousQuestion() {
     if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
         showQuestion(currentQuestionIndex);
+    } else if (currentQuestionIndex === 0) {
+        // Go back to quiz start screen
+        document.getElementById('quiz-questions-wrapper').style.display = 'none';
+        document.getElementById('quiz-start-screen').style.display = 'block';
+        document.getElementById('action-buttons').style.display = 'none';
     }
 }
 
