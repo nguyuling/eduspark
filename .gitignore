@@ -1,26 +1,55 @@
-*.log
-.DS_Store
+# Environment Variables
 .env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
+.env.*
+!.env.example
+
+# IDE and Editor Files
+/.vscode
 /.idea
 /.nova
-/.phpunit.cache
-/.vscode
+/.fleet
 /.zed
-/auth.json
+.phpactor.json
+
+# OS Files
+.DS_Store
+Thumbs.db
+.git.zip
+
+# Editor Temporary Files
+*.swp
+*.swo
+*~
+
+# Dependencies
+/vendor
 /node_modules
+package-lock.json
+yarn.lock
+
+# Composer Auto-Generated Files
+/vendor/composer/
+
+# Laravel Framework Specific
+/auth.json
+.phpunit.result.cache
+/.phpunit.cache
+bootstrap/cache/*.php
+/storage/*.key
+/storage/pail
+/storage/logs/*
+/storage/framework/*
+
+# Database
+/database/*.sqlite
+
+# Build Artifacts
 /public/build
 /public/hot
 /public/storage
-/storage/*.key
-/storage/pail
-/vendor
-bootstrap/cache/*.php
+/public/js/*.min.js
+/public/css/*.min.css
+
+# Deployment
 Homestead.json
 Homestead.yaml
-Thumbs.db
-.git.zip
