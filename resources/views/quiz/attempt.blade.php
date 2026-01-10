@@ -37,7 +37,7 @@
           </section>
           <div style="text-align:center; margin-top:30px; margin-bottom:20px;">
             <button type="button" onclick="startQuiz()" class="btn-start-quiz" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:16px 40px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:14px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
-              <i class="bi bi-play-fill"></i>Mulai Kuiz
+              <i class="bi bi-arrow-right"></i>Mulai Kuiz
             </button>
           </div>
         </div>
@@ -56,12 +56,12 @@
         </section>
       @else
         <!-- Question Navigation Counter -->
-        <div style="text-align:center; margin-bottom:20px; font-size:14px; color:var(--muted); font-weight:600;">
+        <div style="text-align:center; margin-bottom:20px; font-size:14px; font-weight:600;">
           Question <span id="current-question-num">1</span> of {{ $quiz->questions->count() }}
         </div>
 
         <!-- Questions Container with Side Arrows -->
-        <div style="display:flex; align-items:center; gap:20px; margin-bottom:20px; justify-content:center;">
+        <div style="display:flex; align-items:center; gap:20px; margin-bottom:20px; justify-content:center; margin-top:40px;">
           <!-- Previous Arrow Button -->
           <button type="button" onclick="previousQuestion()" id="prev-arrow-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; width:50px !important; height:50px !important; background:transparent !important; color:#6a4df7 !important; border:none !important; border-radius:8px !important; font-weight:600 !important; font-size:28px !important; cursor:pointer !important; transition:all 0.2s ease !important; flex-shrink:0; box-shadow:0 4px 12px rgba(106,77,247,0.3) !important;" onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)'">
             <i class="bi bi-chevron-left"></i>
@@ -73,7 +73,7 @@
               <section class="panel question-section" style="margin-bottom:0; display:{{ $key === 0 ? 'block' : 'none' }};" data-question-index="{{ $key }}">
             <div class="question-card" data-question-id="{{ $question->id }}">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <span style="font-weight:600;">Question {{ $key + 1 }}</span>
+                <span style="font-weight:600; color:#6a4df7;">Question {{ $key + 1 }}</span>
                 <span style="background:rgba(106,77,247,0.1); padding:4px 8px; border-radius:4px; font-size:12px; font-weight:600;">{{ $question->points }} Points</span>
               </div>
               <div style="font-weight:700; margin-bottom:12px; font-size:18px;">{{ $question->question_text }}</div>
@@ -182,7 +182,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div id="action-buttons" style="display:none; gap:12px; justify-content:center; align-items:center; margin-top:40px; margin-bottom:20px; padding:0;">
+    <div id="action-buttons" style="display:none; gap:12px; justify-content:center; align-items:center; margin-bottom:20px; padding:0;">
         <!-- Submit Button -->
         <button type="button" onclick="submitQuizData()" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
             <i class="bi bi-check-lg"></i>Hantar Kuiz
@@ -190,10 +190,12 @@
     </div>
 
     <!-- Progress Bar -->
-    <div style="display:flex; justify-content:center; margin-top:60px; margin-bottom:20px;">
+    <div style="display:flex; justify-content:center; margin-top:60px; margin-bottom:40px;">
       <div style="max-width:700px; width:100%; padding:0 20px;">
-        <div style="background:#f0f0f0; height:8px; border-radius:10px; overflow:hidden; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-          <div id="progress-bar" style="background:linear-gradient(90deg, #A855F7, #9333EA); height:100%; border-radius:10px; width:0%; transition:width 0.3s ease;"></div>
+        <div style="background:#f0f0f0; height:25px; border-radius:10px; overflow:hidden; box-shadow:0 2px 4px rgba(0,0,0,0.1); position:relative;">
+          <div id="progress-bar" style="background:linear-gradient(90deg, #A855F7, #9333EA); height:100%; border-radius:10px; width:0%; transition:width 0.3s ease; display:flex; align-items:center; justify-content:center;">
+            <span id="progress-percentage" style="color:#fff; font-size:14px; font-weight:600; text-shadow:0 1px 2px rgba(0,0,0,0.2);">0%</span>
+          </div>
         </div>
       </div>
     </div>
@@ -282,9 +284,11 @@ function updateSubmitButtonVisibility() {
 
 function updateProgressBar() {
     const progressBar = document.getElementById('progress-bar');
+    const progressPercentage = document.getElementById('progress-percentage');
     // Calculate progress: (currentQuestion + 1) / totalQuestions * 100
     const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
     progressBar.style.width = progress + '%';
+    progressPercentage.textContent = Math.round(progress) + '%';
 }
 
 function nextQuestion() {
