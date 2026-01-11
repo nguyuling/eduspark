@@ -9,13 +9,13 @@
     <main class="main">
         <div class="header">
             <div>
-            <div class="title">Laporan</div>
-            <div class="sub">Prestasi pelajar dan kelas</div>
+                <div class="title">Laporan</div>
+                <div class="sub">Prestasi pelajar dan kelas</div>
             </div>
         </div>
 
         {{-- ===================== STATISTICS ===================== --}}
-        <section class="panel" style="margin-bottom:20px; padding-bottom:20px;">
+        <section class="panel" style="margin-bottom:20px;">
             <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Statistik</h2>
             <div style="display:grid; grid-template-columns:1fr 1fr auto auto; gap:12px; align-items:flex-end; margin-bottom:25px;">
                 <div>
