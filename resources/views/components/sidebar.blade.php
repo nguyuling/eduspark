@@ -120,7 +120,7 @@ body.dark .search-results {
 .search-results a {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 10px 12px !important;
   border-bottom: 1px solid rgba(106, 77, 247, 0.1);
   color: var(--muted) !important;
@@ -132,6 +132,7 @@ body.dark .search-results {
   border-radius: 0 !important;
   background: transparent !important;
   transition: all .2s ease;
+  min-width: 0;
 }
 
 .search-results a:last-child {
@@ -372,9 +373,14 @@ body.dark #themeToggle::before {
         'permain': ['permainan'],
         'game': ['permainan'],
         'profil': ['profil'],
-        'profil saya': ['profil'],
+        'password': ['profil'],
         'akun': ['profil'],
-        'pengaturan': ['profil']
+        'nama': ['profil'],
+        'kata alu-aluan': ['profil'],
+        'coding': ['kuiz'],
+        'koding': ['kuiz'],
+        'results': ['kuiz', 'laporan', 'prestasi', 'permainan'],
+        'keputusan': ['kuiz', 'laporan', 'prestasi', 'permainan'],
     };
     
     if (searchInput) {
@@ -407,11 +413,14 @@ body.dark #themeToggle::before {
         
         if (filtered.length > 0) {
           searchResults.classList.add('active');
-          searchResults.innerHTML = filtered.map(link => `
-            <a href="${link.href}" class="${link.classList.contains('active') ? 'active' : ''}">
-              ${link.innerHTML}
-            </a>
-          `).join('');
+          searchResults.innerHTML = filtered.map(link => {
+            const moduleName = link.querySelector('span') ? link.querySelector('span').textContent : link.textContent;
+            return `
+              <a href="${link.href}" class="${link.classList.contains('active') ? 'active' : ''}">
+                ${moduleName}
+              </a>
+            `;
+          }).join('');
         } else {
           searchResults.classList.remove('active');
         }
