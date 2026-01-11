@@ -7,11 +7,14 @@
     <main class="main">
         <div class="header">
             <div>
-            <div class="title">Kuiz</div>
-            <div class="sub">Cipta dan uruskan kuiz anda</div>
+                <div class="title">Kuiz</div>
+                <div class="sub">Cipta dan uruskan kuiz anda</div>
             </div>
-            <a href="{{ route('teacher.quizzes.create') }}" style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer; margin-top:15px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
-            <i class="bi bi-plus-lg"></i>
+            <a href="{{ route('teacher.quizzes.create') }}"
+                style="display:inline-block; padding:12px 24px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; text-decoration:none; border-radius:8px; font-weight:700; font-size:14px; transition:transform .2s ease, box-shadow .2s ease; box-shadow: 0 4px 12px rgba(106,77,247,0.3); border:none; cursor:pointer; margin-top:15px;"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(106,77,247,0.4)';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(106,77,247,0.3)';">
+                <i class="bi bi-plus-lg"></i>
                 Cipta Kuiz
             </a>
         </div>
