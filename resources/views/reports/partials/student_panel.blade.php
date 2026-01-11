@@ -12,13 +12,13 @@
 
     <div style="display:grid;grid-template-columns:1fr 4fr;gap:20px; width:100%;">
     <!-- Row 1, Col 1: Purata Skor -->
-    <div class="card" style="padding:24px;border-radius:14px;border:none;box-shadow:0 4px 12px rgba(0,0,0,0.08);background:linear-gradient(135deg,rgba(102,126,234,0.1) 0%,rgba(118,75,162,0.08) 100%);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:140px;">
+    <div class="card" style="padding:24px;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 2px 12px rgba(2,6,23,0.12);background:linear-gradient(135deg,rgba(102,126,234,0.1) 0%,rgba(118,75,162,0.08) 100%);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:140px;transition:transform 0.12s ease,box-shadow 0.12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='#e5e7eb';">
         <div style="font-size:18px;font-weight:800;color:#111827;">Purata Skor</div>
         <div class="value" style="font-size:28px;font-weight:800;color:var(--accent);line-height:1.2;">{{ str_replace('%', '', $stats['average_score'] ?? 'N/A') }}</div>
     </div>
 
     <!-- Row 1, Col 2: Topik Terkuat -->
-    <div class="card" style="padding:24px;border-radius:14px;border:none;box-shadow:0 4px 12px rgba(0,0,0,0.08);background:linear-gradient(135deg,rgba(0,150,136,0.1) 0%,rgba(76,175,80,0.08) 100%);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:140px;">
+    <div class="card" style="padding:24px;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 2px 12px rgba(2,6,23,0.12);background:linear-gradient(135deg,rgba(0,150,136,0.1) 0%,rgba(76,175,80,0.08) 100%);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:140px;transition:transform 0.12s ease,box-shadow 0.12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='#e5e7eb';">
         <div style="font-size:18px;font-weight:800;color:#111827;">Topik Terkuat</div>
         <div class="value" style="font-size:28px;font-weight:800;color:#009688;line-height:1.2;">
             {{ $stats['highest_subject'] ?? 'N/A' }}
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Row 2, Col 1: Gred -->
-    <div class="card" style="padding:24px;border-radius:14px;border:none;box-shadow:0 4px 12px rgba(0,0,0,0.08);background:linear-gradient(135deg,rgba(76,175,80,0.1) 0%,rgba(102,204,102,0.08) 100%);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:140px;">
+    <div class="card" style="padding:24px;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 2px 12px rgba(2,6,23,0.12);background:linear-gradient(135deg,rgba(76,175,80,0.1) 0%,rgba(102,204,102,0.08) 100%);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:140px;transition:transform 0.12s ease,box-shadow 0.12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='#e5e7eb';">
         <div style="font-size:18px;font-weight:800;color:#111827;">Gred</div>
         <div class="value" style="font-size:28px;font-weight:800;line-height:1.2;">
             @php
@@ -53,7 +53,7 @@
     </div>
 
     <!-- Row 2, Col 2: Topik Lemah -->
-    <div class="card" style="padding:24px;border-radius:14px;border:none;box-shadow:0 4px 12px rgba(0,0,0,0.08);background:linear-gradient(135deg,rgba(244,67,54,0.1) 0%,rgba(229,57,53,0.08) 100%);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:140px;">
+    <div class="card" style="padding:24px;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 2px 12px rgba(2,6,23,0.12);background:linear-gradient(135deg,rgba(244,67,54,0.1) 0%,rgba(229,57,53,0.08) 100%);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:140px;transition:transform 0.12s ease,box-shadow 0.12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='#e5e7eb';">
         <div style="font-size:18px;font-weight:800;color:#111827;">Topik Lemah</div>
         <div class="value" style="font-size:28px;font-weight:800;color:#f44336;line-height:1.2;">
             {{ $stats['weakest_subject'] ?? 'N/A' }}
