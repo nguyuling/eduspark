@@ -289,7 +289,110 @@ body.dark #themeToggle::before {
   display: flex !important;
 }
 
-@media (max-width:920px){ .sidebar{ display:none; } }
+.sidebar-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+  margin-top: auto;
+}
+
+#helpToggle {
+  position: relative;
+  z-index: 101 !important;
+  visibility: visible !important;
+  display: flex !important;
+  opacity: 1 !important;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 30px;
+  flex-shrink: 0;
+  padding: 0;
+  transition: all .3s ease;
+}
+
+#helpToggle:hover {
+  transform: scale(1.15);
+}
+
+.help-modal {
+  position: fixed;
+  bottom: 0;
+  left: 28px;
+  width: 240px;
+  max-height: 0;
+  background: var(--card-bg);
+  border: 2px solid rgba(106, 77, 247, 0.3);
+  border-bottom: none;
+  border-radius: 14px 14px 0 0;
+  z-index: 99;
+  overflow: hidden;
+  transition: max-height .4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+}
+
+body.light .help-modal {
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+  border-color: rgba(106, 77, 247, 0.2);
+}
+
+body.dark .help-modal {
+  background: linear-gradient(180deg, rgba(20, 30, 48, 0.95), rgba(15, 23, 36, 0.9));
+  border-color: rgba(106, 77, 247, 0.4);
+}
+
+.help-modal.active {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.help-content {
+  padding: 16px;
+}
+
+.help-title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 12px;
+  color: var(--accent);
+}
+
+.faq-item {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(106, 77, 247, 0.1);
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.faq-question {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.faq-question:hover {
+  color: var(--accent);
+}
+
+.faq-answer {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
+@media (max-width:920px){ .sidebar{ display:none; } .help-modal { display:none; } }
 </style>
 
 <aside class="sidebar">
@@ -340,8 +443,50 @@ body.dark #themeToggle::before {
 
     @endif
   </nav>
-  <button id="themeToggle"><div class="toggle-slider"></div></button>
+
+  <div class="sidebar-bottom">
+    <i id="helpToggle" class="bi bi-info-circle-fill" title="Help & FAQ" style="cursor: pointer;"></i>
+    <button id="themeToggle"><div class="toggle-slider"></div></button>
+  </div>
 </aside>
+
+<!-- Help Modal -->
+<div class="help-modal" id="helpModal">
+  <div class="help-content">
+    <div class="help-title">Bantuan & FAQ</div>
+    
+    <div class="faq-item">
+      <div class="faq-question">📚 Apa itu Bahan?</div>
+      <div class="faq-answer">Bahan adalah koleksi materi pembelajaran yang disediakan untuk mendukung proses belajar mengajar.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">❓ Bagaimana cara mengerjakan Kuiz?</div>
+      <div class="faq-answer">Klik menu Kuiz, pilih topik, dan jawab semua soalan. Hasil akan ditampilkan setelah selesai.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">💬 Bagaimana menggunakan Forum?</div>
+      <div class="faq-answer">Forum memungkinkan Anda berdiskusi dengan pengguna lain. Klik Forum untuk membuat atau menanggapi pertanyaan.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">🎮 Apa manfaat Permainan?</div>
+      <div class="faq-answer">Permainan membantu pembelajaran menjadi lebih menyenangkan sambil menguji pengetahuan Anda.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">📊 Bagaimana melihat Prestasi?</div>
+      <div class="faq-answer">Prestasi menampilkan ringkasan hasil belajar Anda termasuk skor kuiz dan permainan.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">👤 Bagaimana mengubah Profil?</div>
+      <div class="faq-answer">Klik menu Profil untuk melihat dan mengubah informasi akun Anda.</div>
+    </div>
+  </div>
+</div>
+
 <script>
   (function(){
     // Search functionality with keyword aliases
@@ -493,6 +638,22 @@ body.dark #themeToggle::before {
       themeToggle.addEventListener('click', () => {
         const isDark = document.body.classList.toggle('dark');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      });
+    }
+
+    // Help modal toggle
+    const helpToggle = document.querySelector('#helpToggle');
+    const helpModal = document.querySelector('#helpModal');
+    
+    if (helpToggle && helpModal) {
+      helpToggle.addEventListener('click', () => {
+        helpModal.classList.toggle('active');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#helpToggle') && !e.target.closest('#helpModal')) {
+          helpModal.classList.remove('active');
+        }
       });
     }
   })();
