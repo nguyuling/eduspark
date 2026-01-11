@@ -6,171 +6,167 @@
 @section('content')
 
 <div class="app">
-  <main class="main">
-    <div class="header">
-      <div>
-        <div class="title">Laporan</div>
-        <div class="sub">Prestasi pelajar dan kelas</div>
-      </div>
-    </div>
-
-{{-- ===================== STATISTICS ===================== --}}
-<div class="panel" style="padding:18px;border-radius:12px;margin-bottom:20px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h3 style="margin:0;font-weight:700;">Statistik Kelas</h3>
-        <div style="display:flex;gap:8px;">
-            <button id="export-stats-btn" class="btn" style="padding:6px 12px;border-radius:8px;background:var(--success);color:#fff;border:0;font-weight:600;font-size:13px;cursor:pointer;">
-                Export
-            </button>
+    <main class="main">
+        <div class="header">
+            <div>
+            <div class="title">Laporan</div>
+            <div class="sub">Prestasi pelajar dan kelas</div>
+            </div>
         </div>
-    </div>
 
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
-        <label style="font-weight:700;color:var(--muted);font-size:13px;">Filter Kelas:</label>
-        <select id="stats-class-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:160px;border:2px solid #ddd;background:#f9f9f9;" required>
-            <option value="">-- Sila Pilih --</option>
-            <option value="semua">Semua Kelas</option>
-            @foreach($classes as $c)
-                <option value="{{ $c }}">{{ $c }}</option>
-            @endforeach
-        </select>
+        {{-- ===================== STATISTICS ===================== --}}
+        <section class="panel" style="margin-bottom:20px; padding-bottom:20px;">
+            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Statistik</h2>
+            <div style="display:grid; grid-template-columns:1fr 1fr auto auto; gap:12px; align-items:flex-end; margin-bottom:25px;">
+                <div>
+                    <label style="font-size:12px;">Kelas</label>
+                    <select id="stats-class-select" class="select" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" required>
+                        <option value="">-- Sila Pilih --</option>
+                        <option value="semua">Semua Kelas</option>
+                        @foreach($classes as $c)
+                            <option value="{{ $c }}">{{ $c }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-        <label style="font-weight:700;color:var(--muted);font-size:13px;margin-left:16px;">Jangka Masa:</label>
-        <select id="stats-date-range" class="select" style="padding:8px 12px;border-radius:8px;min-width:140px;border:2px solid #ddd;background:#f9f9f9;" required>
-            <option value="">-- Sila Pilih --</option>
-            <option value="week">Minggu Ini</option>
-            <option value="month">Bulan Ini</option>
-            <option value="all">Semua Masa</option>
-        </select>
+                <div>
+                    <label style="font-size:12px;">Jangka Masa</label>
+                    <select id="stats-date-range" class="select" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" required>
+                        <option value="">-- Sila Pilih --</option>
+                        <option value="week">Minggu Ini</option>
+                        <option value="month">Bulan Ini</option>
+                        <option value="all">Semua Masa</option>
+                    </select>
+                </div>
 
-        <button id="refresh-stats-btn" class="btn" style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-left:auto;">
-            Muat Semula
-        </button>
-    </div>
+                <button id="export-stats-btn" class="btn" style="padding:12px 24px; border-radius:8px; background:var(--success); color:#fff; border:none; font-weight:700; font-size:14px; cursor:pointer; height:40px;">
+                    Export
+                </button>
+                <button id="refresh-stats-btn" class="btn" style="padding:12px 24px; border-radius:8px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:none; font-weight:700; font-size:14px; cursor:pointer; height:40px;">
+                    Muat Semula
+                </button>
+            </div>
 
-    {{-- Statistics Cards --}}
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px;">
-        <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:8px;padding:16px;color:#fff;">
-            <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Purata Skor</div>
-            <div id="stat-avg-score" style="font-size:28px;font-weight:700;">0</div>
-        </div>
-        <div style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);border-radius:8px;padding:16px;color:#fff;">
-            <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Gred Purata</div>
-            <div id="stat-avg-grade" style="font-size:28px;font-weight:700;">N/A</div>
-        </div>
-        <div style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);border-radius:8px;padding:16px;color:#fff;">
-            <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Jumlah Percubaan</div>
-            <div id="stat-total-attempts" style="font-size:28px;font-weight:700;">0</div>
-        </div>
-        <div style="background:linear-gradient(135deg,#fa709a 0%,#fee140 100%);border-radius:8px;padding:16px;color:#fff;">
-            <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Pelajar Aktif</div>
-            <div id="stat-active-students" style="font-size:28px;font-weight:700;">0</div>
-        </div>
-    </div>
+            {{-- Statistics Cards --}}
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:20px;">
+                <div style="background:linear-gradient(135deg,#f5f0ffff 0%,#ffffffff 100%);border-radius:16px;padding:24px;border:1px solid #e5e7eb;box-shadow:0 2px 12px rgba(2,6,23,0.12);transition:transform 0.12s ease,box-shadow 0.12s ease;text-align:center;cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='#e5e7eb';">
+                    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Purata Skor</div>
+                    <div id="stat-avg-score" style="font-size:28px;font-weight:700;color:#7c3aed;">0</div>
+                </div>
+                <div style="background:linear-gradient(135deg,#f5f0ffff 0%,#ffffffff 100%);border-radius:16px;padding:24px;border:1px solid #e5e7eb;box-shadow:0 2px 12px rgba(2,6,23,0.12);transition:transform 0.12s ease,box-shadow 0.12s ease;text-align:center;cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='#e5e7eb';">
+                    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Gred Purata</div>
+                    <div id="stat-avg-grade" style="font-size:28px;font-weight:700;color:#7c3aed;">N/A</div>
+                </div>
+                <div style="background:linear-gradient(135deg,#f5f0ffff 0%,#ffffffff 100%);border-radius:16px;padding:24px;border:1px solid #e5e7eb;box-shadow:0 2px 12px rgba(2,6,23,0.12);transition:transform 0.12s ease,box-shadow 0.12s ease;text-align:center;cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='#e5e7eb';">
+                    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Jumlah Percubaan</div>
+                    <div id="stat-total-attempts" style="font-size:28px;font-weight:700;color:#7c3aed;">0</div>
+                </div>
+                <div style="background:linear-gradient(135deg,#f5f0ffff 0%,#ffffffff 100%);border-radius:16px;padding:24px;border:1px solid #e5e7eb;box-shadow:0 2px 12px rgba(2,6,23,0.12);transition:transform 0.12s ease,box-shadow 0.12s ease;text-align:center;cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='#e5e7eb';">
+                    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Pelajar Aktif</div>
+                    <div id="stat-active-students" style="font-size:28px;font-weight:700;color:#7c3aed;">0</div>
+                </div>
+            </div>
 
-    {{-- Debug info --}}
-    <div id="debug-info" style="background:#f0f0f0;padding:12px;border-radius:8px;margin-bottom:16px;font-size:12px;color:#666;display:none;">
-        Status: <span id="debug-status">Menunggu...</span>
-    </div>
+            {{-- Debug info --}}
+            <div id="debug-info" style="background:#f0f0f0;padding:12px;border-radius:8px;margin-bottom:16px;font-size:12px;color:#666;display:none;">
+                Status: <span id="debug-status">Menunggu...</span>
+            </div>
 
-    {{-- Charts Container --}}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-        <div style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;">
-            <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Prestasi Mengikut Topik</div>
-            <canvas id="topicChart" style="max-height:250px;"></canvas>
-        </div>
-        <div style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;">
-            <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Trend Prestasi</div>
-            <canvas id="trendChart" style="max-height:250px;"></canvas>
-        </div>
-    </div>
+            {{-- Charts Container --}}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                <div style="border:1px dotted rgba(0,0,0,0.2);border-radius:16px;padding:16px;transition:transform 0.12s ease,box-shadow 0.12s ease,border-color 0.12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none';this.style.borderColor='rgba(0,0,0,0.2)';">
+                    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Prestasi Mengikut Topik</div>
+                    <div id="topicChartPlaceholder" style="display:flex;align-items:center;justify-content:center;height:250px;color:#999;font-size:14px;">Sila pilih kelas untuk melihat grafik</div>
+                    <canvas id="topicChart" style="max-height:250px;display:none;"></canvas>
+                </div>
+                <div style="border:1px dotted rgba(0,0,0,0.2);border-radius:16px;padding:16px;transition:transform 0.12s ease,box-shadow 0.12s ease,border-color 0.12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none';this.style.borderColor='rgba(0,0,0,0.2)';">
+                    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Trend Prestasi</div>
+                    <div id="trendChartPlaceholder" style="display:flex;align-items:center;justify-content:center;height:250px;color:#999;font-size:14px;">Sila pilih kelas untuk melihat grafik</div>
+                    <canvas id="trendChart" style="max-height:250px;display:none;"></canvas>
+                </div>
+            </div>
 
-    {{-- Performance Table --}}
-    <div id="stats-table-container" style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;display:none;">
-        <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Perbandingan Prestasi Kelas</div>
-        <div style="overflow:auto;">
-            <table id="stats-table" style="width:100%;border-collapse:collapse;font-size:13px;">
-                <thead style="text-align:left;color:var(--muted);background:rgba(0,0,0,0.02);">
-                    <tr>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kelas</th>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Purata Skor</th>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Tertinggi</th>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Terendah</th>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kuiz Tertinggi</th>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kuiz Terendah</th>
-                    </tr>
-                </thead>
-                <tbody id="stats-tbody">
-                    <tr>
-                        <td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Memuatkan data...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+            {{-- Performance Table --}}
+            <div id="stats-table-container" style="border:1px solid rgba(0,0,0,0.1);border-radius:16px;padding:16px;display:none;transition:transform 0.12s ease,box-shadow 0.12s ease,border-color 0.12s ease;box-shadow:0 2px 12px rgba(2,6,23,0.12);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='rgba(0,0,0,0.1)';">
+                <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Perbandingan Prestasi Kelas</div>
+                <div style="overflow:auto;">
+                    <table id="stats-table" style="width:100%;border-collapse:collapse;font-size:13px;">
+                        <thead style="text-align:left;color:var(--muted);background:rgba(0,0,0,0.02);">
+                            <tr>
+                                <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kelas</th>
+                                <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Purata Skor</th>
+                                <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Tertinggi</th>
+                                <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Terendah</th>
+                                <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kuiz Tertinggi</th>
+                                <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kuiz Terendah</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stats-tbody">
+                            <tr>
+                                <td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Memuatkan data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        {{-- ===================== STUDENT REPORT ===================== --}}
+        <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Laporan Pelajar</h2>
+            <div style="display:flex;gap:0;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:200px;">
+                    <label style="font-size:12px;">Kelas</label>
+                    <select id="class-select" class="select" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" required>
+                        <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
+                        @foreach($classes as $c)
+                            <option value="{{ $c }}">{{ $c }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div style="flex:2;min-width:300px;margin-left:16px;">
+                    <label style="font-size:12px;">Pelajar</label>
+                    <select id="student-select" class="select" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" required>
+                        <option value="">{{ $studentPlaceholder ?? '-- pilih pelajar --' }}</option>
+                    </select>
+                </div>
+
+                <button id="open-student" class="btn"
+                    style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:20px;margin-left:16px;cursor:pointer;">
+                    Buka
+                </button>
+            </div>
+
+            <div id="student-panel-wrap" style="display:none;">
+            </div>
+
+
+        </section>
+
+
+        {{-- ===================== CLASS REPORT ===================== --}}
+        <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Laporan Kelas</h2>
+            <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:220px;">
+                    <label style="font-size:12px;">Pilih Kelas</label>
+                    <select id="class-report-select" class="select" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" required>
+                        <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
+                        @foreach($classes as $c)
+                            <option value="{{ $c }}">{{ $c }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <button id="open-class" class="btn"
+                    style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:20px;cursor:pointer;">
+                    Buka
+                </button>
+            </div>
+        </section>
+    </main>
 </div>
-
-{{-- ===================== STUDENT REPORT ===================== --}}
-<div class="panel" style="padding:18px;border-radius:12px;">
-    <h3 style="margin-top:0;font-weight:700;">Laporan Pelajar</h3>
-
-    <div style="display:flex;gap:0;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:200px;">
-            <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Kelas</label>
-            <select id="class-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:160px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
-                <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
-                @foreach($classes as $c)
-                    <option value="{{ $c }}">{{ $c }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div style="flex:2;min-width:300px;margin-left:16px;">
-            <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Pelajar</label>
-            <select id="student-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:280px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
-                <option value="">{{ $studentPlaceholder ?? '-- pilih pelajar --' }}</option>
-            </select>
-        </div>
-
-        <button id="open-student" class="btn"
-            style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:20px;margin-left:16px;cursor:pointer;">
-            Buka
-        </button>
-    </div>
-
-    <div id="student-panel-wrap" style="display:none;">
-    </div>
-
-
-</div>
-
-
-{{-- ===================== CLASS REPORT ===================== --}}
-<div class="panel" style="padding:18px;border-radius:12px;margin-top:16px;">
-    <h3 style="margin-top:0;font-weight:700;">Laporan Kelas</h3>
-
-    <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:220px;">
-            <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Pilih kelas</label>
-            <select id="class-report-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:160px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
-                <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
-                @foreach($classes as $c)
-                    <option value="{{ $c }}">{{ $c }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <button id="open-class" class="btn"
-            style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:20px;cursor:pointer;">
-            Buka
-        </button>
-    </div>
-
-    <div id="class-panel-wrap" style="color:var(--muted);">
-        Pilih kelas untuk melihat ringkasan kelas.
-    </div>
-</div>
-
 @endsection
 
 
@@ -344,6 +340,11 @@ async function loadStatistics() {
         const tbody = document.getElementById('stats-tbody');
         tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Sila pilih kelas dan jangka masa untuk melihat data.</td></tr>';
         document.getElementById('stats-table-container').style.display = 'none';
+        // Show placeholders and hide charts when no selection
+        document.getElementById('topicChartPlaceholder').style.display = 'flex';
+        document.getElementById('topicChart').style.display = 'none';
+        document.getElementById('trendChartPlaceholder').style.display = 'flex';
+        document.getElementById('trendChart').style.display = 'none';
         if (typeof Chart !== 'undefined') {
             if (statsChart) statsChart.destroy();
             if (trendChart) trendChart.destroy();
@@ -398,12 +399,18 @@ async function loadStatistics() {
                 updateTopicChart(data.topicData);
             } else {
                 const ctx = document.getElementById('topicChart').getContext('2d');
+                const placeholder = document.getElementById('topicChartPlaceholder');
+                const canvas = document.getElementById('topicChart');
+                const containerDiv = canvas.parentElement;
                 if (statsChart) statsChart.destroy();
                 statsChart = new Chart(ctx, {
                     type: 'bar',
                     data: { labels: ['Tiada data'], datasets: [{ label: 'N/A', data: [0], backgroundColor: '#ccc' }] },
                     options: { responsive: true, maintainAspectRatio: true, indexAxis: 'y' }
                 });
+                placeholder.style.display = 'none';
+                canvas.style.display = 'block';
+                containerDiv.style.borderStyle = 'solid';
             }
 
             // Update trend chart
@@ -411,12 +418,18 @@ async function loadStatistics() {
                 updateTrendChart(data.trendData);
             } else {
                 const ctx = document.getElementById('trendChart').getContext('2d');
+                const placeholder = document.getElementById('trendChartPlaceholder');
+                const canvas = document.getElementById('trendChart');
+                const containerDiv = canvas.parentElement;
                 if (trendChart) trendChart.destroy();
                 trendChart = new Chart(ctx, {
                     type: 'line',
                     data: { labels: ['Tiada data'], datasets: [{ label: 'N/A', data: [0], borderColor: '#ccc' }] },
                     options: { responsive: true, maintainAspectRatio: true }
                 });
+                placeholder.style.display = 'none';
+                canvas.style.display = 'block';
+                containerDiv.style.borderStyle = 'solid';
             }
         } else {
             console.warn('Chart.js not loaded');
@@ -445,6 +458,9 @@ async function loadStatistics() {
 
 function updateTopicChart(data) {
     const ctx = document.getElementById('topicChart').getContext('2d');
+    const placeholder = document.getElementById('topicChartPlaceholder');
+    const canvas = document.getElementById('topicChart');
+    const containerDiv = canvas.parentElement;
     
     if (statsChart) statsChart.destroy();
     
@@ -472,10 +488,16 @@ function updateTopicChart(data) {
             }
         }
     });
+    
+    placeholder.style.display = 'none';
+    canvas.style.display = 'block';
+    containerDiv.style.borderStyle = 'solid';
 }
 
 function updateTrendChart(data) {
     const ctx = document.getElementById('trendChart').getContext('2d');
+    const placeholder = document.getElementById('trendChartPlaceholder');
+    const canvas = document.getElementById('trendChart');
     const selectedClass = document.getElementById('stats-class-select').value;
     
     if (trendChart) trendChart.destroy();
@@ -556,6 +578,10 @@ function updateTrendChart(data) {
             }
         }
     });
+    
+    placeholder.style.display = 'none';
+    canvas.style.display = 'block';
+    containerDiv.style.borderStyle = 'solid';
 }
 
 function updateStatsTable(classStats) {
