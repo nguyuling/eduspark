@@ -69,6 +69,7 @@ class QuizSeeder extends Seeder
                     'coding_template' => $coding_template,
                     'coding_language' => $coding_language,
                     'coding_expected_output' => $coding_expected_output,
+                    'correct_answer' => ($question_data['type'] === 'short_answer') ? $correct_text : null,
                 ]);
 
                 // Create options
@@ -77,15 +78,6 @@ class QuizSeeder extends Seeder
                         'question_id' => $question->id,
                         'option_text' => $option['text'],
                         'is_correct' => $option['is_correct'] ?? false,
-                    ]);
-                }
-
-                // Handle short_answer correct text
-                if ($correct_text && $question->type === 'short_answer') {
-                    QuizOption::create([
-                        'question_id' => $question->id,
-                        'option_text' => $correct_text,
-                        'is_correct' => true,
                     ]);
                 }
             }
