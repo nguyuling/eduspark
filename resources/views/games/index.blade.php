@@ -56,7 +56,7 @@
 
         <!-- Search and Filter Section -->
         <section class="panel" style="margin-bottom:20px; padding-bottom:20px;">
-            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Penapis Permainan</h2>
+            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Cari Permainan</h2>
             <form method="GET" action="{{ route('games.index') }}" id="filter-form">
                 <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 50px; gap:12px; margin-bottom:15px;">
                     <div>

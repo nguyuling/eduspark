@@ -24,7 +24,8 @@
         </div>
 
         {{-- Search Form --}}
-        <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+        <section class="panel" style="margin-bottom:20px; padding-bottom:20px;">
+            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Cari Forum Post</h2>
             <form method="GET" action="{{ route('forum.index') }}" id="searchForm"
                   style="display:flex; align-items:center; gap:12px;">
                 <input type="text" name="search" id="searchInput"

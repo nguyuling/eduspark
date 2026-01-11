@@ -18,7 +18,7 @@
 
         <!-- Filter Panel -->
         <section class="panel" style="margin-bottom:20px; padding-bottom:20px;">
-        <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Penapis Kuiz</h2>
+        <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Cari Kuiz</h2>
         <form method="GET" action="{{ route('student.quizzes.index') }}" id="filter-form">
             <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:15px;">
             <div>
