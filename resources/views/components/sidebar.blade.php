@@ -36,7 +36,7 @@ body.dark .sidebar{
 .search-box input {
   width: 100%;
   padding: 10px 12px 10px 36px;
-  border-radius: 16px;
+  border-radius: 12px;
   border: none;
   background: rgb(0, 0, 0);
   color: var(--text, #333);
@@ -487,12 +487,17 @@ body.dark .help-modal {
     <div class="help-title"><a href="{{ Route::has('index') ? route('index') : url('/') }}">Bantuan</a></div>
     
     <div class="faq-item">
+      <div class="faq-question"><a href="{{ Route::has('reports.index') ? route('reports.index') : (Route::has('performance') ? route('performance') : url('/performance')) }}">Bagaimana melihat Prestasi?</a></div>
+      <div class="faq-answer">Prestasi menampilkan ringkasan hasil belajar Anda termasuk skor kuiz dan permainan.</div>
+    </div>
+
+    <div class="faq-item">
       <div class="faq-question"><a href="{{ Route::has('lessons.index') ? route('lessons.index') : url('/lessons') }}">Apa itu Bahan?</a></div>
       <div class="faq-answer">Bahan adalah koleksi materi pembelajaran yang disediakan untuk mendukung proses belajar mengajar.</div>
     </div>
 
     <div class="faq-item">
-      <div class="faq-question"><a href="{{ (Route::has('student.quizzes.index') ? route('student.quizzes.index') : (Route::has('teacher.quizzes.index') ? route('teacher.quizzes.index') : url('/quizzes'))) }}">Bagaimana cara mengerjakan Kuiz?</a></div>
+      <div class="faq-question"><a href="{{ Route::has('teacher.quizzes.index') ? route('teacher.quizzes.index') : (Route::has('student.quizzes.index') ? route('student.quizzes.index') : url('/quizzes')) }}">Bagaimana cara mengerjakan Kuiz?</a></div>
       <div class="faq-answer">Klik menu Kuiz, pilih topik, dan jawab semua soalan. Hasil akan ditampilkan setelah selesai.</div>
     </div>
 
@@ -504,11 +509,6 @@ body.dark .help-modal {
     <div class="faq-item">
       <div class="faq-question"><a href="{{ url('/games') }}">Apa manfaat Permainan?</a></div>
       <div class="faq-answer">Permainan membantu pembelajaran menjadi lebih menyenangkan sambil menguji pengetahuan Anda.</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-question"><a href="{{ Route::has('performance') ? route('performance') : url('/performance') }}">Bagaimana melihat Prestasi?</a></div>
-      <div class="faq-answer">Prestasi menampilkan ringkasan hasil belajar Anda termasuk skor kuiz dan permainan.</div>
     </div>
 
     <div class="faq-item">
