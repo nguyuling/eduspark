@@ -128,16 +128,16 @@
             @if($games->count() > 0)
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:20px; margin-top:10px;">
                 <div class="panel" style="display:flex; flex-direction:column; gap:8px;">
-                <div style="font-size:12px; color:var(--muted); font-weight:600;">Jumlah Permainan</div>
-                <div style="font-size:28px; font-weight:700; color:var(--accent);">{{ $games->count() }}</div>
+                    <div style="font-size:12px; color:var(--muted); font-weight:600;">Jumlah Permainan</div>
+                    <div style="font-size:28px; font-weight:700; color:var(--accent);">{{ $games->count() }}</div>
                 </div>
-                <div class="panel" style="display:flex; flex-direction:column; gap:8px;">
-                <div style="font-size:12px; color:var(--muted); font-weight:600;">Diterbitkan</div>
-                <div style="font-size:28px; font-weight:700; color:#22c55e;">{{ $games->where('is_published', true)->count() }}</div>
+                    <div class="panel" style="display:flex; flex-direction:column; gap:8px;">
+                    <div style="font-size:12px; color:var(--muted); font-weight:600;">Diterbitkan</div>
+                    <div style="font-size:28px; font-weight:700; color:#22c55e;">{{ $games->where('is_published', true)->count() }}</div>
                 </div>
-                <div class="panel" style="display:flex; flex-direction:column; gap:8px;">
-                <div style="font-size:12px; color:var(--muted); font-weight:600;">Draf</div>
-                <div style="font-size:28px; font-weight:700; color:#f97316;">{{ $games->where('is_published', false)->count() }}</div>
+                    <div class="panel" style="display:flex; flex-direction:column; gap:8px;">
+                    <div style="font-size:12px; color:var(--muted); font-weight:600;">Draf</div>
+                    <div style="font-size:28px; font-weight:700; color:#f97316;">{{ $games->where('is_published', false)->count() }}</div>
                 </div>
             </div>
             @endif
@@ -226,21 +226,26 @@
         @if($games->count() > 0)
         <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:24px;">
             @foreach($games as $game)
-            <div class="panel game-card" onclick="playGame('{{ route('games.play', $game->id) }}')" style="cursor:pointer; display:flex; flex-direction:column; height:100%; gap:16px;">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <div style="font-size:48px;">
-                    🎮
+            <div class="panel game-card" onclick="playGame('{{ route('games.play', $game->id) }}')" style="cursor:pointer; display:flex; flex-direction:column; height:100%; gap:16px; position:relative;">
+                <div style="position:absolute; top:0; left:0; padding:16px;">
+                    <span class="game-category" style="display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; background:rgba(106,77,247,0.15); color:var(--accent);">
+                        {{ $game->category ?? 'Umum' }}
+                    </span>
                 </div>
-                <span class="game-difficulty" style="display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;
-                    {{ $game->difficulty === 'easy' ? 'background:rgba(74,222,128,0.2); color:#22c55e;' : 
-                        ($game->difficulty === 'medium' ? 'background:rgba(251,146,60,0.2); color:#f97316;' : 
-                        'background:rgba(239,68,68,0.2); color:#ef4444;') }}">
-                    {{ $game->difficulty === 'easy' ? 'Mudah' : ($game->difficulty === 'medium' ? 'Sederhana' : 'Sukar') }}
-                </span>
+                <div style="position:absolute; top:0; right:0; padding:16px;">
+                    <span class="game-difficulty" style="display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;
+                        {{ $game->difficulty === 'easy' ? 'background:rgba(74,222,128,0.2); color:#22c55e;' : 
+                            ($game->difficulty === 'medium' ? 'background:rgba(251,146,60,0.2); color:#f97316;' : 
+                            'background:rgba(239,68,68,0.2); color:#ef4444;') }}">
+                        {{ $game->difficulty === 'easy' ? 'Mudah' : ($game->difficulty === 'medium' ? 'Sederhana' : 'Sukar') }}
+                    </span>
                 </div>
-                <div style="flex:1;">
-                <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:inherit;">{{ $game->title }}</div>
-                <div style="font-size:13px; color:var(--muted); line-height:1.5;">{{ $game->description ?? 'Permainan edukatif yang menyenangkan' }}</div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:16px; flex:1; padding-top:20px;">
+                    <div style="font-size:48px;" class="game-emoji" data-game-name="{{ $game->title }}"></div>
+                    <div style="text-align:center;">
+                        <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:inherit;">{{ $game->title }}</div>
+                        <div style="font-size:13px; color:var(--muted); line-height:1.5;">{{ $game->description ?? 'Permainan edukatif yang menyenangkan' }}</div>
+                    </div>
                 </div>
             </div>
             @endforeach
@@ -346,6 +351,13 @@
           if (banner) banner.style.display = 'none';
         }, 20000);
       }
+    });
+
+    // Initialize game emojis
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.game-emoji').forEach(el => {
+        el.textContent = getGameEmoji(el.dataset.gameName);
+      });
     });
 </script>
 
