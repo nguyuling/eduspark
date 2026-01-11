@@ -11,6 +11,7 @@ use App\Http\Controllers\AIChatController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\DirectMessageController;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\GameTeacherController;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
