@@ -21,10 +21,6 @@ body.dark .sidebar{
 }
 .logo { width:180px; height:auto; margin:0 auto -20px; }
 
-.span {
-    font-weight: 700;
-}
-
 .search-box {
   width: 100%;
   margin: 20px 0 0 0;
@@ -175,8 +171,11 @@ body.dark .search-results {
   overflow: hidden;
   box-sizing: border-box;
 }
+.nav a span {
+  font-weight: 650 !important;
+}
 .nav a:hover { color:var(--accent) !important; background:rgba(106,77,247,0.15) !important; }
-.nav a.active { color:var(--accent); }
+.nav a.active { color:var(--accent); font-weight: 700 !important; }
 .nav a i {
   font-size: 16px;
   flex-shrink: 0;
@@ -417,6 +416,10 @@ body.dark .help-modal {
   color: var(--muted);
   line-height: 1.4;
   opacity: 0.85;
+}
+
+.span {
+    font-weight: 700;
 }
 
 @media (max-width:920px){ .sidebar{ display:none; } .help-modal { display:none; } }
