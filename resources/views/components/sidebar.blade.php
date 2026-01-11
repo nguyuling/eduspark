@@ -36,7 +36,7 @@ body.dark .sidebar{
 .search-box input {
   width: 100%;
   padding: 10px 12px 10px 36px;
-  border-radius: 12px;
+  border-radius: 16px;
   border: none;
   background: rgb(0, 0, 0);
   color: var(--text, #333);
@@ -88,23 +88,23 @@ body.dark .search-box input:focus {
 }
 
 .search-results {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin-top: 4px;
-  background: var(--card-bg, rgba(255, 255, 255, 0.95));
-  border: 1px solid rgba(106, 77, 247, 0.2);
-  border-radius: 12px;
-  max-height: 300px;
-  overflow-y: auto;
-  z-index: 1000;
-  display: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    background: var(--card-bg, rgb(255, 255, 255));
+    border: 1px solid rgba(106, 77, 247, 0.2);
+    border-radius: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 body.light .search-results {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgb(255, 255, 255);
   border-color: rgba(0, 0, 0, 0.1);
 }
 
@@ -230,33 +230,38 @@ body.dark .search-results {
 }
 
 #themeToggle::before {
-  content: '☀';
+  content: '';
   font-size: 18px;
   z-index: 1;
   transition: opacity .3s ease;
-  color: #FDB813;
-  text-shadow: 0 0 2px #000, 0 0 4px rgba(0,0,0,0.5);
-  filter: drop-shadow(0 0 1px #000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#themeToggle::before::before {
+  content: '';
 }
 
 #themeToggle::after {
-  content: '☽';
+  content: '';
   font-size: 18px;
   z-index: 1;
   transition: opacity .3s ease;
-  color: #f5f5f5;
-  text-shadow: 0 0 2px #000, 0 0 4px rgba(0,0,0,0.5);
-  filter: drop-shadow(0 0 1px #000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Sliding indicator circle */
 #themeToggle .toggle-slider {
   position: absolute;
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
-  border-radius: 50%;
-  left: 4px;
+  width: 34px;
+  height: 30px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.20), rgba(255,255,255,0.10));
+  border-radius: 60%;
+  left: 0;
+  right: 4px;
   transition: left .4s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   z-index: 0;
@@ -299,22 +304,22 @@ body.dark #themeToggle::before {
 }
 
 #helpToggle {
-  position: relative;
-  z-index: 101 !important;
-  visibility: visible !important;
-  display: flex !important;
-  opacity: 1 !important;
-  background: none;
-  border: none;
-  cursor: pointer;
-  background: linear-gradient(135deg, rgba(106, 77, 247, 0.6), rgba(139, 92, 246, 0.6));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: 30px;
-  flex-shrink: 0;
-  padding: 0;
-  transition: all .3s ease;
+    position: relative;
+    z-index: 101 !important;
+    visibility: visible !important;
+    display: flex !important;
+    opacity: 1 !important;
+    cursor: pointer;
+    background: rgba(106, 77, 247, 0.3);
+    border: 1px solid rgba(106, 77, 247, 0.5);
+    border-radius:50%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 30px;
+    flex-shrink: 0;
+    padding: 0;
+    transition: all .3s ease;
 }
 
 #helpToggle:hover {
@@ -323,19 +328,19 @@ body.dark #themeToggle::before {
 }
 
 .help-modal {
-  position: fixed;
-  bottom: 0;
-  left: 28px;
-  width: 240px;
-  max-height: 0;
-  background: var(--card-bg);
-  border: 2px solid rgba(106, 77, 247, 0.3);
-  border-bottom: none;
-  border-radius: 14px 14px 0 0;
-  z-index: 101;
-  overflow: hidden;
-  transition: max-height .4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+    position: fixed;
+    bottom: 0;
+    left: 28px;
+    width: 240px;
+    max-height: 0;
+    background: var(--card-bg, rgb(255, 255, 255));
+    border: 1px solid rgba(106, 77, 247, 0.2);
+    border-bottom: none;
+    border-radius: 4px;
+    z-index: 101;
+    overflow: hidden;
+    transition: max-height .4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
 }
 
 body.light .help-modal {
@@ -467,8 +472,12 @@ body.dark .help-modal {
   </nav>
 
   <div class="sidebar-bottom">
-    <i id="helpToggle" class="bi bi-info-circle-fill" title="Help & FAQ" style="cursor: pointer;"></i>
-    <button id="themeToggle"><div class="toggle-slider"></div></button>
+    <i id="helpToggle" class="bi bi-info-circle-fill" style="color: #5819c6;" title="Help & FAQ" style="cursor: pointer;"></i>
+    <button id="themeToggle">
+      <i class="bi bi-brightness-high-fill" style="color: #FDB813;"></i>
+      <div class="toggle-slider"></div>
+      <i class="bi bi-moon-fill" style="color: #5819c6;"></i>
+    </button>
   </div>
 </aside>
 
