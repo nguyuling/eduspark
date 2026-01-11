@@ -164,6 +164,8 @@
                     Buka
                 </button>
             </div>
+
+            <div id="class-panel-wrap" style="margin-top:20px;"></div>
         </section>
     </main>
 </div>
@@ -309,12 +311,16 @@ openClassBtn.addEventListener('click', async function () {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
 
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+
         const json = await res.json();
         classPanelWrap.innerHTML = json.html || 'Tiada maklumat.';
         setClassDownloadLinks(cls);
     } catch (error) {
-        console.error(error);
-        alert('Tidak dapat memuatkan ringkasan kelas.');
+        console.error('Error loading class summary:', error);
+        alert('Tidak dapat memuatkan ringkasan kelas: ' + error.message);
     }
 });
 
@@ -417,19 +423,21 @@ async function loadStatistics() {
             if (data.trendData && data.trendData.dates && data.trendData.dates.length > 0) {
                 updateTrendChart(data.trendData);
             } else {
-                const ctx = document.getElementById('trendChart').getContext('2d');
-                const placeholder = document.getElementById('trendChartPlaceholder');
                 const canvas = document.getElementById('trendChart');
-                const containerDiv = canvas.parentElement;
-                if (trendChart) trendChart.destroy();
-                trendChart = new Chart(ctx, {
-                    type: 'line',
-                    data: { labels: ['Tiada data'], datasets: [{ label: 'N/A', data: [0], borderColor: '#ccc' }] },
-                    options: { responsive: true, maintainAspectRatio: true }
-                });
-                placeholder.style.display = 'none';
-                canvas.style.display = 'block';
-                containerDiv.style.borderStyle = 'solid';
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    const placeholder = document.getElementById('trendChartPlaceholder');
+                    const containerDiv = canvas.parentElement;
+                    if (trendChart) trendChart.destroy();
+                    trendChart = new Chart(ctx, {
+                        type: 'line',
+                        data: { labels: ['Tiada data'], datasets: [{ label: 'N/A', data: [0], borderColor: '#ccc' }] },
+                        options: { responsive: true, maintainAspectRatio: true }
+                    });
+                    placeholder.style.display = 'none';
+                    canvas.style.display = 'block';
+                    containerDiv.style.borderStyle = 'solid';
+                }
             }
         } else {
             console.warn('Chart.js not loaded');
@@ -457,9 +465,13 @@ async function loadStatistics() {
 }
 
 function updateTopicChart(data) {
-    const ctx = document.getElementById('topicChart').getContext('2d');
-    const placeholder = document.getElementById('topicChartPlaceholder');
     const canvas = document.getElementById('topicChart');
+    if (!canvas) {
+        console.error('topicChart canvas not found');
+        return;
+    }
+    const ctx = canvas.getContext('2d');
+    const placeholder = document.getElementById('topicChartPlaceholder');
     const containerDiv = canvas.parentElement;
     
     if (statsChart) statsChart.destroy();
@@ -491,13 +503,17 @@ function updateTopicChart(data) {
     
     placeholder.style.display = 'none';
     canvas.style.display = 'block';
-    containerDiv.style.borderStyle = 'solid';
+    if (containerDiv) containerDiv.style.borderStyle = 'solid';
 }
 
 function updateTrendChart(data) {
-    const ctx = document.getElementById('trendChart').getContext('2d');
-    const placeholder = document.getElementById('trendChartPlaceholder');
     const canvas = document.getElementById('trendChart');
+    if (!canvas) {
+        console.error('trendChart canvas not found');
+        return;
+    }
+    const ctx = canvas.getContext('2d');
+    const placeholder = document.getElementById('trendChartPlaceholder');
     const selectedClass = document.getElementById('stats-class-select').value;
     
     if (trendChart) trendChart.destroy();
@@ -579,9 +595,10 @@ function updateTrendChart(data) {
         }
     });
     
+    const containerDiv = canvas.parentElement;
     placeholder.style.display = 'none';
     canvas.style.display = 'block';
-    containerDiv.style.borderStyle = 'solid';
+    if (containerDiv) containerDiv.style.borderStyle = 'solid';
 }
 
 function updateStatsTable(classStats) {
