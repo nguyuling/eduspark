@@ -343,10 +343,39 @@ body.dark #themeToggle::before {
 </aside>
 <script>
   (function(){
-    // Search functionality
+    // Search functionality with keyword aliases
     const searchInput = document.querySelector('#searchInput');
     const searchResults = document.querySelector('#searchResults');
     const navLinks = Array.from(document.querySelectorAll('.nav a'));
+    
+    // Keyword mapping for better search results
+    const keywordMap = {
+        'statistik' : ['laporan', 'prestasi'],
+        'skor' : ['laporan', 'prestasi'],
+        'purata' : ['laporan', 'prestasi'],
+        'gred' : ['laporan', 'prestasi'],
+        'topik' : ['laporan', 'prestasi', 'bahan', 'kuiz'],
+        'game' : ['permainan'],
+        'soalan': ['kuiz'],
+        'id': ['kuiz'],
+        'kelas': ['laporan', 'bahan'],
+        'cikgu': ['bahan', 'kuiz', 'permainan'],
+        'guru': ['bahan', 'kuiz', 'permainan'],
+        'pelajar': ['laporan', 'prestasi'],
+        'materi': ['bahan'],
+        'pembelajaran': ['bahan'],
+        'ujian': ['kuiz'],
+        'test': ['kuiz'],
+        'forum': ['forum'],
+        'prestasi': ['prestasi'],
+        'lapor': ['laporan'],
+        'permain': ['permainan'],
+        'game': ['permainan'],
+        'profil': ['profil'],
+        'profil saya': ['profil'],
+        'akun': ['profil'],
+        'pengaturan': ['profil']
+    };
     
     if (searchInput) {
       searchInput.addEventListener('input', (e) => {
@@ -359,7 +388,21 @@ body.dark #themeToggle::before {
         
         const filtered = navLinks.filter(link => {
           const text = link.textContent.toLowerCase();
-          return text.includes(query);
+          
+          // Direct text match (exact or partial)
+          if (text.includes(query)) {
+            return true;
+          }
+          
+          // Check keyword aliases
+          for (const [keyword, modules] of Object.entries(keywordMap)) {
+            if (query.includes(keyword) || keyword.includes(query)) {
+              const linkText = text.toLowerCase();
+              return modules.some(module => linkText.includes(module));
+            }
+          }
+          
+          return false;
         });
         
         if (filtered.length > 0) {
