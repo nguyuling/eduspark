@@ -19,7 +19,7 @@
             <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Cari Statistik</h2>
             <div style="display:grid; grid-template-columns:1fr 1fr auto auto; gap:12px; align-items:flex-end; margin-bottom:25px;">
                 <div>
-                    <label style="font-size:12px;">Filter Kelas</label>
+                    <label style="font-size:12px;">Kelas</label>
                     <select id="stats-class-select" class="select" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" required>
                         <option value="">-- Sila Pilih --</option>
                         <option value="semua">Semua Kelas</option>
@@ -116,8 +116,8 @@
             <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Laporan Pelajar</h2>
             <div style="display:flex;gap:0;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
                 <div style="flex:1;min-width:200px;">
-                    <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Kelas</label>
-                    <select id="class-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:160px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
+                    <label style="font-size:12px;">Kelas</label>
+                    <select id="class-select" class="select" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" required>
                         <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
                         @foreach($classes as $c)
                             <option value="{{ $c }}">{{ $c }}</option>
@@ -126,8 +126,8 @@
                 </div>
 
                 <div style="flex:2;min-width:300px;margin-left:16px;">
-                    <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Pelajar</label>
-                    <select id="student-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:280px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
+                    <label style="font-size:12px;">Pelajar</label>
+                    <select id="student-select" class="select" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" required>
                         <option value="">{{ $studentPlaceholder ?? '-- pilih pelajar --' }}</option>
                     </select>
                 </div>
@@ -150,8 +150,8 @@
             <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Laporan Kelas</h2>
             <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
                 <div style="flex:1;min-width:220px;">
-                    <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Pilih kelas</label>
-                    <select id="class-report-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:160px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
+                    <label style="font-size:12px;">Pilih Kelas</label>
+                    <select id="class-report-select" class="select" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" required>
                         <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
                         @foreach($classes as $c)
                             <option value="{{ $c }}">{{ $c }}</option>
@@ -163,10 +163,6 @@
                     style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:20px;cursor:pointer;">
                     Buka
                 </button>
-            </div>
-
-            <div id="class-panel-wrap" style="color:var(--muted);">
-                Pilih kelas untuk melihat ringkasan kelas.
             </div>
         </section>
     </main>
