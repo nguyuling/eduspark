@@ -43,15 +43,15 @@
           <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:15px;">
             <div>
               <label style="font-size:12px;">ID Unik</label>
-              <input type="text" name="unique_id" value="{{ request('unique_id') ?? '' }}" placeholder="A1b2C3d4" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+              <input type="text" name="unique_id" value="{{ request('unique_id') ?? '' }}" placeholder="A1b2C3d4" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" onkeyup="autoSubmitForm()">
             </div>
             <div>
               <label style="font-size:12px;">Tajuk</label>
-              <input type="text" name="title" value="{{ request('title') ?? '' }}" placeholder="Sains Komputer" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+              <input type="text" name="title" value="{{ request('title') ?? '' }}" placeholder="Sains Komputer" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" onkeyup="autoSubmitForm()">
             </div>
             <div>
               <label style="font-size:12px;">Email Pencipta</label>
-              <input type="email" name="creator_email" value="{{ request('creator_email') ?? '' }}" placeholder="guru@email.com" onchange="autoSubmitForm()" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;">
+              <input type="email" name="creator_email" value="{{ request('creator_email') ?? '' }}" placeholder="guru@email.com" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" onkeyup="autoSubmitForm()">
             </div>
             <div style="display:flex; flex-direction:column;">
               <label style="font-size:12px;">Tarikh Diterbitkan</label>
@@ -206,7 +206,19 @@ function keepFilterPanelOpen() {
 }
 
 function autoSubmitForm() {
-  document.getElementById('filter-form').submit();
+  // Clear any existing timeout
+  if (window.filterTimeout) clearTimeout(window.filterTimeout);
+  // Debounce: submit form after 500ms of no input
+  window.filterTimeout = setTimeout(() => {
+    console.log('Submitting filter form with values:', {
+      unique_id: document.querySelector('input[name="unique_id"]').value,
+      title: document.querySelector('input[name="title"]').value,
+      creator_email: document.querySelector('input[name="creator_email"]').value,
+      publish_date_range: document.querySelector('select[name="publish_date_range"]').value,
+      scope: document.querySelector('input[name="scope"]').checked ? 'mine' : ''
+    });
+    document.getElementById('filter-form').submit();
+  }, 500);
 }
 
 // Keep filter panel open if flag is set

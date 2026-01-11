@@ -38,7 +38,7 @@
         <!-- Class Performance Overview -->
         <section class="panel" style="margin-top: 20px;">
             <div class="panel-header">
-                <h3>Ringkasan Prestasi Kelas</h3>
+                <h3>Ringkasan Prestasi Pelajar</h3>
             </div>
             
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 20px;">

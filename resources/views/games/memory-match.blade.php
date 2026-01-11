@@ -3,20 +3,24 @@
 @section('content')
 <div class="app">
     <main class="main">
-        <div id="gameContainer" style="padding: 20px;">
-            <!-- Game Header -->
-            <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                <div>
-                    <h1 style="margin: 0; font-size: 28px; font-weight: 700;">🎴 Memory Match</h1>
-                    <p style="color: var(--muted); margin-top: 8px;">Padankan kad yang sama untuk menang!</p>
-                </div>
-                <div style="display: flex; gap: 20px; align-items: center;">
-                    <div style="text-align: center;">
-                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Pergerakan</div>
-                        <div id="moveCount" style="font-size: 32px; font-weight: 700; color: var(--accent);">0</div>
-                    </div>
-                </div>
+        <!-- Game Header -->
+        <div id="gameHeader" class="header">
+            <div>
+                <div class="title">Memory Match</div>
+                <div class="sub">Padankan kad yang sama untuk menang!</div>
             </div>
+            <div style="display: flex; gap: 60px; align-items: center;">
+                <div style="text-align: center;">
+                    <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Markah</div>
+                    <div id="moveCount" style="font-size: 32px; font-weight: 700; color: var(--accent);">0</div>
+                </div>
+                <a href="{{ route('games.index') }}" class="btn-kembali">
+                    <i class="bi bi-arrow-left"></i>Kembali
+                </a>
+            </div>
+        </div>
+
+        <div id="gameContainer" style="padding: 20px;">
 
             <!-- Game Area -->
             <div id="gameContent" style="display: none;">
@@ -28,34 +32,35 @@
             </div>
 
             <!-- Start Screen -->
-            <div id="startScreen" style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">🎴</div>
-                <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Memory Match</h2>
-                <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px; max-width: 500px; margin-left: auto; margin-right: auto;">
-                    Padankan semua pasangan kad dalam bilangan pergerakan yang paling sedikit! Pilih 2 kad pada satu masa untuk mendedahkannya.
-                </p>
-                <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, var(--accent), #9d4edd); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
-                    Mula Bermain ▶
-                </button>
+            <div id="startScreen" style="text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <section class="panel" style="width: 100%; max-width: 500px; padding: 40px;">
+                    <div style="font-size: 80px; margin-bottom: 20px;">🎴</div>
+                    <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Memory Match</h2>
+                    <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px;">
+                        Padankan semua pasangan kad dalam bilangan pergerakan yang paling sedikit! Pilih 2 kad pada satu masa untuk mendedahkannya.
+                    </p>
+                    <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
+                        Mula
+                    </button>
+                </section>
             </div>
 
             <!-- Game Over Screen -->
-            <div id="gameOverScreen" style="display: none; text-align: center; padding: 60px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">🎉</div>
-                <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Anda Menang!</h2>
-                <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 40px; max-width: 400px; margin: 20px auto; margin-bottom: 30px;">
-                    <div style="margin-bottom: 20px;">
-                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Jumlah Pergerakan</div>
-                        <div id="finalMoves" style="font-size: 48px; font-weight: 700; color: var(--accent);">0</div>
+            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px; min-height: 500px; flex-direction: column; align-items: center; justify-content: center;">
+                <div style="font-size: 80px; margin-bottom: 20px;">🎉</div>
+                <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 32px;">Anda Menang!</h2>
+                <section class="panel" style="max-width: 450px; margin: 0 auto 40px;">
+                    <div style="padding: 32px;">
+                        <div>
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Jumlah Pergerakan</div>
+                            <div id="finalMoves" style="font-size: 48px; font-weight: 700; color: var(--accent);">0</div>
+                        </div>
                     </div>
-                </div>
+                </section>
                 <div style="display: flex; gap: 12px; justify-content: center;">
                     <button id="playAgainBtn" style="padding: 12px 30px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
-                        Main Semula
+                        Lihat Skor & Ganjaran
                     </button>
-                    <a href="/games" style="padding: 12px 30px; background: var(--border); color: var(--text); border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;">
-                        Kembali ke Permainan
-                    </a>
                 </div>
             </div>
         </div>
@@ -112,6 +117,7 @@
     let gameActive = false;
     let flippedCards = [];
     let matchedPairs = 0;
+    let gameStartTime = 0;
 
     const elements = {
         gameContainer: document.getElementById('gameContainer'),
@@ -128,7 +134,37 @@
 
     // Event Listeners
     elements.startBtn.addEventListener('click', startGame);
-    elements.playAgainBtn.addEventListener('click', resetGame);
+    elements.playAgainBtn.addEventListener('click', () => {
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
+        const calculatedScore = Math.max(0, 1000 - (moves * 50));
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ isset($game) ? route("games.storeResult", $game->id) : route("games.storeResult", 3) }}';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
+        
+        const scoreInput = document.createElement('input');
+        scoreInput.type = 'hidden';
+        scoreInput.name = 'score';
+        scoreInput.value = calculatedScore;
+        form.appendChild(scoreInput);
+        
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 'time_taken';
+        timeInput.value = timeInSeconds;
+        form.appendChild(timeInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    });
 
     function startGame() {
         gameStarted = true;
@@ -136,6 +172,7 @@
         moves = 0;
         matchedPairs = 0;
         flippedCards = [];
+        gameStartTime = Date.now();
 
         elements.startScreen.style.display = 'none';
         elements.gameContent.style.display = 'block';
@@ -207,10 +244,32 @@
     function endGame() {
         gameStarted = false;
         gameActive = false;
-        elements.gameContent.style.display = 'none';
-        elements.gameHeader.style.display = 'none';
-        elements.gameOverScreen.style.display = 'block';
-        elements.finalMoves.textContent = moves;
+        
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
+        // Calculate score based on moves (fewer moves = higher score)
+        const calculatedScore = Math.max(0, 1000 - (moves * 50));
+        
+        // If wrapped in play mode, submit to game summary
+        if (window.isPlayWrapperMode && window.submitGameScore) {
+            // Hide all game elements
+            const gameContent = document.getElementById('gameContent');
+            const gameOverScreen = document.getElementById('gameOverScreen');
+            const gameHeader = document.getElementById('gameHeader');
+            
+            if (gameContent) gameContent.style.display = 'none';
+            if (gameOverScreen) gameOverScreen.style.display = 'none';
+            if (gameHeader) gameHeader.style.display = 'none';
+            
+            window.submitGameScore(calculatedScore, timeInSeconds);
+            return;
+        }
+        
+        // Standalone mode - show game over screen
+        document.getElementById('gameOverScreen').style.display = 'flex';
+        document.getElementById('gameContent').style.display = 'none';
+        document.getElementById('finalMoves').textContent = moves;
     }
 
     function resetGame() {

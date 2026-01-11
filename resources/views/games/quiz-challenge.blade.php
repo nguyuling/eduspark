@@ -3,24 +3,30 @@
 @section('content')
 <div class="app">
     <main class="main">
-        <div id="gameContainer" style="padding: 20px;">
-            <!-- Game Header -->
-            <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                <div>
-                    <h1 style="margin: 0; font-size: 28px; font-weight: 700;">❓ Quiz Challenge</h1>
-                    <p style="color: var(--muted); margin-top: 8px;">Cabaran kuiz pantas - Jawab soalan dengan betul sebanyak mungkin!</p>
-                </div>
+        <!-- Game Header -->
+        <div id="gameHeader" class="header">
+            <div>
+                <div class="title">Quiz Challenge</div>
+                <div class="sub">Cabaran kuiz pantas - Jawab soalan dengan betul sebanyak mungkin!</div>
+            </div>
+            <div style="display: flex; gap: 60px; align-items: center;">
                 <div style="display: flex; gap: 20px; align-items: center;">
                     <div style="text-align: center;">
-                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Skor</div>
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Skor</div>
                         <div id="scoreDisplay" style="font-size: 32px; font-weight: 700; color: var(--accent);">0</div>
                     </div>
                     <div style="text-align: center;">
-                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Masa</div>
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Masa</div>
                         <div id="timerDisplay" style="font-size: 32px; font-weight: 700; color: #ef4444;">60</div>
                     </div>
                 </div>
+                <a href="{{ route('games.index') }}" class="btn-kembali">
+                    <i class="bi bi-arrow-left"></i>Kembali
+                </a>
             </div>
+        </div>
+
+        <div id="gameContainer" style="padding: 20px;">
 
             <!-- Game Area -->
             <div id="gameContent" style="display: none;">
@@ -35,15 +41,17 @@
             </div>
 
             <!-- Start Screen -->
-            <div id="startScreen" style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">❓</div>
-                <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Quiz Challenge</h2>
-                <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px; max-width: 500px; margin-left: auto; margin-right: auto;">
-                    Anda akan mendapat 10 soalan kuiz yang berbeza. Jawab dengan betul sebanyak mungkin dalam 60 saat. Setiap jawapan yang betul memberikan 10 poin!
-                </p>
-                <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, var(--accent), #9d4edd); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
-                    Mula Bermain ▶
-                </button>
+            <div id="startScreen" style="text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <section class="panel" style="width: 100%; max-width: 500px; padding: 40px;">
+                    <div style="font-size: 80px; margin-bottom: 20px;">❓</div>
+                    <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Quiz Challenge</h2>
+                    <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px;">
+                        Anda akan mendapat 10 soalan kuiz yang berbeza. Jawab dengan betul sebanyak mungkin dalam 60 saat. Setiap jawapan yang betul memberikan 10 poin!
+                    </p>
+                    <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
+                        Mula
+                    </button>
+                </section>
             </div>
 
             <!-- Game Over Screen -->
@@ -62,7 +70,7 @@
                 </div>
                 <div style="display: flex; gap: 12px; justify-content: center;">
                     <button id="playAgainBtn" style="padding: 12px 30px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
-                        Main Semula
+                        Lihat Skor & Ganjaran
                     </button>
                     <a href="/games" style="padding: 12px 30px; background: var(--border); color: var(--text); border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;">
                         Kembali ke Permainan
@@ -181,6 +189,7 @@
     let gameStarted = false;
     let gameActive = false;
     let selectedAnswer = null;
+    let gameStartTime = 0;
 
     const elements = {
         gameContainer: document.getElementById('gameContainer'),
@@ -211,6 +220,7 @@
         correctCount = 0;
         timeLeft = 60;
         selectedAnswer = null;
+        gameStartTime = Date.now();
 
         elements.startScreen.style.display = 'none';
         elements.gameContent.style.display = 'block';
@@ -287,11 +297,50 @@
     function endGame() {
         gameStarted = false;
         gameActive = false;
-        elements.gameContent.style.display = 'none';
-        elements.gameHeader.style.display = 'none';
-        elements.gameOverScreen.style.display = 'block';
-        elements.finalScore.textContent = score;
-        elements.correctAnswers.textContent = `${correctCount}/${quizzes.length}`;
+        
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
+        // If wrapped in play mode, submit to game summary
+        if (window.isPlayWrapperMode && window.submitGameScore) {
+            // Hide all game elements
+            const gameContent = document.getElementById('gameContent');
+            const gameOverScreen = document.getElementById('gameOverScreen');
+            const gameHeader = document.getElementById('gameHeader');
+            
+            if (gameContent) gameContent.style.display = 'none';
+            if (gameOverScreen) gameOverScreen.style.display = 'none';
+            if (gameHeader) gameHeader.style.display = 'none';
+            
+            window.submitGameScore(score, timeInSeconds);
+            return;
+        }
+        
+        // Standalone mode - submit form directly
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ isset($game) ? route("games.storeResult", $game->id) : route("games.storeResult", 5) }}';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
+        
+        const scoreInput = document.createElement('input');
+        scoreInput.type = 'hidden';
+        scoreInput.name = 'score';
+        scoreInput.value = score;
+        form.appendChild(scoreInput);
+        
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 'time_taken';
+        timeInput.value = timeInSeconds;
+        form.appendChild(timeInput);
+        
+        document.body.appendChild(form);
+        form.submit();
     }
 
     function resetGame() {

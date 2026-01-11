@@ -1,65 +1,73 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    .main { max-width: 100% !important; }
-</style>
-<div class="app" style="height: 100vh; display: flex; flex-direction: column;">
-    <main class="main" style="overflow: hidden; margin: 0; padding: 0; flex: 1; display: flex; flex-direction: column; width: 100%; max-width: 100%;">
-        <div id="gameContainer" style="padding: 0; width: 100%; flex: 1; display: flex; flex-direction: column; background: #000;">
-            <!-- Game Header -->
-            <div id="gameHeader" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10; height: auto;">
-                <div style="color: white;">
-                    <h1 style="margin: 0; font-size: 24px; font-weight: 700;">🚀 Cosmic Defender</h1>
-                </div>
-                <div style="display: flex; gap: 20px; align-items: center;">
-                    <div style="text-align: center; color: white;">
-                        <div style="color: rgba(255,255,255,0.7); font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Skor</div>
-                        <div id="scoreDisplay" style="font-size: 24px; font-weight: 700; color: #22c55e;">0</div>
-                    </div>
-                    <div style="text-align: center; color: white;">
-                        <div style="color: rgba(255,255,255,0.7); font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Nyawa</div>
-                        <div id="livesDisplay" style="font-size: 24px; font-weight: 700; color: #ef4444;">3</div>
-                    </div>
-                </div>
+<div class="app">
+    <main class="main">
+        <!-- Game Header -->
+        <div id="gameHeader" class="header">
+            <div>
+                <div class="title">Cosmic Defender</div>
+                <div class="sub">Pertahankan planet anda dari musuh kosmik! Gunakan panah kiri/kanan untuk bergerak dan SPACE untuk menembak.</div>
             </div>
+            <div style="display: flex; gap: 60px; align-items: center;">
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <div style="text-align: center;">
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Skor</div>
+                        <div id="scoreDisplay" style="font-size: 32px; font-weight: 700; color: var(--accent);">0</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;">Nyawa</div>
+                        <div id="livesDisplay" style="font-size: 32px; font-weight: 700; color: #ef4444;">3</div>
+                    </div>
+                </div>
+                <a href="{{ route('games.index') }}" class="btn-kembali">
+                    <i class="bi bi-arrow-left"></i>Kembali
+                </a>
+            </div>
+        </div>
+
+        <div id="gameContainer" style="padding: 20px;">
 
             <!-- Game Canvas -->
-            <canvas id="gameCanvas" style="flex: 1; display: block !important; width: 100%; height: 100%; background: linear-gradient(to bottom, #000428, #004e92); cursor: none;"></canvas>
+            <div id="gameCanvasWrapper" style="display: none; justify-content: center;">
+                <section class="panel" style="width: 100%; max-width: 600px; padding: 20px;">
+                    <canvas id="gameCanvas" style="max-width: 100%; height: auto; border-radius: 12px; background: white;"></canvas>
+                </section>
+            </div>
 
             <!-- Start Screen -->
-            <div id="startScreen" style="display: flex; align-items: center; justify-content: center; flex: 1; text-align: center; color: white;">
-                <div style="max-width: 500px;">
+            <div id="startScreen" style="text-align: center; padding: 80px 40px; min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <section class="panel" style="width: 100%; max-width: 500px; padding: 40px;">
                     <div style="font-size: 80px; margin-bottom: 20px;">🚀</div>
                     <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 12px;">Cosmic Defender</h2>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 16px; margin-bottom: 30px;">
+                    <p style="color: var(--muted); font-size: 16px; margin-bottom: 30px;">
                         Pertahankan planet anda dari musuh kosmik! Gunakan panah kiri/kanan untuk bergerak dan SPACE untuk menembak.
                     </p>
-                    <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, #1D5DCD, #E63946); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
-                        Mula Bermain ▶
+                    <button id="startBtn" style="padding: 14px 40px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease;">
+                        Mula
                     </button>
-                </div>
+                </section>
             </div>
 
             <!-- Game Over Screen -->
-            <div id="gameOverScreen" style="display: none; flex: 1; align-items: center; justify-content: center; text-align: center; color: white; background: rgba(0,0,0,0.9);">
-                <div style="max-width: 400px;">
-                    <div style="font-size: 64px; margin-bottom: 20px;">☠️</div>
-                    <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 20px;">Permainan Tamat!</h2>
-                    <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 30px; margin-bottom: 30px;">
+            <div id="gameOverScreen" style="display: none; text-align: center; padding: 80px 40px; min-height: 500px; flex-direction: column; align-items: center; justify-content: center;">
+                <div style="font-size: 80px; margin-bottom: 20px;">☠️</div>
+                <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 32px;">Permainan Tamat!</h2>
+                <section class="panel" style="max-width: 450px; margin: 0 auto 40px;">
+                    <div style="padding: 32px;">
                         <div style="margin-bottom: 15px;">
-                            <div style="color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Skor Akhir</div>
-                            <div id="finalScore" style="font-size: 40px; font-weight: 700; color: #22c55e;">0</div>
+                            <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 8px;\">Skor Akhir</div>
+                            <div id="finalScore" style="font-size: 48px; font-weight: 700; color: var(--accent);\">0</div>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 12px; justify-content: center;">
-                        <button id="playAgainBtn" style="padding: 12px 30px; background: #1D5DCD; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
-                            Main Semula
-                        </button>
-                        <a href="/games" style="padding: 12px 30px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;">
-                            Kembali
-                        </a>
-                    </div>
+                </section>
+                <div style="display: flex; gap: 12px; justify-content: center;\">
+                    <button id="playAgainBtn" style="padding: 12px 30px; background: linear-gradient(90deg, #A855F7, #9333EA); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">
+                        Lihat Skor & Ganjaran
+                    </button>
+                    <a href="/games" style="padding: 12px 30px; background: var(--border); color: var(--text); border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block;\">
+                        Kembali
+                    </a>
                 </div>
             </div>
         </div>
@@ -74,6 +82,7 @@
     let gameActive = false;
     let score = 0;
     let lives = 3;
+    let gameStartTime = 0; // Track when game starts
 
     // Player
     const player = {
@@ -95,15 +104,11 @@
     window.addEventListener('keyup', (e) => { keys[e.key] = false; });
 
     function resizeCanvas() {
-        const gameContainer = document.getElementById('gameContainer');
-        const header = document.getElementById('gameHeader');
         const canvas = document.getElementById('gameCanvas');
         
-        // Get actual available height by calculating from gameContainer minus header
-        const availableHeight = gameContainer.clientHeight - header.clientHeight;
-        
-        canvas.width = gameContainer.clientWidth;
-        canvas.height = availableHeight;
+        // Set canvas size with proper aspect ratio - larger for better visibility
+        canvas.width = 600;
+        canvas.height = 400;
         
         player.x = canvas.width / 2 - player.width / 2;
         player.y = canvas.height - 60;
@@ -116,9 +121,10 @@
         lives = 3;
         enemies = [];
         player.bullets = [];
+        gameStartTime = Date.now(); // Record start time
 
         document.getElementById('startScreen').style.display = 'none';
-        document.getElementById('gameCanvas').style.display = 'block';
+        document.getElementById('gameCanvasWrapper').style.display = 'flex';
         document.getElementById('gameOverScreen').style.display = 'none';
         document.getElementById('gameHeader').style.display = 'flex';
         document.getElementById('scoreDisplay').textContent = '0';
@@ -131,9 +137,25 @@
     function gameLoop() {
         if (!gameActive) return;
 
-        // Clear
-        ctx.fillStyle = 'rgba(0, 20, 50, 0.1)';
+        // Clear with white background
+        ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Add subtle grid pattern
+        ctx.strokeStyle = 'rgba(200, 200, 200, 0.1)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < canvas.width; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, canvas.height);
+            ctx.stroke();
+        }
+        for (let i = 0; i < canvas.height; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(canvas.width, i);
+            ctx.stroke();
+        }
 
         // Update player
         if (keys['ArrowLeft'] || keys['a']) player.x = Math.max(0, player.x - player.speed);
@@ -213,16 +235,61 @@
 
     function endGame() {
         gameActive = false;
-        document.getElementById('gameCanvas').style.display = 'none';
-        document.getElementById('gameHeader').style.display = 'none';
+        
+        // Calculate time taken (from game start to now)
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
+        // If wrapped in play mode, submit to game summary
+        if (window.isPlayWrapperMode && window.submitGameScore) {
+            // Hide all game elements
+            const gameOverScreen = document.getElementById('gameOverScreen');
+            const gameCanvasWrapper = document.getElementById('gameCanvasWrapper');
+            const gameHeader = document.getElementById('gameHeader');
+            
+            if (gameOverScreen) gameOverScreen.style.display = 'none';
+            if (gameCanvasWrapper) gameCanvasWrapper.style.display = 'none';
+            if (gameHeader) gameHeader.style.display = 'none';
+            
+            window.submitGameScore(score, timeInSeconds);
+            return;
+        }
+        
+        // Standalone mode - show game over screen
         document.getElementById('gameOverScreen').style.display = 'flex';
+        document.getElementById('gameCanvasWrapper').style.display = 'none';
         document.getElementById('finalScore').textContent = score;
     }
 
     document.getElementById('startBtn').addEventListener('click', startGame);
     document.getElementById('playAgainBtn').addEventListener('click', () => {
-        document.getElementById('gameOverScreen').style.display = 'none';
-        document.getElementById('startScreen').style.display = 'flex';
+        const gameEndTime = Date.now();
+        const timeInSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ isset($game) ? route("games.storeResult", $game->id) : route("games.storeResult", 1) }}';
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
+        
+        const scoreInput = document.createElement('input');
+        scoreInput.type = 'hidden';
+        scoreInput.name = 'score';
+        scoreInput.value = score;
+        form.appendChild(scoreInput);
+        
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 'time_taken';
+        timeInput.value = timeInSeconds;
+        form.appendChild(timeInput);
+        
+        document.body.appendChild(form);
+        form.submit();
     });
 
     window.addEventListener('resize', resizeCanvas);
