@@ -307,7 +307,10 @@ body.dark #themeToggle::before {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--accent);
+  background: linear-gradient(135deg, rgba(106, 77, 247, 0.6), rgba(139, 92, 246, 0.6));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-size: 30px;
   flex-shrink: 0;
   padding: 0;
@@ -316,6 +319,7 @@ body.dark #themeToggle::before {
 
 #helpToggle:hover {
   transform: scale(1.15);
+  opacity: 0.8;
 }
 
 .help-modal {
@@ -328,7 +332,7 @@ body.dark #themeToggle::before {
   border: 2px solid rgba(106, 77, 247, 0.3);
   border-bottom: none;
   border-radius: 14px 14px 0 0;
-  z-index: 99;
+  z-index: 101;
   overflow: hidden;
   transition: max-height .4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
@@ -360,6 +364,17 @@ body.dark .help-modal {
   color: var(--accent);
 }
 
+.help-title a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: all .2s ease;
+}
+
+.help-title a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
 .faq-item {
   margin-bottom: 12px;
   padding-bottom: 12px;
@@ -381,7 +396,14 @@ body.dark .help-modal {
   transition: all .2s ease;
 }
 
-.faq-question:hover {
+.faq-question a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: all .2s ease;
+  display: block;
+}
+
+.faq-question a:hover {
   color: var(--accent);
 }
 
@@ -453,35 +475,35 @@ body.dark .help-modal {
 <!-- Help Modal -->
 <div class="help-modal" id="helpModal">
   <div class="help-content">
-    <div class="help-title">Bantuan & FAQ</div>
+    <div class="help-title"><a href="{{ Route::has('index') ? route('index') : url('/') }}">Bantuan</a></div>
     
     <div class="faq-item">
-      <div class="faq-question">📚 Apa itu Bahan?</div>
+      <div class="faq-question"><a href="{{ Route::has('lessons.index') ? route('lessons.index') : url('/lessons') }}">Apa itu Bahan?</a></div>
       <div class="faq-answer">Bahan adalah koleksi materi pembelajaran yang disediakan untuk mendukung proses belajar mengajar.</div>
     </div>
 
     <div class="faq-item">
-      <div class="faq-question">❓ Bagaimana cara mengerjakan Kuiz?</div>
+      <div class="faq-question"><a href="{{ (Route::has('student.quizzes.index') ? route('student.quizzes.index') : (Route::has('teacher.quizzes.index') ? route('teacher.quizzes.index') : url('/quizzes'))) }}">Bagaimana cara mengerjakan Kuiz?</a></div>
       <div class="faq-answer">Klik menu Kuiz, pilih topik, dan jawab semua soalan. Hasil akan ditampilkan setelah selesai.</div>
     </div>
 
     <div class="faq-item">
-      <div class="faq-question">💬 Bagaimana menggunakan Forum?</div>
+      <div class="faq-question"><a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}">Bagaimana menggunakan Forum?</a></div>
       <div class="faq-answer">Forum memungkinkan Anda berdiskusi dengan pengguna lain. Klik Forum untuk membuat atau menanggapi pertanyaan.</div>
     </div>
 
     <div class="faq-item">
-      <div class="faq-question">🎮 Apa manfaat Permainan?</div>
+      <div class="faq-question"><a href="{{ url('/games') }}">Apa manfaat Permainan?</a></div>
       <div class="faq-answer">Permainan membantu pembelajaran menjadi lebih menyenangkan sambil menguji pengetahuan Anda.</div>
     </div>
 
     <div class="faq-item">
-      <div class="faq-question">📊 Bagaimana melihat Prestasi?</div>
+      <div class="faq-question"><a href="{{ Route::has('performance') ? route('performance') : url('/performance') }}">Bagaimana melihat Prestasi?</a></div>
       <div class="faq-answer">Prestasi menampilkan ringkasan hasil belajar Anda termasuk skor kuiz dan permainan.</div>
     </div>
 
     <div class="faq-item">
-      <div class="faq-question">👤 Bagaimana mengubah Profil?</div>
+      <div class="faq-question"><a href="{{ route('profile.show') }}">Bagaimana mengubah Profil?</a></div>
       <div class="faq-answer">Klik menu Profil untuk melihat dan mengubah informasi akun Anda.</div>
     </div>
   </div>
