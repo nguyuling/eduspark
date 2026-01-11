@@ -6,6 +6,8 @@ const Header = () => {
   const [theme, setTheme] = useState('dark');
   const [userRole, setUserRole] = useState('student'); 
   const [userName, setUserName] = useState('Azila');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     // Load saved theme
@@ -88,23 +90,39 @@ const Header = () => {
 
   // Navigation based on role
   const studentNavItems = [
-    { path: '/', label: 'Dashboard', icon: '📊' },
+    { path: '/', label: 'Dashboard', icon: '🏠' },
     { path: '/games', label: 'Games', icon: '🎮' },
     { path: '/materials', label: 'Materials', icon: '📚' },
     { path: '/forum', label: 'Forum', icon: '💬' },
-    { path: '/assessments', label: 'Assessments', icon: '📝' },
-    { path: '/progress', label: 'Progress', icon: '📈' },
+    { path: '/assessments', label: 'Quizzes', icon: '✏️' },
+    { path: '/progress', label: 'Progress', icon: '📊' },
   ];
 
   const teacherNavItems = [
-    { path: '/teacher', label: 'Dashboard', icon: '📊' },
+    { path: '/teacher', label: 'Dashboard', icon: '🏠' },
     { path: '/teacher/games', label: 'Manage Games', icon: '🎮' },
     { path: '/teacher/materials', label: 'Manage Materials', icon: '📚' },
     { path: '/teacher/forum', label: 'Moderate Forum', icon: '💬' },
-    { path: '/teacher/assessments', label: 'Create Assessments', icon: '📝' },
-    { path: '/teacher/analytics', label: 'Analytics', icon: '📈' },
-    { path: '/teacher/students', label: 'Student Management', icon: '👥' },
+    { path: '/teacher/assessments', label: 'Create Quizzes', icon: '✏️' },
+    { path: '/teacher/analytics', label: 'Analytics', icon: '📊' },
+    { path: '/teacher/students', label: 'Students', icon: '👥' },
   ];
+
+  // Handle search
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    
+    if (query.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+
+    const allNavItems = userRole === 'teacher' ? teacherNavItems : studentNavItems;
+    const filtered = allNavItems.filter(item =>
+      item.label.toLowerCase().includes(query.toLowerCase())
+    );
+    setSearchResults(filtered);
+  };
 
   const navItems = userRole === 'teacher' ? teacherNavItems : studentNavItems;
 
@@ -221,6 +239,120 @@ const Header = () => {
             {userRole === 'teacher' ? 'Teacher' : 'Student'}
           </span>
         </div>
+      </div>
+
+      {/* Search Feature */}
+      <div style={{
+        width: '100%',
+        position: 'relative',
+        marginBottom: '12px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          backgroundColor: theme === 'light' 
+            ? 'rgba(0,0,0,0.05)' 
+            : 'rgba(255,255,255,0.08)',
+          border: `1px solid ${theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)'}`,
+          borderRadius: '10px',
+          padding: '8px 12px',
+          gap: '8px'
+        }}>
+          <span style={{ fontSize: '14px' }}>🔍</span>
+          <input
+            type="text"
+            placeholder="Search modules..."
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            style={{
+              flex: 1,
+              backgroundColor: 'transparent',
+              border: 'none',
+              outline: 'none',
+              fontSize: '13px',
+              color: theme === 'light' ? '#333' : '#fff',
+              padding: '0'
+            }}
+            onFocus={(e) => {
+              e.target.parentElement.style.backgroundColor = theme === 'light' 
+                ? 'rgba(0,0,0,0.08)' 
+                : 'rgba(255,255,255,0.12)';
+              e.target.parentElement.style.borderColor = theme === 'light' ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.25)';
+            }}
+            onBlur={(e) => {
+              e.target.parentElement.style.backgroundColor = theme === 'light' 
+                ? 'rgba(0,0,0,0.05)' 
+                : 'rgba(255,255,255,0.08)';
+              e.target.parentElement.style.borderColor = theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
+            }}
+          />
+        </div>
+        
+        {/* Search Results Dropdown */}
+        {searchResults.length > 0 && searchQuery.trim() !== '' && (
+          <div style={{
+            position: 'absolute',
+            top: '100%',
+            left: '0',
+            right: '0',
+            marginTop: '4px',
+            backgroundColor: theme === 'light' 
+              ? 'rgba(255,255,255,0.95)' 
+              : 'rgba(15,23,36,0.95)',
+            border: `1px solid ${theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)'}`,
+            borderRadius: '10px',
+            overflow: 'hidden',
+            zIndex: 1000,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+          }}>
+            {searchResults.map((result, index) => {
+              const isActive = location.pathname === result.path || 
+                              (result.path !== '/' && location.pathname.startsWith(result.path));
+              const accentColor = userRole === 'teacher' 
+                ? (theme === 'light' ? '#E63946' : '#FF6B6B')
+                : (theme === 'light' ? '#1D5DCD' : '#4DABF7');
+              
+              return (
+                <Link
+                  key={index}
+                  to={result.path}
+                  onClick={() => setSearchQuery('')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px 12px',
+                    backgroundColor: isActive 
+                      ? (theme === 'light' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)')
+                      : 'transparent',
+                    color: isActive ? accentColor : (theme === 'light' ? '#333' : '#ddd'),
+                    textDecoration: 'none',
+                    borderBottom: index < searchResults.length - 1 
+                      ? `1px solid ${theme === 'light' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}` 
+                      : 'none',
+                    fontSize: '13px',
+                    fontWeight: isActive ? '600' : '500',
+                    transition: 'all 0.2s ease',
+                    cursor: 'pointer'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = theme === 'light' 
+                      ? 'rgba(0,0,0,0.08)' 
+                      : 'rgba(255,255,255,0.08)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = isActive 
+                      ? (theme === 'light' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)')
+                      : 'transparent';
+                  }}
+                >
+                  <span style={{ fontSize: '14px' }}>{result.icon}</span>
+                  <span>{result.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Navigation */}

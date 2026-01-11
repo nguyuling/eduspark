@@ -17,21 +17,151 @@ body.light .sidebar{
 }
 body.dark .sidebar{
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border:1px solid rgba(255,255,255,0.03);
+  border:2px solid rgba(255,255,255,0.03);
 }
-.logo { width:200px; height:auto; margin:0 auto -4px; }
+.logo { width:180px; height:auto; margin:0 auto -20px; }
 
-.nav { width:100%; margin-top:14px; padding-top:6px; padding-left:6px; position:relative; }
+.search-box {
+  width: 100%;
+  margin: 20px 0 0 0;
+  position: relative;
+}
+
+.search-box input {
+  width: calc(100% - 32px);
+  padding: 12px 16px;
+  padding-left: 40px;
+  border-radius: 12px;
+  border: none;
+  background: rgb(0, 0, 0);
+  color: var(--text, #333);
+  font-size: 13px;
+  font-family: inherit;
+  transition: all .2s ease;
+  outline: none;
+}
+
+body.light .search-box input {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+body.dark .search-box input {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #ddd;
+}
+
+.search-box input:focus {
+  border-color: rgba(106, 77, 247, 0.6);
+  background: rgba(106, 77, 247, 0.12);
+}
+
+.search-box input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.search-box::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+
+.search-box i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--muted);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--card-bg, rgba(255, 255, 255, 0.95));
+  border: 1px solid rgba(106, 77, 247, 0.2);
+  border-radius: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+body.light .search-results {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.dark .search-results {
+  background: rgba(15, 23, 36, 0.95);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.search-results.active {
+  display: block;
+}
+
+.search-results a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px !important;
+  border-bottom: 1px solid rgba(106, 77, 247, 0.1);
+  color: var(--muted) !important;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 13px !important;
+  margin: 0 !important;
+  width: 100% !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  transition: all .2s ease;
+}
+
+.search-results a:last-child {
+  border-bottom: none;
+}
+
+.search-results a:hover {
+  background: rgba(106, 77, 247, 0.1) !important;
+  color: var(--accent) !important;
+}
+
+.search-results a.active {
+  background: rgba(106, 77, 247, 0.15) !important;
+  color: var(--accent) !important;
+  font-weight: 600;
+}
+
+.nav { width:100%; margin-top:8px; padding-left:2px; position:relative; }
 .nav a {
-  display:block; padding:12px 16px; padding-left:28px; border-radius:12px;
+  display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:12px;
   color:var(--muted); text-decoration:none; font-weight:600;
-  margin:8px 0; position:relative; font-size:16px;
+  margin:4px 0; position:relative; font-size:16px;
   transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
   width:calc(100% - 32px);
   overflow: hidden;
 }
 .nav a:hover { color:var(--accent) !important; background:rgba(106,77,247,0.15) !important; }
 .nav a.active { color:var(--accent); }
+.nav a i {
+  font-size: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* floating indicator pill */
 .nav-indicator{
@@ -53,15 +183,6 @@ body.dark .sidebar{
   position: relative; 
   z-index: 101 !important;
   visibility: visible !important;
-  display: flex !important;
-  opacity: 1 !important;
-}
-
-/* Theme Toggle Switch Styling */
-#themeToggle {
-  width: 80px;
-  height: 36px;
-  background: rgba(106, 77, 247, 0.3);
   border: 1px solid rgba(106, 77, 247, 0.5);
   border-radius: 999px;
   cursor: pointer;
@@ -155,22 +276,34 @@ body.dark #themeToggle::before {
       <span style="color:#1D5DCD;">Pel</span><span style="color:#E63946;">ajar</span>
     @endif
   </div>
+
+  <!-- Search Box -->
+  <div class="search-box">
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="Search..."
+      autocomplete="off"
+    />
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
   <nav class="nav">
     @if($isTeacher)
-      <a href="{{ Route::has('reports.index') ? route('reports.index') : url('/reports') }}" class="{{ request()->is('reports*') ? 'active' : '' }}">Laporan</a>
-      <a href="{{ Route::has('lessons.index') ? route('lessons.index') : url('/lessons') }}" class="{{ request()->is('lessons*') ? 'active' : '' }}">Bahan</a>
-      <a href="{{ Route::has('teacher.quizzes.index') ? route('teacher.quizzes.index') : url('/teacher/quizzes') }}" class="{{ request()->is('teacher/quizzes*') ? 'active' : '' }}">Kuiz</a>
-      <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}" class="{{ request()->is('forum*') ? 'active' : '' }}">Forum</a>
-      <a href="{{ url('/games') }}" class="{{ request()->is('games*') ? 'active' : '' }}">Permainan</a>
-      <a href="{{ route('profile.show') }}" class="{{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}">Profil</a>
+      <a href="{{ Route::has('reports.index') ? route('reports.index') : url('/reports') }}" class="{{ request()->is('reports*') ? 'active' : '' }}"><i class="bi bi-bar-chart-line-fill"></i> <span>Laporan</span></a>
+      <a href="{{ Route::has('lessons.index') ? route('lessons.index') : url('/lessons') }}" class="{{ request()->is('lessons*') ? 'active' : '' }}"><i class="bi bi-file-earmark-text-fill"></i> <span>Bahan</span></a>
+      <a href="{{ Route::has('teacher.quizzes.index') ? route('teacher.quizzes.index') : url('/teacher/quizzes') }}" class="{{ request()->is('teacher/quizzes*') ? 'active' : '' }}"><i class="bi bi-question-square-fill"></i> <span>Kuiz</span></a>
+      <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}" class="{{ request()->is('forum*') ? 'active' : '' }}"><i class="bi bi-chat-square-text-fill"></i> <span>Forum</span></a>
+      <a href="{{ url('/games') }}" class="{{ request()->is('games*') ? 'active' : '' }}"><i class="bi bi-controller"></i> <span>Permainan</span></a>
+      <a href="{{ route('profile.show') }}" class="{{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}"><i class="bi bi-person-lines-fill"></i> <span>Profil</span></a>
 
     @else
-      <a href="{{ Route::has('performance') ? route('performance') : url('/performance') }}" class="{{ request()->is('performance*') ? 'active' : '' }}">Prestasi</a>
-      <a href="{{ Route::has('lessons.index') ? route('lessons.index') : url('/lessons') }}" class="{{ request()->is('lessons*') ? 'active' : '' }}">Bahan</a>
-      <a href="{{ Route::has('student.quizzes.index') ? route('student.quizzes.index') : url('/quizzes') }}" class="{{ request()->is('quizzes*') ? 'active' : '' }}">Kuiz</a>
-      <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}" class="{{ request()->is('forum*') ? 'active' : '' }}">Forum</a>
-      <a href="{{ url('/games') }}" class="{{ request()->is('games*') ? 'active' : '' }}">Permainan</a>
-      <a href="{{ route('profile.show') }}" class="{{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}">Profil</a>
+      <a href="{{ Route::has('performance') ? route('performance') : url('/performance') }}" class="{{ request()->is('performance*') ? 'active' : '' }}"><i class="bi bi-graph-up"></i> <span>Prestasi</span></a>
+      <a href="{{ Route::has('lessons.index') ? route('lessons.index') : url('/lessons') }}" class="{{ request()->is('lessons*') ? 'active' : '' }}"><i class="bi bi-file-earmark-text-fill"></i> <span>Bahan</span></a>
+      <a href="{{ Route::has('student.quizzes.index') ? route('student.quizzes.index') : url('/quizzes') }}" class="{{ request()->is('quizzes*') ? 'active' : '' }}"><i class="bi bi-question-square-fill"></i> <span>Kuiz</span></a>
+      <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}" class="{{ request()->is('forum*') ? 'active' : '' }}"><i class="bi bi-chat-square-text-fill"></i> <span>Forum</span></a>
+      <a href="{{ url('/games') }}" class="{{ request()->is('games*') ? 'active' : '' }}"><i class="bi bi-controller"></i> <span>Permainan</span></a>
+      <a href="{{ route('profile.show') }}" class="{{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}"><i class="bi bi-person-lines-fill"></i> <span>Profil</span></a>
 
     @endif
   </nav>
@@ -178,6 +311,50 @@ body.dark #themeToggle::before {
 </aside>
 <script>
   (function(){
+    // Search functionality
+    const searchInput = document.querySelector('#searchInput');
+    const searchResults = document.querySelector('#searchResults');
+    const navLinks = Array.from(document.querySelectorAll('.nav a'));
+    
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        
+        if (query === '') {
+          searchResults.classList.remove('active');
+          return;
+        }
+        
+        const filtered = navLinks.filter(link => {
+          const text = link.textContent.toLowerCase();
+          return text.includes(query);
+        });
+        
+        if (filtered.length > 0) {
+          searchResults.classList.add('active');
+          searchResults.innerHTML = filtered.map(link => `
+            <a href="${link.href}" class="${link.classList.contains('active') ? 'active' : ''}">
+              ${link.innerHTML}
+            </a>
+          `).join('');
+        } else {
+          searchResults.classList.remove('active');
+        }
+      });
+      
+      searchInput.addEventListener('focus', () => {
+        if (searchInput.value.trim() !== '') {
+          searchResults.classList.add('active');
+        }
+      });
+      
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-box')) {
+          searchResults.classList.remove('active');
+        }
+      });
+    }
+
     const nav = document.querySelector('.nav');
     if(!nav) return;
     
@@ -189,7 +366,7 @@ body.dark #themeToggle::before {
       nav.insertBefore(indicator, nav.firstChild);
     }
 
-    const navLinks = Array.from(nav.querySelectorAll('a'));
+    const allNavLinks = Array.from(nav.querySelectorAll('a'));
     
     function moveTo(el){
       if(!el) return;
@@ -200,20 +377,20 @@ body.dark #themeToggle::before {
       indicator.style.opacity = '1';
     }
 
-    navLinks.forEach(link => {
+    allNavLinks.forEach(link => {
       link.addEventListener('mouseenter', () => moveTo(link));
       link.addEventListener('focus', () => moveTo(link));
       link.addEventListener('click', () => moveTo(link));
     });
 
     nav.addEventListener('mouseleave', () => {
-      const active = nav.querySelector('a.active') || navLinks[0];
+      const active = nav.querySelector('a.active') || allNavLinks[0];
       if(active) moveTo(active); else indicator.style.opacity = '0';
     });
 
     // initial position on load
     window.requestAnimationFrame(()=>{
-      const active = nav.querySelector('a.active') || navLinks[0];
+      const active = nav.querySelector('a.active') || allNavLinks[0];
       if(active) moveTo(active);
     });
 
