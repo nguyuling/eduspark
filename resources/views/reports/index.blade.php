@@ -15,62 +15,55 @@
         </div>
 
         {{-- ===================== STATISTICS ===================== --}}
-        <section class="panel" style="margin-bottom:20px;">
-            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Statistik Kelas</h2>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-            </div>
-
-            <div style="display:grid;gap:16px;margin-bottom:16px;">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:flex-end;">
-                    <div>
-                        <label style="font-weight:700;color:var(--muted);font-size:13px;display:block;margin-bottom:8px;">Filter Kelas:</label>
-                        <select id="stats-class-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;border:2px solid #ddd;background:#f9f9f9;" required>
-                            <option value="">-- Sila Pilih --</option>
-                            <option value="semua">Semua Kelas</option>
-                            @foreach($classes as $c)
-                                <option value="{{ $c }}">{{ $c }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label style="font-weight:700;color:var(--muted);font-size:13px;display:block;margin-bottom:8px;">Jangka Masa:</label>
-                        <select id="stats-date-range" class="select" style="padding:8px 12px;border-radius:8px;width:100%;border:2px solid #ddd;background:#f9f9f9;" required>
-                            <option value="">-- Sila Pilih --</option>
-                            <option value="week">Minggu Ini</option>
-                            <option value="month">Bulan Ini</option>
-                            <option value="all">Semua Masa</option>
-                        </select>
-                    </div>
+        <section class="panel" style="margin-bottom:20px; padding-bottom:20px;">
+            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Cari Statistik</h2>
+            <div style="display:grid; grid-template-columns:1fr 1fr auto auto; gap:12px; align-items:flex-end; margin-bottom:25px;">
+                <div>
+                    <label style="font-size:12px;">Filter Kelas</label>
+                    <select id="stats-class-select" class="select" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" required>
+                        <option value="">-- Sila Pilih --</option>
+                        <option value="semua">Semua Kelas</option>
+                        @foreach($classes as $c)
+                            <option value="{{ $c }}">{{ $c }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
-                <div style="display:flex;gap:8px;">
-                    <button id="refresh-stats-btn" class="btn" style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;">
-                        Muat Semula
-                    </button>
-                    <button id="export-stats-btn" class="btn" style="padding:6px 12px;border-radius:8px;background:var(--success);color:#fff;border:0;font-weight:600;font-size:13px;cursor:pointer;">
-                        Export
-                    </button>
+                <div>
+                    <label style="font-size:12px;">Jangka Masa</label>
+                    <select id="stats-date-range" class="select" style="height:40px; width:100%; padding:8px 12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:12px;" required>
+                        <option value="">-- Sila Pilih --</option>
+                        <option value="week">Minggu Ini</option>
+                        <option value="month">Bulan Ini</option>
+                        <option value="all">Semua Masa</option>
+                    </select>
                 </div>
+
+                <button id="export-stats-btn" class="btn" style="padding:12px 24px; border-radius:8px; background:var(--success); color:#fff; border:none; font-weight:700; font-size:14px; cursor:pointer; height:40px;">
+                    Export
+                </button>
+                <button id="refresh-stats-btn" class="btn" style="padding:12px 24px; border-radius:8px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:none; font-weight:700; font-size:14px; cursor:pointer; height:40px;">
+                    Muat Semula
+                </button>
             </div>
 
             {{-- Statistics Cards --}}
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px;">
-                <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:8px;padding:16px;color:#fff;">
-                    <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Purata Skor</div>
-                    <div id="stat-avg-score" style="font-size:28px;font-weight:700;">0</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:20px;">
+                <div style="background:linear-gradient(135deg,#f5f0ffff 0%,#ffffffff 100%);border-radius:16px;padding:24px;border:1px solid #e5e7eb;box-shadow:0 2px 12px rgba(2,6,23,0.12);transition:transform 0.12s ease,box-shadow 0.12s ease;text-align:center;cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='#e5e7eb';">
+                    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Purata Skor</div>
+                    <div id="stat-avg-score" style="font-size:28px;font-weight:700;color:#7c3aed;">0</div>
                 </div>
-                <div style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);border-radius:8px;padding:16px;color:#fff;">
-                    <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Gred Purata</div>
-                    <div id="stat-avg-grade" style="font-size:28px;font-weight:700;">N/A</div>
+                <div style="background:linear-gradient(135deg,#f5f0ffff 0%,#ffffffff 100%);border-radius:16px;padding:24px;border:1px solid #e5e7eb;box-shadow:0 2px 12px rgba(2,6,23,0.12);transition:transform 0.12s ease,box-shadow 0.12s ease;text-align:center;cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='#e5e7eb';">
+                    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Gred Purata</div>
+                    <div id="stat-avg-grade" style="font-size:28px;font-weight:700;color:#7c3aed;">N/A</div>
                 </div>
-                <div style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);border-radius:8px;padding:16px;color:#fff;">
-                    <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Jumlah Percubaan</div>
-                    <div id="stat-total-attempts" style="font-size:28px;font-weight:700;">0</div>
+                <div style="background:linear-gradient(135deg,#f5f0ffff 0%,#ffffffff 100%);border-radius:16px;padding:24px;border:1px solid #e5e7eb;box-shadow:0 2px 12px rgba(2,6,23,0.12);transition:transform 0.12s ease,box-shadow 0.12s ease;text-align:center;cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='#e5e7eb';">
+                    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Jumlah Percubaan</div>
+                    <div id="stat-total-attempts" style="font-size:28px;font-weight:700;color:#7c3aed;">0</div>
                 </div>
-                <div style="background:linear-gradient(135deg,#fa709a 0%,#fee140 100%);border-radius:8px;padding:16px;color:#fff;">
-                    <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Pelajar Aktif</div>
-                    <div id="stat-active-students" style="font-size:28px;font-weight:700;">0</div>
+                <div style="background:linear-gradient(135deg,#f5f0ffff 0%,#ffffffff 100%);border-radius:16px;padding:24px;border:1px solid #e5e7eb;box-shadow:0 2px 12px rgba(2,6,23,0.12);transition:transform 0.12s ease,box-shadow 0.12s ease;text-align:center;cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='#e5e7eb';">
+                    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Pelajar Aktif</div>
+                    <div id="stat-active-students" style="font-size:28px;font-weight:700;color:#7c3aed;">0</div>
                 </div>
             </div>
 
@@ -81,19 +74,21 @@
 
             {{-- Charts Container --}}
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-                <div style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;">
-                    <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Prestasi Mengikut Topik</div>
-                    <canvas id="topicChart" style="max-height:250px;"></canvas>
+                <div style="border:1px dotted rgba(0,0,0,0.2);border-radius:16px;padding:16px;transition:transform 0.12s ease,box-shadow 0.12s ease,border-color 0.12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none';this.style.borderColor='rgba(0,0,0,0.2)';">
+                    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Prestasi Mengikut Topik</div>
+                    <div id="topicChartPlaceholder" style="display:flex;align-items:center;justify-content:center;height:250px;color:#999;font-size:14px;">Sila pilih kelas untuk melihat grafik</div>
+                    <canvas id="topicChart" style="max-height:250px;display:none;"></canvas>
                 </div>
-                <div style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;">
-                    <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Trend Prestasi</div>
-                    <canvas id="trendChart" style="max-height:250px;"></canvas>
+                <div style="border:1px dotted rgba(0,0,0,0.2);border-radius:16px;padding:16px;transition:transform 0.12s ease,box-shadow 0.12s ease,border-color 0.12s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none';this.style.borderColor='rgba(0,0,0,0.2)';">
+                    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Trend Prestasi</div>
+                    <div id="trendChartPlaceholder" style="display:flex;align-items:center;justify-content:center;height:250px;color:#999;font-size:14px;">Sila pilih kelas untuk melihat grafik</div>
+                    <canvas id="trendChart" style="max-height:250px;display:none;"></canvas>
                 </div>
             </div>
 
             {{-- Performance Table --}}
-            <div id="stats-table-container" style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;display:none;">
-                <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Perbandingan Prestasi Kelas</div>
+            <div id="stats-table-container" style="border:1px solid rgba(0,0,0,0.1);border-radius:16px;padding:16px;display:none;transition:transform 0.12s ease,box-shadow 0.12s ease,border-color 0.12s ease;box-shadow:0 2px 12px rgba(2,6,23,0.12);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(106,77,247,0.2)';this.style.borderColor='#6A4DF7';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 12px rgba(2,6,23,0.12)';this.style.borderColor='rgba(0,0,0,0.1)';">
+                <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">Perbandingan Prestasi Kelas</div>
                 <div style="overflow:auto;">
                     <table id="stats-table" style="width:100%;border-collapse:collapse;font-size:13px;">
                         <thead style="text-align:left;color:var(--muted);background:rgba(0,0,0,0.02);">
@@ -349,6 +344,11 @@ async function loadStatistics() {
         const tbody = document.getElementById('stats-tbody');
         tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Sila pilih kelas dan jangka masa untuk melihat data.</td></tr>';
         document.getElementById('stats-table-container').style.display = 'none';
+        // Show placeholders and hide charts when no selection
+        document.getElementById('topicChartPlaceholder').style.display = 'flex';
+        document.getElementById('topicChart').style.display = 'none';
+        document.getElementById('trendChartPlaceholder').style.display = 'flex';
+        document.getElementById('trendChart').style.display = 'none';
         if (typeof Chart !== 'undefined') {
             if (statsChart) statsChart.destroy();
             if (trendChart) trendChart.destroy();
@@ -403,12 +403,18 @@ async function loadStatistics() {
                 updateTopicChart(data.topicData);
             } else {
                 const ctx = document.getElementById('topicChart').getContext('2d');
+                const placeholder = document.getElementById('topicChartPlaceholder');
+                const canvas = document.getElementById('topicChart');
+                const containerDiv = canvas.parentElement;
                 if (statsChart) statsChart.destroy();
                 statsChart = new Chart(ctx, {
                     type: 'bar',
                     data: { labels: ['Tiada data'], datasets: [{ label: 'N/A', data: [0], backgroundColor: '#ccc' }] },
                     options: { responsive: true, maintainAspectRatio: true, indexAxis: 'y' }
                 });
+                placeholder.style.display = 'none';
+                canvas.style.display = 'block';
+                containerDiv.style.borderStyle = 'solid';
             }
 
             // Update trend chart
@@ -416,12 +422,18 @@ async function loadStatistics() {
                 updateTrendChart(data.trendData);
             } else {
                 const ctx = document.getElementById('trendChart').getContext('2d');
+                const placeholder = document.getElementById('trendChartPlaceholder');
+                const canvas = document.getElementById('trendChart');
+                const containerDiv = canvas.parentElement;
                 if (trendChart) trendChart.destroy();
                 trendChart = new Chart(ctx, {
                     type: 'line',
                     data: { labels: ['Tiada data'], datasets: [{ label: 'N/A', data: [0], borderColor: '#ccc' }] },
                     options: { responsive: true, maintainAspectRatio: true }
                 });
+                placeholder.style.display = 'none';
+                canvas.style.display = 'block';
+                containerDiv.style.borderStyle = 'solid';
             }
         } else {
             console.warn('Chart.js not loaded');
@@ -450,6 +462,9 @@ async function loadStatistics() {
 
 function updateTopicChart(data) {
     const ctx = document.getElementById('topicChart').getContext('2d');
+    const placeholder = document.getElementById('topicChartPlaceholder');
+    const canvas = document.getElementById('topicChart');
+    const containerDiv = canvas.parentElement;
     
     if (statsChart) statsChart.destroy();
     
@@ -477,10 +492,16 @@ function updateTopicChart(data) {
             }
         }
     });
+    
+    placeholder.style.display = 'none';
+    canvas.style.display = 'block';
+    containerDiv.style.borderStyle = 'solid';
 }
 
 function updateTrendChart(data) {
     const ctx = document.getElementById('trendChart').getContext('2d');
+    const placeholder = document.getElementById('trendChartPlaceholder');
+    const canvas = document.getElementById('trendChart');
     const selectedClass = document.getElementById('stats-class-select').value;
     
     if (trendChart) trendChart.destroy();
@@ -561,6 +582,10 @@ function updateTrendChart(data) {
             }
         }
     });
+    
+    placeholder.style.display = 'none';
+    canvas.style.display = 'block';
+    containerDiv.style.borderStyle = 'solid';
 }
 
 function updateStatsTable(classStats) {
