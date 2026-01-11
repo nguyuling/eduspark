@@ -88,7 +88,7 @@
                     $badgeStyle = 'background:rgba(106,77,247,0.1); color:inherit;';
                     if ($highestAttempt) {
                         $statusBadge = 'Completed';
-                        $badgeStyle = 'color:#fff';
+                        $badgeStyle = 'background: #00a100; color:#ffffff';
                     } elseif ($quiz->due_at && $quiz->due_at->isPast()) {
                         $statusBadge = 'Due';
                         $badgeStyle = 'background:rgba(230,57,70,0.15); color:#000;';
