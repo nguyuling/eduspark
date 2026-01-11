@@ -99,7 +99,7 @@
                                                     $expectedCode = trim($codeLine);
                                                     $isCorrect = trim($studentAnswer) === $expectedCode;
                                                 @endphp
-                                                <div style="height: 1.5em; display: flex; align-items: center; background: {{ $isHidden ? ($isCorrect ? 'rgba(42,157,143,0.15)' : 'rgba(230,57,70,0.15)') : 'transparent' }}; flex-shrink: 0;">{{ $isHidden ? ($studentAnswer ?: '(Walang sagot)') : $codeLine }}</div>
+                                                <div style="height: 1.5em; display: flex; align-items: center; background: {{ $isHidden ? ($isCorrect ? 'rgba(42,157,143,0.15)' : 'rgba(230,57,70,0.15)') : 'transparent' }}; flex-shrink: 0;">{{ $isHidden ? ($studentAnswer ?: '(Tidak dijawab)') : $codeLine }}</div>
                                             @endforeach
                                         </div>
                                     </div>
