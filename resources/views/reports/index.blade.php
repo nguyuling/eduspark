@@ -6,171 +6,176 @@
 @section('content')
 
 <div class="app">
-  <main class="main">
-    <div class="header">
-      <div>
-        <div class="title">Laporan</div>
-        <div class="sub">Prestasi pelajar dan kelas</div>
-      </div>
-    </div>
-
-{{-- ===================== STATISTICS ===================== --}}
-<div class="panel" style="padding:18px;border-radius:12px;margin-bottom:20px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h3 style="margin:0;font-weight:700;">Statistik Kelas</h3>
-        <div style="display:flex;gap:8px;">
-            <button id="export-stats-btn" class="btn" style="padding:6px 12px;border-radius:8px;background:var(--success);color:#fff;border:0;font-weight:600;font-size:13px;cursor:pointer;">
-                Export
-            </button>
+    <main class="main">
+        <div class="header">
+            <div>
+            <div class="title">Laporan</div>
+            <div class="sub">Prestasi pelajar dan kelas</div>
+            </div>
         </div>
-    </div>
 
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
-        <label style="font-weight:700;color:var(--muted);font-size:13px;">Filter Kelas:</label>
-        <select id="stats-class-select" class="select" style="padding:8px 12px;border-radius:8px;min-width:160px;border:2px solid #ddd;background:#f9f9f9;" required>
-            <option value="">-- Sila Pilih --</option>
-            <option value="semua">Semua Kelas</option>
-            @foreach($classes as $c)
-                <option value="{{ $c }}">{{ $c }}</option>
-            @endforeach
-        </select>
+        {{-- ===================== STATISTICS ===================== --}}
+        <section class="panel" style="margin-bottom:20px;">
+            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Statistik Kelas</h2>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            </div>
 
-        <label style="font-weight:700;color:var(--muted);font-size:13px;margin-left:16px;">Jangka Masa:</label>
-        <select id="stats-date-range" class="select" style="padding:8px 12px;border-radius:8px;min-width:140px;border:2px solid #ddd;background:#f9f9f9;" required>
-            <option value="">-- Sila Pilih --</option>
-            <option value="week">Minggu Ini</option>
-            <option value="month">Bulan Ini</option>
-            <option value="all">Semua Masa</option>
-        </select>
+            <div style="display:grid;gap:16px;margin-bottom:16px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:flex-end;">
+                    <div>
+                        <label style="font-weight:700;color:var(--muted);font-size:13px;display:block;margin-bottom:8px;">Filter Kelas:</label>
+                        <select id="stats-class-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;border:2px solid #ddd;background:#f9f9f9;" required>
+                            <option value="">-- Sila Pilih --</option>
+                            <option value="semua">Semua Kelas</option>
+                            @foreach($classes as $c)
+                                <option value="{{ $c }}">{{ $c }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
-        <button id="refresh-stats-btn" class="btn" style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-left:auto;">
-            Muat Semula
-        </button>
-    </div>
+                    <div>
+                        <label style="font-weight:700;color:var(--muted);font-size:13px;display:block;margin-bottom:8px;">Jangka Masa:</label>
+                        <select id="stats-date-range" class="select" style="padding:8px 12px;border-radius:8px;width:100%;border:2px solid #ddd;background:#f9f9f9;" required>
+                            <option value="">-- Sila Pilih --</option>
+                            <option value="week">Minggu Ini</option>
+                            <option value="month">Bulan Ini</option>
+                            <option value="all">Semua Masa</option>
+                        </select>
+                    </div>
+                </div>
 
-    {{-- Statistics Cards --}}
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px;">
-        <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:8px;padding:16px;color:#fff;">
-            <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Purata Skor</div>
-            <div id="stat-avg-score" style="font-size:28px;font-weight:700;">0</div>
-        </div>
-        <div style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);border-radius:8px;padding:16px;color:#fff;">
-            <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Gred Purata</div>
-            <div id="stat-avg-grade" style="font-size:28px;font-weight:700;">N/A</div>
-        </div>
-        <div style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);border-radius:8px;padding:16px;color:#fff;">
-            <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Jumlah Percubaan</div>
-            <div id="stat-total-attempts" style="font-size:28px;font-weight:700;">0</div>
-        </div>
-        <div style="background:linear-gradient(135deg,#fa709a 0%,#fee140 100%);border-radius:8px;padding:16px;color:#fff;">
-            <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Pelajar Aktif</div>
-            <div id="stat-active-students" style="font-size:28px;font-weight:700;">0</div>
-        </div>
-    </div>
+                <div style="display:flex;gap:8px;">
+                    <button id="refresh-stats-btn" class="btn" style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;">
+                        Muat Semula
+                    </button>
+                    <button id="export-stats-btn" class="btn" style="padding:6px 12px;border-radius:8px;background:var(--success);color:#fff;border:0;font-weight:600;font-size:13px;cursor:pointer;">
+                        Export
+                    </button>
+                </div>
+            </div>
 
-    {{-- Debug info --}}
-    <div id="debug-info" style="background:#f0f0f0;padding:12px;border-radius:8px;margin-bottom:16px;font-size:12px;color:#666;display:none;">
-        Status: <span id="debug-status">Menunggu...</span>
-    </div>
+            {{-- Statistics Cards --}}
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px;">
+                <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:8px;padding:16px;color:#fff;">
+                    <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Purata Skor</div>
+                    <div id="stat-avg-score" style="font-size:28px;font-weight:700;">0</div>
+                </div>
+                <div style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);border-radius:8px;padding:16px;color:#fff;">
+                    <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Gred Purata</div>
+                    <div id="stat-avg-grade" style="font-size:28px;font-weight:700;">N/A</div>
+                </div>
+                <div style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);border-radius:8px;padding:16px;color:#fff;">
+                    <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Jumlah Percubaan</div>
+                    <div id="stat-total-attempts" style="font-size:28px;font-weight:700;">0</div>
+                </div>
+                <div style="background:linear-gradient(135deg,#fa709a 0%,#fee140 100%);border-radius:8px;padding:16px;color:#fff;">
+                    <div style="font-size:13px;opacity:0.9;margin-bottom:8px;">Pelajar Aktif</div>
+                    <div id="stat-active-students" style="font-size:28px;font-weight:700;">0</div>
+                </div>
+            </div>
 
-    {{-- Charts Container --}}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-        <div style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;">
-            <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Prestasi Mengikut Topik</div>
-            <canvas id="topicChart" style="max-height:250px;"></canvas>
-        </div>
-        <div style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;">
-            <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Trend Prestasi</div>
-            <canvas id="trendChart" style="max-height:250px;"></canvas>
-        </div>
-    </div>
+            {{-- Debug info --}}
+            <div id="debug-info" style="background:#f0f0f0;padding:12px;border-radius:8px;margin-bottom:16px;font-size:12px;color:#666;display:none;">
+                Status: <span id="debug-status">Menunggu...</span>
+            </div>
 
-    {{-- Performance Table --}}
-    <div id="stats-table-container" style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;display:none;">
-        <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Perbandingan Prestasi Kelas</div>
-        <div style="overflow:auto;">
-            <table id="stats-table" style="width:100%;border-collapse:collapse;font-size:13px;">
-                <thead style="text-align:left;color:var(--muted);background:rgba(0,0,0,0.02);">
-                    <tr>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kelas</th>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Purata Skor</th>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Tertinggi</th>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Terendah</th>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kuiz Tertinggi</th>
-                        <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kuiz Terendah</th>
-                    </tr>
-                </thead>
-                <tbody id="stats-tbody">
-                    <tr>
-                        <td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Memuatkan data...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+            {{-- Charts Container --}}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                <div style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;">
+                    <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Prestasi Mengikut Topik</div>
+                    <canvas id="topicChart" style="max-height:250px;"></canvas>
+                </div>
+                <div style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;">
+                    <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Trend Prestasi</div>
+                    <canvas id="trendChart" style="max-height:250px;"></canvas>
+                </div>
+            </div>
+
+            {{-- Performance Table --}}
+            <div id="stats-table-container" style="border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:16px;display:none;">
+                <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Perbandingan Prestasi Kelas</div>
+                <div style="overflow:auto;">
+                    <table id="stats-table" style="width:100%;border-collapse:collapse;font-size:13px;">
+                        <thead style="text-align:left;color:var(--muted);background:rgba(0,0,0,0.02);">
+                            <tr>
+                                <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kelas</th>
+                                <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Purata Skor</th>
+                                <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Tertinggi</th>
+                                <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Terendah</th>
+                                <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kuiz Tertinggi</th>
+                                <th style="padding:10px 8px;border-bottom:1px solid rgba(0,0,0,0.1);">Kuiz Terendah</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stats-tbody">
+                            <tr>
+                                <td colspan="5" style="padding:20px;text-align:center;color:var(--muted);">Memuatkan data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        {{-- ===================== STUDENT REPORT ===================== --}}
+        <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Laporan Pelajar</h2>
+            <div style="display:flex;gap:0;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:200px;">
+                    <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Kelas</label>
+                    <select id="class-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:160px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
+                        <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
+                        @foreach($classes as $c)
+                            <option value="{{ $c }}">{{ $c }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div style="flex:2;min-width:300px;margin-left:16px;">
+                    <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Pelajar</label>
+                    <select id="student-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:280px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
+                        <option value="">{{ $studentPlaceholder ?? '-- pilih pelajar --' }}</option>
+                    </select>
+                </div>
+
+                <button id="open-student" class="btn"
+                    style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:20px;margin-left:16px;cursor:pointer;">
+                    Buka
+                </button>
+            </div>
+
+            <div id="student-panel-wrap" style="display:none;">
+            </div>
+
+
+        </section>
+
+
+        {{-- ===================== CLASS REPORT ===================== --}}
+        <section class="panel" style="margin-bottom:20px; margin-top:10px;">
+            <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; line-height:1;">Laporan Kelas</h2>
+            <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:220px;">
+                    <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Pilih kelas</label>
+                    <select id="class-report-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:160px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
+                        <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
+                        @foreach($classes as $c)
+                            <option value="{{ $c }}">{{ $c }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <button id="open-class" class="btn"
+                    style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:20px;cursor:pointer;">
+                    Buka
+                </button>
+            </div>
+
+            <div id="class-panel-wrap" style="color:var(--muted);">
+                Pilih kelas untuk melihat ringkasan kelas.
+            </div>
+        </section>
+    </main>
 </div>
-
-{{-- ===================== STUDENT REPORT ===================== --}}
-<div class="panel" style="padding:18px;border-radius:12px;">
-    <h3 style="margin-top:0;font-weight:700;">Laporan Pelajar</h3>
-
-    <div style="display:flex;gap:0;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:200px;">
-            <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Kelas</label>
-            <select id="class-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:160px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
-                <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
-                @foreach($classes as $c)
-                    <option value="{{ $c }}">{{ $c }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div style="flex:2;min-width:300px;margin-left:16px;">
-            <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Pelajar</label>
-            <select id="student-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:280px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
-                <option value="">{{ $studentPlaceholder ?? '-- pilih pelajar --' }}</option>
-            </select>
-        </div>
-
-        <button id="open-student" class="btn"
-            style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:20px;margin-left:16px;cursor:pointer;">
-            Buka
-        </button>
-    </div>
-
-    <div id="student-panel-wrap" style="display:none;">
-    </div>
-
-
-</div>
-
-
-{{-- ===================== CLASS REPORT ===================== --}}
-<div class="panel" style="padding:18px;border-radius:12px;margin-top:16px;">
-    <h3 style="margin-top:0;font-weight:700;">Laporan Kelas</h3>
-
-    <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:220px;">
-            <label style="font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Pilih kelas</label>
-            <select id="class-report-select" class="select" style="padding:8px 12px;border-radius:8px;width:100%;min-width:160px;border:2px solid #ddd;background:#f9f9f9;transition:border-color 0.3s;" required>
-                <option value="">{{ $classPlaceholder ?? '-- pilih kelas --' }}</option>
-                @foreach($classes as $c)
-                    <option value="{{ $c }}">{{ $c }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <button id="open-class" class="btn"
-            style="padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0;font-weight:700;margin-top:20px;cursor:pointer;">
-            Buka
-        </button>
-    </div>
-
-    <div id="class-panel-wrap" style="color:var(--muted);">
-        Pilih kelas untuk melihat ringkasan kelas.
-    </div>
-</div>
-
 @endsection
 
 
