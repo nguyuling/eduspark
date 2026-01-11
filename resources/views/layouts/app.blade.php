@@ -14,6 +14,9 @@
     {{-- Bootstrap Icons CDN --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 
+    {{-- Chart.js CDN --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="{{ asset('css/pages.css') }}" rel="stylesheet">
     
@@ -102,6 +105,16 @@
         }
         .nav a:hover::before { transform:scaleY(1); }
         .nav a.active::before { transform:scaleY(1); }
+
+        /* Page content offset to clear the fixed sidebar */
+        .page-content {
+          margin-left: 296px;
+          padding: 28px;
+          min-height: 100vh;
+        }
+        @media (max-width: 920px) {
+          .page-content { margin-left: 0; padding: 18px; }
+        }
     </style>
 </head>
 <body class="light">
@@ -112,12 +125,16 @@
         @endauth
         
         {{-- Page Content --}}
+          <main class="page-content">
             @yield('content')
+          </main>
         </div>
     </div>
 
     <footer class="page-footer">
         © 2025 EduSpark • Belajar • Bermain • Berkembang
     </footer>
+
+    @yield('scripts')
 </body>
 </html>

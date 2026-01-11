@@ -6,6 +6,11 @@ use App\Http\Controllers\QuizTeacherController;
 use App\Http\Controllers\QuizStudentController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\PerformanceController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AIChatController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\DirectMessageController;
+use App\Http\Controllers\GameController;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
@@ -14,7 +19,11 @@ require __DIR__ . '/auth.php';
 Route::get('/', function() {
     if (auth()->check()) {
         $user = auth()->user();
-        return redirect('/performance');
+        // Teachers land on reports, others on performance
+        if (($user->role ?? null) === 'teacher') {
+            return redirect()->route('reports.index');
+        }
+        return redirect()->route('performance');
     }
     return redirect('/login');
 })->name('home');
@@ -30,25 +39,15 @@ Route::middleware('auth')->group(function () {
 
 // Lesson routes (authenticated only)
 Route::middleware('auth')->group(function () {
-    // List and Create
     Route::get('/lesson', [LessonController::class, 'index'])->name('lesson.index');
     Route::get('/lesson/create', [LessonController::class, 'create'])->name('lesson.create');
+    Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
     Route::post('/lesson', [LessonController::class, 'store'])->name('lesson.store');
-    
-    // Preview and Download (MUST come before {id} routes)
-    Route::get('/lesson/{id}/preview', [LessonController::class, 'previewFile'])->name('lesson.preview-file');
+    Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
+    Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');
     Route::get('/lesson/{id}/preview', [LessonController::class, 'preview'])->name('lesson.preview');
     Route::get('/lesson/{id}/download', [LessonController::class, 'downloadLesson'])->name('lesson.download');
     Route::get('/lesson/{id}/preview-file', [LessonController::class, 'previewFile'])->name('lesson.preview-file');
-    Route::get('/lesson/{id}/edit', [LessonController::class, 'edit'])->name('lesson.edit');
-    
-    // View, Update, Delete
-    Route::get('/lesson/{id}', [LessonController::class, 'show'])->name('lesson.show');
-    Route::put('/lesson/{id}', [LessonController::class, 'update'])->name('lesson.update');
-    Route::delete('/lesson/{id}', [LessonController::class, 'destroy'])->name('lesson.destroy');
-    
-    // Legacy routes for compatibility
-    Route::get('/lessons', [LessonController::class, 'index'])->name('lessons.index');
 });
 
 // Quiz Teacher routes
@@ -74,7 +73,71 @@ Route::middleware('auth')->group(function () {
 
 // Performance routes
 Route::middleware('auth')->group(function () {
-    Route::get('/performance', [PerformanceController::class, 'index'])->name('performance.student_view');
+    Route::get('/performance', [PerformanceController::class, 'index'])->name('performance');
+});
+
+// Report routes (authenticated)
+Route::middleware('auth')->group(function () {
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
+    // Students dropdown + detail
+    Route::get('/reports/students-by-class/{class}', [ReportController::class, 'studentsByClass'])
+        ->name('reports.students.byClass');
+    Route::get('/reports/student/{id}', [ReportController::class, 'student'])
+        ->name('reports.student');
+    Route::get('/reports/student/{id}/export/csv', [ReportController::class, 'exportStudentCsv'])
+        ->name('reports.student.csv');
+    Route::get('/reports/student/{id}/export/print', [ReportController::class, 'exportStudentPdf'])
+        ->name('reports.student.print');
+
+    // Class reports
+    Route::get('/reports/class', [ReportController::class, 'classIndex'])
+        ->name('reports.class');
+    Route::get('/reports/class/{class}/export/csv', [ReportController::class, 'exportClassCsv'])
+        ->name('reports.class.csv');
+    Route::get('/reports/class/{class}/export/pdf', [ReportController::class, 'exportClassPdf'])
+        ->name('reports.class.pdf');
+
+    // Student performance (optional, kept for compatibility)
+    Route::get('/reports/students', [ReportController::class, 'studentsPerformance'])
+        ->name('reports.students');
+    Route::get('/reports/students/export-csv', [ReportController::class, 'exportStudentsCsv'])
+        ->name('reports.students.csv');
+    Route::get('/reports/students/chart-data', [ReportController::class, 'studentsChartData'])
+        ->name('reports.students.chart');
+    
+    // Statistics export
+    Route::get('/reports/export-statistics', [ReportController::class, 'exportStatistics'])
+        ->name('reports.statistics.export');
+    
+    // Statistics API
+    Route::get('/api/statistics', [ReportController::class, 'getStatistics'])
+        ->name('api.statistics');
+});
+
+// Games routes (authenticated)
+Route::middleware('auth')->group(function () {
+    Route::get('/games', [GameController::class, 'index'])->name('games.index');
+    Route::get('/games/{id}/play', [GameController::class, 'play'])->name('games.play');
+    Route::post('/games/{id}/result', [GameController::class, 'storeResult'])->name('games.storeResult');
+    Route::get('/games/{id}/result', [GameController::class, 'result'])->name('games.result');
+    Route::put('/games/{id}', [GameController::class, 'update'])->name('games.update');
+    Route::delete('/games/{id}', [GameController::class, 'destroy'])->name('games.destroy');
+    Route::post('/games/{id}/restore', [GameController::class, 'restore'])->name('games.restore');
+    Route::get('/games/{id}/leaderboard', [GameController::class, 'leaderboard'])->name('games.leaderboard');
+    
+    // Rewards routes
+    Route::get('/rewards', [GameController::class, 'myRewards'])->name('rewards.index');
+    Route::post('/rewards/{id}/claim', [GameController::class, 'claimReward'])->name('rewards.claim');
+    
+    // Teacher games routes
+    Route::get('/teacher/games', [GameTeacherController::class, 'index'])->name('teacher.games.index');
+    Route::get('/teacher/games/create', [GameTeacherController::class, 'create'])->name('teacher.games.create');
+    Route::post('/teacher/games', [GameTeacherController::class, 'store'])->name('teacher.games.store');
+    Route::get('/teacher/games/{id}/edit', [GameTeacherController::class, 'edit'])->name('teacher.games.edit');
+    Route::put('/teacher/games/{id}', [GameTeacherController::class, 'update'])->name('teacher.games.update');
+    Route::delete('/teacher/games/{id}', [GameTeacherController::class, 'destroy'])->name('teacher.games.destroy');
+    Route::post('/teacher/games/{id}/restore', [GameTeacherController::class, 'restore'])->name('teacher.games.restore');
 });
 
 // Forum routes
@@ -87,4 +150,21 @@ Route::middleware('auth')->group(function () {
     Route::put('/forum/{id}', [ForumController::class, 'update'])->name('forum.update');
     Route::delete('/forum/{id}', [ForumController::class, 'destroy'])->name('forum.destroy');
     Route::post('/forum/{id}/reply', [ForumController::class, 'reply'])->name('forum.reply');
+});
+
+// AI Chat routes
+Route::middleware('auth')->group(function () {
+    Route::post('/api/ai-chat/send', [AIChatController::class, 'sendMessage'])->name('ai.chat.send');
+});
+
+// Messages routes
+Route::middleware('auth')->group(function () {
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages/send', [MessageController::class, 'send'])->name('messages.send');
+    Route::get('/messages/{user}', [MessageController::class, 'conversation'])->name('messages.conversation');
+    
+    // Direct messages
+    Route::get('/direct-messages', [DirectMessageController::class, 'index'])->name('direct-messages.index');
+    Route::post('/direct-messages/{user}', [DirectMessageController::class, 'store'])->name('direct-messages.store');
+    Route::get('/direct-messages/{user}', [DirectMessageController::class, 'show'])->name('direct-messages.show');
 });

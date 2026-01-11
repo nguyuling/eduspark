@@ -26,11 +26,11 @@
 
       <div class="card" style="text-align:center;">
         <div class="panel-header" style="justify-content:center;">
-            <h3>Purata Skor Permainan</h3>
+            <h3>Permainan Dimainkan</h3>
         </div>
         <div class="value" style="margin-top:-10px;">
           <span class="badge-pill" style="background:linear-gradient(90deg,var(--yellow),var(--accent)); font-size:14px; padding:6px 12px;">
-            {{ $avgGameScore }}%
+            {{ $totalGames ?? 0 }}
           </span>
         </div>
       </div>
@@ -63,7 +63,6 @@
       <div class="panel-header">
         <div>
           <h3>Trend Prestasi</h3>
-          <div class="subtitle">Kuiz & permainan terkini</div>
         </div>
       </div>
       <canvas id="trendChart"></canvas>
@@ -78,13 +77,18 @@ const gr = ctx.getContext('2d').createLinearGradient(0,0,0,200);
 gr.addColorStop(0,'rgba(106,77,247,0.22)');
 gr.addColorStop(1,'rgba(156,123,255,0.06)');
 
+const labels = {!! json_encode($labels) !!};
+const labelsFull = {!! json_encode($labelsFull ?? $labels) !!};
+const scores = {!! json_encode($scores) !!};
+const rawScores = {!! json_encode($rawScores ?? []) !!};
+
 new Chart(ctx,{
   type:'line',
   data:{
-    labels:{!! json_encode($labels) !!},
+    labels: labels,
     datasets:[{
       label:'Skor',
-      data:{!! json_encode($scores) !!},
+      data: scores,
       borderColor:'#6A4DF7',
       backgroundColor:gr,
       tension:.38,
@@ -95,8 +99,35 @@ new Chart(ctx,{
     }]
   },
   options:{
-    plugins:{legend:{display:false}},
-    scales:{y:{beginAtZero:true,max:100}}
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        callbacks:{
+          title:(items)=>{
+            const idx = items[0]?.dataIndex ?? 0;
+            return labelsFull[idx] ?? labels[idx] ?? '';
+          },
+          label:(ctx)=> {
+            const idx = ctx.dataIndex;
+            const percent = ctx.parsed.y;
+            const raw = rawScores[idx];
+            if (raw && raw.raw !== null && raw.max !== null && raw.max > 0) {
+              return [`Skor: ${percent}%`, `(${raw.raw}/${raw.max})`];
+            } else if (raw && raw.raw !== null) {
+              return `Skor: ${raw.raw}`;
+            }
+            return `Skor: ${percent}%`;
+          }
+        }
+      }
+    },
+    scales:{
+      y:{beginAtZero:true,max:100,suggestedMax:100},
+      x:{ticks:{callback:(value)=>{
+        const label = labels[value] ?? '';
+        return label;
+      }}}
+    }
   }
 });
 </script>

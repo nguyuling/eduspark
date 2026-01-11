@@ -56,3 +56,4 @@ bootstrap/cache/*.php
 # Deployment
 Homestead.json
 Homestead.yaml
+database/database.sqlite

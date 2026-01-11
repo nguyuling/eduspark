@@ -16,7 +16,6 @@ class LessonController extends Controller
     {
         $query = Lesson::query();
 
-        // Search by title or description
         if ($request->has('q') && $request->q) {
             $q = $request->q;
             $query->where(function ($q_builder) use ($q) {
@@ -25,13 +24,11 @@ class LessonController extends Controller
             });
         }
 
-        // Filter by file type
         if ($request->has('file_type') && $request->file_type) {
             $ext = strtolower($request->file_type);
             $query->where('file_ext', '=', $ext);
         }
 
-        // Filter by date range
         if ($request->has('date_from') && $request->date_from) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
@@ -39,7 +36,20 @@ class LessonController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $lessons = $query->orderBy('created_at', 'desc')->get();
+        $lessons = $query->get();
+
+        // Get limit from request (default 10, increments by 10)
+        $limit = (int) $request->get('limit', 10);
+        if ($limit < 10) $limit = 10;
+        if ($limit > 1000) $limit = 1000; // Safety limit
+        
+        // Get lessons with the specified limit
+        $allLessons = $lessons;
+        $lessons = $allLessons->take($limit);
+        $hasMore = count($allLessons) > $limit;
+        $nextLimit = $limit + 10;
+        
+        // Prepare filters for view
         $filters = $request->only(['q', 'file_type', 'date_from', 'date_to']);
 
         // Return JSON if API request
@@ -63,10 +73,10 @@ class LessonController extends Controller
         // Determine user role and show appropriate view
         $user = Auth::user();
         if ($user && $user->role === 'teacher') {
-            return view('lesson.index-teacher', compact('lessons', 'filters'));
+            return view('lesson.index-teacher', compact('lessons', 'filters', 'limit', 'hasMore', 'nextLimit'));
         }
         
-        return view('lesson.index-student', compact('lessons', 'filters'));
+        return view('lesson.index-student', compact('lessons', 'filters', 'limit', 'hasMore', 'nextLimit'));
     }
 
     /**

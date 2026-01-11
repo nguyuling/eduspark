@@ -84,4 +84,13 @@ class QuizPolicy
     {
         return false;
     }
+
+    /**
+     * Determine whether the user can view quiz results.
+     * All teachers can view results of any quiz.
+     */
+    public function viewResults(User $user, Quiz $quiz): bool
+    {
+        return $user->role === 'teacher';
+    }
 }

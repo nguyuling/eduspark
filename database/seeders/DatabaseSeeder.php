@@ -22,9 +22,11 @@ class DatabaseSeeder extends Seeder
         // quiz
         $this->call([
             UserSeeder::class, // Must run first to create teacher/student
+            StudentSeeder::class, // Mirror student users into students table with classes
             QuizSeeder::class, // Depends on UserSeeder
             ForumSeeder::class, // Depends on UserSeeder
             LessonSeeder::class, // Depends on UserSeeder
+            GameSeeder::class, // Seed games
         ]);
     }
 }

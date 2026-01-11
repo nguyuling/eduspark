@@ -50,27 +50,27 @@
         @csrf
 
         <div class="auth-form-group">
-            <label for="name">Nama Penuh</label>
+            <label for="name">Nama Penuh*</label>
             <input type="text" id="name" name="name" required placeholder="contoh: Ahmad bin Ali" value="{{ old('name') }}">
         </div>
 
         <div class="auth-form-group">
-            <label for="email">Alamat Email</label>
+            <label for="email">Alamat Email*</label>
             <input type="email" id="email" name="email" required placeholder="anda@contoh.com" value="{{ old('email') }}">
         </div>
 
         <div class="auth-form-group">
-            <label for="password">Kata Laluan</label>
+            <label for="password">Kata Laluan*</label>
             <input type="password" id="password" name="password" required minlength="6" placeholder="Minimum 6 aksara">
         </div>
 
         <div class="auth-form-group">
-            <label for="password_confirmation">Sahkan Kata Laluan</label>
+            <label for="password_confirmation">Sahkan Kata Laluan*</label>
             <input type="password" id="password_confirmation" name="password_confirmation" required minlength="6" placeholder="••••••••">
         </div>
 
         <div class="auth-form-group" id="role-group" style="display: none;">
-            <label for="role">Saya adalah:</label>
+            <label for="role">Saya adalah*</label>
             <select id="role" name="role">
                 <option value="">-- Pilih Peranan --</option>
                 <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Pelajar</option>
@@ -79,7 +79,7 @@
         </div>
 
         <div class="auth-form-group" id="district-group" style="display: none;">
-            <label for="district">Daerah</label>
+            <label for="district">Daerah*</label>
             <select id="district" name="district">
                 <option value="">-- Pilih Daerah --</option>
                 <option value="Pengerang" {{ old('district') == 'Pengerang' ? 'selected' : '' }}>Pengerang</option>
@@ -95,7 +95,7 @@
         </div>
 
         <div class="auth-form-group" id="school-group" style="display: none;">
-            <label for="school_code">Sekolah</label>
+            <label for="school_code">Sekolah*</label>
             <select id="school_code" name="school_code">
                 <option value="">-- Pilih Sekolah --</option>
             </select>

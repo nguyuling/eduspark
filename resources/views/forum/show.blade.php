@@ -8,8 +8,8 @@
                 <div class="title">{{ $post->title }}</div>
                 <div class="sub">Lihat post dan balasan dari komuniti</div>
             </div>
-            <a href="{{ route('forum.index') }}" class="btn-kembali" style="display:inline-block !important; margin-top:15px; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important; white-space:nowrap; flex-shrink:0;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
-                <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+            <a href="{{ route('forum.index') }}" class="btn-kembali">
+                <i class="bi bi-arrow-left"></i>Kembali
             </a>
         </div>
 
@@ -37,7 +37,12 @@
                         {{ $firstLetter }}
                     </div>
                     <div style="flex:1;">
-                        <p style="font-weight:700; margin-bottom:4px; font-size:15px;">{{ $userName }}</p>
+                        <p style="font-weight:700; margin-bottom:4px; font-size:15px;"
+   class="user-name"
+   data-user-id="{{ $post->user->id }}">
+   {{ $userName }}
+</p>
+
                         <p style="font-size:12px; color:var(--muted);">{{ $post->created_at->format('M d, Y') }}</p>
                     </div>
                 </div>

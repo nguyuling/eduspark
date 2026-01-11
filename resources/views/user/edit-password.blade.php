@@ -9,8 +9,8 @@
         <div class="title">Tukar Kata Laluan</div>
         <div class="sub">Kemaskini kata laluan anda untuk menjaga keamanan akaun</div>
       </div>
-        <a href="{{ route('profile.show') }}" class="btn-kembali" style="display:inline-block !important; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; margin-top:15px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
-            <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+        <a href="{{ route('profile.show') }}" class="btn-kembali">
+            <i class="bi bi-arrow-left"></i>Kembali
         </a>
     </div>
 
@@ -44,7 +44,7 @@
         @method('PUT')
 
         <div class="form-group">
-          <label for="current_password">Kata Laluan Semasa</label>
+          <label for="current_password">Kata Laluan Semasa*</label>
           <input
             type="password"
             id="current_password"
@@ -59,7 +59,7 @@
         </div>
 
         <div class="form-group">
-          <label for="password">Kata Laluan Baru</label>
+          <label for="password">Kata Laluan Baru*</label>
           <input
             type="password"
             id="password"
@@ -76,7 +76,7 @@
         </div>
 
         <div class="form-group">
-          <label for="password_confirmation">Sahkan Kata Laluan Baru</label>
+          <label for="password_confirmation">Sahkan Kata Laluan Baru*</label>
           <input
             type="password"
             id="password_confirmation"

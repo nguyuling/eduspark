@@ -10,8 +10,8 @@
         <div class="title">Cipta Kuiz Baru</div>
         <div class="sub">Sediakan kuiz anda dengan soalan dan pilihan</div>
       </div>
-      <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali" style="display:inline-block !important; margin-top:15px; padding:12px 24px !important; background:transparent !important; color:#6A4DF7 !important; border:2px solid #6A4DF7 !important; text-decoration:none !important; border-radius:8px !important; font-weight:700 !important; font-size:14px !important; transition:all 0.2s ease !important; cursor:pointer !important; line-height:1 !important; height:auto !important;" onmouseover="this.style.background='rgba(106,77,247,0.1)'" onmouseout="this.style.background='transparent'">
-        <i class="bi bi-arrow-left" style="margin-right:6px;"></i>Kembali
+      <a href="{{ route('teacher.quizzes.index') }}" class="btn-kembali" onclick="return confirm('Kuiz anda tidak akan disimpan sebagai draf atau diterbitkan. Adakah anda pasti untuk meninggalkan halaman ini?');">
+        <i class="bi bi-arrow-left"></i>Kembali
       </a>
     </div>
 
@@ -109,6 +109,7 @@
               onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
               onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';"
               onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"
+              oninput="validateNaturalNumber(this)"
             >
             @error('max_attempts')<span style="color: var(--danger); font-size: 12px;">{{ $message }}</span>@enderror
           </div>
@@ -146,7 +147,7 @@
 
       <!-- Action Buttons - Outside all containers but inside form -->
       <div style="display:flex; gap:12px; justify-content:center; margin-top:40px; margin-bottom:40px; padding:0;">
-        <button type="submit" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'">
+        <button type="submit" class="btn-submit" style="display:inline-flex !important; align-items:center !important; gap:8px !important; padding:14px 26px !important; background:linear-gradient(90deg, #A855F7, #9333EA) !important; color:#fff !important; border:none !important; text-decoration:none !important; border-radius:8px !important; font-weight:600 !important; font-size:13px !important; cursor:pointer !important; transition:all 0.2s ease !important; box-shadow:0 2px 8px rgba(168, 85, 247, 0.3) !important;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(168, 85, 247, 0.3)'" onclick="return validateBeforeSubmit()">
           <i class="bi bi-check-lg"></i>Simpan Kuiz
         </button>
       </div>
@@ -154,13 +155,23 @@
   </main>
 </div>
 
+<style>
+    .code-full-textarea {
+        background-image: 
+            linear-gradient(90deg, #f5f5f5 40px, transparent 40px);
+        background-attachment: local;
+        background-repeat: no-repeat;
+    }
+</style>
+
 <script>
     // Define the question types based on the Question Model constants
     const QUESTION_TYPES = {
         MC: 'multiple_choice',
         SA: 'short_answer',
         TF: 'true_false',
-        CHECKBOX: 'checkbox'
+        CHECKBOX: 'checkbox',
+        CODING: 'coding'
     };
     
     // Global counter for question indices
@@ -173,7 +184,11 @@
         <section class="panel" style="margin-bottom:20px;" question-card data-index="${index}">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #d4c5f9;">
                 <h3 style="margin:0; font-size:16px; font-weight:700;">Soalan ${index + 1}</h3>
-                <button type="button" style="background:transparent; color:var(--danger); border:2px solid var(--danger); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-question-btn" data-index="${index}"><i class="bi bi-trash"></i></button>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button type="button" title="Pindah ke atas" style="background:transparent; color:var(--accent); border:2px solid var(--accent); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="move-up-btn" data-index="${index}"><i class="bi bi-arrow-up"></i></button>
+                    <button type="button" title="Pindah ke bawah" style="background:transparent; color:var(--accent); border:2px solid var(--accent); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="move-down-btn" data-index="${index}"><i class="bi bi-arrow-down"></i></button>
+                    <button type="button" style="background:transparent; color:var(--danger); border:2px solid var(--danger); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-question-btn" data-index="${index}"><i class="bi bi-trash"></i></button>
+                </div>
             </div>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
                 <!-- Left: Teks Soalan -->
@@ -185,7 +200,7 @@
                 <div style="display: flex; flex-direction: column; gap: 12px;">
                     <div>
                         <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Markah <span style="color: var(--danger);">*</span></label>
-                        <input type="number" name="questions[${index}][points]" value="1" min="1" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';"/>
+                        <input type="number" name="questions[${index}][points]" value="1" min="1" required style="width: 100%; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';" oninput="validateNaturalNumber(this)"/>
                     </div>
                     <div>
                         <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Jenis Soalan <span style="color: var(--danger);">*</span></label>
@@ -194,6 +209,7 @@
                             <option value="${QUESTION_TYPES.CHECKBOX}">Kotak Semak</option>
                             <option value="${QUESTION_TYPES.SA}">Jawapan Pendek</option>
                             <option value="${QUESTION_TYPES.TF}">Benar/Salah</option>
+                            <option value="${QUESTION_TYPES.CODING}">Koding</option>
                         </select>
                     </div>
                 </div>
@@ -213,15 +229,240 @@
         </div>
     `;
 
+    // Template for the Coding question input (Java only)
+    const codingTemplate = (index) => {
+        return `<div style="margin-top:12px;">
+<!-- Full Code Input Section with Inline Checkboxes -->
+<div style="margin-bottom:20px;">
+<label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px;">Kod Penuh<span style="color: var(--danger);">*</span></label>
+<div style="display: flex; gap: 0; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; background: #f5f5f5;">
+  <!-- Checkbox Column -->
+  <div id="code-checkboxes-${index}" style="display: flex; flex-direction: column; background: linear-gradient(to bottom, #fafafa, #f5f5f5); border-right: 2px solid #e5e7eb; min-width: 40px; padding: 11px 4px; overflow-y: auto; font-size: 13px; line-height: 1.5; gap: 0px;">
+  </div>
+  
+  <!-- Line Numbers Column -->
+  <div id="code-lines-${index}" style="position: relative; background: #f9fafb; padding: 11px 8px; text-align: right; font-size: 13px; font-family: 'Courier New', monospace; color: #9ca3af; border-right: 2px solid #e5e7eb; line-height: 1.5; user-select: none; min-width: 40px;">1</div>
+  
+  <!-- Code Textarea -->
+  <div style="flex: 1; position: relative; overflow: hidden;">
+    <textarea name="questions[${index}][coding_full_code]" class="code-full-textarea" data-index="${index}" rows="1" placeholder="Masukkan kod Java lengkap di sini..." required style="width: 100%; padding: 11px 12px; border: none; background: transparent; color: inherit; font-size: 13px; font-family: 'Courier New', monospace; outline: none; resize: vertical; box-sizing: border-box; line-height: 1.5;" oninput="updateCodeLineNumbers(this, ${index})"></textarea>
+  </div>
+</div>
+<div style="font-size:12px; color:#888; margin-top:8px; margin-bottom:12px;">
+<i class="bi bi-info-circle"></i> Klik checkbox untuk untuk baris yang harus dijawab oleh pelajar | ENTER untuk baris seterusnya | TAB untuk indentasi
+</div>
+</div>
+
+<!-- Hidden Lines Input -->
+<input type="hidden" name="questions[${index}][hidden_line_numbers]" class="hidden-lines-input" data-index="${index}" value="">
+
+<!-- Preview Section (Student View) -->
+<div style="margin-top:20px;">
+<label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px;">Pandangan Pelajar</label>
+<div id="code-preview-${index}" style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:0; min-height:100px; display: flex;">
+<div id="preview-lines-${index}" style="flex-shrink: 0; width: 40px; background: #e8e8e8; padding: 8px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none; padding-right: 6px;"></div>
+<div id="preview-code-${index}" style="flex: 1; padding: 8px 8px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit; white-space: pre-wrap; word-wrap: break-word; overflow-x: auto;">Masukkan kod di atas</div>
+</div>
+</div>
+</div>`;
+    };
+
+    // Function to update line numbers and refresh checkboxes
+    function updateCodeLineNumbers(textarea, index) {
+        const lines = textarea.value.split('\n');
+        
+        const lineNumbersDiv = document.getElementById(`code-lines-${index}`);
+        const checkboxesDiv = document.getElementById(`code-checkboxes-${index}`);
+        
+        // Auto-expand textarea based on content, starting from minimum single line
+        textarea.style.height = 'auto';
+        const minHeight = parseInt(window.getComputedStyle(textarea).lineHeight) * 1 + parseInt(window.getComputedStyle(textarea).paddingTop) + parseInt(window.getComputedStyle(textarea).paddingBottom);
+        textarea.style.height = Math.max(textarea.scrollHeight, minHeight) + 'px';
+        
+        // Update line numbers
+        let lineNumbers = '';
+        for (let i = 1; i <= Math.max(lines.length, 1); i++) {
+            lineNumbers += i + '<br>';
+        }
+        lineNumbersDiv.innerHTML = lineNumbers;
+        
+        // Update checkboxes column
+        updateCheckboxesColumn(index, lines);
+        
+        // Update preview
+        updateCodePreview(index, lines);
+    }
+
+    // Function to render checkboxes in the checkbox column
+    function updateCheckboxesColumn(index, lines) {
+        const checkboxesDiv = document.getElementById(`code-checkboxes-${index}`);
+        const hiddenInput = document.querySelector(`.hidden-lines-input[data-index="${index}"]`);
+        const currentHidden = hiddenInput.value ? hiddenInput.value.split(',').map(Number) : [];
+        
+        let html = '';
+        lines.forEach((line, i) => {
+            const lineNum = i + 1;
+            const isHidden = currentHidden.includes(lineNum);
+            
+            html += `<div class="checkbox-wrapper" data-line="${lineNum}" style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 17px;
+                margin: 1px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            " onmouseover="this.style.background='${isHidden ? 'rgba(168, 85, 247, 0.1)' : 'rgba(0, 0, 0, 0.03)'}';" onmouseout="this.style.background='transparent';">
+                <input 
+                    type="checkbox" 
+                    class="code-line-checkbox" 
+                    data-line="${lineNum}" 
+                    ${isHidden ? 'checked' : ''} 
+                    style="
+                        cursor: pointer;
+                        width: 10px;
+                        height: 10px;
+                        margin: 2px;
+                        accent-color: #A855F7;
+                    "
+                >
+            </div>`;
+        });
+        
+        checkboxesDiv.innerHTML = html;
+        
+        // Add event listeners to checkboxes
+        checkboxesDiv.querySelectorAll('.code-line-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', () => updateHiddenLines(index));
+        });
+    }
+
+    // Function to update hidden lines input and preview
+    function updateHiddenLines(index) {
+        const checkboxesDiv = document.getElementById(`code-checkboxes-${index}`);
+        const hiddenInput = document.querySelector(`.hidden-lines-input[data-index="${index}"]`);
+        const checkboxes = checkboxesDiv.querySelectorAll('.code-line-checkbox:checked');
+        
+        const hiddenLines = Array.from(checkboxes).map(cb => {
+            return cb.getAttribute('data-line');
+        });
+        
+        hiddenInput.value = hiddenLines.join(',');
+        
+        // Auto-calculate points: 1 point per hidden line
+        const pointsInput = document.querySelector(`input[name="questions[${index}][points]"]`);
+        if (pointsInput) {
+            pointsInput.value = Math.max(1, hiddenLines.length); // Minimum 1 point
+        }
+        
+        // Update preview
+        const textarea = document.querySelector(`.code-full-textarea[data-index="${index}"]`);
+        const lines = textarea.value.split('\n');
+        updateCodePreview(index, lines);
+    }
+
+
+
+    // Function to update code preview (showing what students will see)
+    function updateCodePreview(index, lines) {
+        const hiddenInput = document.querySelector(`.hidden-lines-input[data-index="${index}"]`);
+        const currentHidden = hiddenInput.value ? hiddenInput.value.split(',').map(Number) : [];
+        
+        const previewDiv = document.getElementById(`preview-code-${index}`);
+        const previewLines = document.getElementById(`preview-lines-${index}`);
+        
+        if (lines.length === 0) {
+            previewDiv.textContent = 'Masukkan kod di atas';
+            previewLines.innerHTML = '';
+            return;
+        }
+        
+        let previewHtml = '';
+        let lineNumbersHtml = '';
+        let lineNum = 1;
+        
+        lines.forEach((line, i) => {
+            if (currentHidden.includes(i + 1)) {
+                previewHtml += '<div style="height: 1.5em; display: flex; align-items: center;"><span style="background-color: #ffee8c; color: #000; padding: 2px 4px; border-radius: 2px;">[___BARIS DISEMBUNYIKAN___]</span></div>';
+            } else {
+                previewHtml += '<div style="height: 1.5em; display: flex; align-items: center;">' + line.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
+            }
+            lineNumbersHtml += '<div style="height: 1.5em; display: flex; align-items: center; justify-content: flex-end;">' + lineNum + '</div>';
+            lineNum++;
+        });
+        
+        previewDiv.innerHTML = previewHtml;
+        previewDiv.style.display = 'flex';
+        previewDiv.style.flexDirection = 'column';
+        previewLines.innerHTML = lineNumbersHtml;
+        previewLines.style.display = 'flex';
+        previewLines.style.flexDirection = 'column';
+    }
+
+    // Function to update line numbers in output textarea
+    function updateOutputLineNumbers(textarea, index) {
+        const lines = textarea.value.split('\n');
+        const lineNumbersDiv = document.getElementById(`output-lines-${index}`);
+        
+        // Auto-expand textarea based on content
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.max(textarea.scrollHeight, 30) + 'px';
+        
+        let lineNumbers = '';
+        for (let i = 1; i <= Math.max(lines.length, 1); i++) {
+            lineNumbers += i + '<br>';
+        }
+        lineNumbersDiv.innerHTML = lineNumbers;
+    }
+
+    // Function to handle tab key for 4 spaces
+    function handleTabKey(event, index) {
+        const textarea = event.target;
+        if (event.code === 'Tab') {
+            event.preventDefault();
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            
+            // Insert 4 spaces at cursor position
+            textarea.value = textarea.value.substring(0, start) + '    ' + textarea.value.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + 4;
+            updateCodeLineNumbers(textarea, index);
+        }
+    }
+
+    // Function to handle enter key for progressive line reveal on output
+    function handleOutputEnterReveal(event, index) {
+        const textarea = event.target;
+        if (event.code === 'Enter') {
+            const lines = textarea.value.split('\n');
+            const currentLine = textarea.value.substring(0, textarea.selectionStart).split('\n').length - 1;
+            
+            // Show next line only if at the end of the last line
+            if (currentLine === lines.length - 1 && lines[currentLine].trim() !== '') {
+                event.preventDefault();
+                const start = textarea.selectionStart;
+                textarea.value = textarea.value.substring(0, start) + '\n' + textarea.value.substring(start);
+                textarea.selectionStart = start + 1;
+                updateOutputLineNumbers(textarea, index);
+            }
+        }
+    }
+
     // Template for Options container (used by MC, TF, and CHECKBOX)
     const optionTemplate = (qIndex, type) => {
         const rowTemplate = (type === QUESTION_TYPES.CHECKBOX) ? checkboxOptionRow : optionRow;
+        
+        // Show 4 options by default for MC and CHECKBOX types, 2 for others
+        const defaultOptionCount = (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.CHECKBOX) ? 4 : 2;
+        let optionsHtml = '';
+        for (let i = 0; i < defaultOptionCount; i++) {
+            optionsHtml += rowTemplate(qIndex, i);
+        }
 
         return `
             <h6 style="margin:0 0 12px 0; font-weight:600; font-size:13px;">Pilihan & Jawapan Betul <span style="color: var(--danger);">*</span></h6>
             <div class="options-list" data-q-index="${qIndex}" style="display:flex; flex-direction:column; gap:8px;">
-                ${rowTemplate(qIndex, 0)}
-                ${rowTemplate(qIndex, 1)}
+                ${optionsHtml}
             </div>
             <button type="button" style="display:inline-block; padding:8px 14px; background:transparent; color:var(--accent); border:1px solid var(--accent); text-decoration:none; border-radius:6px; font-weight:600; font-size:12px; cursor:pointer; margin-top:12px;" class="add-option-btn" data-q-index="${qIndex}">
                 <i class="bi bi-plus-lg"></i> Tambah Pilihan
@@ -231,39 +472,39 @@
     
     // Template for a single option row (Radio button for MC/TF)
     const optionRow = (qIndex, oIndex) => `
-        <div style="display:flex; gap:8px; align-items:flex-start;" class="option-row" data-o-index="${oIndex}">
+        <div style="display:flex; gap:8px; align-items:center;" class="option-row" data-o-index="${oIndex}">
             <input class="form-check-input mt-0 correct-option-radio" type="radio" 
                    name="questions[${qIndex}][correct_answer]" 
                    value="" 
                    data-option-text-target 
-                   ${oIndex === 0 ? 'checked' : ''} required style="width:18px; height:18px; margin-top:11px; cursor:pointer;">
+                   ${oIndex === 0 ? 'checked' : ''} required style="width:18px; height:18px; cursor:pointer; flex-shrink:0;">
             <input type="text" 
                    name="questions[${qIndex}][options][]" 
                    class="option-text-input" 
                    placeholder="Teks Pilihan" 
                    required
                    oninput="updateRadioValue(this)"
-                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
-            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); padding:8px 10px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
+                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
+            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; width:42px; height:42px; padding:0; display:flex; align-items:center; justify-content:center; flex-shrink:0;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
         </div>
     `;
 
     // Template for a single option row (Checkbox)
     const checkboxOptionRow = (qIndex, oIndex) => `
-        <div style="display:flex; gap:8px; align-items:flex-start;" class="option-row" data-o-index="${oIndex}">
+        <div style="display:flex; gap:8px; align-items:center;" class="option-row" data-o-index="${oIndex}">
             <input class="form-check-input mt-0 correct-option-checkbox" type="checkbox" 
                    name="questions[${qIndex}][correct_answers][]" 
                    value="" 
                    data-option-text-target
-                   style="width:18px; height:18px; margin-top:11px; cursor:pointer;">
+                   style="width:18px; height:18px; cursor:pointer; flex-shrink:0;">
             <input type="text" 
                    name="questions[${qIndex}][options][]" 
                    class="option-text-input" 
                    placeholder="Teks Pilihan" 
                    required
                    oninput="updateCheckboxValue(this)"
-                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
-            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); padding:8px 10px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
+                   style="flex:1; padding: 11px 14px; border-radius: 8px; border: 2px solid #d1d5db; background: transparent; color: inherit; font-size: 14px; outline: none; box-sizing: border-box; height: 42px; transition: border-color 0.2s ease, background 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.background='transparent';" onfocus="this.style.borderColor='#9ca3af'; this.style.background='rgba(200, 200, 200, 0.08)';" onblur="this.style.borderColor='#d1d5db'; this.style.background='transparent';">
+            <button type="button" style="background:transparent; color:var(--danger); border:1px solid var(--danger); border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; width:42px; height:42px; padding:0; display:flex; align-items:center; justify-content:center; flex-shrink:0;" class="remove-option-btn" data-o-index="${oIndex}">✕</button>
         </div>
     `;
 
@@ -274,6 +515,113 @@
         if (radio && radio.type === 'radio') {
             radio.value = optionText;
         }
+    }
+
+    // Function to update question numbers after moving
+    function updateQuestionNumbers() {
+        const container = document.getElementById('questions-container');
+        const questionCards = container.querySelectorAll('[question-card]');
+        
+        questionCards.forEach((card, index) => {
+            const oldIndex = parseInt(card.getAttribute('data-index'));
+            const newIndex = index;
+            
+            // CRITICAL: Preserve all form field values BEFORE innerHTML replacement
+            const fieldValues = {};
+            card.querySelectorAll('input, textarea, select').forEach(field => {
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    fieldValues[field.name] = {
+                        value: field.value,
+                        checked: field.checked,
+                        type: field.type
+                    };
+                } else {
+                    fieldValues[field.name] = field.value;
+                }
+            });
+            
+            // Update question number display
+            const titleElement = card.querySelector('h3');
+            if (titleElement) {
+                titleElement.textContent = `Soalan ${newIndex + 1}`;
+            }
+            
+            // Update all field names from questions[oldIndex] to questions[newIndex]
+            card.setAttribute('data-index', newIndex);
+            card.innerHTML = card.innerHTML
+                .replace(new RegExp(`questions\\[${oldIndex}\\]`, 'g'), `questions[${newIndex}]`)
+                .replace(new RegExp(`code-checkboxes-${oldIndex}`, 'g'), `code-checkboxes-${newIndex}`)
+                .replace(new RegExp(`code-lines-${oldIndex}`, 'g'), `code-lines-${newIndex}`)
+                .replace(new RegExp(`preview-lines-${oldIndex}`, 'g'), `preview-lines-${newIndex}`)
+                .replace(new RegExp(`preview-code-${oldIndex}`, 'g'), `preview-code-${newIndex}`)
+                .replace(new RegExp(`code-preview-${oldIndex}`, 'g'), `code-preview-${newIndex}`)
+                .replace(new RegExp(`answers-container-${oldIndex}`, 'g'), `answers-container-${newIndex}`)
+                .replace(new RegExp(`data-index="${oldIndex}"`, 'g'), `data-index="${newIndex}"`);
+            
+            // CRITICAL: Restore all form field values and reattach listeners
+            const newFieldNames = {};
+            card.querySelectorAll('input, textarea, select').forEach(field => {
+                // Build map of new field names to elements
+                newFieldNames[field.name] = field;
+            });
+            
+            // Restore values using old names mapped to new elements
+            for (let oldName in fieldValues) {
+                const newName = oldName.replace(new RegExp(`questions\\[${oldIndex}\\]`), `questions[${newIndex}]`);
+                if (newFieldNames[newName]) {
+                    const field = newFieldNames[newName];
+                    if (field.type === 'checkbox' || field.type === 'radio') {
+                        field.checked = fieldValues[oldName].checked;
+                        field.value = fieldValues[oldName].value;
+                    } else {
+                        field.value = fieldValues[oldName];
+                    }
+                }
+            }
+            
+            // Re-attach event listeners for type change select
+            const typeSelect = card.querySelector(`.question-type-select[data-index="${newIndex}"]`);
+            if (typeSelect) {
+                // Remove all existing listeners by cloning and replacing
+                const newTypeSelect = typeSelect.cloneNode(true);
+                typeSelect.parentNode.replaceChild(newTypeSelect, typeSelect);
+                
+                // Attach new listener
+                newTypeSelect.addEventListener('change', function() {
+                    const qIndex = this.getAttribute('data-index');
+                    const type = this.value;
+                    renderAnswerFields(qIndex, type);
+                    
+                    // Handle points field based on question type
+                    const pointsInput = container.querySelector(`input[name="questions[${qIndex}][points]"]`);
+                    if (pointsInput) {
+                        if (type === QUESTION_TYPES.CODING) {
+                            pointsInput.readOnly = true;
+                            pointsInput.style.opacity = '0.6';
+                            pointsInput.style.cursor = 'not-allowed';
+                        } else {
+                            pointsInput.readOnly = false;
+                            pointsInput.style.opacity = '1';
+                            pointsInput.style.cursor = 'auto';
+                        }
+                    }
+                });
+            }
+            
+            // Re-attach event listeners for code textarea if it's a coding question
+            const fullCodeTextarea = card.querySelector(`.code-full-textarea[data-index="${newIndex}"]`);
+            if (fullCodeTextarea) {
+                const newCodeTextarea = fullCodeTextarea.cloneNode(true);
+                fullCodeTextarea.parentNode.replaceChild(newCodeTextarea, fullCodeTextarea);
+                
+                newCodeTextarea.addEventListener('input', function() {
+                    updateCodeLineNumbers(this, newIndex);
+                });
+                newCodeTextarea.addEventListener('keydown', function(e) {
+                    handleTabKey(e, newIndex);
+                });
+            }
+        });
     }
 
     // Function to dynamically update the checkbox button's value when the option text changes
@@ -297,15 +645,13 @@
 
         if (type === QUESTION_TYPES.SA) {
             container.innerHTML = shortAnswerTemplate(qIndex);
+        } else if (type === QUESTION_TYPES.CODING) {
+            container.innerHTML = codingTemplate(qIndex);
         } else if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF || type === QUESTION_TYPES.CHECKBOX) {
             
             container.innerHTML = optionTemplate(qIndex, type);
             
-            // Re-bind the add option button using the correct template
-            const addBtn = container.querySelector('.add-option-btn');
-            addBtn.onclick = function() {
-                addOptionRow(qIndex, this.previousElementSibling, rowTemplate);
-            };
+            // Note: Do NOT bind onclick here as it's handled by event delegation below
 
             // For True/False, immediately adjust to only two options: True and False
             if (type === QUESTION_TYPES.TF) {
@@ -341,6 +687,93 @@
         optionsList.insertAdjacentHTML('beforeend', rowTemplate(qIndex, currentOptions));
     };
 
+    // Validate quiz title and all questions before allowing a new one to be added
+    const validateAllQuestions = () => {
+        const container = document.getElementById('questions-container');
+        const questionCards = container.querySelectorAll('[question-card]');
+        
+        // First, check if quiz title is filled
+        const titleInput = document.getElementById('title');
+        const titleValue = titleInput ? titleInput.value.trim() : '';
+        
+        if (!titleValue) {
+            alert('Sila isi medan "Tajuk Kuiz" terlebih dahulu sebelum menambah soalan baru.');
+            return false;
+        }
+        
+        if (questionCards.length === 0) return true; // No questions yet, allow adding
+        
+        // Validate ALL questions (not just the last one)
+        for (let i = 0; i < questionCards.length; i++) {
+            const card = questionCards[i];
+            const questionNum = i + 1;
+            
+            // Check if question text is not empty
+            const textArea = card.querySelector('textarea[name*="question_text"]');
+            const questionText = textArea ? textArea.value.trim() : '';
+            
+            if (!questionText) {
+                alert(`Teks soalan untuk Soalan ${questionNum} tidak boleh kosong.`);
+                return false;
+            }
+            
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            // Validation for Checkbox questions
+            if (type === QUESTION_TYPES.CHECKBOX) {
+                const checkboxes = card.querySelectorAll('input[type="checkbox"][name*="correct_answers"]');
+                const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                
+                if (checkedCount < 2) {
+                    alert(`Soalan ${questionNum} (Kotak Semak): Sekurang-kurangnya 2 jawapan yang betul mesti dipilih.`);
+                    return false;
+                }
+            }
+            
+            // Validation for Coding questions
+            else if (type === QUESTION_TYPES.CODING) {
+                const hiddenLinesInput = card.querySelector('.hidden-lines-input');
+                const hiddenLines = hiddenLinesInput ? hiddenLinesInput.value.trim() : '';
+                
+                if (!hiddenLines) {
+                    alert(`Soalan ${questionNum} (Koding): Sekurang-kurangnya 1 baris mesti dipilih sebagai baris tersembunyi.`);
+                    return false;
+                }
+            }
+            
+            // Validation for Short Answer questions
+            else if (type === QUESTION_TYPES.SA) {
+                const correctAnswerInput = card.querySelector('input[name*="correct_answer"]');
+                const correctAnswer = correctAnswerInput ? correctAnswerInput.value.trim() : '';
+                
+                if (!correctAnswer) {
+                    alert(`Soalan ${questionNum} (Jawapan Pendek): Medan jawapan yang betul tidak boleh kosong.`);
+                    return false;
+                }
+            }
+            
+            // Validation for MC and TF - check that options have text
+            else if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF) {
+                const optionInputs = card.querySelectorAll('input[name*="options"][]');
+                let hasEmptyOption = false;
+                
+                optionInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        hasEmptyOption = true;
+                    }
+                });
+                
+                if (hasEmptyOption) {
+                    alert(`Soalan ${questionNum}: Semua pilihan mesti mempunyai teks. Sila isi semua medan pilihan.`);
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    };
+
 
     // --- EVENT LISTENERS & INITIALIZATION ---
     
@@ -352,22 +785,80 @@
         // 1. Initial Load: Render the first question
         // Fix: Use insertAdjacentHTML and renderAnswerFields to ensure correct setup
         container.insertAdjacentHTML('beforeend', questionTemplate(questionIndex));
-        renderAnswerFields(questionIndex, QUESTION_TYPES.MC); 
+        renderAnswerFields(questionIndex, QUESTION_TYPES.MC);
+        
+        // Setup type change listener for initial question
+        const initialTypeSelect = container.querySelector(`.question-type-select[data-index="${questionIndex}"]`);
+        if (initialTypeSelect) {
+            initialTypeSelect.addEventListener('change', function() {
+                const qIndex = this.getAttribute('data-index');
+                const type = this.value;
+                renderAnswerFields(qIndex, type);
+                
+                // Handle points field based on question type
+                const pointsInput = container.querySelector(`input[name="questions[${qIndex}][points]"]`);
+                if (pointsInput) {
+                    if (type === QUESTION_TYPES.CODING) {
+                        pointsInput.readOnly = true;
+                        pointsInput.style.opacity = '0.6';
+                        pointsInput.style.cursor = 'not-allowed';
+                    } else {
+                        pointsInput.readOnly = false;
+                        pointsInput.style.opacity = '1';
+                        pointsInput.style.cursor = 'auto';
+                    }
+                }
+            });
+        }
+        
         questionIndex++;
 
         // 2. Add Question Button
         addQuestionBtn.addEventListener('click', function() {
+            // Validate all questions and quiz title before adding a new one
+            if (!validateAllQuestions()) {
+                return;
+            }
+            
             container.insertAdjacentHTML('beforeend', questionTemplate(questionIndex));
             renderAnswerFields(questionIndex, QUESTION_TYPES.MC);
+            
+            // Setup type change listener for the new question
+            const newTypeSelect = container.querySelector(`.question-type-select[data-index="${questionIndex}"]`);
+            if (newTypeSelect) {
+                newTypeSelect.addEventListener('change', function() {
+                    const qIndex = this.getAttribute('data-index');
+                    const type = this.value;
+                    renderAnswerFields(qIndex, type);
+                    
+                    // Handle points field based on question type
+                    const pointsInput = container.querySelector(`input[name="questions[${qIndex}][points]"]`);
+                    if (pointsInput) {
+                        if (type === QUESTION_TYPES.CODING) {
+                            pointsInput.readOnly = true;
+                            pointsInput.style.opacity = '0.6';
+                            pointsInput.style.cursor = 'not-allowed';
+                        } else {
+                            pointsInput.readOnly = false;
+                            pointsInput.style.opacity = '1';
+                            pointsInput.style.cursor = 'auto';
+                        }
+                    }
+                });
+            }
+            
             questionIndex++;
         });
 
-        // 3. Delegation for Dynamic Events (Type Change, Remove Question/Option)
+        // 3. Delegation for Dynamic Events (Remove Question/Option)
         container.addEventListener('click', function(e) {
             
             // Remove Question
-            if (e.target.classList.contains('remove-question-btn')) {
-                const card = e.target.closest('[question-card]');
+            const removeBtn = e.target.closest('.remove-question-btn');
+            if (removeBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const card = removeBtn.closest('[question-card]');
                 const questionCards = container.querySelectorAll('[question-card]');
                 if (questionCards.length > 1) {
                      // Get the index of the card being removed
@@ -386,7 +877,7 @@
                              qCard.setAttribute('data-index', newIndex);
                              
                              // Update display number
-                             qCard.querySelector('h5').textContent = `Soalan #${newIndex + 1}`;
+                             qCard.querySelector('h3').textContent = `Soalan ${newIndex + 1}`;
                              
                              // Update all names and IDs within the card using regex
                              qCard.innerHTML = qCard.innerHTML.replace(new RegExp(`questions\\[${currentCardIndex}\\]`, 'g'), `questions[${newIndex}]`)
@@ -403,6 +894,37 @@
                 } else {
                     alert("Kuiz mesti mempunyai sekurang-kurangnya satu soalan.");
                 }
+                return;
+            }
+            
+            // Move Question Up
+            const moveUpBtn = e.target.closest('.move-up-btn');
+            if (moveUpBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const card = moveUpBtn.closest('[question-card]');
+                const prevCard = card.previousElementSibling;
+                
+                if (prevCard && prevCard.hasAttribute('question-card')) {
+                    card.parentNode.insertBefore(card, prevCard);
+                    updateQuestionNumbers();
+                }
+                return;
+            }
+            
+            // Move Question Down
+            const moveDownBtn = e.target.closest('.move-down-btn');
+            if (moveDownBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const card = moveDownBtn.closest('[question-card]');
+                const nextCard = card.nextElementSibling;
+                
+                if (nextCard && nextCard.hasAttribute('question-card')) {
+                    card.parentNode.insertBefore(nextCard, card);
+                    updateQuestionNumbers();
+                }
+                return;
             }
             
             // Remove Option
@@ -451,9 +973,269 @@
                 const qIndex = e.target.getAttribute('data-index');
                 const type = e.target.value;
                 renderAnswerFields(qIndex, type);
+                
+                // Handle points field based on question type
+                const pointsInput = container.querySelector(`input[name="questions[${qIndex}][points]"]`);
+                if (pointsInput) {
+                    if (type === QUESTION_TYPES.CODING) {
+                        // For coding questions, make points readonly (auto-calculated)
+                        pointsInput.readOnly = true;
+                        pointsInput.style.opacity = '0.6';
+                        pointsInput.style.cursor = 'not-allowed';
+                        pointsInput.title = 'Points are auto-calculated (1 point per hidden line)';
+                    } else {
+                        // For other questions, make points editable
+                        pointsInput.readOnly = false;
+                        pointsInput.style.opacity = '1';
+                        pointsInput.style.cursor = 'auto';
+                        pointsInput.title = '';
+                    }
+                }
+                
+                // Setup code template listeners if coding type
+                if (type === QUESTION_TYPES.CODING) {
+                    setTimeout(() => {
+                        const fullCodeTextarea = document.querySelector(`.code-full-textarea[data-index="${qIndex}"]`);
+                        
+                        if (fullCodeTextarea) {
+                            fullCodeTextarea.addEventListener('input', function() {
+                                updateCodeLineNumbers(this, qIndex);
+                            });
+                            fullCodeTextarea.addEventListener('keydown', function(e) {
+                                handleTabKey(e, qIndex);
+                            });
+                            // Initialize line numbers
+                            updateCodeLineNumbers(fullCodeTextarea, qIndex);
+                        }
+                    }, 0);
+                }
             }
         });
         
+        // Validate that quiz title is filled before allowing question text input
+        container.addEventListener('focus', function(e) {
+            if (e.target.tagName === 'TEXTAREA' && e.target.name.includes('question_text')) {
+                const titleInput = document.getElementById('title');
+                const titleValue = titleInput ? titleInput.value.trim() : '';
+                
+                if (!titleValue) {
+                    alert('Sila isi medan "Tajuk Kuiz" terlebih dahulu.');
+                    e.target.blur();
+                }
+            }
+        }, true);
+        
+    });
+
+    // Custom HTML5 validation messages in Malay
+    function setupMalayValidationMessages() {
+        const form = document.getElementById('quiz-form');
+        if (!form) return;
+        
+        form.addEventListener('invalid', function(e) {
+            const input = e.target;
+            
+            if (!input.validity.valid) {
+                if (input.validity.valueMissing) {
+                    input.setCustomValidity('Sila isi medan ini.');
+                } else if (input.validity.typeMismatch) {
+                    input.setCustomValidity('Sila masukkan format yang betul.');
+                } else if (input.validity.tooShort) {
+                    input.setCustomValidity(`Teks hendaklah sekurang-kurangnya ${input.minLength} aksara.`);
+                } else if (input.validity.tooLong) {
+                    input.setCustomValidity(`Teks tidak boleh lebih daripada ${input.maxLength} aksara.`);
+                } else if (input.validity.rangeUnderflow) {
+                    input.setCustomValidity(`Nilai mesti sekurang-kurangnya ${input.min}.`);
+                } else if (input.validity.rangeOverflow) {
+                    input.setCustomValidity(`Nilai tidak boleh lebih daripada ${input.max}.`);
+                }
+            }
+        }, true);
+        
+        form.addEventListener('input', function(e) {
+            if (e.target.validity.valid) {
+                e.target.setCustomValidity('');
+            }
+        }, true);
+    }
+    
+    // Setup validation for natural number inputs (max_attempts and points)
+    function setupNaturalNumberValidation() {
+        // Setup max_attempts field
+        const maxAttemptsInput = document.getElementById('max_attempts');
+        if (maxAttemptsInput) {
+            validateNaturalNumber(maxAttemptsInput);
+        }
+        
+        // Setup delegation for points fields (they are dynamic)
+        const container = document.getElementById('questions-container');
+        if (container) {
+            container.addEventListener('change', function(e) {
+                if (e.target.name && e.target.name.includes('[points]')) {
+                    validateNaturalNumber(e.target);
+                }
+            });
+            
+            container.addEventListener('input', function(e) {
+                if (e.target.name && e.target.name.includes('[points]')) {
+                    validateNaturalNumber(e.target);
+                }
+            });
+        }
+    }
+    
+    // Function to validate natural number input
+    function validateNaturalNumber(input) {
+        // Remove non-digit characters
+        let value = input.value.replace(/[^0-9]/g, '');
+        
+        // Convert to number
+        let numValue = parseInt(value, 10);
+        
+        // Ensure minimum of 1
+        if (value === '' || numValue < 1 || isNaN(numValue)) {
+            input.value = '1';
+        } else {
+            input.value = numValue;
+        }
+    }
+    
+    // Handle paste events to ensure only natural numbers
+    function setupPasteValidation() {
+        const maxAttemptsInput = document.getElementById('max_attempts');
+        if (maxAttemptsInput) {
+            maxAttemptsInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                const numValue = parseInt(pastedText.replace(/[^0-9]/g, ''), 10);
+                this.value = (numValue >= 1) ? numValue : '1';
+            });
+        }
+        
+        // For dynamic points fields
+        const container = document.getElementById('questions-container');
+        if (container) {
+            container.addEventListener('paste', function(e) {
+                if (e.target.name && e.target.name.includes('[points]')) {
+                    e.preventDefault();
+                    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                    const numValue = parseInt(pastedText.replace(/[^0-9]/g, ''), 10);
+                    e.target.value = (numValue >= 1) ? numValue : '1';
+                }
+            });
+        }
+    }
+    // Validation function to check that all coding questions have hidden lines
+    // AND sync all radio/checkbox values with their option text before submission
+    function validateBeforeSubmit() {
+        const container = document.getElementById('questions-container');
+        const codingQuestions = container.querySelectorAll('[question-card]');
+        
+        // DEBUG: Log form data before submission
+        console.log('=== FORM DATA DEBUG ===');
+        const formData = new FormData(document.getElementById('quiz-form'));
+        let questionCount = 0;
+        for (let pair of formData.entries()) {
+            console.log(pair[0], '=', pair[1]);
+            if (pair[0].includes('question_text')) questionCount++;
+        }
+        console.log('Total questions detected:', questionCount);
+        
+        // STEP 1: Sync all radio buttons and checkboxes with their option text values
+        container.querySelectorAll('[question-card]').forEach(card => {
+            const qIndex = card.getAttribute('data-index');
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            console.log(`Question ${qIndex}, Type: ${type}`);
+            
+            // For multiple choice and true/false (radio buttons)
+            if (type === QUESTION_TYPES.MC || type === QUESTION_TYPES.TF) {
+                const radios = card.querySelectorAll('input[type="radio"][name*="correct_answer"]');
+                const optionInputs = card.querySelectorAll('input[name*="options"]');
+                
+                console.log(`  MC/TF: Found ${radios.length} radios, ${optionInputs.length} options`);
+                
+                radios.forEach((radio, index) => {
+                    if (optionInputs[index]) {
+                        radio.value = optionInputs[index].value;
+                        console.log(`    Radio ${index} value set to: ${radio.value}`);
+                    }
+                });
+            }
+            // For checkbox questions
+            else if (type === QUESTION_TYPES.CHECKBOX) {
+                const checkboxes = card.querySelectorAll('input[type="checkbox"][name*="correct_answer"]');
+                const optionInputs = card.querySelectorAll('input[name*="options"]');
+                
+                console.log(`  CHECKBOX: Found ${checkboxes.length} checkboxes, ${optionInputs.length} options`);
+                
+                checkboxes.forEach((checkbox, index) => {
+                    if (optionInputs[index]) {
+                        checkbox.value = optionInputs[index].value;
+                        console.log(`    Checkbox ${index} value set to: ${checkbox.value}`);
+                    }
+                });
+            }
+        });
+        
+        // STEP 2: Validate coding questions have hidden lines
+        let hasInvalidCodingQuestion = false;
+        
+        codingQuestions.forEach(card => {
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            if (type === 'coding') {
+                const hiddenLinesInput = card.querySelector('.hidden-lines-input');
+                const hiddenLines = hiddenLinesInput ? hiddenLinesInput.value.trim() : '';
+                
+                if (!hiddenLines) {
+                    hasInvalidCodingQuestion = true;
+                    const questionNum = card.getAttribute('data-index') + 1;
+                    console.warn(`Soalan ${questionNum} (Pengaturaan/Coding) tidak mempunyai baris tersembunyi yang dipilih`);
+                }
+            }
+        });
+        
+        if (hasInvalidCodingQuestion) {
+            alert('Semua soalan Pengaturaan (Coding) mesti mempunyai sekurang-kurangnya satu baris yang dipilih sebagai baris yang perlu dijawab oleh pelajar. Sila klik checkbox untuk menandakan baris.');
+            return false;
+        }
+
+        // STEP 3: Validate checkbox questions have at least 2 correct answers
+        let hasInvalidCheckboxQuestion = false;
+        
+        codingQuestions.forEach(card => {
+            const typeSelect = card.querySelector('.question-type-select');
+            const type = typeSelect ? typeSelect.value : QUESTION_TYPES.MC;
+            
+            if (type === QUESTION_TYPES.CHECKBOX) {
+                const checkboxes = card.querySelectorAll('input[type="checkbox"][name*="correct_answers"]');
+                const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                
+                if (checkedCount < 2) {
+                    hasInvalidCheckboxQuestion = true;
+                    const questionNum = card.getAttribute('data-index') + 1;
+                    console.warn(`Soalan ${questionNum} (Kotak Semak) mempunyai kurang daripada 2 jawapan yang betul yang dipilih`);
+                }
+            }
+        });
+        
+        if (hasInvalidCheckboxQuestion) {
+            alert('Untuk soalan jenis "Kotak Semak", sekurang-kurangnya 2 jawapan yang betul mesti dipilih. Sila semak jawapan yang betul untuk setiap soalan Kotak Semak.');
+            return false;
+        }
+        
+        console.log('=== END DEBUG ===');
+        return true;
+    }
+    
+    // Initialize Malay validation messages and natural number validation when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        setupMalayValidationMessages();
+        setupNaturalNumberValidation();
+        setupPasteValidation();
     });
 </script>
 
