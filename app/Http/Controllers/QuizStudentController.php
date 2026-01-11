@@ -207,15 +207,20 @@ class QuizStudentController extends Controller
                 }
 
             } elseif ($question->type === 'short_answer') {
-                // Short answer logic: Compare student answer with is_correct option
                 $submittedText = $studentAnswer['text'] ?? '';
-                
-                // Get the correct answer from options table
-                $correctOption = $question->options->where('is_correct', true)->first();
-                $correctText = $correctOption ? strtolower(trim($correctOption->option_text)) : '';
 
-                if (strtolower(trim($submittedText)) === $correctText && $submittedText !== '') {
-                    $isCorrect = true;
+                // Get the correct answer(s) directly from the question model
+                $correctAnswersRaw = $question->correct_answer ?? '';
+                $correctAnswers = array_map(function($ans) {
+                    return strtolower(trim($ans));
+                }, explode(',', $correctAnswersRaw));
+
+                if (!empty($submittedText)) {
+                    $trimmedSubmittedText = strtolower(trim($submittedText));
+                    // Check if the submitted answer is in the list of correct answers
+                    if (in_array($trimmedSubmittedText, $correctAnswers)) {
+                        $isCorrect = true;
+                    }
                 }
                 $submittedOptions = []; 
 
