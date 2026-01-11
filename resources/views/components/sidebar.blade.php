@@ -21,16 +21,21 @@ body.dark .sidebar{
 }
 .logo { width:180px; height:auto; margin:0 auto -20px; }
 
+.span {
+    font-weight: 700px;
+}
+
 .search-box {
   width: 100%;
   margin: 20px 0 0 0;
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .search-box input {
-  width: calc(100% - 32px);
-  padding: 12px 16px;
-  padding-left: 40px;
+  width: 100%;
+  padding: 10px 12px 10px 36px;
   border-radius: 12px;
   border: none;
   background: rgb(0, 0, 0);
@@ -65,21 +70,15 @@ body.dark .search-box input {
 
 .search-box::before {
   content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  pointer-events: none;
+  display: none;
 }
 
 .search-box i {
   position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 10px;
   font-size: 14px;
-  color: var(--muted);
   pointer-events: none;
-  z-index: 2;
+  color: var(--muted);
 }
 
 .search-results {
@@ -144,14 +143,30 @@ body.dark .search-results {
   font-weight: 600;
 }
 
-.nav { width:100%; margin-top:8px; padding-left:2px; position:relative; }
+.nav { 
+  width: 100%; 
+  margin-top: 8px; 
+  padding-left: 0; 
+  position: relative;
+  background: transparent;
+  border-radius: 12px;
+}
 .nav a {
-  display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:12px;
-  color:var(--muted); text-decoration:none; font-weight:600;
-  margin:4px 0; position:relative; font-size:16px;
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  padding: 10px 12px; 
+  border-radius: 12px;
+  color: var(--muted); 
+  text-decoration: none; 
+  font-weight: 600;
+  margin: 4px 0; 
+  position: relative; 
+  font-size: 16px;
   transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
-  width:calc(100% - 32px);
+  width: 100%;
   overflow: hidden;
+  box-sizing: border-box;
 }
 .nav a:hover { color:var(--accent) !important; background:rgba(106,77,247,0.15) !important; }
 .nav a.active { color:var(--accent); }
@@ -174,8 +189,8 @@ body.dark .search-results {
   transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
   opacity:0;
 }
-.nav-icon { width:20px; height:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.nav-icon svg { width:100%; height:100%; stroke:currentColor; fill:none; stroke-width:2; }
+.nav-icon { width:20px; height:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.nav-icon svg { width:100%; height:100%; stroke:currentColor; fill:none; stroke-width:2;}
 
 .profile-icon { display:none; }
 
@@ -183,6 +198,15 @@ body.dark .search-results {
   position: relative; 
   z-index: 101 !important;
   visibility: visible !important;
+  display: flex !important;
+  opacity: 1 !important;
+}
+
+/* Theme Toggle Switch Styling */
+#themeToggle {
+  width: 80px;
+  height: 36px;
+  background: rgba(106, 77, 247, 0.3);
   border: 1px solid rgba(106, 77, 247, 0.5);
   border-radius: 999px;
   cursor: pointer;
@@ -279,6 +303,7 @@ body.dark #themeToggle::before {
 
   <!-- Search Box -->
   <div class="search-box">
+    <i class="bi bi-search"></i>
     <input 
       type="text" 
       id="searchInput" 
@@ -290,20 +315,20 @@ body.dark #themeToggle::before {
 
   <nav class="nav">
     @if($isTeacher)
-      <a href="{{ Route::has('reports.index') ? route('reports.index') : url('/reports') }}" class="{{ request()->is('reports*') ? 'active' : '' }}"><i class="bi bi-bar-chart-line-fill"></i> <span>Laporan</span></a>
-      <a href="{{ Route::has('lessons.index') ? route('lessons.index') : url('/lessons') }}" class="{{ request()->is('lessons*') ? 'active' : '' }}"><i class="bi bi-file-earmark-text-fill"></i> <span>Bahan</span></a>
-      <a href="{{ Route::has('teacher.quizzes.index') ? route('teacher.quizzes.index') : url('/teacher/quizzes') }}" class="{{ request()->is('teacher/quizzes*') ? 'active' : '' }}"><i class="bi bi-question-square-fill"></i> <span>Kuiz</span></a>
-      <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}" class="{{ request()->is('forum*') ? 'active' : '' }}"><i class="bi bi-chat-square-text-fill"></i> <span>Forum</span></a>
-      <a href="{{ url('/games') }}" class="{{ request()->is('games*') ? 'active' : '' }}"><i class="bi bi-controller"></i> <span>Permainan</span></a>
-      <a href="{{ route('profile.show') }}" class="{{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}"><i class="bi bi-person-lines-fill"></i> <span>Profil</span></a>
+      <a href="{{ Route::has('reports.index') ? route('reports.index') : url('/reports') }}" class="{{ request()->is('reports*') ? 'active' : '' }}"><i class="bi bi-bar-chart-line-fill" style="margin-left:16px"></i> <span>Laporan</span></a>
+      <a href="{{ Route::has('lessons.index') ? route('lessons.index') : url('/lessons') }}" class="{{ request()->is('lessons*') ? 'active' : '' }}"><i class="bi bi-file-earmark-text-fill" style="margin-left:16px"></i> <span>Bahan</span></a>
+      <a href="{{ Route::has('teacher.quizzes.index') ? route('teacher.quizzes.index') : url('/teacher/quizzes') }}" class="{{ request()->is('teacher/quizzes*') ? 'active' : '' }}"><i class="bi bi-question-square-fill" style="margin-left:16px"></i> <span>Kuiz</span></a>
+      <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}" class="{{ request()->is('forum*') ? 'active' : '' }}"><i class="bi bi-chat-square-text-fill" style="margin-left:16px"></i> <span>Forum</span></a>
+      <a href="{{ url('/games') }}" class="{{ request()->is('games*') ? 'active' : '' }}"><i class="bi bi-controller" style="margin-left:16px"></i> <span>Permainan</span></a>
+      <a href="{{ route('profile.show') }}" class="{{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}"><i class="bi bi-person-lines-fill" style="margin-left:16px"></i> <span>Profil</span></a>
 
     @else
-      <a href="{{ Route::has('performance') ? route('performance') : url('/performance') }}" class="{{ request()->is('performance*') ? 'active' : '' }}"><i class="bi bi-graph-up"></i> <span>Prestasi</span></a>
-      <a href="{{ Route::has('lessons.index') ? route('lessons.index') : url('/lessons') }}" class="{{ request()->is('lessons*') ? 'active' : '' }}"><i class="bi bi-file-earmark-text-fill"></i> <span>Bahan</span></a>
-      <a href="{{ Route::has('student.quizzes.index') ? route('student.quizzes.index') : url('/quizzes') }}" class="{{ request()->is('quizzes*') ? 'active' : '' }}"><i class="bi bi-question-square-fill"></i> <span>Kuiz</span></a>
-      <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}" class="{{ request()->is('forum*') ? 'active' : '' }}"><i class="bi bi-chat-square-text-fill"></i> <span>Forum</span></a>
-      <a href="{{ url('/games') }}" class="{{ request()->is('games*') ? 'active' : '' }}"><i class="bi bi-controller"></i> <span>Permainan</span></a>
-      <a href="{{ route('profile.show') }}" class="{{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}"><i class="bi bi-person-lines-fill"></i> <span>Profil</span></a>
+      <a href="{{ Route::has('performance') ? route('performance') : url('/performance') }}" class="{{ request()->is('performance*') ? 'active' : '' }}"><i class="bi bi-graph-up" style="margin-left:16px"></i> <span>Prestasi</span></a>
+      <a href="{{ Route::has('lessons.index') ? route('lessons.index') : url('/lessons') }}" class="{{ request()->is('lessons*') ? 'active' : '' }}"><i class="bi bi-file-earmark-text-fill" style="margin-left:16px"></i> <span>Bahan</span></a>
+      <a href="{{ Route::has('student.quizzes.index') ? route('student.quizzes.index') : url('/quizzes') }}" class="{{ request()->is('quizzes*') ? 'active' : '' }}"><i class="bi bi-question-square-fill" style="margin-left:16px"></i> <span>Kuiz</span></a>
+      <a href="{{ Route::has('forum.index') ? route('forum.index') : url('/forum') }}" class="{{ request()->is('forum*') ? 'active' : '' }}"><i class="bi bi-chat-square-text-fill" style="margin-left:16px"></i> <span>Forum</span></a>
+      <a href="{{ url('/games') }}" class="{{ request()->is('games*') ? 'active' : '' }}"><i class="bi bi-controller" style="margin-left:16px"></i> <span>Permainan</span></a>
+      <a href="{{ route('profile.show') }}" class="{{ Route::current()->getName() === 'profile.show' ? 'active' : '' }}"><i class="bi bi-person-lines-fill" style="margin-left:16px"></i> <span>Profil</span></a>
 
     @endif
   </nav>
