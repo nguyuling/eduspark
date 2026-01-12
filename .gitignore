@@ -1,8 +1,7 @@
 # Environment Variables
 .env
-.env.backup
-.env.production
-.env.testing
+.env.*
+!.env.example
 
 # IDE and Editor Files
 /.vscode
@@ -29,9 +28,7 @@ package-lock.json
 yarn.lock
 
 # Composer Auto-Generated Files
-/vendor/composer/InstalledVersions.php
-/vendor/composer/autoload_classmap.php
-/vendor/composer/autoload_static.php
+/vendor/composer/
 
 # Laravel Framework Specific
 /auth.json
@@ -40,11 +37,11 @@ yarn.lock
 bootstrap/cache/*.php
 /storage/*.key
 /storage/pail
-/storage/logs/laravel.log
+/storage/logs/*
+/storage/framework/*
 
 # Database
-/database.sqlite
-/database/database.sqlite
+/database/*.sqlite
 
 # Build Artifacts
 /public/build
@@ -56,4 +53,3 @@ bootstrap/cache/*.php
 # Deployment
 Homestead.json
 Homestead.yaml
-database/database.sqlite

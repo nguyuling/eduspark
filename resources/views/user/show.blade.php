@@ -56,17 +56,20 @@
       @endphp
       <div class="info-grid">
         <div class="info-item">
+          <div class="info-label">Nama Sekolah</div>
+          <div class="info-value">{{ $user->school_name }}</div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">Kod Sekolah</div>
+          <div class="info-value">{{ $schoolName }}</div>
+        </div>
+
+        <div class="info-item">
           <div class="info-label">Daerah</div>
           <div class="info-value">{{ $user->district }}</div>
         </div>
-        <div class="info-item">
-          <div class="info-label">Sekolah</div>
-          <div class="info-value">{{ $schoolName }}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Ahli Sejak</div>
-          <div class="info-value">{{ $user->created_at->format('j M Y') }}</div>
-        </div>
+
         <div class="info-item">
           <div class="info-label">ID Pengguna</div>
           <div class="info-value"><span class="badge">{{ $user->user_id }}</span></div>

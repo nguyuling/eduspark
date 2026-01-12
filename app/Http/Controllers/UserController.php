@@ -61,12 +61,14 @@ public function show($id)
         ]);
 
         return redirect('/login')
-            ->with('success', "Account successfully created! You can now log in.");
+            ->with('success', "Akaun berjaya dicipta! Anda kini boleh log masuk.");
     }
 
     // Login (unchanged — keeps your JSON API behavior)
     public function login(Request $request)
     {
+
+
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -89,6 +91,14 @@ public function show($id)
         ]);
     }
 
+    protected function authenticated(Request $request, $user)
+    {
+        if (!$user->hasVerifiedEmail()) {
+            auth()->logout();
+            return redirect('/login')->with('error', 'Anda perlu mengesahkan emel anda terlebih dahulu.');
+        }
+    }
+
     // Show main profile page
     public function profile()
     {
@@ -103,27 +113,25 @@ public function show($id)
         return view('user.edit', compact('user'));
     }
 
-    // Update name/email
+    // Update email and phone only
     public function updateProfile(Request $request)
     {
         $user = auth()->user();
 
         $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'required|string|max:11',
         ]);
 
-        if ($request->filled('name')) {
-            $user->name = $request->name;
-        }
-        if ($request->filled('email')) {
-            $user->email = $request->email;
-        }
+        // Only update email and phone
+        $user->email = $request->email;
+        $user->phone = $request->phone;
 
         $user->save();
 
-        return back()->with('success', 'Profile information updated successfully.');
+        return redirect()->route('profile.show')->with('success', 'Maklumat profil telah berjaya dikemaskini.');
     }
+
 
     // Show password change form
     public function editPassword()
@@ -139,7 +147,7 @@ public function show($id)
                 'required',
                 function ($attribute, $value, $fail) {
                     if (!Hash::check($value, auth()->user()->password)) {
-                        $fail('The current password is incorrect.');
+                        $fail('Katalaluan semasa tidak betul.');
                     }
                 },
             ],
@@ -152,6 +160,7 @@ public function show($id)
 
         // SAFE & EXPLICIT REDIRECT
         return redirect()->route('profile.show')
-            ->with('success', 'Your password has been updated successfully.');
+            ->with('success', 'Katalaluan anda telah berjaya dikemas kini.
+');
     }
 }

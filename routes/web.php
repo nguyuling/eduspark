@@ -29,13 +29,18 @@ Route::get('/', function() {
     return redirect('/login');
 })->name('home');
 
+
+// Auth routes with email verification
+Auth::routes(['verify' => true]);
+
 // Profile routes (authenticated only)
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () { //, 'verified'
     Route::get('/profile', [UserController::class, 'profile'])->name('profile.show');
     Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
     Route::get('/profile/edit-password', [UserController::class, 'editPassword'])->name('profile.password.edit');
     Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password.update');
+
 });
 
 // Lesson routes (authenticated only)
