@@ -231,14 +231,42 @@ class QuizStudentController extends Controller
                     $submittedCode = trim($studentAnswer['code'] ?? '');
                     $expectedCode = trim($question->coding_full_code ?? '');
                     
-                    // Compare the full code (trimmed and normalized)
-                    if ($submittedCode === $expectedCode) {
+                    // Normalize code for comparison: remove extra whitespace, normalize line breaks
+                    $normalizeCode = function($code) {
+                        // Split into lines
+                        $lines = explode("\n", $code);
+                        // Trim each line and remove empty lines
+                        $lines = array_filter(array_map('trim', $lines), function($line) {
+                            return $line !== '';
+                        });
+                        // Rejoin with single newlines
+                        return implode("\n", $lines);
+                    };
+                    
+                    $normalizedSubmitted = $normalizeCode($submittedCode);
+                    $normalizedExpected = $normalizeCode($expectedCode);
+                    
+                    // Compare normalized code
+                    if ($normalizedSubmitted === $normalizedExpected) {
                         $isCorrect = true;
                         $scoreGained = $question->points;
                     } else {
-                        // Partial credit: check if the key logic is present
-                        // For now, partial match gives 0, but you can enhance this
-                        $scoreGained = 0;
+                        // Check similarity for partial credit
+                        similar_text($normalizedSubmitted, $normalizedExpected, $percent);
+                        
+                        if ($percent >= 90) {
+                            // Very close - give most points
+                            $scoreGained = round($question->points * 0.8);
+                            $isCorrect = false;
+                        } elseif ($percent >= 70) {
+                            // Somewhat correct - give partial points
+                            $scoreGained = round($question->points * 0.5);
+                            $isCorrect = false;
+                        } else {
+                            // Too different - no points
+                            $scoreGained = 0;
+                            $isCorrect = false;
+                        }
                     }
                     
                     $submittedText = $submittedCode;

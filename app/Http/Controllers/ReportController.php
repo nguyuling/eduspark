@@ -213,12 +213,12 @@ class ReportController extends Controller
             if (is_null($lookupUserId)) $lookupUserId = $studentRecord->id;
         }
 
-        // Fetch attempts with quiz titles and max scores
+        // Fetch attempts with quiz titles
         $attempts = [];
         if (Schema::hasTable('quiz_attempts') && $lookupUserId) {
             $attempts = DB::table('quiz_attempts as qa')
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
-                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.quiz_id', 'q.max_points')
+                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.quiz_id')
                 ->where('qa.student_id', $lookupUserId)
                 ->whereNotNull('qa.submitted_at') // Only include submitted attempts
                 ->orderBy('qa.created_at', 'desc')
@@ -227,7 +227,7 @@ class ReportController extends Controller
         } elseif (Schema::hasTable('quiz_attempt') && $lookupUserId) {
             $attempts = DB::table('quiz_attempt as qa')
                 ->leftJoin('quiz as q', 'qa.quiz_id', '=', 'q.id')
-                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.quiz_id', 'q.max_points')
+                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.quiz_id')
                 ->where('qa.user_id', $lookupUserId)
                 ->whereNotNull('qa.submitted_at') // Only include submitted attempts
                 ->orderBy('qa.created_at', 'desc')
@@ -235,14 +235,26 @@ class ReportController extends Controller
                 ->toArray();
         }
 
-        // Convert scores to percentages based on max_points
+        // Build a cache of quiz max points
+        $quizMaxPoints = [];
+
+        // Convert scores to percentages based on calculated max_points
         $convertedAttempts = [];
         foreach ($attempts as $a) {
             $score = isset($a->score) ? (float)$a->score : 0;
-            $maxScore = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
-            $percentage = ($score / $maxScore) * 100;
+            
+            // Get max points for this quiz if not cached
+            if (!isset($quizMaxPoints[$a->quiz_id])) {
+                $quizMaxPoints[$a->quiz_id] = DB::table('questions')
+                    ->where('quiz_id', $a->quiz_id)
+                    ->sum('points') ?: 100;
+            }
+            
+            $maxScore = (float)$quizMaxPoints[$a->quiz_id];
+            $percentage = $maxScore > 0 ? ($score / $maxScore) * 100 : 0;
             
             $a->percentage = round($percentage, 2);
+            $a->max_points = $maxScore;
             $convertedAttempts[] = $a;
         }
         $attempts = $convertedAttempts;
@@ -349,7 +361,7 @@ class ReportController extends Controller
         if (Schema::hasTable('quiz_attempts')) {
             $attemptsQuery = DB::table('quiz_attempts as qa')
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
-                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'q.max_points')
+                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'qa.quiz_id')
                 ->where('qa.student_id', $userId)
                 ->whereNotNull('qa.submitted_at')
                 ->orderBy('qa.created_at', 'desc')
@@ -357,12 +369,28 @@ class ReportController extends Controller
         } elseif (Schema::hasTable('quiz_attempt')) {
             $attemptsQuery = DB::table('quiz_attempt as qa')
                 ->leftJoin('quiz as q', 'qa.quiz_id', '=', 'q.id')
-                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'q.max_points')
+                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'qa.quiz_id')
                 ->where('qa.user_id', $userId)
                 ->orderBy('qa.created_at','desc')
                 ->get();
         } else {
             $attemptsQuery = collect();
+        }
+
+        // Preload quiz max points for all quizzes in this report
+        $quizMaxPoints = [];
+        if ($attemptsQuery && $attemptsQuery->count() > 0) {
+            $quizIds = collect($attemptsQuery)->pluck('quiz_id')->unique();
+            if ($quizIds->count() > 0) {
+                $maxPointsData = DB::table('questions')
+                    ->whereIn('quiz_id', $quizIds)
+                    ->groupBy('quiz_id')
+                    ->select('quiz_id', DB::raw('SUM(points) as total_points'))
+                    ->get();
+                foreach ($maxPointsData as $item) {
+                    $quizMaxPoints[$item->quiz_id] = (int)$item->total_points;
+                }
+            }
         }
 
         // Resolve student name (check users link) and class (check classroom_id)
@@ -394,7 +422,7 @@ class ReportController extends Controller
         $studentName = $studentName ?? 'N/A';
         $filename = 'laporan_prestasi_' . Str::slug($studentName) . '.csv';
 
-        $response = new StreamedResponse(function() use ($attemptsQuery, $studentName, $studentClass) {
+        $response = new StreamedResponse(function() use ($attemptsQuery, $studentName, $studentClass, $quizMaxPoints) {
             $out = fopen('php://output','w');
 
             // Header block
@@ -411,7 +439,7 @@ class ReportController extends Controller
             foreach ($attemptsQuery as $r) {
                 $dateStr = $r->date ? substr($r->date, 0, 10) : '';
                 $score = isset($r->score) ? (float)$r->score : 0;
-                $maxPoints = isset($r->max_points) && (float)$r->max_points > 0 ? (float)$r->max_points : 100;
+                $maxPoints = (float)($quizMaxPoints[$r->quiz_id] ?? 100);
                 $percentage = ($score / $maxPoints) * 100;
                 $scoreDisplay = round($score, 2) . '/' . (int)$maxPoints . ' (' . round($percentage, 2) . '%)';
                 
@@ -530,17 +558,33 @@ class ReportController extends Controller
 
         $attempts = [];
         if (Schema::hasTable('quiz_attempts')) {
-            $attempts = DB::table('quiz_attempts as qa')
+            $attemptsData = DB::table('quiz_attempts as qa')
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
-                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'q.max_points')
+                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'qa.quiz_id')
                 ->where('qa.student_id', $userId)
                 ->whereNotNull('qa.submitted_at')
                 ->orderBy('qa.created_at', 'desc')
-                ->get()
-                ->map(function ($r) {
+                ->get();
+
+            // Preload quiz max points
+            $quizIds = $attemptsData->pluck('quiz_id')->unique();
+            $quizMaxPoints = [];
+            if ($quizIds->count() > 0) {
+                $maxPointsData = DB::table('questions')
+                    ->whereIn('quiz_id', $quizIds)
+                    ->groupBy('quiz_id')
+                    ->select('quiz_id', DB::raw('SUM(points) as total_points'))
+                    ->get();
+                foreach ($maxPointsData as $item) {
+                    $quizMaxPoints[$item->quiz_id] = (int)$item->total_points;
+                }
+            }
+
+            $attempts = $attemptsData
+                ->map(function ($r) use ($quizMaxPoints) {
                     $dateStr = $r->date ? \Carbon\Carbon::parse($r->date)->format('Y-m-d') : '';
                     $score = isset($r->score) ? (float)$r->score : 0;
-                    $maxPoints = isset($r->max_points) && (float)$r->max_points > 0 ? (float)$r->max_points : 100;
+                    $maxPoints = (float)($quizMaxPoints[$r->quiz_id] ?? 100);
                     $percentage = ($score / $maxPoints) * 100;
                     $scoreDisplay = round($score, 2) . '/' . (int)$maxPoints . ' (' . round($percentage, 2) . '%)';
                     return [
@@ -628,16 +672,32 @@ class ReportController extends Controller
 
         $attempts = [];
         if (Schema::hasTable('quiz_attempts')) {
-            $attempts = DB::table('quiz_attempts as qa')
+            $attemptsData = DB::table('quiz_attempts as qa')
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
-                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'q.max_points')
+                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'qa.quiz_id')
                 ->where('qa.student_id', $userId)
                 ->whereNotNull('qa.submitted_at')
                 ->orderBy('qa.created_at', 'desc')
-                ->get()
-                ->map(function($r){
+                ->get();
+
+            // Preload quiz max points
+            $quizIds = $attemptsData->pluck('quiz_id')->unique();
+            $quizMaxPoints = [];
+            if ($quizIds->count() > 0) {
+                $maxPointsData = DB::table('questions')
+                    ->whereIn('quiz_id', $quizIds)
+                    ->groupBy('quiz_id')
+                    ->select('quiz_id', DB::raw('SUM(points) as total_points'))
+                    ->get();
+                foreach ($maxPointsData as $item) {
+                    $quizMaxPoints[$item->quiz_id] = (int)$item->total_points;
+                }
+            }
+
+            $attempts = $attemptsData
+                ->map(function($r) use ($quizMaxPoints){
                     $score = isset($r->score) ? (float)$r->score : 0;
-                    $maxPoints = isset($r->max_points) && (float)$r->max_points > 0 ? (float)$r->max_points : 100;
+                    $maxPoints = (float)($quizMaxPoints[$r->quiz_id] ?? 100);
                     $percentage = ($score / $maxPoints) * 100;
                     return [
                         'date' => $r->date ? date('Y-m-d', strtotime($r->date)) : '',
@@ -749,20 +809,34 @@ class ReportController extends Controller
             
             if (!empty($userIds) && Schema::hasTable('quiz_attempts')) {
                 // Get all attempts with quiz info
-                $attempts = DB::table('quiz_attempts as qa')
+                $attemptsData = DB::table('quiz_attempts as qa')
                     ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
-                    ->select('qa.score', 'q.max_points', 'q.title')
+                    ->select('qa.score', 'qa.quiz_id', 'q.title')
                     ->whereIn('qa.student_id', $userIds)
                     ->get();
                 
-                $totalAttempts = $attempts->count();
+                // Preload quiz max points
+                $quizIds = $attemptsData->pluck('quiz_id')->unique();
+                $quizMaxPoints = [];
+                if ($quizIds->count() > 0) {
+                    $maxPointsData = DB::table('questions')
+                        ->whereIn('quiz_id', $quizIds)
+                        ->groupBy('quiz_id')
+                        ->select('quiz_id', DB::raw('SUM(points) as total_points'))
+                        ->get();
+                    foreach ($maxPointsData as $item) {
+                        $quizMaxPoints[$item->quiz_id] = (int)$item->total_points;
+                    }
+                }
+                
+                $totalAttempts = $attemptsData->count();
                 
                 if ($totalAttempts > 0) {
                     // Calculate average with percentage
                     $scores = [];
-                    foreach ($attempts as $a) {
+                    foreach ($attemptsData as $a) {
                         $score = isset($a->score) ? (float)$a->score : 0;
-                        $maxPoints = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
+                        $maxPoints = (float)($quizMaxPoints[$a->quiz_id] ?? 100);
                         $percentage = ($score / $maxPoints) * 100;
                         $scores[] = $percentage;
                         
@@ -1128,16 +1202,33 @@ class ReportController extends Controller
             }
 
             $attempts = $query->where('qa.created_at', '>=', $fromDate)
-                ->select('qa.created_at', 'qa.score', 'q.title', 'qa.student_id', 'q.max_points')
+                ->select('qa.created_at', 'qa.score', 'q.title', 'q.id as quiz_id', 'qa.student_id')
                 ->get();
+        }
+
+        // Preload ALL quiz max points at once (much more efficient than querying per attempt)
+        $quizMaxPoints = [];
+        if ($attempts->count() > 0) {
+            $quizIds = $attempts->pluck('quiz_id')->unique();
+            if ($quizIds->count() > 0) {
+                $maxPointsData = DB::table('questions')
+                    ->whereIn('quiz_id', $quizIds)
+                    ->groupBy('quiz_id')
+                    ->select('quiz_id', DB::raw('SUM(points) as total_points'))
+                    ->get();
+                
+                foreach ($maxPointsData as $item) {
+                    $quizMaxPoints[$item->quiz_id] = (int)$item->total_points;
+                }
+            }
         }
 
         // Convert scores to percentages
         $convertedAttempts = [];
         foreach ($attempts as $a) {
             $score = isset($a->score) ? (float)$a->score : 0;
-            $maxPoints = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
-            $percentage = ($score / $maxPoints) * 100;
+            $maxPoints = (float)($quizMaxPoints[$a->quiz_id] ?? 100);
+            $percentage = $maxPoints > 0 ? ($score / $maxPoints) * 100 : 0;
             
             $convertedAttempts[] = (object)[
                 'created_at' => $a->created_at,
@@ -1228,14 +1319,28 @@ class ReportController extends Controller
                 }
                 
                 $classAttemptsData = $classQuery->where('qa.created_at', '>=', $fromDate)
-                    ->select('qa.created_at', 'qa.score', 'q.max_points')
+                    ->select('qa.created_at', 'qa.score', 'qa.quiz_id')
                     ->get();
+                
+                // Preload quiz max points for this class's attempts
+                $quizIds = $classAttemptsData->pluck('quiz_id')->unique();
+                $classQuizMaxPoints = [];
+                if ($quizIds->count() > 0) {
+                    $maxPointsData = DB::table('questions')
+                        ->whereIn('quiz_id', $quizIds)
+                        ->groupBy('quiz_id')
+                        ->select('quiz_id', DB::raw('SUM(points) as total_points'))
+                        ->get();
+                    foreach ($maxPointsData as $item) {
+                        $classQuizMaxPoints[$item->quiz_id] = (int)$item->total_points;
+                    }
+                }
                 
                 // Convert to percentages
                 $classAttemptsList = [];
                 foreach ($classAttemptsData as $a) {
                     $score = isset($a->score) ? (float)$a->score : 0;
-                    $maxPoints = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
+                    $maxPoints = (float)($classQuizMaxPoints[$a->quiz_id] ?? 100);
                     $percentage = ($score / $maxPoints) * 100;
                     
                     $classAttemptsList[] = (object)[
@@ -1308,15 +1413,33 @@ class ReportController extends Controller
                 
                 // Filter by date range for this class
                 $classAttempts = $classQuery->where('qa.created_at', '>=', $fromDate)
-                    ->select('qa.created_at', 'qa.score', 'q.title', 'qa.student_id', 'q.max_points')
+                    ->whereNotNull('qa.submitted_at')
+                    ->select('qa.created_at', 'qa.score', 'q.id as quiz_id', 'q.title', 'qa.student_id')
                     ->get();
+                
+                if ($classAttempts->count() === 0) continue;
+                
+                // Preload ALL quiz max points at once (much more efficient)
+                $quizIds = $classAttempts->pluck('quiz_id')->unique();
+                $quizMaxPoints = [];
+                if ($quizIds->count() > 0) {
+                    $maxPointsData = DB::table('questions')
+                        ->whereIn('quiz_id', $quizIds)
+                        ->groupBy('quiz_id')
+                        ->select('quiz_id', DB::raw('SUM(points) as total_points'))
+                        ->get();
+                    
+                    foreach ($maxPointsData as $item) {
+                        $quizMaxPoints[$item->quiz_id] = (int)$item->total_points;
+                    }
+                }
                 
                 // Convert to percentages
                 $classAttemptsList = [];
                 foreach ($classAttempts as $a) {
                     $score = isset($a->score) ? (float)$a->score : 0;
-                    $maxPoints = isset($a->max_points) && (float)$a->max_points > 0 ? (float)$a->max_points : 100;
-                    $percentage = ($score / $maxPoints) * 100;
+                    $maxPoints = (float)($quizMaxPoints[$a->quiz_id] ?? 100);
+                    $percentage = $maxPoints > 0 ? ($score / $maxPoints) * 100 : 0;
                     
                     $classAttemptsList[] = (object)[
                         'score' => round($percentage, 2),

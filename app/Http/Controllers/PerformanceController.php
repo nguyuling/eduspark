@@ -53,17 +53,31 @@ class PerformanceController extends Controller
             $allQuizAttempts = DB::table($quizTable . ' as qa')
                 ->when($quizMetaTable, function ($q) use ($quizMetaTable) {
                     return $q->join($quizMetaTable . ' as q', 'qa.quiz_id', '=', 'q.id')
-                        ->select('qa.quiz_id', 'qa.score', 'q.max_points');
+                        ->select('qa.quiz_id', 'qa.score');
                 })
                 ->where("qa.$quizUserCol", $studentId)
                 ->whereNotNull('qa.submitted_at')
                 ->get();
 
+            // Preload all quiz max points at once
+            $quizIds = collect($allQuizAttempts)->pluck('quiz_id')->unique();
+            $quizMaxPointsData = [];
+            if ($quizIds->count() > 0) {
+                $maxPointsRows = DB::table('questions')
+                    ->whereIn('quiz_id', $quizIds)
+                    ->groupBy('quiz_id')
+                    ->select('quiz_id', DB::raw('SUM(points) as total_points'))
+                    ->get();
+                foreach ($maxPointsRows as $row) {
+                    $quizMaxPointsData[$row->quiz_id] = (int)$row->total_points;
+                }
+            }
+
             $normalizedQuizScores = [];
             $quizAggregates = [];
             foreach ($allQuizAttempts as $a) {
-                // Use max_points from quizzes table
-                $maxScore = $a->max_points ?? 0;
+                // Get max_points from questions table sum
+                $maxScore = $quizMaxPointsData[$a->quiz_id] ?? 0;
                 if ($maxScore && $maxScore > 0) {
                     $normalizedQuizScores[] = ($a->score / $maxScore) * 100;
                 } else {
@@ -112,7 +126,7 @@ class PerformanceController extends Controller
                 }
             }
 
-            // Fetch recent quiz rows with max_points
+            // Fetch recent quiz rows
             $recentQuizRows = DB::table($quizTable . ' as a')
                 ->join($quizMetaTable . ' as q', 'a.quiz_id', '=', 'q.id')
                 ->where("a.$quizUserCol", $studentId)
@@ -123,7 +137,6 @@ class PerformanceController extends Controller
                     'a.score', 
                     'a.quiz_id',
                     'q.title as quiz_title',
-                    'q.max_points',
                     $quizTimestampCol ? 'a.' . $quizTimestampCol . ' as completed_at' : DB::raw('NULL as completed_at')
                 ])
                 ->get();
@@ -133,7 +146,7 @@ class PerformanceController extends Controller
                 $completedAt = property_exists($r, 'completed_at') ? $r->completed_at : null;
                 $fullTitle = $r->quiz_title ?? ($r->quiz_id ? 'Kuiz #' . $r->quiz_id : 'Kuiz');
                 $shortTitle = Str::limit($fullTitle, 18, '…');
-                $maxScore = $r->max_points ?? 0;
+                $maxScore = $quizMaxPointsData[$r->quiz_id] ?? 0;
                 $scorePercent = ($maxScore && $maxScore > 0)
                     ? round(($r->score / $maxScore) * 100, 2)
                     : (float) $r->score;
