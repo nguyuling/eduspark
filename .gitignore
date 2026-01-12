@@ -1,10 +1,10 @@
 # Environment Variables
 .env
-.env.*
-!.env.example
-
-# IDE and Editor Files
-/.vscode
+.env.backup
+.env.production
+.phpactor.json
+.phpunit.result.cache
+/.fleet
 /.idea
 /.nova
 /.fleet
@@ -24,26 +24,6 @@ Thumbs.db
 # Dependencies
 /vendor
 /node_modules
-package-lock.json
-yarn.lock
-
-# Composer Auto-Generated Files
-/vendor/composer/
-
-# Laravel Framework Specific
-/auth.json
-.phpunit.result.cache
-/.phpunit.cache
-bootstrap/cache/*.php
-/storage/*.key
-/storage/pail
-/storage/logs/*
-/storage/framework/*
-
-# Database
-/database/*.sqlite
-
-# Build Artifacts
 /public/build
 /public/hot
 /public/storage
@@ -53,3 +33,5 @@ bootstrap/cache/*.php
 # Deployment
 Homestead.json
 Homestead.yaml
+Thumbs.db
+.git.zip
