@@ -9,10 +9,41 @@ use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
-    // List all users (except self)
+    // List all users (except self) with unread message counts
     public function index()
     {
-        $users = User::where('id', '!=', Auth::id())->get();
+        $currentUserId = Auth::id();
+        
+        $users = User::where('id', '!=', $currentUserId)
+            ->select('id', 'name', 'email')
+            ->get()
+            ->map(function($user) use ($currentUserId) {
+                // Count unread messages from this user to current user
+                $unreadCount = Message::where('sender_id', $user->id)
+                    ->where('receiver_id', $currentUserId)
+                    ->whereNull('read_at')
+                    ->count();
+                
+                // Get the last message timestamp for sorting
+                $lastMessage = Message::where(function($q) use ($user, $currentUserId){
+                    $q->where('sender_id', $user->id)
+                      ->where('receiver_id', $currentUserId);
+                })->orWhere(function($q) use ($user, $currentUserId){
+                    $q->where('sender_id', $currentUserId)
+                      ->where('receiver_id', $user->id);
+                })->latest()->first();
+                
+                $user->unread_count = $unreadCount;
+                $user->last_message_at = $lastMessage ? $lastMessage->created_at : null;
+                
+                return $user;
+            })
+            ->sortByDesc(function($user) {
+                // Sort by: users with unread messages first, then by last message time
+                return [$user->unread_count > 0 ? 1 : 0, $user->last_message_at];
+            })
+            ->values();
+
         return response()->json($users);
     }
 
@@ -26,6 +57,12 @@ class MessageController extends Controller
             $q->where('sender_id', $user->id)
               ->where('receiver_id', Auth::id());
         })->orderBy('created_at')->get();
+        
+        // Mark all messages from this user as read
+        Message::where('sender_id', $user->id)
+            ->where('receiver_id', Auth::id())
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
 
         return response()->json($messages);
     }

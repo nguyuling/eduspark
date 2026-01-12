@@ -133,21 +133,39 @@
 </button>
 
 
-            <div id="chat-box" style="display:none; background:white; border:1px solid #ccc; border-radius:12px; width:300px; max-height:500px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+            <div id="chat-box" style="display:none; background:white; border:1px solid #ccc; border-radius:12px; width:320px; max-height:550px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.2);">
                 <div id="chat-header" style="background:#6a4df7; color:white; padding:10px; font-weight:bold; cursor:move;">
                     Mesej
                     <span id="chat-close" style="float:right; cursor:pointer;">✖</span>
                 </div>
-                <div style="padding:8px; border-bottom:1px solid #ccc;">
-    <input type="text" id="chat-search" placeholder="Search user..." 
-           style="width:100%; padding:6px 8px; border:1px solid #ddd; border-radius:6px;">
-</div>
-<div id="chat-users" style="max-height:130px; overflow-y:auto;"></div>
-
-                <div id="chat-messages" style="padding:10px; max-height:200px; overflow-y:auto;"></div>
-                <div style="display:flex; border-top:1px solid #ccc;">
-                    <input type="text" id="chat-input" placeholder="Type a message..." style="flex:1; padding:8px; border:none;">
-                    <button id="chat-send" style="background:#6a4df7; color:white; border:none; padding:0 12px;">Send</button>
+                
+                <!-- Active Chat Header (WhatsApp-style) -->
+                <div id="active-chat-header" style="display:none; background:#f0f0f0; padding:12px; border-bottom:2px solid #e0e0e0; align-items:center;">
+                    <div style="display:flex; align-items:center;">
+                        <div id="back-to-users" style="cursor:pointer; margin-right:10px; font-size:20px; color:#6a4df7;">←</div>
+                        <div style="flex:1; cursor:pointer;" id="active-user-info">
+                            <div id="active-user-name" style="font-weight:600; font-size:15px; color:#333;"></div>
+                            <div id="active-user-status" style="font-size:11px; color:#777;">Click to view profile</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User List View -->
+                <div id="chat-list-view">
+                    <div style="padding:8px; border-bottom:1px solid #ccc;">
+                        <input type="text" id="chat-search" placeholder="Search user..." 
+                               style="width:100%; padding:6px 8px; border:1px solid #ddd; border-radius:6px;">
+                    </div>
+                    <div id="chat-users" style="max-height:180px; overflow-y:auto;"></div>
+                </div>
+                
+                <!-- Chat Messages View -->
+                <div id="chat-messages-view" style="display:none;">
+                    <div id="chat-messages" style="padding:10px; max-height:280px; overflow-y:auto; background:#fafafa;"></div>
+                    <div style="display:flex; border-top:1px solid #ccc; background:white;">
+                        <input type="text" id="chat-input" placeholder="Type a message..." style="flex:1; padding:10px; border:none; font-size:14px;">
+                        <button id="chat-send" style="background:#6a4df7; color:white; border:none; padding:0 16px; cursor:pointer; font-weight:600;">Send</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -200,9 +218,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatInput = document.getElementById('chat-input');
     const chatSend = document.getElementById('chat-send');
     const chatSearch = document.getElementById('chat-search');
+    const chatListView = document.getElementById('chat-list-view');
+    const chatMessagesView = document.getElementById('chat-messages-view');
+    const activeChatHeader = document.getElementById('active-chat-header');
+    const activeUserNameEl = document.getElementById('active-user-name');
+    const activeUserInfo = document.getElementById('active-user-info');
+    const backToUsersBtn = document.getElementById('back-to-users');
+    
     let activeUserId = null;
+    let activeUserName = null;
     let pollingInterval = null;
     let allUsers = []; // store all users for search filter
+    let lastAIMessage = null; // store last message sent to AI
     const currentUserId = {{ auth()->id() }}; // Store current user ID
 
     // AI Assistant User Object
@@ -211,9 +238,41 @@ document.addEventListener('DOMContentLoaded', function() {
         name: 'Pembantu EduSpark AI 🤖',
         is_ai: true
     };
+    
+    // Click on active user info to view profile
+    activeUserInfo.onclick = () => {
+        if(activeUserId && activeUserId !== 'ai-assistant') {
+            window.location.href = `/users/${activeUserId}`;
+        }
+    };
+    
+    // Back to user list
+    backToUsersBtn.onclick = () => {
+        chatListView.style.display = 'block';
+        chatMessagesView.style.display = 'none';
+        activeChatHeader.style.display = 'none';
+        activeUserId = null;
+        activeUserName = null;
+        if (pollingInterval) clearInterval(pollingInterval);
+        highlightActiveUser();
+    };
 
     // Toggle chat box
-    toggleBtn.onclick = () => chatBox.style.display = chatBox.style.display === 'block' ? 'none' : 'block';
+    toggleBtn.onclick = () => {
+        if(chatBox.style.display === 'block') {
+            chatBox.style.display = 'none';
+        } else {
+            chatBox.style.display = 'block';
+            // Ensure we show the user list view when opening
+            chatListView.style.display = 'block';
+            chatMessagesView.style.display = 'none';
+            activeChatHeader.style.display = 'none';
+            // Load users if not already loaded
+            if(allUsers.length === 0) {
+                loadChatUsers();
+            }
+        }
+    };
     chatClose.onclick = () => chatBox.style.display = 'none';
 
     // Load all users
@@ -223,6 +282,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(users => {
                 allUsers = users; // store full list
                 renderUsers(users);
+            })
+            .catch(err => {
+                console.error('Error loading chat users:', err);
+                // Still render AI assistant even if user loading fails
+                renderUsers([]);
             });
     }
 
@@ -233,24 +297,116 @@ document.addEventListener('DOMContentLoaded', function() {
         // ALWAYS add AI Assistant at the top
         const aiDiv = document.createElement('div');
         aiDiv.textContent = AI_ASSISTANT.name;
-        aiDiv.style.padding = '10px 8px';
+        aiDiv.className = 'chat-user-item ai-user';
+        aiDiv.dataset.userId = 'ai-assistant';
+        aiDiv.style.padding = '12px 12px';
         aiDiv.style.cursor = 'pointer';
         aiDiv.style.borderBottom = '2px solid #6a4df7';
-        aiDiv.style.fontWeight = 'bold';
+        aiDiv.style.fontWeight = '600';
         aiDiv.style.color = '#6a4df7';
         aiDiv.style.backgroundColor = 'rgba(106, 77, 247, 0.1)';
+        aiDiv.style.transition = 'all 0.2s ease';
+        aiDiv.style.borderRadius = '8px';
+        aiDiv.style.marginBottom = '4px';
+        
+        aiDiv.onmouseenter = function() {
+            if(activeUserId !== 'ai-assistant') {
+                this.style.backgroundColor = 'rgba(106, 77, 247, 0.2)';
+                this.style.transform = 'translateX(4px)';
+            }
+        };
+        aiDiv.onmouseleave = function() {
+            if(activeUserId !== 'ai-assistant') {
+                this.style.backgroundColor = 'rgba(106, 77, 247, 0.1)';
+                this.style.transform = 'translateX(0)';
+            }
+        };
         aiDiv.onclick = () => openAIChat();
         chatUsers.appendChild(aiDiv);
         
         // Then render regular users
         users.forEach(user => {
             const div = document.createElement('div');
-            div.textContent = user.name;
-            div.style.padding = '8px';
+            div.className = 'chat-user-item';
+            div.dataset.userId = user.id;
+            div.dataset.userName = user.name;
+            div.style.padding = '12px 12px';
             div.style.cursor = 'pointer';
-            div.style.borderBottom = '1px solid #eee';
-            div.onclick = () => openChat(user.id);
+            div.style.borderBottom = '1px solid #e0e0e0';
+            div.style.transition = 'all 0.2s ease';
+            div.style.borderRadius = '8px';
+            div.style.marginBottom = '2px';
+            div.style.fontWeight = '500';
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            div.style.justifyContent = 'space-between';
+            
+            // Create name span
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = user.name;
+            div.appendChild(nameSpan);
+            
+            // Add unread indicator if there are unread messages
+            if(user.unread_count && user.unread_count > 0) {
+                const badge = document.createElement('span');
+                badge.className = 'unread-badge';
+                badge.textContent = user.unread_count;
+                badge.style.backgroundColor = '#6a4df7';
+                badge.style.color = 'white';
+                badge.style.borderRadius = '50%';
+                badge.style.width = '20px';
+                badge.style.height = '20px';
+                badge.style.display = 'flex';
+                badge.style.alignItems = 'center';
+                badge.style.justifyContent = 'center';
+                badge.style.fontSize = '11px';
+                badge.style.fontWeight = '700';
+                badge.style.flexShrink = '0';
+                div.appendChild(badge);
+                
+                // Make the user stand out more
+                div.style.fontWeight = '600';
+                div.style.backgroundColor = 'rgba(106, 77, 247, 0.05)';
+            }
+            
+            div.onmouseenter = function() {
+                if(activeUserId !== user.id) {
+                    this.style.backgroundColor = '#f5f5f5';
+                    this.style.transform = 'translateX(4px)';
+                    this.style.borderLeft = '3px solid #6a4df7';
+                }
+            };
+            div.onmouseleave = function() {
+                if(activeUserId !== user.id) {
+                    // Restore background color based on unread count
+                    this.style.backgroundColor = (user.unread_count && user.unread_count > 0) 
+                        ? 'rgba(106, 77, 247, 0.05)' 
+                        : 'transparent';
+                    this.style.transform = 'translateX(0)';
+                    this.style.borderLeft = 'none';
+                }
+            };
+            div.onclick = () => openChat(user.id, user.name);
             chatUsers.appendChild(div);
+        });
+        
+        // Highlight active user
+        highlightActiveUser();
+    }
+    
+    // Highlight the currently active user
+    function highlightActiveUser() {
+        document.querySelectorAll('.chat-user-item').forEach(item => {
+            const userId = item.dataset.userId;
+            if(userId == activeUserId) {
+                item.style.backgroundColor = activeUserId === 'ai-assistant' ? 'rgba(106, 77, 247, 0.25)' : '#e3f2fd';
+                item.style.borderLeft = '4px solid #6a4df7';
+                item.style.fontWeight = '600';
+            } else {
+                item.style.backgroundColor = userId === 'ai-assistant' ? 'rgba(106, 77, 247, 0.1)' : 'transparent';
+                item.style.borderLeft = 'none';
+                item.style.fontWeight = userId === 'ai-assistant' ? '600' : '500';
+            }
         });
     }
 
@@ -296,18 +452,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Open chat with a user
-    function openChat(userId) {
+    function openChat(userId, userName) {
         activeUserId = userId;
+        activeUserName = userName;
+        
+        // Show chat messages view and header
+        chatListView.style.display = 'none';
+        chatMessagesView.style.display = 'block';
+        activeChatHeader.style.display = 'block';
+        activeUserNameEl.textContent = userName;
+        
         if(chatBox.style.display !== 'block') chatBox.style.display = 'block'; // auto-open
         chatMessages.innerHTML = '';
         if(pollingInterval) clearInterval(pollingInterval);
         fetchConversation();
         pollingInterval = setInterval(fetchConversation, 2000);
+        highlightActiveUser();
+        
+        // Reload user list to update unread counts after opening conversation
+        setTimeout(() => loadChatUsers(), 500);
     }
 
     // Open AI Chat
     function openAIChat() {
         activeUserId = 'ai-assistant';
+        activeUserName = AI_ASSISTANT.name;
+        
+        // Show chat messages view and header
+        chatListView.style.display = 'none';
+        chatMessagesView.style.display = 'block';
+        activeChatHeader.style.display = 'block';
+        activeUserNameEl.textContent = AI_ASSISTANT.name;
+        
         if(chatBox.style.display !== 'block') chatBox.style.display = 'block';
         
         // Clear existing messages and interval
@@ -316,19 +492,58 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Load AI conversation from localStorage
         loadAIConversation();
+        highlightActiveUser();
     }
 
     function fetchConversation(){
         if(!activeUserId) return;
-        fetch(`/messages/conversation/${activeUserId}`)
+        fetch(`/messages/${activeUserId}`)
             .then(res=>res.json())
             .then(messages=>{
                 chatMessages.innerHTML='';
                 messages.forEach(m=>{
-                    const div = document.createElement('div');
-                    div.textContent = (m.sender_id === currentUserId ? 'You: ' : 'Them: ') + m.message;
-                    div.style.marginBottom='6px';
-                    chatMessages.appendChild(div);
+                    const isMe = m.sender_id === currentUserId;
+                    
+                    // Create container for alignment
+                    const container = document.createElement('div');
+                    container.style.display='flex';
+                    container.style.justifyContent = isMe ? 'flex-end' : 'flex-start';
+                    container.style.marginBottom='8px';
+                    
+                    // Create wrapper for name + bubble
+                    const wrapper = document.createElement('div');
+                    wrapper.style.maxWidth='75%';
+                    
+                    // Add name label for other person's messages
+                    if(!isMe) {
+                        const nameLabel = document.createElement('div');
+                        nameLabel.textContent = activeUserName;
+                        nameLabel.style.fontSize = '11px';
+                        nameLabel.style.color = '#666';
+                        nameLabel.style.marginBottom = '2px';
+                        nameLabel.style.marginLeft = '4px';
+                        wrapper.appendChild(nameLabel);
+                    }
+                    
+                    // Create message bubble
+                    const bubble = document.createElement('div');
+                    bubble.textContent = m.message;
+                    bubble.style.padding='8px 12px';
+                    bubble.style.borderRadius='12px';
+                    bubble.style.wordWrap='break-word';
+                    bubble.style.display='inline-block';
+                    
+                    if(isMe) {
+                        bubble.style.backgroundColor='#6a4df7';
+                        bubble.style.color='white';
+                    } else {
+                        bubble.style.backgroundColor='#f0f0f0';
+                        bubble.style.color='#333';
+                    }
+                    
+                    wrapper.appendChild(bubble);
+                    container.appendChild(wrapper);
+                    chatMessages.appendChild(container);
                 });
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             });
@@ -363,29 +578,59 @@ document.addEventListener('DOMContentLoaded', function() {
         const message = chatInput.value.trim();
         if(!message) return;
         
-        // Show user message immediately
-        saveAIMessage('user', message);
-        const userDiv = document.createElement('div');
-        userDiv.textContent = 'You: ' + message;
-        userDiv.style.marginBottom = '8px';
-        userDiv.style.padding = '6px 8px';
-        userDiv.style.borderRadius = '4px';
-        userDiv.style.backgroundColor = '#e3f2fd';
-        userDiv.style.textAlign = 'right';
-        userDiv.style.wordWrap = 'break-word';
-        chatMessages.appendChild(userDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        // Store the message for potential refresh
+        lastAIMessage = message;
+        
+        // Clear input immediately
+        chatInput.value = '';
+        
+        // Send the message
+        sendAIRequest(message);
+    }
+    
+    // Refresh AI response (regenerate answer)
+    function refreshAIResponse() {
+        if(!lastAIMessage) return;
+        sendAIRequest(lastAIMessage, true);
+    }
+    
+    // Send request to AI backend
+    function sendAIRequest(message, isRefresh = false) {
+        // Show user message immediately with better styling (only if not refresh)
+        if(!isRefresh) {
+            saveAIMessage('user', message);
+            const userBubble = document.createElement('div');
+            userBubble.textContent = message;
+            userBubble.style.padding = '8px 12px';
+            userBubble.style.borderRadius = '12px';
+            userBubble.style.backgroundColor = '#6a4df7';
+            userBubble.style.color = 'white';
+            userBubble.style.maxWidth = '75%';
+            userBubble.style.marginLeft = 'auto';
+            userBubble.style.marginBottom = '8px';
+            userBubble.style.wordWrap = 'break-word';
+            userBubble.style.textAlign = 'left';
+            chatMessages.appendChild(userBubble);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        } else {
+            // Remove last AI response for refresh
+            const aiResponses = chatMessages.querySelectorAll('.ai-response-container');
+            if(aiResponses.length > 0) {
+                aiResponses[aiResponses.length - 1].remove();
+            }
+        }
         
         // Show loading indicator
         const loadingDiv = document.createElement('div');
-        loadingDiv.textContent = 'AI: Thinking...';
+        loadingDiv.innerHTML = isRefresh ? '🔄 Menghasilkan jawapan baru...' : '🤖 AI sedang berfikir...';
         loadingDiv.id = 'loading-indicator';
         loadingDiv.style.marginBottom = '8px';
-        loadingDiv.style.padding = '6px 8px';
-        loadingDiv.style.borderRadius = '4px';
-        loadingDiv.style.backgroundColor = '#f5f5f5';
-        loadingDiv.style.fontSize = '12px';
-        loadingDiv.style.opacity = '0.6';
+        loadingDiv.style.padding = '8px 12px';
+        loadingDiv.style.borderRadius = '12px';
+        loadingDiv.style.backgroundColor = '#f0f0f0';
+        loadingDiv.style.fontSize = '13px';
+        loadingDiv.style.opacity = '0.7';
+        loadingDiv.style.maxWidth = '75%';
         chatMessages.appendChild(loadingDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
         
@@ -405,33 +650,113 @@ document.addEventListener('DOMContentLoaded', function() {
             if(loadingEl) loadingEl.remove();
             
             if(data.success && data.reply) {
-                // Save AI response
-                saveAIMessage('ai', data.reply);
+                // Save AI response (only for new messages, not refresh)
+                if(!isRefresh) {
+                    saveAIMessage('ai', data.reply);
+                }
                 
-                // Show AI response
-                const aiDiv = document.createElement('div');
-                aiDiv.textContent = 'AI: ' + data.reply;
-                aiDiv.style.marginBottom = '8px';
-                aiDiv.style.padding = '6px 8px';
-                aiDiv.style.borderRadius = '4px';
-                aiDiv.style.backgroundColor = '#f5f5f5';
-                aiDiv.style.wordWrap = 'break-word';
-                chatMessages.appendChild(aiDiv);
+                // Create AI response with smart formatting
+                const aiContainer = document.createElement('div');
+                aiContainer.className = 'ai-response-container';
+                aiContainer.style.marginBottom = '8px';
+                aiContainer.style.maxWidth = '85%';
+                
+                // Check if response contains code blocks
+                const codeMatch = data.reply.match(/```(\w*)\n([\s\S]*?)```/g);
+                
+                if(codeMatch) {
+                    // Parse message with code blocks
+                    let parts = data.reply.split(/(```\w*\n[\s\S]*?```)/g);
+                    parts.forEach(part => {
+                        if(part.startsWith('```')) {
+                            // Extract language and code
+                            const match = part.match(/```(\w*)\n([\s\S]*?)```/);
+                            if(match) {
+                                const code = match[2];
+                                const codeBlock = document.createElement('pre');
+                                codeBlock.style.backgroundColor = '#2d2d2d';
+                                codeBlock.style.color = '#f8f8f2';
+                                codeBlock.style.padding = '12px';
+                                codeBlock.style.borderRadius = '6px';
+                                codeBlock.style.overflowX = 'auto';
+                                codeBlock.style.fontSize = '12px';
+                                codeBlock.style.fontFamily = 'monospace';
+                                codeBlock.style.marginTop = '4px';
+                                codeBlock.textContent = code;
+                                aiContainer.appendChild(codeBlock);
+                            }
+                        } else if(part.trim()) {
+                            // Regular text
+                            const textDiv = document.createElement('div');
+                            textDiv.innerHTML = part.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                            textDiv.style.padding = '8px 12px';
+                            textDiv.style.borderRadius = '12px';
+                            textDiv.style.backgroundColor = '#f0f0f0';
+                            textDiv.style.color = '#333';
+                            textDiv.style.lineHeight = '1.5';
+                            aiContainer.appendChild(textDiv);
+                        }
+                    });
+                } else {
+                    // Simple text response with formatting
+                    const textDiv = document.createElement('div');
+                    textDiv.innerHTML = data.reply.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/✅/g, '<span style="color:#28a745;">✅</span>').replace(/🔹/g, '<span style="color:#6a4df7;">🔹</span>');
+                    textDiv.style.padding = '8px 12px';
+                    textDiv.style.borderRadius = '12px';
+                    textDiv.style.backgroundColor = '#f0f0f0';
+                    textDiv.style.color = '#333';
+                    textDiv.style.lineHeight = '1.5';
+                    textDiv.style.wordWrap = 'break-word';
+                    aiContainer.appendChild(textDiv);
+                }
+                
+                // Add refresh button to AI response
+                const refreshBtn = document.createElement('button');
+                refreshBtn.innerHTML = '🔄 Regenerate Answer';
+                refreshBtn.style.marginTop = '6px';
+                refreshBtn.style.padding = '4px 10px';
+                refreshBtn.style.fontSize = '11px';
+                refreshBtn.style.backgroundColor = 'transparent';
+                refreshBtn.style.color = '#6a4df7';
+                refreshBtn.style.border = '1px solid #6a4df7';
+                refreshBtn.style.borderRadius = '6px';
+                refreshBtn.style.cursor = 'pointer';
+                refreshBtn.style.transition = 'all 0.2s';
+                refreshBtn.onmouseenter = function() {
+                    this.style.backgroundColor = '#6a4df7';
+                    this.style.color = 'white';
+                };
+                refreshBtn.onmouseleave = function() {
+                    this.style.backgroundColor = 'transparent';
+                    this.style.color = '#6a4df7';
+                };
+                refreshBtn.onclick = refreshAIResponse;
+                aiContainer.appendChild(refreshBtn);
+                
+                chatMessages.appendChild(aiContainer);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             } else {
                 alert('Error getting AI response');
             }
-            
-            chatInput.value = '';
         })
         .catch(err => {
             console.error('AI Chat Error:', err);
             const loadingEl = document.getElementById('loading-indicator');
             if(loadingEl) loadingEl.remove();
             alert('Failed to connect to AI Assistant');
-            chatInput.value = '';
         });
     }
+    
+    // Enter key to send message
+    chatInput.addEventListener('keypress', function(e) {
+        if(e.key === 'Enter') {
+            if(activeUserId === 'ai-assistant') {
+                sendMessageToAI();
+            } else {
+                chatSend.click();
+            }
+        }
+    });
 });
 </script>
 

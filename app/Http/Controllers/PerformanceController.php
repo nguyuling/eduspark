@@ -13,6 +13,11 @@ class PerformanceController extends Controller
 {
     public function index()
     {
+        // Redirect teachers to reports page
+        if (Auth::check() && Auth::user()->role === 'teacher') {
+            return redirect()->route('reports.index');
+        }
+        
         // use the authenticated user when available, otherwise test id 2
         $studentId = Auth::id() ?? 2;
 
