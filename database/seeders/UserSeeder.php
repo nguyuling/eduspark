@@ -21,7 +21,9 @@ class UserSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
-            'role' => null,
+            'role' => null,           
+            'school_name' => 'SMK Pengerang Utama',
+
         ]);
 
         // Create All Teachers
@@ -112,6 +114,7 @@ class UserSeeder extends Seeder
                 'school_code' => 'PU001',
                 'phone' => '+60210000005',
                 'user_id' => 'P-PU001-005',
+                'school_name' => 'SMK Kota Kemuning',
             ],
             [
                 'id' => 10,

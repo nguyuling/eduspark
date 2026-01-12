@@ -50,11 +50,14 @@
             id="name"
             name="name"
             value="{{ old('name', $user->name) }}"
-            required
+            readonly
+            style="background-color:#f9fafb; border-color:#d1d5db; color:#6b7280; cursor:not-allowed;"
           >
           @error('name')
             <div class="error-msg">{{ $message }}</div>
           @enderror
+
+          
         </div>
 
         <div class="form-group">
@@ -72,6 +75,35 @@
           @enderror
         </div>
 
+        <div class="form-group">
+          <label for="phone">No. Telefon*</label>
+          <input
+            type="text"
+            id="phone"
+            name="phone"
+            value="{{ old('phone', $user->phone) }}"
+            required
+          >
+          @error('phone')
+            <div class="error-msg">{{ $message }}</div>
+          @enderror
+        </div>
+
+        <div class="form-group">
+          <label for="role">Peranan*</label>
+          <input
+            type="text"
+            id="role"
+            name="role"
+            value="{{ old('role', $user->role) }}"
+            readonly
+            style="background-color:#f9fafb; border-color:#d1d5db; color:#6b7280; cursor:not-allowed;"
+          >
+          @error('role')
+            <div class="error-msg">{{ $message }}</div>
+          @enderror
+        </div>
+
         <div class="panel-footer" style="display:flex;justify-content:center;">
           <button type="submit" class="btn btn-primary" style="padding:14px 26px">
             <i class="bi bi-check-lg"></i>
@@ -83,3 +115,4 @@
   </main>
 </div>
 @endsection
+
