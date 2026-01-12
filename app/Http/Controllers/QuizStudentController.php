@@ -225,43 +225,63 @@ class QuizStudentController extends Controller
                 $submittedOptions = []; 
 
             } elseif ($question->type === 'coding') {
-                // Coding question grading: Award 1 point per correctly answered hidden line
-                $hiddenLineNumbers = !empty($question->hidden_line_numbers) 
-                    ? array_map('intval', explode(',', $question->hidden_line_numbers))
-                    : [];
-                
-                $codeLines = explode("\n", $question->coding_full_code);
-                $correctLineCount = 0;
-                
-                // Check each hidden line
-                foreach ($hiddenLineNumbers as $lineNum) {
-                    $lineIndex = $lineNum - 1; // Convert to 0-indexed
+                // Check if it's the new format (full code in 'code' field) or old format (line by line)
+                if (isset($studentAnswer['code'])) {
+                    // New format: full code submitted in textarea
+                    $submittedCode = trim($studentAnswer['code'] ?? '');
+                    $expectedCode = trim($question->coding_full_code ?? '');
                     
-                    if (!isset($codeLines[$lineIndex])) {
-                        continue;
+                    // Compare the full code (trimmed and normalized)
+                    if ($submittedCode === $expectedCode) {
+                        $isCorrect = true;
+                        $scoreGained = $question->points;
+                    } else {
+                        // Partial credit: check if the key logic is present
+                        // For now, partial match gives 0, but you can enhance this
+                        $scoreGained = 0;
                     }
                     
-                    $expectedCode = trim($codeLines[$lineIndex]);
-                    $lineKey = 'line_' . $lineNum;
-                    $submittedCode = trim($studentAnswer[$lineKey] ?? '');
+                    $submittedText = $submittedCode;
+                    $submittedOptions = [];
+                } else {
+                    // Old format: line-by-line hidden line grading
+                    $hiddenLineNumbers = !empty($question->hidden_line_numbers) 
+                        ? array_map('intval', explode(',', $question->hidden_line_numbers))
+                        : [];
                     
-                    // Exact match comparison (case-sensitive for code)
-                    if ($expectedCode === $submittedCode) {
-                        $correctLineCount++;
+                    $codeLines = explode("\n", $question->coding_full_code);
+                    $correctLineCount = 0;
+                    
+                    // Check each hidden line
+                    foreach ($hiddenLineNumbers as $lineNum) {
+                        $lineIndex = $lineNum - 1; // Convert to 0-indexed
+                        
+                        if (!isset($codeLines[$lineIndex])) {
+                            continue;
+                        }
+                        
+                        $expectedCode = trim($codeLines[$lineIndex]);
+                        $lineKey = 'line_' . $lineNum;
+                        $submittedCode = trim($studentAnswer[$lineKey] ?? '');
+                        
+                        // Exact match comparison (case-sensitive for code)
+                        if ($expectedCode === $submittedCode) {
+                            $correctLineCount++;
+                        }
                     }
+                    
+                    // Award 1 point per correctly answered line (capped at question points)
+                    $scoreGained = min($correctLineCount, $question->points);
+                    
+                    // Consider correct only if all lines answered correctly
+                    if ($correctLineCount === count($hiddenLineNumbers) && count($hiddenLineNumbers) > 0) {
+                        $isCorrect = true;
+                    }
+                    
+                    // Store submitted code as JSON for reference
+                    $submittedText = json_encode($studentAnswer);
+                    $submittedOptions = [];
                 }
-                
-                // Award 1 point per correctly answered line (capped at question points)
-                $scoreGained = min($correctLineCount, $question->points);
-                
-                // Consider correct only if all lines answered correctly
-                if ($correctLineCount === count($hiddenLineNumbers) && count($hiddenLineNumbers) > 0) {
-                    $isCorrect = true;
-                }
-                
-                // Store submitted code as JSON for reference
-                $submittedText = json_encode($studentAnswer);
-                $submittedOptions = [];
             }
             
             // --- SCORING & STORAGE ---

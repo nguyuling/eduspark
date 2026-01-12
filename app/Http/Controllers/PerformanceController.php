@@ -56,6 +56,7 @@ class PerformanceController extends Controller
                         ->select('qa.quiz_id', 'qa.score', 'q.max_points');
                 })
                 ->where("qa.$quizUserCol", $studentId)
+                ->whereNotNull('qa.submitted_at')
                 ->get();
 
             $normalizedQuizScores = [];
@@ -83,6 +84,7 @@ class PerformanceController extends Controller
 
             $totalQuizzes = DB::table($quizTable)
                 ->where($quizUserCol, $studentId)
+                ->whereNotNull('submitted_at')
                 ->count();
 
             // weakest topic: pick the lowest average percent but only if below 100%
@@ -114,6 +116,7 @@ class PerformanceController extends Controller
             $recentQuizRows = DB::table($quizTable . ' as a')
                 ->join($quizMetaTable . ' as q', 'a.quiz_id', '=', 'q.id')
                 ->where("a.$quizUserCol", $studentId)
+                ->whereNotNull('a.submitted_at')
                 ->orderBy('a.' . ($quizTimestampCol ?? 'id'), 'asc') // chronological order (oldest first)
                 ->limit(6)
                 ->select([

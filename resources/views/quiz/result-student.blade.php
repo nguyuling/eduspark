@@ -74,37 +74,66 @@
 
                             @elseif($answer->question->type === 'coding')
                                 @php
-                                    $submittedAnswers = json_decode($answer->submitted_text, true) ?? [];
-                                    $hiddenLineNumbers = !empty($answer->question->hidden_line_numbers) 
-                                        ? array_map('intval', explode(',', $answer->question->hidden_line_numbers))
-                                        : [];
-                                    $codeLines = explode("\n", $answer->question->coding_full_code);
+                                    // Check if submitted_text is JSON (old format) or plain text (new format)
+                                    $submittedAnswers = json_decode($answer->submitted_text, true);
+                                    $isNewFormat = ($submittedAnswers === null && !empty($answer->submitted_text));
+                                    
+                                    if ($isNewFormat) {
+                                        // New format: full code submitted
+                                        $submittedCode = $answer->submitted_text;
+                                        $expectedCode = $answer->question->coding_full_code ?? '';
+                                    } else {
+                                        // Old format: line-by-line answers
+                                        $submittedAnswers = $submittedAnswers ?? [];
+                                        $hiddenLineNumbers = !empty($answer->question->hidden_line_numbers) 
+                                            ? array_map('intval', explode(',', $answer->question->hidden_line_numbers))
+                                            : [];
+                                        $codeLines = explode("\n", $answer->question->coding_full_code);
+                                    }
                                 @endphp
-                                @if(count($codeLines) > 0)
-                                    <div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:0; min-height:100px; display: flex;">
-                                        <!-- Line Numbers Column -->
-                                        <div style="flex-shrink: 0; width: 40px; background: #e8e8e8; padding: 8px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none; padding-right: 6px; display: flex; flex-direction: column;">
-                                            @foreach ($codeLines as $lineIndex => $line)
-                                                <div style="height: 1.5em; display: flex; align-items: center; justify-content: flex-end;">{{ $lineIndex + 1 }}</div>
-                                            @endforeach
+                                
+                                @if($isNewFormat)
+                                    <!-- New Format: Show side-by-side comparison -->
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                        <!-- Student's Code -->
+                                        <div>
+                                            <div style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--danger);">Kod Anda:</div>
+                                            <div style="background: rgba(230,57,70,0.08); border: 2px solid var(--danger); border-radius: 8px; padding: 12px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; white-space: pre; overflow-x: auto;">{{ $submittedCode ?: '(Tidak dijawab)' }}</div>
                                         </div>
-                                        <!-- Code Content Column -->
-                                        <div style="flex: 1; padding: 8px 8px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit; white-space: pre; overflow-x: auto; display: flex; flex-direction: column;">
-                                            @foreach ($codeLines as $lineIndex => $codeLine)
-                                                @php
-                                                    $lineNum = $lineIndex + 1;
-                                                    $isHidden = in_array($lineNum, $hiddenLineNumbers);
-                                                    $lineKey = 'line_' . $lineNum;
-                                                    $studentAnswer = $submittedAnswers[$lineKey] ?? '';
-                                                    $expectedCode = trim($codeLine);
-                                                    $isCorrect = trim($studentAnswer) === $expectedCode;
-                                                @endphp
-                                                <div style="height: 1.5em; display: flex; align-items: center; background: {{ $isHidden ? ($isCorrect ? 'rgba(42,157,143,0.15)' : 'rgba(230,57,70,0.15)') : 'transparent' }}; flex-shrink: 0;">{{ $isHidden ? ($studentAnswer ?: '(Tidak dijawab)') : $codeLine }}</div>
-                                            @endforeach
+                                        <!-- Expected Code -->
+                                        <div>
+                                            <div style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--success);">Kod yang Betul:</div>
+                                            <div style="background: rgba(42,157,143,0.08); border: 2px solid var(--success); border-radius: 8px; padding: 12px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; white-space: pre; overflow-x: auto;">{{ $expectedCode }}</div>
                                         </div>
                                     </div>
                                 @else
-                                    <div style="font-size:14px; color:#0b1220;">(Tidak dijawab)</div>
+                                    <!-- Old Format: Line-by-line display -->
+                                    @if(count($codeLines) > 0)
+                                        <div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:0; min-height:100px; display: flex;">
+                                            <!-- Line Numbers Column -->
+                                            <div style="flex-shrink: 0; width: 40px; background: #e8e8e8; padding: 8px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none; padding-right: 6px; display: flex; flex-direction: column;">
+                                                @foreach ($codeLines as $lineIndex => $line)
+                                                    <div style="height: 1.5em; display: flex; align-items: center; justify-content: flex-end;">{{ $lineIndex + 1 }}</div>
+                                                @endforeach
+                                            </div>
+                                            <!-- Code Content Column -->
+                                            <div style="flex: 1; padding: 8px 8px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit; white-space: pre; overflow-x: auto; display: flex; flex-direction: column;">
+                                                @foreach ($codeLines as $lineIndex => $codeLine)
+                                                    @php
+                                                        $lineNum = $lineIndex + 1;
+                                                        $isHidden = in_array($lineNum, $hiddenLineNumbers);
+                                                        $lineKey = 'line_' . $lineNum;
+                                                        $studentAnswer = $submittedAnswers[$lineKey] ?? '';
+                                                        $expectedCode = trim($codeLine);
+                                                        $isCorrect = trim($studentAnswer) === $expectedCode;
+                                                    @endphp
+                                                    <div style="height: 1.5em; display: flex; align-items: center; background: {{ $isHidden ? ($isCorrect ? 'rgba(42,157,143,0.15)' : 'rgba(230,57,70,0.15)') : 'transparent' }}; flex-shrink: 0;">{{ $isHidden ? ($studentAnswer ?: '(Tidak dijawab)') : $codeLine }}</div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div style="font-size:14px; color:#0b1220;">(Tidak dijawab)</div>
+                                    @endif
                                 @endif
 
                             @else
@@ -150,41 +179,14 @@
                         </div>
                     </div>
 
-                    <!-- Correct Answer (show for short answer or coding when wrong) -->
-                    @if(!$answer->is_correct && ($answer->question->type === 'short_answer' || $answer->question->type === 'coding'))
+                    <!-- Correct Answer (show for short answer when wrong, skip for coding since it's shown above) -->
+                    @if(!$answer->is_correct && $answer->question->type === 'short_answer')
                         <div style="margin-bottom:20px;">
                             <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color:var(--muted);">Jawapan yang Betul</label>
                             
-                            @if($answer->question->type === 'short_answer')
-                                <div style="font-size: 14px; font-weight: 600; padding:12px; background:rgba(42, 157, 143, 0.08); border-radius:8px; border-left:3px solid var(--success);">
-                                    {{ ($answer->question->correct_answer === null || $answer->question->correct_answer === '') ? '(Tiada jawapan betul ditakrifkan)' : $answer->question->correct_answer }}
-                                </div>
-                            @elseif($answer->question->type === 'coding')
-                                @php
-                                    $codeLines = explode("\n", $answer->question->coding_full_code);
-                                    $hiddenLineNumbers = !empty($answer->question->hidden_line_numbers) 
-                                        ? array_map('intval', explode(',', $answer->question->hidden_line_numbers))
-                                        : [];
-                                @endphp
-                                <div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #06a77d; overflow: hidden; padding:0; min-height:100px; display: flex;">
-                                    <!-- Line Numbers Column -->
-                                    <div style="flex-shrink: 0; width: 40px; background: #e8e8e8; padding: 8px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none; padding-right: 6px; display: flex; flex-direction: column;">
-                                        @foreach ($codeLines as $lineIndex => $line)
-                                            <div style="height: 1.5em; display: flex; align-items: center; justify-content: flex-end;">{{ $lineIndex + 1 }}</div>
-                                        @endforeach
-                                    </div>
-                                    <!-- Code Content Column -->
-                                    <div style="flex: 1; padding: 8px 8px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit; white-space: pre; overflow-x: auto; display: flex; flex-direction: column;">
-                                        @foreach ($codeLines as $lineIndex => $codeLine)
-                                            @php
-                                                $lineNum = $lineIndex + 1;
-                                                $isHidden = in_array($lineNum, $hiddenLineNumbers);
-                                            @endphp
-                                            <div style="height: 1.5em; display: flex; align-items: center; background: {{ $isHidden ? 'rgba(42,157,143,0.2)' : 'transparent' }}; flex-shrink: 0;">{{ $codeLine }}</div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
+                            <div style="font-size: 14px; font-weight: 600; padding:12px; background:rgba(42, 157, 143, 0.08); border-radius:8px; border-left:3px solid var(--success);">
+                                {{ ($answer->question->correct_answer === null || $answer->question->correct_answer === '') ? '(Tiada jawapan betul ditakrifkan)' : $answer->question->correct_answer }}
+                            </div>
                         </div>
                     @endif
                 </section>

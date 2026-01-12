@@ -207,55 +207,18 @@
                   </div>
 
                 @elseif ($question->type === 'coding')
-                  <!-- Code Template Display -->
-                  @if ($question->coding_template)
-                    <div style="margin-bottom:20px; border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; background:rgba(106,77,247,0.02); text-align:left;">
-                      <div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:8px;">Template Kod:</div>
-                      <div style="background:#f5f5f5; padding:12px; border-radius:8px; border:2px solid #d1d5db; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; white-space:pre; overflow-x:auto;">{{ $question->coding_template }}</div>
-                    </div>
-                  @endif
-
-                  <!-- Pandangan Pelajar (Student View) -->
-                  @if ($question->coding_full_code)
-                    <div style="border:2px solid rgba(106,77,247,0.3); border-radius:12px; padding:16px; background:rgba(106,77,247,0.02); margin-bottom:12px; text-align:left;">
-                      <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 12px;">Jawapan</label>
-                      <div style="position: relative; background: #f5f5f5; border-radius: 8px; border: 2px solid #d1d5db; overflow: hidden; padding:0; min-height:100px; display: flex;">
-                        @php
-                          $hiddenLines = !empty($question->hidden_line_numbers) ? array_map('intval', explode(',', $question->hidden_line_numbers)) : [];
-                          $lines = explode("\n", $question->coding_full_code);
-                        @endphp
-                        
-                        <!-- Line Numbers Column -->
-                        <div style="flex-shrink: 0; width: 40px; background: #e8e8e8; padding: 8px 0; text-align: right; font-size: 12px; font-family: 'Courier New', monospace; color: #888; border-right: 1px solid #d1d5db; line-height: 1.5; user-select: none; padding-right: 6px; display: flex; flex-direction: column;">
-                          @foreach ($lines as $index => $line)
-                            <div style="height: 1.5em; display: flex; align-items: center; justify-content: flex-end;">{{ $index + 1 }}</div>
-                          @endforeach
-                        </div>
-                        
-                        <!-- Code Content Column -->
-                        <div style="flex: 1; padding: 8px 8px; font-family:'Courier New', monospace; font-size:12px; line-height:1.5; color:inherit; white-space: pre; overflow-x: auto; display: flex; flex-direction: column;">
-                          @foreach ($lines as $index => $line)
-                            @php $lineNum = $index + 1; $isHidden = in_array($lineNum, $hiddenLines); @endphp
-                            @if ($isHidden)
-                              <!-- Hidden line: input field with yellow background -->
-                              <div style="height: 1.5em; display: flex; align-items: center; background: rgba(255, 193, 7, 0.2); flex-shrink: 0;">
-                                <input type="text" 
-                                       class="quiz-answer-input coding-line-input" 
-                                       data-question-id="{{ $question->id }}" 
-                                       data-line-number="{{ $lineNum }}"
-                                       name="answers[{{ $question->id }}][line_{{ $lineNum }}]"
-                                       value=""
-                                       style="flex:1; border:none; background:transparent; font-family:'Courier New', monospace; font-size:12px; padding:0 4px; outline:none; color:#000; line-height:1.5; margin:0; display:block; white-space:pre;">
-                              </div>
-                            @else
-                              <!-- Non-hidden line: display as text (read-only) -->
-                              <div style="height: 1.5em; display: flex; align-items: center; flex-shrink: 0;">{{ $line }}</div>
-                            @endif
-                          @endforeach
-                        </div>
-                      </div>
-                    </div>
-                  @endif
+                  <!-- Coding Question - Editable Code Box -->
+                  <div style="text-align:left;">
+                    <label for="q{{ $question->id }}_code" style="display:block; font-size:15px; color:var(--muted); margin-bottom:8px; font-weight:600;">Tulis kod anda:</label>
+                    <textarea class="quiz-answer-input" 
+                              name="answers[{{ $question->id }}][code]" 
+                              id="q{{ $question->id }}_code"
+                              placeholder="Taip atau edit kod anda di sini..."
+                              data-question-id="{{ $question->id }}"
+                              style="width:100%; min-height:200px; padding:12px; border-radius:8px; border:2px solid #d1d5db; box-sizing:border-box; font-size:14px; font-family:'Courier New', monospace; line-height:1.5; resize:vertical; background:#f5f5f5;"
+                              onfocus="this.style.borderColor='rgba(106,77,247,0.6)'; this.style.background='#fff';"
+                              onblur="this.style.borderColor='#d1d5db'; this.style.background='#f5f5f5';">{{ $question->coding_template ?? '' }}</textarea>
+                  </div>
                 @endif
               </section>
             @endforeach
@@ -509,6 +472,7 @@ function updateProgressBar() {
         const radios = questionCard.parentElement.querySelectorAll('input[type="radio"][data-question-id="' + questionId + '"]');
         const checkboxes = questionCard.parentElement.querySelectorAll('input[type="checkbox"][data-question-id="' + questionId + '"]');
         const textInputs = questionCard.parentElement.querySelectorAll('input[type="text"]:not(.coding-line-input)[data-question-id="' + questionId + '"]');
+        const textareas = questionCard.parentElement.querySelectorAll('textarea[data-question-id="' + questionId + '"]');
         const codingLineInputs = questionCard.parentElement.querySelectorAll('input.coding-line-input[data-question-id="' + questionId + '"]');
         
         let isAnswered = false;
@@ -524,6 +488,10 @@ function updateProgressBar() {
         if (textInputs.length > 0 && !isAnswered) {
             const filledText = Array.from(textInputs).find(t => t.value.trim() !== '');
             if (filledText) isAnswered = true;
+        }
+        if (textareas.length > 0 && !isAnswered) {
+            const filledTextarea = Array.from(textareas).find(t => t.value.trim() !== '');
+            if (filledTextarea) isAnswered = true;
         }
         if (codingLineInputs.length > 0 && !isAnswered) {
             const filledCodeLine = Array.from(codingLineInputs).find(c => c.value.trim() !== '');
@@ -565,6 +533,7 @@ function updateSubmitButtonVisibility() {
         const radios = questionCard.parentElement.querySelectorAll('input[type="radio"][data-question-id="' + questionId + '"]');
         const checkboxes = questionCard.parentElement.querySelectorAll('input[type="checkbox"][data-question-id="' + questionId + '"]');
         const textInputs = questionCard.parentElement.querySelectorAll('input[type="text"]:not(.coding-line-input)[data-question-id="' + questionId + '"]');
+        const textareas = questionCard.parentElement.querySelectorAll('textarea[data-question-id="' + questionId + '"]');
         const codingLineInputs = questionCard.parentElement.querySelectorAll('input.coding-line-input[data-question-id="' + questionId + '"]');
         
         let isAnswered = false;
@@ -580,6 +549,10 @@ function updateSubmitButtonVisibility() {
         if (textInputs.length > 0 && !isAnswered) {
             const filledText = Array.from(textInputs).find(t => t.value.trim() !== '');
             if (filledText) isAnswered = true;
+        }
+        if (textareas.length > 0 && !isAnswered) {
+            const filledTextarea = Array.from(textareas).find(t => t.value.trim() !== '');
+            if (filledTextarea) isAnswered = true;
         }
         if (codingLineInputs.length > 0 && !isAnswered) {
             const filledCodeLine = Array.from(codingLineInputs).find(c => c.value.trim() !== '');
@@ -690,6 +663,7 @@ function checkAllQuestionsAnswered() {
         const radios = questionCard.parentElement.querySelectorAll('input[type="radio"][data-question-id="' + questionId + '"]');
         const checkboxes = questionCard.parentElement.querySelectorAll('input[type="checkbox"][data-question-id="' + questionId + '"]');
         const textInputs = questionCard.parentElement.querySelectorAll('input[type="text"]:not(.coding-line-input)[data-question-id="' + questionId + '"]');
+        const textareas = questionCard.parentElement.querySelectorAll('textarea[data-question-id="' + questionId + '"]');
         const codingLineInputs = questionCard.parentElement.querySelectorAll('input.coding-line-input[data-question-id="' + questionId + '"]');
 
         let isAnswered = false;
@@ -706,12 +680,16 @@ function checkAllQuestionsAnswered() {
             const filledText = Array.from(textInputs).find(t => t.value.trim() !== '');
             if (filledText) isAnswered = true;
         }
+        if (textareas.length > 0 && !isAnswered) {
+            const filledTextarea = Array.from(textareas).find(t => t.value.trim() !== '');
+            if (filledTextarea) isAnswered = true;
+        }
         if (codingLineInputs.length > 0 && !isAnswered) {
             const filledCodeLine = Array.from(codingLineInputs).find(c => c.value.trim() !== '');
             if (filledCodeLine) isAnswered = true;
         }
 
-        if (!isAnswered && (radios.length > 0 || checkboxes.length > 0 || textInputs.length > 0 || codingLineInputs.length > 0)) {
+        if (!isAnswered && (radios.length > 0 || checkboxes.length > 0 || textInputs.length > 0 || textareas.length > 0 || codingLineInputs.length > 0)) {
             unansweredCount++;
         }
     });
@@ -746,6 +724,10 @@ function submitQuizData() {
         else if (input.type === 'radio' && input.checked) {
             answers[qId] = input.value;
         }
+        // Handle Textarea (coding questions)
+        else if (input.tagName === 'TEXTAREA' && input.value) {
+            answers[qId] = { code: input.value };
+        }
         // Handle Short Answer Text (but not coding line inputs)
         else if (input.type === 'text' && input.value && !input.classList.contains('coding-line-input')) {
             answers[qId] = { text: input.value };
@@ -778,6 +760,8 @@ function submitQuizData() {
             answer.forEach(val => payload.append(`answers[${qId}][]`, val));
         } else if (typeof answer === 'object' && answer !== null && 'text' in answer) {
             payload.append(`answers[${qId}][text]`, answer.text);
+        } else if (typeof answer === 'object' && answer !== null && 'code' in answer) {
+            payload.append(`answers[${qId}][code]`, answer.code);
         } else if (typeof answer === 'object' && answer !== null) {
             // Handle coding line answers
             for (const [lineKey, lineValue] of Object.entries(answer)) {
@@ -858,7 +842,7 @@ document.addEventListener('change', function(e) {
 document.addEventListener('input', function(e) {
     if (
         e.target.classList.contains('quiz-answer-input') &&
-        (e.target.type === 'text' || e.target.classList.contains('coding-line-input'))
+        (e.target.type === 'text' || e.target.tagName === 'TEXTAREA' || e.target.classList.contains('coding-line-input'))
     ) {
         updateProgressBar();
     }

@@ -895,7 +895,14 @@ return [
                 'text' => 'Tulis kaedah Java yang menerima dua integer sebagai parameter dan mengembalikan hasil tambah mereka. Nama kaedah: `tambah`',
                 'type' => 'coding', 'points' => 10,
                 'coding_language' => 'java',
-                'coding_template' => null,
+                'coding_template' => 'public static int tambah(int a, int b) {
+    // Lengkapkan kod di sini
+    
+}',
+                'coding_full_code' => 'public static int tambah(int a, int b) {
+    return a + b;
+}',
+                'hidden_line_numbers' => '2',
                 'coding_expected_output' => null,
             ],
             [

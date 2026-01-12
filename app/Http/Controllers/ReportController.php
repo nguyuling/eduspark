@@ -220,6 +220,7 @@ class ReportController extends Controller
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
                 ->select('qa.created_at', 'qa.score', 'q.title', 'qa.quiz_id', 'q.max_points')
                 ->where('qa.student_id', $lookupUserId)
+                ->whereNotNull('qa.submitted_at') // Only include submitted attempts
                 ->orderBy('qa.created_at', 'desc')
                 ->get()
                 ->toArray();
@@ -228,6 +229,7 @@ class ReportController extends Controller
                 ->leftJoin('quiz as q', 'qa.quiz_id', '=', 'q.id')
                 ->select('qa.created_at', 'qa.score', 'q.title', 'qa.quiz_id', 'q.max_points')
                 ->where('qa.user_id', $lookupUserId)
+                ->whereNotNull('qa.submitted_at') // Only include submitted attempts
                 ->orderBy('qa.created_at', 'desc')
                 ->get()
                 ->toArray();
@@ -349,6 +351,7 @@ class ReportController extends Controller
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
                 ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'q.max_points')
                 ->where('qa.student_id', $userId)
+                ->whereNotNull('qa.submitted_at')
                 ->orderBy('qa.created_at', 'desc')
                 ->get();
         } elseif (Schema::hasTable('quiz_attempt')) {
@@ -464,8 +467,9 @@ class ReportController extends Controller
         if (Schema::hasTable('quiz_attempts')) {
             $attempts = DB::table('quiz_attempts as qa')
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
-                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score')
+                ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'g.title as topic', 'qa.score')
                 ->where('qa.student_id', $userId)
+                ->whereNotNull('qa.submitted_at')
                 ->orderBy('qa.created_at', 'desc')
                 ->get()
                 ->map(function($r){
@@ -530,6 +534,7 @@ class ReportController extends Controller
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
                 ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'q.max_points')
                 ->where('qa.student_id', $userId)
+                ->whereNotNull('qa.submitted_at')
                 ->orderBy('qa.created_at', 'desc')
                 ->get()
                 ->map(function ($r) {
@@ -627,6 +632,7 @@ class ReportController extends Controller
                 ->leftJoin('quizzes as q', 'qa.quiz_id', '=', 'q.id')
                 ->select('qa.created_at as date', DB::raw("'Kuiz' as type"), 'q.title as topic', 'qa.score', 'q.max_points')
                 ->where('qa.student_id', $userId)
+                ->whereNotNull('qa.submitted_at')
                 ->orderBy('qa.created_at', 'desc')
                 ->get()
                 ->map(function($r){
@@ -814,6 +820,7 @@ class ReportController extends Controller
                     ->leftJoin('quizzes', 'quiz_attempts.quiz_id', '=', 'quizzes.id')
                     ->select('quiz_attempts.score', 'quizzes.max_points')
                     ->where('quiz_attempts.student_id', $s->user_id)
+                    ->whereNotNull('quiz_attempts.submitted_at')
                     ->get();
                 
                 if ($attempts->count() > 0) {
@@ -897,6 +904,7 @@ class ReportController extends Controller
                     ->leftJoin('quizzes', 'quiz_attempts.quiz_id', '=', 'quizzes.id')
                     ->select('quiz_attempts.score', 'quizzes.max_points')
                     ->where('quiz_attempts.student_id', $s->user_id)
+                    ->whereNotNull('quiz_attempts.submitted_at')
                     ->get();
                 
                 if ($attempts->count() > 0) {
@@ -983,6 +991,7 @@ class ReportController extends Controller
                     ->leftJoin('quizzes', 'quiz_attempts.quiz_id', '=', 'quizzes.id')
                     ->select('quiz_attempts.score', 'quizzes.max_points')
                     ->where('quiz_attempts.student_id', $s->user_id)
+                    ->whereNotNull('quiz_attempts.submitted_at')
                     ->get();
                 
                 if ($attempts->count() > 0) {
