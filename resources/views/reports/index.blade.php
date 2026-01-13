@@ -541,7 +541,8 @@ function updateTrendChart(data) {
                 backgroundColor: color.bg,
                 borderWidth: 2,
                 fill: false,
-                tension: 0.4
+                tension: 0.4,
+                spanGaps: true
             });
             colorIndex++;
         }
@@ -556,7 +557,8 @@ function updateTrendChart(data) {
             backgroundColor: 'rgba(102, 126, 234, 0.1)',
             borderWidth: 2,
             fill: true,
-            tension: 0.4
+            tension: 0.4,
+            spanGaps: true
         });
         // Get counts for tooltips
         counts = { 'Prestasi Purata': data.counts || [] };

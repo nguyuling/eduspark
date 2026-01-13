@@ -1201,8 +1201,9 @@ class ReportController extends Controller
                 }
             }
 
-            $attempts = $query->where('qa.created_at', '>=', $fromDate)
-                ->select('qa.created_at', 'qa.score', 'q.title', 'q.id as quiz_id', 'qa.student_id')
+            $attempts = $query->where('qa.submitted_at', '>=', $fromDate)
+                ->whereNotNull('qa.submitted_at')
+                ->select('qa.submitted_at', 'qa.score', 'q.title', 'q.id as quiz_id', 'qa.student_id')
                 ->get();
         }
 
@@ -1231,7 +1232,7 @@ class ReportController extends Controller
             $percentage = $maxPoints > 0 ? ($score / $maxPoints) * 100 : 0;
             
             $convertedAttempts[] = (object)[
-                'created_at' => $a->created_at,
+                'submitted_at' => $a->submitted_at,
                 'score' => round($percentage, 2),
                 'title' => $a->title,
                 'student_id' => $a->student_id
@@ -1262,7 +1263,7 @@ class ReportController extends Controller
 
         // Trend data (by date) - include student count
         $trendDataGrouped = $attempts->groupBy(function($item) {
-            return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
+            return $item->submitted_at ? date('Y-m-d', strtotime($item->submitted_at)) : 'Unknown';
         })
         ->map(function($group) {
             $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
@@ -1319,7 +1320,7 @@ class ReportController extends Controller
                 }
                 
                 $classAttemptsData = $classQuery->where('qa.created_at', '>=', $fromDate)
-                    ->select('qa.created_at', 'qa.score', 'qa.quiz_id')
+                    ->select('qa.submitted_at', 'qa.score', 'qa.quiz_id')
                     ->get();
                 
                 // Preload quiz max points for this class's attempts
@@ -1344,14 +1345,14 @@ class ReportController extends Controller
                     $percentage = ($score / $maxPoints) * 100;
                     
                     $classAttemptsList[] = (object)[
-                        'created_at' => $a->created_at,
+                        'submitted_at' => $a->submitted_at,
                         'score' => round($percentage, 2)
                     ];
                 }
                 
                 // Group by date for this class
                 $classTrendGrouped = collect($classAttemptsList)->groupBy(function($item) {
-                    return $item->created_at ? date('Y-m-d', strtotime($item->created_at)) : 'Unknown';
+                    return $item->submitted_at ? date('Y-m-d', strtotime($item->submitted_at)) : 'Unknown';
                 })
                 ->map(function($group) {
                     $scores = $group->pluck('score')->filter(function($v) { return is_numeric($v); });
@@ -1363,10 +1364,20 @@ class ReportController extends Controller
                 ->sortKeys();
                 
                 if ($classTrendGrouped->count() > 0) {
-                    // Extract just the averages for the chart data
-                    $trendDataByClass[$cls] = $classTrendGrouped->map(function($item) { return $item['avg']; })->values()->toArray();
-                    // Store counts separately for tooltip
-                    $trendCountsByClass[$cls] = $classTrendGrouped->map(function($item) { return $item['count']; })->values()->toArray();
+                    // Align class data with master dates (fill missing dates with null)
+                    $alignedScores = [];
+                    $alignedCounts = [];
+                    foreach ($trendDates as $date) {
+                        if ($classTrendGrouped->has($date)) {
+                            $alignedScores[] = $classTrendGrouped[$date]['avg'];
+                            $alignedCounts[] = $classTrendGrouped[$date]['count'];
+                        } else {
+                            $alignedScores[] = null;  // No data for this date
+                            $alignedCounts[] = 0;
+                        }
+                    }
+                    $trendDataByClass[$cls] = $alignedScores;
+                    $trendCountsByClass[$cls] = $alignedCounts;
                 }
             }
         }
@@ -1412,9 +1423,9 @@ class ReportController extends Controller
                 }
                 
                 // Filter by date range for this class
-                $classAttempts = $classQuery->where('qa.created_at', '>=', $fromDate)
+                $classAttempts = $classQuery->where('qa.submitted_at', '>=', $fromDate)
                     ->whereNotNull('qa.submitted_at')
-                    ->select('qa.created_at', 'qa.score', 'q.id as quiz_id', 'q.title', 'qa.student_id')
+                    ->select('qa.submitted_at', 'qa.score', 'q.id as quiz_id', 'q.title', 'qa.student_id')
                     ->get();
                 
                 if ($classAttempts->count() === 0) continue;

@@ -371,7 +371,7 @@ class QuizStudentController extends Controller
         }
 
         $attempt->load([
-            'quiz.questions', 
+            'quiz.questions.options', 
             'answers.question.options', 
             'answers.selectedOption'
         ]);
