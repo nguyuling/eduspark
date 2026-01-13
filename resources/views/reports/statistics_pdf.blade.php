@@ -29,6 +29,23 @@
     <small>Dijana: {{ $generatedAt ?? now()->format('Y-m-d H:i:s') }}</small>
   </div>
 
+  @php
+    // Define grade function globally for use throughout the template
+    // Must match the UI grading scale from ReportController
+    $getGrade = function($score) {
+      if ($score >= 90) return 'A+';
+      if ($score >= 80) return 'A';
+      if ($score >= 70) return 'A-';
+      if ($score >= 65) return 'B+';
+      if ($score >= 60) return 'B';
+      if ($score >= 55) return 'C+';
+      if ($score >= 50) return 'C';
+      if ($score >= 45) return 'D';
+      if ($score >= 40) return 'E';
+      return 'F';
+    };
+  @endphp
+
   <h2>Ringkasan Statistik</h2>
   <div class="stats-grid">
     <div class="stat-card">
@@ -44,8 +61,8 @@
       <div class="stat-label">Pelajar Aktif</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">{{ $statsData['successRate'] ?? 'N/A' }}</div>
-      <div class="stat-label">Kadar Kejayaan (%)</div>
+      <div class="stat-value">{{ $getGrade($statsData['avgScore'] ?? 0) }}</div>
+      <div class="stat-label">Gred Purata</div>
     </div>
   </div>
 
@@ -61,6 +78,7 @@
         <tr>
           <th>Topik</th>
           <th style="width:100px;" class="text-right">Purata Skor (%)</th>
+          <th style="width:80px;" class="text-center">Gred</th>
         </tr>
       </thead>
       <tbody>
@@ -68,6 +86,7 @@
           <tr>
             <td>{{ $label ?? 'N/A' }}</td>
             <td class="text-right">{{ number_format($topicScores[$index] ?? 0, 2) }}%</td>
+            <td class="text-center"><strong>{{ $getGrade($topicScores[$index] ?? 0) }}</strong></td>
           </tr>
         @endforeach
       </tbody>
@@ -88,6 +107,7 @@
         <tr>
           <th>Tarikh</th>
           <th style="width:100px;" class="text-right">Purata Skor (%)</th>
+          <th style="width:80px;" class="text-center">Gred</th>
         </tr>
       </thead>
       <tbody>
@@ -95,6 +115,7 @@
           <tr>
             <td>{{ $date ?? 'N/A' }}</td>
             <td class="text-right">{{ number_format($trendScores[$index] ?? 0, 2) }}%</td>
+            <td class="text-center"><strong>{{ $getGrade($trendScores[$index] ?? 0) }}</strong></td>
           </tr>
         @endforeach
       </tbody>
