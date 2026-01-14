@@ -31,9 +31,14 @@ RUN npm install && npm run build
 # Setup Laravel
 RUN php artisan storage:link || true
 RUN mkdir -p database && touch database/database.sqlite
+RUN mkdir -p storage/app/lessons bootstrap/cache
 RUN chown -R www-data:www-data storage bootstrap/cache database
 RUN chmod -R 775 storage bootstrap/cache database
 RUN chmod 664 database/database.sqlite
+
+# Copy setup script
+COPY docker-setup.sh /docker-setup.sh
+RUN chmod +x /docker-setup.sh
 
 # Configure Apache
 RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
@@ -46,7 +51,8 @@ RUN echo '<Directory /var/www/html/public>\n\
 
 EXPOSE 80
 
-CMD php artisan migrate:refresh --seed --force && \
+CMD /docker-setup.sh && \
+    php artisan migrate:refresh --seed --force && \
     php artisan config:clear && \
     php artisan cache:clear && \
     apache2-foreground
