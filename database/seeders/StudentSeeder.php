@@ -14,6 +14,12 @@ class StudentSeeder extends Seeder
             return;
         }
 
+        // Skip if students already exist (from import or previous seeding)
+        if (DB::table('students')->count() > 0) {
+            echo "Students already seeded. Skipping.\n";
+            return;
+        }
+
         // Clear existing students
         DB::statement('DELETE FROM students');
         // Reset sequence for PostgreSQL
