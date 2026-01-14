@@ -17,6 +17,12 @@ class QuizSeeder extends Seeder
      */
     public function run(): void
     {
+        // Skip if quizzes already exist (from import or previous seeding)
+        if (Quiz::count() > 0) {
+            echo "Quizzes already seeded. Skipping.\n";
+            return;
+        }
+
         $quizzes_data = include database_path('seeders/QuizQuestionSeeder.php');
         
         // Get a teacher user (role = 'teacher')

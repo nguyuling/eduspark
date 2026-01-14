@@ -13,6 +13,12 @@ class LessonSeeder extends Seeder
      */
     public function run(): void
     {
+        // Skip if lessons already exist (from import or previous seeding)
+        if (Lesson::count() > 0) {
+            echo "Lessons already seeded. Skipping.\n";
+            return;
+        }
+
         // Get all teachers from UserSeeder
         $teachers = User::where('role', 'teacher')->get();
 

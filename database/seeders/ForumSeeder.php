@@ -15,6 +15,12 @@ class ForumSeeder extends Seeder
      */
     public function run(): void
     {
+        // Skip if forum posts already exist (from import or previous seeding)
+        if (ForumPost::count() > 0) {
+            echo "Forum posts already seeded. Skipping.\n";
+            return;
+        }
+
         // Skip if no users exist
         if (User::count() === 0) {
             echo "No users found. Skipping forum seeding.\n";

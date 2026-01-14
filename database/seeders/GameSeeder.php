@@ -14,6 +14,12 @@ class GameSeeder extends Seeder
      */
     public function run(): void
     {
+        // Skip if games already exist (from import or previous seeding)
+        if (Game::count() > 0) {
+            echo "Games already seeded. Skipping.\n";
+            return;
+        }
+
         // Get the first teacher user (or create one if needed)
         $teacher = User::where('role', 'teacher')->first();
         
