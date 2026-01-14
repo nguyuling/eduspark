@@ -154,14 +154,22 @@ class PerformanceController extends Controller
                 $fullTitle = $r->quiz_title ?? ($r->quiz_id ? 'Kuiz #' . $r->quiz_id : 'Kuiz');
                 $shortTitle = Str::limit($fullTitle, 18, '…');
                 $maxScore = $quizMaxPointsData[$r->quiz_id] ?? 0;
-                $scorePercent = ($maxScore && $maxScore > 0)
-                    ? round(($r->score / $maxScore) * 100, 2)
-                    : (float) $r->score;
+                
+                // Always convert to percentage (0-100%)
+                // If maxScore available, use it; otherwise assume score is already a percentage
+                $scorePercent = 0;
+                if ($maxScore && $maxScore > 0) {
+                    $scorePercent = round(($r->score / $maxScore) * 100, 2);
+                } elseif ($r->score >= 0) {
+                    // Fallback: if no max_score but we have a score, assume it's already a percentage or normalize it
+                    $scorePercent = (float) $r->score;
+                }
+                
                 $recentCollection->push((object)[
                     'type' => 'quiz',
                     'title' => $shortTitle,
                     'title_full' => $fullTitle,
-                    'score' => (float) $scorePercent,
+                    'score' => (float) $scorePercent,  // This is always 0-100%
                     'raw_score' => (float) $r->score,
                     'max_score' => (float) $maxScore,
                     'completed_at' => $completedAt,
