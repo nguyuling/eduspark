@@ -7,6 +7,7 @@ use App\Models\QuizAttempt;
 use App\Models\QuizAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use App\Models\QuizQuestion; 
@@ -88,6 +89,39 @@ class QuizStudentController extends Controller
 
         // Execute the filtered query
         $allQuizzes = $query->orderBy('due_at', 'asc')->get();
+        
+        // Get max scores from ALL attempts (not just current student)
+        $quizIds = $allQuizzes->pluck('id')->toArray();
+        $maxScoresFromAttempts = [];
+        if (count($quizIds) > 0) {
+            $maxAttempts = DB::table('quiz_attempts')
+                ->whereIn('quiz_id', $quizIds)
+                ->whereNotNull('submitted_at')
+                ->groupBy('quiz_id')
+                ->selectRaw('quiz_id, MAX(score) as max_score')
+                ->get();
+            foreach ($maxAttempts as $row) {
+                $maxScoresFromAttempts[$row->quiz_id] = $row->max_score;
+            }
+        }
+        
+        // For each quiz, calculate max_score from quiz.max_points, questions, or attempts
+        $allQuizzes->each(function ($quiz) use ($maxScoresFromAttempts) {
+            // Priority 1: Use quiz.max_points if set
+            if ($quiz->max_points && $quiz->max_points > 0) {
+                $quiz->max_score = $quiz->max_points;
+            } else {
+                // Priority 2: Sum of question points
+                $questionPointsSum = $quiz->questions->sum('points') ?? 0;
+                if ($questionPointsSum > 0) {
+                    $quiz->max_score = $questionPointsSum;
+                } else {
+                    // Priority 3: Get max from ALL attempts (last resort)
+                    $maxAttemptScore = $maxScoresFromAttempts[$quiz->id] ?? 0;
+                    $quiz->max_score = $maxAttemptScore > 0 ? $maxAttemptScore : 0;
+                }
+            }
+        });
         
         // Get limit from request (default 10, increments by 10)
         $limit = (int) $request->get('limit', 10);

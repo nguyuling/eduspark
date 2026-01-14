@@ -117,10 +117,7 @@
                         <div style="font-size:12px; margin-top:4px;">
                         <div style="margin-bottom:2px;">{{ $attemptsUsed }}/{{ $quiz->max_attempts }} percubaan</div>
                         @if ($highestAttempt)
-                            @php
-                            $totalMarks = $quiz->questions->sum('points') ?? 0;
-                            @endphp
-                            <div style="font-weight:700;">Markah: {{ $highestAttempt->score }}/{{ $totalMarks }}</div>
+                            <div style="font-weight:700;">Markah: {{ $highestAttempt->score }}/{{ (int)$quiz->max_score }}</div>
                         @endif
                         </div>
                     </td>
