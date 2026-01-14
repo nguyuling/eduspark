@@ -440,7 +440,7 @@ class LessonController extends Controller
             abort(404, 'File not found: ' . $e->getMessage());
         }
     }
-}
+
     public function preview($id)
     {
         try {
