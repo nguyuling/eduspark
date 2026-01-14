@@ -890,18 +890,18 @@ class ReportController extends Controller
             $avgScore = 0;
             $avgGrade = 'N/A';
             if (isset($s->user_id) && Schema::hasTable('quiz_attempts')) {
-                $attempts = DB::table('quiz_attempts')
-                    ->leftJoin('quizzes', 'quiz_attempts.quiz_id', '=', 'quizzes.id')
-                    ->select('quiz_attempts.score', 'quizzes.max_points')
-                    ->where('quiz_attempts.student_id', $s->user_id)
-                    ->whereNotNull('quiz_attempts.submitted_at')
+                $attempts = DB::table('quiz_attempts as qa')
+                    ->select('qa.score', 'qa.quiz_id')
+                    ->where('qa.student_id', $s->user_id)
+                    ->whereNotNull('qa.submitted_at')
                     ->get();
                 
                 if ($attempts->count() > 0) {
+                    // Use same preloaded quiz max points from class calculation above
                     $scores = [];
                     foreach ($attempts as $att) {
                         $score = isset($att->score) ? (float)$att->score : 0;
-                        $maxPoints = isset($att->max_points) && (float)$att->max_points > 0 ? (float)$att->max_points : 100;
+                        $maxPoints = (float)($quizMaxPoints[$att->quiz_id] ?? 100);
                         $percentage = ($score / $maxPoints) * 100;
                         $scores[] = $percentage;
                     }

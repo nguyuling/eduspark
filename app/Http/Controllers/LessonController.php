@@ -343,97 +343,97 @@ class LessonController extends Controller
      * Get preview data for a lesson
      */
     /**
- * Serve file for preview in iframe
- */
-public function previewFile($id)
-{
-    try {
-        $lesson = Lesson::findOrFail($id);
-
-        if (!$lesson->file_path) {
-            abort(404, 'File not found');
-        }
-
-        // Try public disk first
-        if (Storage::disk('public')->exists($lesson->file_path)) {
-            $filePath = Storage::disk('public')->path($lesson->file_path);
-            $mimeType = Storage::disk('public')->mimeType($lesson->file_path);
-        } 
-        // Fallback to default disk
-        elseif (Storage::exists($lesson->file_path)) {
-            $filePath = Storage::path($lesson->file_path);
-            $mimeType = Storage::mimeType($lesson->file_path);
-        } 
-        else {
-            abort(404, 'File not found in storage');
-        }
-
-        // Check if file actually exists on filesystem
-        if (!file_exists($filePath)) {
-            abort(404, 'Physical file not found');
-        }
-
-        return response()->file($filePath, [
-            'Content-Type' => $mimeType,
-            'Content-Disposition' => 'inline; filename="' . $lesson->file_name . '"'
-        ]);
-
-    } catch (\Exception $e) {
-        return response('Error: ' . $e->getMessage(), 500);
-    }
-}
-
-    /**
-     * Serve the file for preview/download
+     * Download lesson file
      */
     public function downloadLesson($id)
-{
-    try {
-        $lesson = Lesson::findOrFail($id);
+    {
+        try {
+            $lesson = Lesson::findOrFail($id);
 
-        if (!$lesson->file_path) {
-            abort(404, 'File not found');
-        }
+            if (!$lesson->file_path) {
+                abort(404, 'File not found');
+            }
 
-        // Try public disk first
-        if (Storage::disk('public')->exists($lesson->file_path)) {
-            return Storage::disk('public')->download($lesson->file_path, $lesson->file_name);
-        } 
-        // Fallback to default disk
-        elseif (Storage::exists($lesson->file_path)) {
-            return Storage::download($lesson->file_path, $lesson->file_name);
-        } 
-        else {
+            // Try public storage folder first
+            if (file_exists(public_path('storage/' . $lesson->file_path))) {
+                return response()->download(public_path('storage/' . $lesson->file_path), $lesson->file_name);
+            }
+            
+            // Try public disk
+            if (Storage::disk('public')->exists($lesson->file_path)) {
+                return response()->download(Storage::disk('public')->path($lesson->file_path), $lesson->file_name);
+            }
+            
+            // Fallback to storage app
+            if (Storage::exists($lesson->file_path)) {
+                return response()->download(Storage::path($lesson->file_path), $lesson->file_name);
+            }
+
             abort(404, 'File not found in storage');
+            
+        } catch (\Exception $e) {
+            abort(404, 'Cannot download file: ' . $e->getMessage());
         }
-
-    } catch (\Exception $e) {
-        return back()->withErrors(['error' => 'Gagal memuat turun fail: ' . $e->getMessage()]);
     }
-}
 
     /**
      * Serve file for preview in iframe
      */
+    public function previewFile($id)
+{
+    try {
+        $lesson = Lesson::findOrFail($id);
+
+        if (!$lesson->file_path) {
+            abort(404, 'File not found');
+        }
+
+        // Try public storage folder first (most reliable for iframe)
+        if (file_exists(public_path('storage/' . $lesson->file_path))) {
+            return response()->file(public_path('storage/' . $lesson->file_path), [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline'
+            ]);
+        }
+        
+        // Try public disk
+        if (Storage::disk('public')->exists($lesson->file_path)) {
+            return response()->file(Storage::disk('public')->path($lesson->file_path), [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline'
+            ]);
+        }
+        
+        // Fallback to storage app
+        if (Storage::exists($lesson->file_path)) {
+            return response()->file(Storage::path($lesson->file_path), [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline'
+            ]);
+        }
+
+        abort(404, 'File not found in storage');
+        
+    } catch (\Exception $e) {
+        abort(404, 'File not found: ' . $e->getMessage());
+    }
+}
     public function preview($id)
     {
         try {
             $lesson = Lesson::findOrFail($id);
 
-            if (!$lesson->file_path || !Storage::disk('public')->exists($lesson->file_path)) {
-                return response('File not found', 404);
+            // Calculate file extension
+            if ($lesson->file_path) {
+                $lesson->file_ext = strtolower(pathinfo($lesson->file_path, PATHINFO_EXTENSION));
             }
 
-            $mimeType = Storage::disk('public')->mimeType($lesson->file_path);
-            $filePath = Storage::disk('public')->path($lesson->file_path);
-            
-            return response()->file($filePath, [
-                'Content-Type' => $mimeType,
-                'Content-Disposition' => 'inline; filename="' . $lesson->file_name . '"'
+            return view('lesson.show', [
+                'lesson' => $lesson
             ]);
 
         } catch (\Exception $e) {
-            return response('Error: ' . $e->getMessage(), 422);
+            return back()->withErrors(['error' => 'Gagal memuat fail: ' . $e->getMessage()]);
         }
     }
 }
