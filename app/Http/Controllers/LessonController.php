@@ -343,9 +343,43 @@ class LessonController extends Controller
      * Get preview data for a lesson
      */
     /**
- * Serve file for preview in iframe
- */
-public function previewFile($id)
+     * Download lesson file
+     */
+    public function downloadLesson($id)
+    {
+        try {
+            $lesson = Lesson::findOrFail($id);
+
+            if (!$lesson->file_path) {
+                abort(404, 'File not found');
+            }
+
+            // Try public storage folder first
+            if (file_exists(public_path('storage/' . $lesson->file_path))) {
+                return response()->download(public_path('storage/' . $lesson->file_path), $lesson->file_name);
+            }
+            
+            // Try public disk
+            if (Storage::disk('public')->exists($lesson->file_path)) {
+                return response()->download(Storage::disk('public')->path($lesson->file_path), $lesson->file_name);
+            }
+            
+            // Fallback to storage app
+            if (Storage::exists($lesson->file_path)) {
+                return response()->download(Storage::path($lesson->file_path), $lesson->file_name);
+            }
+
+            abort(404, 'File not found in storage');
+            
+        } catch (\Exception $e) {
+            abort(404, 'Cannot download file: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Serve file for preview in iframe
+     */
+    public function previewFile($id)
 {
     try {
         $lesson = Lesson::findOrFail($id);
