@@ -175,3 +175,25 @@ Route::middleware('auth')->group(function () {
     Route::post('/direct-messages/{user}', [DirectMessageController::class, 'store'])->name('direct-messages.store');
     Route::get('/direct-messages/{user}', [DirectMessageController::class, 'show'])->name('direct-messages.show');
 });
+// TEMPORARY: Refresh lessons database (owner only - remove after using)
+Route::get('/refresh-lessons-db', function() {
+    try {
+        // Clear existing lessons
+        \App\Models\Lesson::truncate();
+        
+        // Run the seeder
+        $seeder = new \Database\Seeders\LessonSeeder();
+        $seeder->run();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Lessons refreshed successfully with correct file paths',
+            'lessons_count' => \App\Models\Lesson::count()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+})->name('refresh-lessons');
