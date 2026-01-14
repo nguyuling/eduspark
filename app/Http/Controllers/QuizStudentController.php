@@ -211,9 +211,15 @@ class QuizStudentController extends Controller
 
         $submittedAnswers = $request->input('answers', []);
         $totalScore = 0;
+        
+        // Pre-load all questions with their options to avoid N+1 queries
+        $questionsMap = $quiz->questions()
+                            ->with('options')
+                            ->get()
+                            ->keyBy('id');
 
         foreach ($submittedAnswers as $questionId => $studentAnswer) {
-            $question = QuizQuestion::with('options')->find($questionId);
+            $question = $questionsMap->get($questionId);
 
             if (!$question) continue;
 
@@ -424,10 +430,12 @@ class QuizStudentController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        // Use eager loading with callback to optimize queries
         $attempt->load([
-            'quiz.questions.options', 
-            'answers.question.options', 
-            'answers.selectedOption'
+            'quiz.questions.options',
+            'answers' => function ($query) {
+                $query->with('question.options', 'options');
+            }
         ]);
 
         // This view will display: Total Score, Correct answers for wrong questions, Teacher's remark.
