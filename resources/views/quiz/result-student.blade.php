@@ -51,7 +51,12 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #d4c5f9;">
                         <h3 style="margin:0; font-size:16px; font-weight:700;">Soalan {{ $index + 1 }}</h3>
                         <div style="display:flex; gap:8px; align-items:center;">
-                            <span style="background:{{ $answer->is_correct ? 'rgba(42, 157, 143, 0.1)' : 'rgba(230, 57, 70, 0.1)' }}; color:{{ $answer->is_correct ? 'var(--success)' : 'var(--danger)' }}; padding:6px 12px; border-radius:6px; font-weight:600; font-size:12px;">{{ $answer->score_gained ?? 0 }}/{{ $answer->question->points }} markah</span>
+                            @if($answer->is_correct === null)
+                                {{-- Pending teacher review (for short answers without correct_answer) --}}
+                                <span style="background:rgba(251, 146, 60, 0.1); color:#fb923c; padding:6px 12px; border-radius:6px; font-weight:600; font-size:12px;">Menunggu Ulasan Guru</span>
+                            @else
+                                <span style="background:{{ $answer->is_correct ? 'rgba(42, 157, 143, 0.1)' : 'rgba(230, 57, 70, 0.1)' }}; color:{{ $answer->is_correct ? 'var(--success)' : 'var(--danger)' }}; padding:6px 12px; border-radius:6px; font-weight:600; font-size:12px;">{{ $answer->score_gained ?? 0 }}/{{ $answer->question->points }} markah</span>
+                            @endif
                         </div>
                     </div>
 
@@ -68,9 +73,18 @@
                         <label style="display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color:var(--muted);">Jawapan Anda</label>
                         <div>
                             @if($answer->question->type === 'short_answer')
-                                <div style="font-size: 14px; font-weight: 600; padding:12px; background:rgba(200, 200, 200, 0.04); border-radius:8px; border-left:3px solid {{ $answer->is_correct ? 'var(--success)' : 'var(--danger)' }};">
-                                    {{ ($answer->submitted_text === null || $answer->submitted_text === '') ? '(Tidak dijawab)' : $answer->submitted_text }}
-                                </div>
+                                @if($answer->is_correct === null)
+                                    {{-- Pending review - show in orange/neutral color --}}
+                                    <div style="font-size: 14px; font-weight: 600; padding:12px; background:rgba(251, 146, 60, 0.08); border-radius:8px; border-left:3px solid #fb923c;">
+                                        {{ ($answer->submitted_text === null || $answer->submitted_text === '') ? '(Tidak dijawab)' : $answer->submitted_text }}
+                                    </div>
+                                    <div style="margin-top:8px; font-size:12px; color:#fb923c; font-style:italic;">Jawapan ini menunggu ulasan daripada guru anda.</div>
+                                @else
+                                    {{-- Automatically graded --}}
+                                    <div style="font-size: 14px; font-weight: 600; padding:12px; background:rgba(200, 200, 200, 0.04); border-radius:8px; border-left:3px solid {{ $answer->is_correct ? 'var(--success)' : 'var(--danger)' }};">
+                                        {{ ($answer->submitted_text === null || $answer->submitted_text === '') ? '(Tidak dijawab)' : $answer->submitted_text }}
+                                    </div>
+                                @endif
 
                             @elseif($answer->question->type === 'coding')
                                 @php

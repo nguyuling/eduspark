@@ -251,17 +251,31 @@ class QuizStudentController extends Controller
 
                 // Get the correct answer(s) directly from the question model
                 $correctAnswersRaw = $question->correct_answer ?? '';
-                $correctAnswers = array_map(function($ans) {
-                    return strtolower(trim($ans));
-                }, explode(',', $correctAnswersRaw));
+                
+                if (!empty($correctAnswersRaw)) {
+                    // If correct answer is defined, check the submitted answer
+                    $correctAnswers = array_map(function($ans) {
+                        return strtolower(trim($ans));
+                    }, explode(',', $correctAnswersRaw));
 
-                if (!empty($submittedText)) {
-                    $trimmedSubmittedText = strtolower(trim($submittedText));
-                    // Check if the submitted answer is in the list of correct answers
-                    if (in_array($trimmedSubmittedText, $correctAnswers)) {
-                        $isCorrect = true;
+                    if (!empty($submittedText)) {
+                        $trimmedSubmittedText = strtolower(trim($submittedText));
+                        // Check if the submitted answer is in the list of correct answers
+                        if (in_array($trimmedSubmittedText, $correctAnswers)) {
+                            $isCorrect = true;
+                            $scoreGained = $question->points;
+                        }
+                    }
+                } else {
+                    // No correct answer defined - mark for manual review
+                    // Award partial points pending teacher review
+                    if (!empty($submittedText)) {
+                        // Mark as pending review (not correct/incorrect)
+                        $isCorrect = null;  // null means pending teacher review
+                        $scoreGained = 0;   // No automatic score
                     }
                 }
+                
                 $submittedOptions = []; 
 
             } elseif ($question->type === 'coding') {
