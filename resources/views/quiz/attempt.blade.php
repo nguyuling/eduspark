@@ -779,8 +779,17 @@ function submitQuizData() {
     
     // Debug: Log the payload
     console.log('Payload entries:');
+    let answerCount = 0;
     for (let [key, value] of payload.entries()) {
+        if (key.startsWith('answers')) answerCount++;
         console.log(`  ${key} = ${value}`);
+    }
+    console.log('Total answer fields:', answerCount);
+    
+    if (answerCount === 0) {
+        console.error('No answers were collected! This might be the issue.');
+        alert('Error: No answers were collected. Please ensure all questions are answered properly.');
+        return;
     }
     
     // Use Fetch API to send POST request
@@ -793,50 +802,29 @@ function submitQuizData() {
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        redirect: 'manual',
+        credentials: 'same-origin',
         body: payload
     })
     .then(response => {
-        console.log('Response status:', response.status, 'type:', response.type);
+        console.log('Response status:', response.status);
+        console.log('Response URL:', response.url);
+        console.log('Response OK:', response.ok);
         
-        // Handle redirect responses (301, 302, 303, 307, 308)
-        if (response.status >= 300 && response.status < 400) {
-            const redirectUrl = response.headers.get('location');
-            console.log('Got redirect to:', redirectUrl);
-            if (redirectUrl) {
-                window.location.href = redirectUrl;
-                return;
-            }
-        }
-        
-        // Handle successful responses
-        if (response.ok) {
-            console.log('Response OK, final URL:', response.url);
-            return response.text().then(html => {
-                // Check if the response contains the result page
-                if (html.includes('Keputusan percubaan kuiz anda') || html.includes('Ulasan Jawapan')) {
-                    // We got the result page, update the DOM
-                    document.body.innerHTML = html;
-                } else {
-                    // Response seems to be HTML but not the result page
-                    console.log('Unexpected response HTML');
-                    alert('Unexpected response from server');
-                }
-            });
-        } else if (response.status === 422) {
-            return response.json().then(data => {
-                alert('Validation error: ' + JSON.stringify(data.errors || data.message));
-            });
-        } else {
+        if (!response.ok) {
             return response.text().then(text => {
-                console.error('Error response text:', text);
-                alert('Error: ' + text || 'An error occurred.');
+                console.error('Error response:', text);
+                throw new Error('Server returned status ' + response.status + ': ' + (text || 'No message'));
             });
         }
+        
+        // If we get here, the response was successful
+        // After following the redirect, we should be on the result page
+        window.location.href = response.url;
+        
     })
     .catch(error => {
-        console.error('Network error:', error);
-        alert('A network error occurred. Please check your connection and try again.');
+        console.error('Network or processing error:', error);
+        alert('Error: ' + error.message || 'A network error occurred. Please check your connection and try again.');
     });
 }
 
