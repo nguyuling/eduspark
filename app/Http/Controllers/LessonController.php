@@ -380,7 +380,9 @@ class LessonController extends Controller
                 return response()->download(Storage::path($lesson->file_path), $lesson->file_name);
             }
 
-            abort(404, 'File not found in storage');
+            // Fallback to GitHub raw URL (for Render free tier)
+            $githubUrl = 'https://raw.githubusercontent.com/nguyuling/eduspark/main/public/storage/' . $lesson->file_path;
+            return redirect($githubUrl);
             
         } catch (\Exception $e) {
             abort(404, 'Cannot download file: ' . $e->getMessage());
@@ -434,7 +436,9 @@ class LessonController extends Controller
                 ]);
             }
 
-            abort(404, 'File not found in storage');
+            // Fallback to GitHub raw URL (for Render free tier)
+            $githubUrl = 'https://raw.githubusercontent.com/nguyuling/eduspark/main/public/storage/' . $lesson->file_path;
+            return redirect($githubUrl);
             
         } catch (\Exception $e) {
             abort(404, 'File not found: ' . $e->getMessage());
