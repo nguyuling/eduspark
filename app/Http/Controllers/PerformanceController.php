@@ -101,16 +101,23 @@ class PerformanceController extends Controller
                 ->whereNotNull('submitted_at')
                 ->count();
 
-            // weakest topic: pick the lowest average percent but only if below 100%
+            // weakest topic: pick the lowest average percent
             $weakTopic = 'Tiada';
             $weakTopicScore = null;
             foreach ($quizAggregates as $quizId => $agg) {
-                $maxScore = $agg['max_points'] ?? null;
-                if (!$maxScore || $maxScore <= 0 || $agg['count'] === 0) {
+                if ($agg['count'] === 0) {
                     continue;
                 }
-                $avgPercent = round((($agg['sum'] / $agg['count']) / $maxScore) * 100, 2);
-                // Include all scores, not just below 100%
+                $maxScore = $agg['max_points'] ?? 0;
+                // If no max_points available, use raw score (fallback)
+                $avgPercent = 0;
+                if ($maxScore > 0) {
+                    $avgPercent = round((($agg['sum'] / $agg['count']) / $maxScore) * 100, 2);
+                } else {
+                    // Use raw average if max_points not available
+                    $avgPercent = round($agg['sum'] / $agg['count'], 2);
+                }
+                // Pick the topic with the lowest score
                 if (is_null($weakTopicScore) || $avgPercent < $weakTopicScore) {
                     $weakTopicScore = $avgPercent;
                     $weakTopic = ($quizTitles[$quizId] ?? ('Kuiz #' . $quizId));
@@ -220,6 +227,8 @@ class PerformanceController extends Controller
                         'title' => Str::limit($r->title ?? ('Game #' . $r->game_id), 18, '…'),
                         'title_full' => $r->title ?? ('Game #' . $r->game_id),
                         'score' => (float) $r->score,
+                        'raw_score' => (float) $r->score,
+                        'max_score' => 100, // Games typically use percentage scores
                         'completed_at' => property_exists($r, 'completed_at') ? $r->completed_at : null,
                     ]);
                 }
@@ -237,6 +246,8 @@ class PerformanceController extends Controller
                         'title' => Str::limit(isset($r->game_id) ? 'Game #' . $r->game_id : 'Game', 18, '…'),
                         'title_full' => isset($r->game_id) ? 'Game #' . $r->game_id : 'Game',
                         'score' => (float) $r->score,
+                        'raw_score' => (float) $r->score,
+                        'max_score' => 100, // Games typically use percentage scores
                         'completed_at' => property_exists($r, 'completed_at') ? $r->completed_at : null,
                     ]);
                 }
@@ -244,15 +255,12 @@ class PerformanceController extends Controller
         }
 
         //
-        // --- Combine & sort recent data: keep only quizzes, oldest 6 chronologically (nulls go last)
+        // --- Combine & sort recent data: include all attempts, oldest 6 chronologically
         //
         $recentData = $recentCollection
-            ->filter(function($row) {
-                return $row->type === 'quiz';
-            })
             ->sortBy(function ($row) {
-                // normalized key: if completed_at null, return very old timestamp so nulls go last
-                return $row->completed_at ? strtotime($row->completed_at) : 0;
+                // Sort chronologically: if completed_at null, push to end
+                return $row->completed_at ? strtotime($row->completed_at) : PHP_INT_MAX;
             })
             ->values()
             ->take(6);
