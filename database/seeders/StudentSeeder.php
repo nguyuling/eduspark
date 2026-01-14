@@ -16,7 +16,10 @@ class StudentSeeder extends Seeder
 
         // Clear existing students
         DB::statement('DELETE FROM students');
-        DB::statement("DELETE FROM sqlite_sequence WHERE name='students'");
+        // Reset sequence for PostgreSQL
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("ALTER SEQUENCE students_id_seq RESTART WITH 1");
+        }
 
         $classes = ['4 Arif', '4 Bestari', '5 Arif', '5 Bestari'];
 
