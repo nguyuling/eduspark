@@ -698,11 +698,16 @@ function checkAllQuestionsAnswered() {
 }
 
 function submitQuizData() {
+    console.log('submitQuizData() called');
+    
     // Check if all questions are answered
     if (!checkAllQuestionsAnswered()) {
+        console.log('Not all questions answered');
         alert('Sila jawab semua soalan sebelum menghantar kuiz.');
         return;
     }
+
+    console.log('All questions answered, proceeding with submission');
 
     // Build the answers payload manually
     const answers = {};
@@ -772,25 +777,59 @@ function submitQuizData() {
         }
     }
     
+    // Debug: Log the payload
+    console.log('Payload entries:');
+    for (let [key, value] of payload.entries()) {
+        console.log(`  ${key} = ${value}`);
+    }
+    
     // Use Fetch API to send POST request
-    fetch('{{ route('student.quizzes.submit', $quiz->id) }}', {
+    const submitUrl = '{{ route('student.quizzes.submit', $quiz->id) }}';
+    console.log('Submitting to:', submitUrl);
+    
+    fetch(submitUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        redirect: 'follow',
+        redirect: 'manual',
         body: payload
     })
     .then(response => {
+        console.log('Response status:', response.status, 'type:', response.type);
+        
+        // Handle redirect responses (301, 302, 303, 307, 308)
+        if (response.status >= 300 && response.status < 400) {
+            const redirectUrl = response.headers.get('location');
+            console.log('Got redirect to:', redirectUrl);
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+                return;
+            }
+        }
+        
+        // Handle successful responses
         if (response.ok) {
-            window.location.href = response.url;
+            console.log('Response OK, final URL:', response.url);
+            return response.text().then(html => {
+                // Check if the response contains the result page
+                if (html.includes('Keputusan percubaan kuiz anda') || html.includes('Ulasan Jawapan')) {
+                    // We got the result page, update the DOM
+                    document.body.innerHTML = html;
+                } else {
+                    // Response seems to be HTML but not the result page
+                    console.log('Unexpected response HTML');
+                    alert('Unexpected response from server');
+                }
+            });
         } else if (response.status === 422) {
             return response.json().then(data => {
                 alert('Validation error: ' + JSON.stringify(data.errors || data.message));
             });
         } else {
             return response.text().then(text => {
+                console.error('Error response text:', text);
                 alert('Error: ' + text || 'An error occurred.');
             });
         }
