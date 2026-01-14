@@ -79,15 +79,14 @@ class PerformanceController extends Controller
                 // Get max_points from questions table sum
                 $maxScore = $quizMaxPointsData[$a->quiz_id] ?? 0;
                 
-                // Always calculate as percentage
-                // If we don't have max_points, we can't calculate properly - log this
+                // Calculate percentage
                 if ($maxScore && $maxScore > 0) {
-                    $normalizedQuizScores[] = ($a->score / $maxScore) * 100;
+                    $scorePercent = ($a->score / $maxScore) * 100;
+                    $normalizedQuizScores[] = $scorePercent;
                 } else {
-                    // ISSUE: If max_points is 0, something is wrong
-                    // Don't just use raw score - this breaks the graph
-                    // For now, skip or use 0 to indicate missing data
-                    $normalizedQuizScores[] = 0;
+                    // If no max_points, assume the score is already a normalized value (0-100)
+                    // This handles cases where questions don't have points set
+                    $normalizedQuizScores[] = (float) $a->score;
                 }
 
                 // aggregate per quiz for weakest topic logic
