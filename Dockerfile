@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     sqlite3 \
     libsqlite3-dev \
-    && docker-php-ext-install pdo_sqlite \
+    libpq-dev \
+    && docker-php-ext-install pdo_sqlite pdo_pgsql \
     && apt-get clean
 
 # Install Composer
