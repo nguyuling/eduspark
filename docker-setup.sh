@@ -15,4 +15,7 @@ mkdir -p bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache database
 chmod -R 775 storage bootstrap/cache database
 
+# Create symlink for public storage access
+php artisan storage:link || true
+
 echo "Storage setup complete"

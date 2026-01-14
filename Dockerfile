@@ -53,7 +53,7 @@ RUN echo '<Directory /var/www/html/public>\n\
 EXPOSE 80
 
 CMD /docker-setup.sh && \
-    php artisan migrate:refresh --seed --force && \
+    php artisan migrate --force && \
     php artisan config:clear && \
     php artisan cache:clear && \
     apache2-foreground

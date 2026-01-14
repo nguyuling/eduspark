@@ -410,7 +410,15 @@ class LessonController extends Controller
                 }
             }
 
-            // Try public storage folder first (most reliable for iframe)
+            // Try storage/app/lessons first (persisted by docker-setup.sh)
+            if (Storage::exists($lesson->file_path)) {
+                return response()->file(Storage::path($lesson->file_path), [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline'
+                ]);
+            }
+
+            // Try public storage folder
             if (file_exists(public_path('storage/' . $lesson->file_path))) {
                 return response()->file(public_path('storage/' . $lesson->file_path), [
                     'Content-Type' => 'application/pdf',
@@ -421,14 +429,6 @@ class LessonController extends Controller
             // Try public disk
             if (Storage::disk('public')->exists($lesson->file_path)) {
                 return response()->file(Storage::disk('public')->path($lesson->file_path), [
-                    'Content-Type' => 'application/pdf',
-                    'Content-Disposition' => 'inline'
-                ]);
-            }
-            
-            // Fallback to storage app
-            if (Storage::exists($lesson->file_path)) {
-                return response()->file(Storage::path($lesson->file_path), [
                     'Content-Type' => 'application/pdf',
                     'Content-Disposition' => 'inline'
                 ]);
