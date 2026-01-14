@@ -105,7 +105,7 @@
     <!-- PDF Preview -->
     @if($lesson->file_path && $lesson->file_ext === 'pdf')
       <section class="panel" style="margin-bottom:20px;">
-        <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Pratonton Fail</h2>
+        <h2 style="margin:0 0 20px 0; font-size:18px; font-weight:700; border-bottom:2px solid #d4c5f9; padding-bottom:12px;">Paparan PDF</h2>
         <div style="margin-top:20px;">
           <iframe src="{{ route('lesson.preview-file', $lesson->id) }}" style="width:100%; height:600px;" frameborder="0"></iframe>
         </div>
