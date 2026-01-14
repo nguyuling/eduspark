@@ -111,8 +111,9 @@ new Chart(ctx,{
             const idx = ctx.dataIndex;
             const percent = ctx.parsed.y;
             const raw = rawScores[idx];
+            // Always show raw/max score format if available
             if (raw && raw.raw !== null && raw.max !== null && raw.max > 0) {
-              return [`Skor: ${percent}%`, `(${raw.raw}/${raw.max})`];
+              return [`Skor: ${percent}%`, `Jawab: ${raw.raw}/${raw.max}`];
             } else if (raw && raw.raw !== null) {
               return `Skor: ${raw.raw}`;
             }

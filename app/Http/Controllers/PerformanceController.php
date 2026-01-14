@@ -255,9 +255,13 @@ class PerformanceController extends Controller
         }
 
         //
-        // --- Combine & sort recent data: include all attempts, oldest 6 chronologically
+        // --- Combine & sort recent data: quizzes only, oldest 6 chronologically
         //
         $recentData = $recentCollection
+            ->filter(function ($row) {
+                // Only include quizzes in the trend graph
+                return $row->type === 'quiz';
+            })
             ->sortBy(function ($row) {
                 // Sort chronologically: if completed_at null, push to end
                 return $row->completed_at ? strtotime($row->completed_at) : PHP_INT_MAX;
