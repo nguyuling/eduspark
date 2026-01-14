@@ -201,7 +201,13 @@ class QuizStudentController extends Controller
                             ->where('student_id', Auth::id())
                             ->whereNull('submitted_at')
                             ->latest()
-                            ->firstOrFail();
+                            ->first();
+        
+        // If no open attempt found, either it doesn't exist or was already submitted
+        if (!$attempt) {
+            return redirect()->route('student.quizzes.index')
+                ->with('error', 'Cannot find an active attempt for this quiz. The attempt may have already been submitted.');
+        }
 
         $submittedAnswers = $request->input('answers', []);
         $totalScore = 0;
