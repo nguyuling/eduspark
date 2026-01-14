@@ -185,6 +185,27 @@ Route::get('/debug-lessons', function() {
     ]);
 });
 
+Route::get('/debug-files', function() {
+    $files = [];
+    $paths = [
+        'public/storage/lessons/',
+        'storage/app/lessons/',
+        'public/storage/lesson/',
+        'storage/app/public/lessons/',
+    ];
+    
+    foreach ($paths as $path) {
+        if (is_dir(public_path() . '/../' . $path) || is_dir(public_path() . '/' . str_replace('public/', '', $path))) {
+            $fullPath = is_dir(public_path() . '/../' . $path) ? public_path() . '/../' . $path : public_path() . '/' . str_replace('public/', '', $path);
+            $files[$path] = is_dir($fullPath) ? scandir($fullPath) : 'NOT FOUND';
+        } else {
+            $files[$path] = 'NOT FOUND';
+        }
+    }
+    
+    return response()->json(['file_check' => $files]);
+});
+
 Route::get('/refresh-lessons-db', function() {
     try {
         $teachers = \App\Models\User::where('role', 'teacher')->get();
