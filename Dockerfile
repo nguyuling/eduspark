@@ -54,6 +54,7 @@ EXPOSE 80
 
 CMD /docker-setup.sh && \
     php artisan migrate --force && \
+    php artisan db:seed --force && \
     php artisan config:clear && \
     php artisan cache:clear && \
     apache2-foreground

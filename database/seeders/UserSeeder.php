@@ -11,9 +11,11 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Clear existing users
-        DB::statement('DELETE FROM users');
-        DB::statement("DELETE FROM sqlite_sequence WHERE name='users'");
+        // Skip if users already exist (for data persistence)
+        if (User::count() > 0) {
+            echo "Users already exist, skipping UserSeeder...\n";
+            return;
+        }
 
         // Test User
         User::create([
