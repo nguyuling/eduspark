@@ -175,25 +175,38 @@ Route::middleware('auth')->group(function () {
     Route::post('/direct-messages/{user}', [DirectMessageController::class, 'store'])->name('direct-messages.store');
     Route::get('/direct-messages/{user}', [DirectMessageController::class, 'show'])->name('direct-messages.show');
 });
-// TEMPORARY: Refresh lessons database (owner only - remove after using)
+
+// TEMPORARY DEBUG ROUTES (remove after fixing)
+Route::get('/debug-lessons', function() {
+    $lessons = \App\Models\Lesson::select('id', 'title', 'file_path', 'file_name')->limit(10)->get();
+    return response()->json([
+        'count' => \App\Models\Lesson::count(),
+        'lessons' => $lessons
+    ]);
+});
+
 Route::get('/refresh-lessons-db', function() {
     try {
-        // Clear existing lessons
+        $teachers = \App\Models\User::where('role', 'teacher')->get();
+        if ($teachers->isEmpty()) {
+            return response()->json(['success' => false, 'error' => 'No teachers found'], 400);
+        }
+        
         \App\Models\Lesson::truncate();
         
-        // Run the seeder
-        $seeder = new \Database\Seeders\LessonSeeder();
-        $seeder->run();
+        \App\Models\Lesson::create(['title' => 'Asas-Asas Pengaturcaraan Java', 'file_name' => 'Java_Fundamentals_MY.pdf', 'file_path' => 'lessons/Java_Fundamentals_MY.pdf', 'file_ext' => 'pdf', 'uploaded_by' => $teachers[0]->id, 'class_group' => 'Form 4', 'visibility' => 'public', 'description' => 'Java Fundamentals']);
+        \App\Models\Lesson::create(['title' => 'Pengaturcaraan Berorientasikan Objek (OOP)', 'file_name' => 'OOP_Concepts_MY.pdf', 'file_path' => 'lessons/OOP_Concepts_MY.pdf', 'file_ext' => 'pdf', 'uploaded_by' => $teachers[1]->id ?? $teachers[0]->id, 'class_group' => 'Form 4', 'visibility' => 'public', 'description' => 'OOP']);
+        \App\Models\Lesson::create(['title' => 'Struktur Data dalam Java', 'file_name' => 'Data_Structures_MY.pdf', 'file_path' => 'lessons/Data_Structures_MY.pdf', 'file_ext' => 'pdf', 'uploaded_by' => $teachers[2]->id ?? $teachers[0]->id, 'class_group' => 'Form 5', 'visibility' => 'public', 'description' => 'Data Structures']);
+        \App\Models\Lesson::create(['title' => 'Pengendalian Pengecualian dalam Java', 'file_name' => 'Exception_Handling_MY.pdf', 'file_path' => 'lessons/Exception_Handling_MY.pdf', 'file_ext' => 'pdf', 'uploaded_by' => $teachers[3]->id ?? $teachers[0]->id, 'class_group' => 'Form 4', 'visibility' => 'public', 'description' => 'Exception Handling']);
+        \App\Models\Lesson::create(['title' => 'Rangka Kerja Koleksi Java', 'file_name' => 'Collections_Framework_MY.pdf', 'file_path' => 'lessons/Collections_Framework_MY.pdf', 'file_ext' => 'pdf', 'uploaded_by' => $teachers[4]->id ?? $teachers[0]->id, 'class_group' => 'Form 5', 'visibility' => 'public', 'description' => 'Collections']);
+        \App\Models\Lesson::create(['title' => 'Multithreading dalam Java', 'file_name' => 'Multithreading_MY.pdf', 'file_path' => 'lessons/Multithreading_MY.pdf', 'file_ext' => 'pdf', 'uploaded_by' => $teachers[0]->id, 'class_group' => 'Form 5', 'visibility' => 'public', 'description' => 'Multithreading']);
+        \App\Models\Lesson::create(['title' => 'Input/Output dan Pemfailan dalam Java', 'file_name' => 'File_IO_MY.pdf', 'file_path' => 'lessons/File_IO_MY.pdf', 'file_ext' => 'pdf', 'uploaded_by' => $teachers[1]->id ?? $teachers[0]->id, 'class_group' => 'Form 4', 'visibility' => 'public', 'description' => 'File I/O']);
+        \App\Models\Lesson::create(['title' => 'Konektivitas Pangkalan Data dengan Java', 'file_name' => 'Database_Connectivity_MY.pdf', 'file_path' => 'lessons/Database_Connectivity_MY.pdf', 'file_ext' => 'pdf', 'uploaded_by' => $teachers[2]->id ?? $teachers[0]->id, 'class_group' => 'Form 5', 'visibility' => 'public', 'description' => 'Database']);
+        \App\Models\Lesson::create(['title' => 'Corak Reka Bentuk dalam Pengaturcaraan Java', 'file_name' => 'Design_Patterns_MY.pdf', 'file_path' => 'lessons/Design_Patterns_MY.pdf', 'file_ext' => 'pdf', 'uploaded_by' => $teachers[3]->id ?? $teachers[0]->id, 'class_group' => 'Form 5', 'visibility' => 'public', 'description' => 'Design Patterns']);
+        \App\Models\Lesson::create(['title' => 'Analisis Algoritma dan Big O Notation', 'file_name' => 'Algorithm_Analysis_MY.pdf', 'file_path' => 'lessons/Algorithm_Analysis_MY.pdf', 'file_ext' => 'pdf', 'uploaded_by' => $teachers[4]->id ?? $teachers[0]->id, 'class_group' => 'Form 5', 'visibility' => 'public', 'description' => 'Algorithm Analysis']);
         
-        return response()->json([
-            'success' => true,
-            'message' => 'Lessons refreshed successfully with correct file paths',
-            'lessons_count' => \App\Models\Lesson::count()
-        ]);
+        return response()->json(['success' => true, 'message' => 'Lessons refreshed', 'count' => \App\Models\Lesson::count()]);
     } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ], 500);
+        return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
     }
-})->name('refresh-lessons');
+});
