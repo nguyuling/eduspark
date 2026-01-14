@@ -12,7 +12,7 @@ return new class extends Migration
     {
         // Update all leaderboard entries with correct student classes and time values
         DB::table('leaderboard')->update([
-            'class' => DB::raw('COALESCE((SELECT class FROM students WHERE students.user_id = leaderboard.user_id), "Unknown")'),
+            'class' => DB::raw("COALESCE((SELECT class FROM students WHERE students.user_id = leaderboard.user_id), 'Unknown')"),
             'time_taken' => DB::raw('COALESCE(time_taken, 0)')
         ]);
     }
