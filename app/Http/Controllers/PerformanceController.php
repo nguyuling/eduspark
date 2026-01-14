@@ -63,13 +63,30 @@ class PerformanceController extends Controller
             $quizIds = collect($allQuizAttempts)->pluck('quiz_id')->unique();
             $quizMaxPointsData = [];
             if ($quizIds->count() > 0) {
+                // First, try to get max points from questions table
                 $maxPointsRows = DB::table('questions')
                     ->whereIn('quiz_id', $quizIds)
                     ->groupBy('quiz_id')
                     ->select('quiz_id', DB::raw('SUM(points) as total_points'))
                     ->get();
                 foreach ($maxPointsRows as $row) {
-                    $quizMaxPointsData[$row->quiz_id] = (int)$row->total_points;
+                    if ((int)$row->total_points > 0) {
+                        $quizMaxPointsData[$row->quiz_id] = (int)$row->total_points;
+                    }
+                }
+                
+                // For quizzes still missing max points, estimate from max attempt score
+                $quizIdsNeeded = $quizIds->filter(fn($id) => !isset($quizMaxPointsData[$id]))->values();
+                if ($quizIdsNeeded->count() > 0) {
+                    $maxAttemptRows = DB::table($quizTable . ' as qa')
+                        ->whereIn('qa.quiz_id', $quizIdsNeeded)
+                        ->groupBy('qa.quiz_id')
+                        ->select('qa.quiz_id', DB::raw('MAX(qa.score) as max_score'))
+                        ->get();
+                    foreach ($maxAttemptRows as $row) {
+                        // Use the max score from attempts as the max_points
+                        $quizMaxPointsData[$row->quiz_id] = (int)$row->max_score;
+                    }
                 }
             }
 
