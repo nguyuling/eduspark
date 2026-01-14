@@ -47,6 +47,7 @@ RUN echo '<Directory /var/www/html/public>\n\
 EXPOSE 80
 
 CMD php artisan migrate --force && \
+    php artisan db:seed --force && \
     php artisan config:clear && \
     php artisan cache:clear && \
     apache2-foreground
