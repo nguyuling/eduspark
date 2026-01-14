@@ -354,7 +354,18 @@ class LessonController extends Controller
                 abort(404, 'File not found');
             }
 
-            // Try public storage folder first
+            // Try DigitalOcean Spaces first
+            if (env('DO_SPACES_BUCKET')) {
+                try {
+                    if (Storage::disk('do_spaces')->exists($lesson->file_path)) {
+                        return Storage::disk('do_spaces')->download($lesson->file_path, $lesson->file_name);
+                    }
+                } catch (\Exception $e) {
+                    // Fall through to local storage
+                }
+            }
+            
+            // Try public storage folder
             if (file_exists(public_path('storage/' . $lesson->file_path))) {
                 return response()->download(public_path('storage/' . $lesson->file_path), $lesson->file_name);
             }
@@ -380,42 +391,54 @@ class LessonController extends Controller
      * Serve file for preview in iframe
      */
     public function previewFile($id)
-{
-    try {
-        $lesson = Lesson::findOrFail($id);
+    {
+        try {
+            $lesson = Lesson::findOrFail($id);
 
-        if (!$lesson->file_path) {
-            abort(404, 'File not found');
-        }
+            if (!$lesson->file_path) {
+                abort(404, 'File not found');
+            }
 
-        // Try public storage folder first (most reliable for iframe)
-        if (file_exists(public_path('storage/' . $lesson->file_path))) {
-            return response()->file(public_path('storage/' . $lesson->file_path), [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline'
-            ]);
-        }
-        
-        // Try public disk
-        if (Storage::disk('public')->exists($lesson->file_path)) {
-            return response()->file(Storage::disk('public')->path($lesson->file_path), [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline'
-            ]);
-        }
-        
-        // Fallback to storage app
-        if (Storage::exists($lesson->file_path)) {
-            return response()->file(Storage::path($lesson->file_path), [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline'
-            ]);
-        }
+            // Try DigitalOcean Spaces first
+            if (env('DO_SPACES_BUCKET')) {
+                try {
+                    if (Storage::disk('do_spaces')->exists($lesson->file_path)) {
+                        return redirect(Storage::disk('do_spaces')->url($lesson->file_path));
+                    }
+                } catch (\Exception $e) {
+                    // Fall through to local storage
+                }
+            }
 
-        abort(404, 'File not found in storage');
-        
-    } catch (\Exception $e) {
-        abort(404, 'File not found: ' . $e->getMessage());
+            // Try public storage folder first (most reliable for iframe)
+            if (file_exists(public_path('storage/' . $lesson->file_path))) {
+                return response()->file(public_path('storage/' . $lesson->file_path), [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline'
+                ]);
+            }
+            
+            // Try public disk
+            if (Storage::disk('public')->exists($lesson->file_path)) {
+                return response()->file(Storage::disk('public')->path($lesson->file_path), [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline'
+                ]);
+            }
+            
+            // Fallback to storage app
+            if (Storage::exists($lesson->file_path)) {
+                return response()->file(Storage::path($lesson->file_path), [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline'
+                ]);
+            }
+
+            abort(404, 'File not found in storage');
+            
+        } catch (\Exception $e) {
+            abort(404, 'File not found: ' . $e->getMessage());
+        }
     }
 }
     public function preview($id)
