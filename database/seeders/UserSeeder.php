@@ -11,22 +11,17 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Skip if users already exist (for data persistence)
-        if (User::count() > 0) {
-            echo "Users already exist, skipping UserSeeder...\n";
-            return;
-        }
-
         // Test User
-        User::create([
-            'id' => 1,
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => Hash::make('password'),
-            'role' => null,           
-            'school_name' => 'SMK Pengerang Utama',
-
-        ]);
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'id' => 1,
+                'name' => 'Test User',
+                'password' => Hash::make('password'),
+                'role' => null,           
+                'school_name' => 'SMK Pengerang Utama',
+            ]
+        );
 
         // Create All Teachers
         $teachers = [
@@ -99,7 +94,10 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($teachers as $teacher) {
-            User::create($teacher);
+            User::firstOrCreate(
+                ['email' => $teacher['email']],
+                $teacher
+            );
         }
 
         echo "6 Teachers created successfully.\n";
@@ -605,7 +603,10 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($students as $student) {
-            User::create($student);
+            User::firstOrCreate(
+                ['email' => $student['email']],
+                $student
+            );
         }
 
         echo "45 Students created successfully.\n";

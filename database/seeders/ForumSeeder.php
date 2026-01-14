@@ -15,6 +15,12 @@ class ForumSeeder extends Seeder
      */
     public function run(): void
     {
+        // Skip if no users exist
+        if (User::count() === 0) {
+            echo "No users found. Skipping forum seeding.\n";
+            return;
+        }
+
         // Get existing teachers and students
         $teacher1 = User::where('email', 'ahmad@example.com')->first();
         $teacher2 = User::where('email', 'farah@example.com')->first();
@@ -26,6 +32,12 @@ class ForumSeeder extends Seeder
         $user1 = $student1 ?? User::where('role', 'student')->first();
         $user2 = $teacher1 ?? User::where('role', 'teacher')->first();
         $user3 = $student2 ?? User::where('role', 'student')->where('id', '!=', $user1->id ?? 0)->first();
+
+        // Skip if we don't have enough users
+        if (!$user1 || !$user2 || !$user3) {
+            echo "Not enough users for forum seeding. Skipping.\n";
+            return;
+        }
 
         // Forum Post 1: Java OOP Concepts
         $post1 = ForumPost::create([
