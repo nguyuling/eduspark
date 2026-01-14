@@ -30,9 +30,6 @@ Route::get('/', function() {
 })->name('home');
 
 
-// Auth routes with email verification
-Auth::routes(['verify' => true]);
-
 // Profile routes (authenticated only)
 Route::middleware(['auth'])->group(function () { //, 'verified'
     Route::get('/profile', [UserController::class, 'profile'])->name('profile.show');
