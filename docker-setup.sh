@@ -1,10 +1,12 @@
 #!/bin/bash
 
-# Copy lesson PDFs from public/storage to storage/app/lessons if they exist
-if [ -d "public/storage/lessons" ]; then
-    mkdir -p storage/app/lessons
-    cp -r public/storage/lessons/* storage/app/lessons/ 2>/dev/null || true
-    echo "PDFs copied to storage/app/lessons"
+# Copy lesson PDFs bundled in repo into storage locations used by the app
+if [ -d "storage/app/lessons" ]; then
+    mkdir -p storage/app/public/lessons
+    mkdir -p public/storage/lessons
+    cp -r storage/app/lessons/* storage/app/public/lessons/ 2>/dev/null || true
+    cp -r storage/app/lessons/* public/storage/lessons/ 2>/dev/null || true
+    echo "PDFs staged to storage/app/public/lessons and public/storage/lessons"
 fi
 
 # Ensure storage directories have correct permissions
