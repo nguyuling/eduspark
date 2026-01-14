@@ -1,10 +1,7 @@
 #!/bin/bash
 set -e
 
-# Wait a moment for filesystem to be ready
-sleep 2
-
-# Ensure storage directories exist with correct permissions
+# Ensure storage directories exist
 mkdir -p storage/framework/{sessions,views,cache}
 mkdir -p storage/logs
 mkdir -p bootstrap/cache
@@ -13,18 +10,20 @@ mkdir -p bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 
-# Create and setup database
-touch database/database.sqlite
+# Create database if not exists
+if [ ! -f database/database.sqlite ]; then
+    touch database/database.sqlite
+fi
 chown www-data:www-data database/database.sqlite
 chmod 664 database/database.sqlite
 
 # Run migrations
-php artisan migrate --force
+php artisan migrate --force || echo "Migration failed, continuing..."
 
-# Cache configuration for production
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+# Cache configuration
+php artisan config:cache || echo "Config cache failed, continuing..."
+php artisan route:cache || echo "Route cache failed, continuing..."
+php artisan view:cache || echo "View cache failed, continuing..."
 
-# Start supervisord
+# Start Apache
 exec "$@"
