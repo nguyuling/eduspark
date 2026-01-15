@@ -54,9 +54,18 @@ class ReportController extends Controller
     {
         $classes = [];
 
-        if (Schema::hasTable('classrooms')) {
+        // Try to get classes from leaderboard table first (most reliable)
+        if (Schema::hasTable('leaderboard')) {
+            $classes = DB::table('leaderboard')->select('class')->distinct()->orderBy('class')->pluck('class')->toArray();
+        }
+
+        // If no leaderboard, try classrooms table
+        if (empty($classes) && Schema::hasTable('classrooms')) {
             $classes = DB::table('classrooms')->orderBy('name')->pluck('name')->toArray();
-        } elseif (Schema::hasTable('students')) {
+        }
+
+        // If still no classes, try students table
+        if (empty($classes) && Schema::hasTable('students')) {
             $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
             foreach ($possible as $col) {
                 if (Schema::hasColumn('students', $col)) {
@@ -754,9 +763,18 @@ class ReportController extends Controller
         $selectedClass = $request->query('class', null);
         $classes = [];
 
-        if (Schema::hasTable('classrooms')) {
+        // Try to get classes from leaderboard table first
+        if (Schema::hasTable('leaderboard')) {
+            $classes = DB::table('leaderboard')->select('class')->distinct()->orderBy('class')->pluck('class')->toArray();
+        }
+
+        // If no leaderboard, try classrooms
+        if (empty($classes) && Schema::hasTable('classrooms')) {
             $classes = DB::table('classrooms')->orderBy('name')->pluck('name')->toArray();
-        } elseif (Schema::hasTable('students')) {
+        }
+
+        // If still no classes, try students table
+        if (empty($classes) && Schema::hasTable('students')) {
             $possible = ['class','class_level','level','form','grade','class_name','group','classroom'];
             foreach ($possible as $col) {
                 if (Schema::hasColumn('students', $col)) {
