@@ -47,32 +47,31 @@
 
     <!-- Organization Details -->
     <section class="panel">
-      <div class="panel-header">
+      <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;">
         <h3>Butiran Organisasi</h3>
+        <a href="{{ route('profile.edit') }}" style="display:inline-flex; align-items:center; justify-content:center; background:transparent; border:none; color:var(--accent); padding:0; font-size:24px; transition:opacity .2s ease; text-decoration:none; cursor:pointer;" onmouseover="this.style.opacity='0.7';" onmouseout="this.style.opacity='1';" title="Kemaskini">
+            <i class="bi bi-pencil-square"></i>
+        </a>
       </div>
-      @php
-        $schoolNames = ['JEA3060' => 'SMK Pengerang Utama', 'JEA3061' => 'SMK Pengerang'];
-        $schoolName = $schoolNames[$user->school_code] ?? $user->school_code;
-      @endphp
       <div class="info-grid">
         <div class="info-item">
           <div class="info-label">Nama Sekolah</div>
-          <div class="info-value">{{ $user->school_name }}</div>
+          <div class="info-value">{{ $user->school_name ?: '—' }}</div>
         </div>
 
         <div class="info-item">
           <div class="info-label">Kod Sekolah</div>
-          <div class="info-value">{{ $schoolName }}</div>
+          <div class="info-value">{{ $user->school_code ?: '—' }}</div>
         </div>
 
         <div class="info-item">
           <div class="info-label">Daerah</div>
-          <div class="info-value">{{ $user->district }}</div>
+          <div class="info-value">{{ $user->district ?: '—' }}</div>
         </div>
 
         <div class="info-item">
           <div class="info-label">ID Pengguna</div>
-          <div class="info-value"><span class="badge">{{ $user->user_id }}</span></div>
+          <div class="info-value"><span class="badge">{{ $user->user_id ?: '—' }}</span></div>
         </div>
       </div>
     </section>

@@ -113,19 +113,25 @@ public function show($id)
         return view('user.edit', compact('user'));
     }
 
-    // Update email and phone only
+    // Update email, phone, and school info
     public function updateProfile(Request $request)
     {
         $user = auth()->user();
 
         $request->validate([
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'phone' => 'required|string|max:11',
+            'phone' => 'required|string|max:20',
+            'school_name' => 'nullable|string|max:255',
+            'school_code' => 'nullable|string|max:100',
+            'district' => 'nullable|string|max:100',
         ]);
 
-        // Only update email and phone
+        // Update all allowed fields
         $user->email = $request->email;
         $user->phone = $request->phone;
+        $user->school_name = $request->school_name;
+        $user->school_code = $request->school_code;
+        $user->district = $request->district;
 
         $user->save();
 

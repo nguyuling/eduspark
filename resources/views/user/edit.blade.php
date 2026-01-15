@@ -104,6 +104,54 @@
           @enderror
         </div>
 
+        <hr style="margin:24px 0; border:none; border-top:1px solid #e5e7eb;">
+
+        <div class="panel-header">
+          <h3>Butiran Organisasi</h3>
+        </div>
+
+        <div class="form-group">
+          <label for="school_name">Nama Sekolah</label>
+          <input
+            type="text"
+            id="school_name"
+            name="school_name"
+            value="{{ old('school_name', $user->school_name) }}"
+            placeholder="Contoh: SMK Pengerang Utama"
+          >
+          @error('school_name')
+            <div class="error-msg">{{ $message }}</div>
+          @enderror
+        </div>
+
+        <div class="form-group">
+          <label for="school_code">Kod Sekolah</label>
+          <input
+            type="text"
+            id="school_code"
+            name="school_code"
+            value="{{ old('school_code', $user->school_code) }}"
+            placeholder="Contoh: JEA3060"
+          >
+          @error('school_code')
+            <div class="error-msg">{{ $message }}</div>
+          @enderror
+        </div>
+
+        <div class="form-group">
+          <label for="district">Daerah</label>
+          <input
+            type="text"
+            id="district"
+            name="district"
+            value="{{ old('district', $user->district) }}"
+            placeholder="Contoh: Johor"
+          >
+          @error('district')
+            <div class="error-msg">{{ $message }}</div>
+          @enderror
+        </div>
+
         <div class="panel-footer" style="display:flex;justify-content:center;">
           <button type="submit" class="btn btn-primary" style="padding:14px 26px">
             <i class="bi bi-check-lg"></i>
